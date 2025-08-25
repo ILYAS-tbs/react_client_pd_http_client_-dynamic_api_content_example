@@ -22,6 +22,7 @@
 ### 🔹 `contexts/AuthContext.tsx`
 
 - **login**: Integrated real login call using the `http_client`.
+- **change_role(role)** : to change the auth user role depending on "get_role" endpoint , which search the role of that user who just logged in
 
 ### 🔹 `pages/dashboard/SchoolDashboard`
 

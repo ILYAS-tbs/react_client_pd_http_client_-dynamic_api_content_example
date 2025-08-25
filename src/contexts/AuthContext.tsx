@@ -24,6 +24,9 @@ interface AuthContextType {
   register: (userData: any) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
+
+  // just to change the role again after login,
+  change_role: (role: "school" | "teacher" | "parent") => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,6 +95,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoading(false);
     return true;
   };
+  function change_role(role: "school" | "teacher" | "parent") {
+    if (!user) return;
+    const newUser: User = {
+      id: "1",
+      name:
+        role === "school"
+          ? "École Primaire El-Hikmah"
+          : role === "teacher"
+          ? "Ahmed Benaissa"
+          : "Fatima Bourahla",
+      email: user.email || "NO EMAIL!",
+      role: role as "school" | "teacher" | "parent",
+      schoolId: role !== "school" ? "school-1" : undefined,
+      schoolType: role === "school" ? "private" : undefined,
+    };
+
+    setUser(newUser);
+    localStorage.setItem("schoolManagementUser", JSON.stringify(newUser));
+  }
 
   const register = async (userData: any): Promise<boolean> => {
     setIsLoading(true);
@@ -120,7 +142,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, isLoading, change_role }}
+    >
       {children}
     </AuthContext.Provider>
   );

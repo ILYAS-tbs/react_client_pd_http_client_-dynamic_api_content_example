@@ -8,11 +8,22 @@ const BASE_URL = "http://127.0.0.1:8000";
 
 const URLS = {
   SESSION: `${BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
+  ROLE: `${BASE_URL}/user-auth/get_role`,
   SIGNUP: `${BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
   LOGIN: `${BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
   LOGOUT: `${BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
   REGISTER_SCHOOL: `${BASE_URL}/api/school/register-school`,
 };
+
+// will return : {"role": "parennt"|"school"|"teacher"} or {"error":"No role for this user account"}
+async function get_role() {
+  const response = await fetch(URLS.ROLE, {
+    method: "GET",
+    credentials: "include", // ensures cookies like sessionid are sent
+  });
+  const data = await response.json();
+  return data;
+}
 
 async function signup(payload: SignupPayload, csrfToken: string) {
   if (!csrfToken) {
@@ -113,4 +124,5 @@ export const http_client = {
   login: login,
   logout: logout,
   register_school: register_school,
+  get_role: get_role,
 };
