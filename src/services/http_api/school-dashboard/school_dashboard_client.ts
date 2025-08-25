@@ -4,6 +4,7 @@ const URLS = {
   get_current_school_students: `${BASE_URL}/student/students/get_current_school_students`,
   get_current_school_teachers: `${BASE_URL}/teacher/teachers/get_current_school_teachers`,
   get_current_school_class_groups: `${BASE_URL}/class-group/class-groups/get_current_school_class_groups`,
+  get_current_school_parents: `${BASE_URL}/parent/parents/get_current_school_parents`,
 };
 
 async function get_current_school_students() {
@@ -35,8 +36,20 @@ async function get_current_school_class_groups() {
   const data = await response.json();
   return data;
 }
+
+async function get_current_school_parents() {
+  const response = await fetch(URLS.get_current_school_parents, {
+    method: "GET",
+    credentials: "include", // ensures cookies like sessionid are sent
+  });
+
+  const data = await response.json();
+  return data;
+}
+
 export const school_dashboard_client = {
   get_current_school_students: get_current_school_students,
   get_current_school_teachers: get_current_school_teachers,
   get_current_school_class_groups: get_current_school_class_groups,
+  get_current_school_parents:get_current_school_parents
 };

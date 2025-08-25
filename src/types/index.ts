@@ -1,4 +1,8 @@
-import { ResponseStudent } from "../services/http_api/http_types";
+import {
+  ResponseParent,
+  ResponseStudent,
+  ResponseTeacher,
+} from "../services/http_api/http_types";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -44,6 +48,36 @@ export interface Student {
   average?: string;
   attendance: string;
 }
+// Frontend Teacher model : in TeacherManagement
+export interface Teacher {
+  id: number;
+  name: string;
+  subject: string;
+  classes: string[];
+  phone: string;
+  email: string;
+  status: string;
+  experience: string | number;
+}
+// Frontend Parent :
+export interface Parent {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  students: string[];
+  address: string;
+  classes: string[];
+}
+
 export interface StudentManagementProps {
   studentsList: ResponseStudent[];
+}
+
+export interface TeacherManagementProps {
+  teachersList: ResponseTeacher[];
+}
+
+export interface ParentManagementProps {
+  parentsList: ResponseParent[];
 }

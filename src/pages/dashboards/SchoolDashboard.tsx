@@ -37,29 +37,38 @@ const SchoolDashboard: React.FC = () => {
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [class_groups, set_class_groups] = useState([]);
+  const [parents, setParents] = useState([]);
+
+  const get_current_school_students = async () => {
+    const data = await school_dashboard_client.get_current_school_students();
+    console.log(data);
+    setStudents(data);
+  };
+
+  const get_current_school_teachers = async () => {
+    const data = await school_dashboard_client.get_current_school_teachers();
+    console.log(data);
+    setTeachers(data);
+  };
+
+  const get_current_school_class_groups = async () => {
+    const data =
+      await school_dashboard_client.get_current_school_class_groups();
+    console.log(data);
+    set_class_groups(data);
+  };
+  const get_current_school_parents = async () => {
+    const data = await school_dashboard_client.get_current_school_parents();
+    console.log(data);
+    setParents(data);
+  };
 
   useEffect(() => {
-    const get_current_school_students = async () => {
-      const data = await school_dashboard_client.get_current_school_students();
-      console.log(data);
-      setStudents(data);
-    };
-    const get_current_school_teachers = async () => {
-      const data = await school_dashboard_client.get_current_school_teachers();
-      console.log(data);
-      setTeachers(data);
-    };
-    const get_current_school_class_groups = async () => {
-      const data =
-        await school_dashboard_client.get_current_school_class_groups();
-      console.log(data);
-      set_class_groups(data);
-    };
-
     //! fetching :
     get_current_school_students();
     get_current_school_teachers();
     get_current_school_class_groups();
+    get_current_school_parents();
   }, []);
   const stats = [
     {
@@ -218,8 +227,8 @@ const SchoolDashboard: React.FC = () => {
         return (
           <div className="space-y-6">
             <StudentManagement studentsList={students} />
-            <TeacherManagement />
-            <ParentManagement />
+            <TeacherManagement teachersList={teachers} />
+            <ParentManagement parentsList={parents}/>
           </div>
         );
       case "levels":
