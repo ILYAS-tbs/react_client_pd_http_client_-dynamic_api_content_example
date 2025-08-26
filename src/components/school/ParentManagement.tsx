@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Plus, Search, Edit, Trash2, Eye, Filter } from "lucide-react";
-import { ResponseParent } from "../../services/http_api/http_types";
+import { ResponseParent } from "../../services/http_api/http_reponse_types";
 import { Parent, ParentManagementProps } from "../../types";
 
 const ParentManagement: React.FC<ParentManagementProps> = ({ parentsList }) => {

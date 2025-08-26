@@ -9,6 +9,9 @@ export default defineConfig({
   },
   server: {
     host: "127.0.0.1", // Specify the host IP address
-    port: 5173, // Optional: Specify a custom port if needed
+    port: 5173, // Optional: Specify a custom port if needed,
+    watch: {
+      ignored: ["**/node_modules/**", "**/dist/**"],
+    },
   },
 });

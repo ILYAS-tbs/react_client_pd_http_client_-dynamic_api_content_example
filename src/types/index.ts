@@ -2,7 +2,7 @@ import {
   ResponseParent,
   ResponseStudent,
   ResponseTeacher,
-} from "../services/http_api/http_types";
+} from "../services/http_api/http_reponse_types";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -58,6 +58,7 @@ export interface Teacher {
   email: string;
   status: string;
   experience: string | number;
+  profile_picture?: string | null;
 }
 // Frontend Parent :
 export interface Parent {

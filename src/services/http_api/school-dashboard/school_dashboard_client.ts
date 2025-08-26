@@ -1,3 +1,5 @@
+import { TeacherPayload } from "../http_payload_types";
+
 const BASE_URL = "http://127.0.0.1:8000";
 
 const URLS = {
@@ -5,6 +7,7 @@ const URLS = {
   get_current_school_teachers: `${BASE_URL}/teacher/teachers/get_current_school_teachers`,
   get_current_school_class_groups: `${BASE_URL}/class-group/class-groups/get_current_school_class_groups`,
   get_current_school_parents: `${BASE_URL}/parent/parents/get_current_school_parents`,
+  patch_teacher: `${BASE_URL}/teacher/teachers/`,
 };
 
 async function get_current_school_students() {
@@ -47,9 +50,33 @@ async function get_current_school_parents() {
   return data;
 }
 
+// POST / PATCH  requests :
+async function update_teacher(
+  id: string,
+  formData: FormData,
+  csrf_token: string
+) {
+  if (!csrf_token) {
+    throw new Error("update teacher : No CSRF TOKEN found..");
+  }
+
+  const PATCH_URL = URLS.patch_teacher + id + "/";
+  //  do not set Content-Type manually, browser will set boundary for multipart (mutipart : data + files)
+  const response = await fetch(PATCH_URL, {
+    method: "PATCH",
+    headers: {
+      "X-CSRFTOKEN": csrf_token,
+    },
+    credentials: "include",
+    body: formData,
+  });
+  const data = await response.json();
+  return data;
+}
 export const school_dashboard_client = {
   get_current_school_students: get_current_school_students,
   get_current_school_teachers: get_current_school_teachers,
   get_current_school_class_groups: get_current_school_class_groups,
-  get_current_school_parents:get_current_school_parents
+  get_current_school_parents: get_current_school_parents,
+  update_teacher: update_teacher,
 };

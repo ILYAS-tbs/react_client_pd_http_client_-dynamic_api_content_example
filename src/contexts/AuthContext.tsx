@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { http_client } from "../services/http_api/auth/http_client";
-import { LoginPayload } from "../services/http_api/http_types";
+import { LoginPayload } from "../services/http_api/http_reponse_types";
 import { getCSRFToken } from "../lib/get_CSRFToken";
 
 interface User {

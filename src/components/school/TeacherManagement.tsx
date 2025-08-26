@@ -9,13 +9,32 @@ import {
   UserX,
 } from "lucide-react";
 import { Teacher, TeacherManagementProps } from "../../types";
-import { ModulesAndClassGroups } from "../../services/http_api/http_types";
+import { ModulesAndClassGroups } from "../../services/http_api/http_reponse_types";
+
+// Backend server :
+import { SERVER_BASE_URL } from "../../services/http_api/auth/http_client";
+import { getCSRFToken } from "../../lib/get_CSRFToken";
+import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const [file, setFile] = useState<File | null>();
+
+  const handleChangeDataSumbit = async (e, id: string) => {
+    const formData = new FormData();
+    formData.append("profile_picture", file);
+    // CSRF
+    const csrf_token = getCSRFToken()!;
+    const data = school_dashboard_client.update_teacher(
+      id,
+      formData,
+      csrf_token
+    );
+  };
 
   // fake teachers data
   const teachers = [
@@ -82,6 +101,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       email: teacher_response.user.email,
       experience: teacher_response.years_of_experience,
       status: teacher_response.status === "pending" ? "معلق" : "نشط",
+      profile_picture: teacher_response.profile_picture,
     };
     return teacher;
   });
@@ -140,9 +160,19 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                  <UserCheck className="h-6 w-6 text-blue-600" />
-                </div>
+                {/* Teacher Proifile pic if it exist */}
+                {teacher.profile_picture ? (
+                  <img
+                    src={`${SERVER_BASE_URL}${teacher.profile_picture}`}
+                    alt=""
+                    className="rounded-full bg-cover w-[64px] h-[64px]"
+                  />
+                ) : (
+                  <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
+                    <UserCheck className="h-6 w-6 text-blue-600" />
+                  </div>
+                )}
+
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {teacher.name}
@@ -162,6 +192,25 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 {teacher.status}
               </span>
             </div>
+            {/* SIMPLE FORM EXAMPLE TO PATCH REQEST */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleChangeDataSumbit(e, teacher.id.toString());
+              }}
+            >
+              <input
+                type="file"
+                className="mb-4"
+                name="change picture"
+                onChange={(e) => setFile(e.target.files?.[0])}
+              />
+              <input
+                type="submit"
+                value="change data"
+                className="bg-blue-800 p-2 my-4 text-white rounded cursor-pointer "
+              />
+            </form>
 
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">

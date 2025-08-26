@@ -52,5 +52,24 @@ const students_real: Student[] = studentsList.map((response_student) => {
 });
 ```
 
+### 🔹 `components/TeacherManagement`
+
+- added example of how to use PATCH request
+- how to use files and form data for files
+- POST , PATCH , DELETE : will have the same logic , a body , csrf_token
+
+- Switched to **real student data** instead of mock data.
+- Example of mapping in "components/StudentManagement" :
+
 - student_api_shape → student_frontend_shape
 - This mapping ensures flexibility if frontend `Student` shape differs from backend for some reason .
+
+### 🔹 `1. src/services/http_api/http_payload_types.ts`:
+
+- to model how we should say payloads in what format
+
+### 🔹 `2. src/services/http_api/http_reponse_types.ts`:
+
+- to model what the api is returning
+
+- why both 1 & 2 : for images we get a "string" for path as response , but in request we send a "FILE"

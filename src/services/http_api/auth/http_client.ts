@@ -2,17 +2,16 @@ import {
   SignupPayload,
   RegisterSchoolPayload,
   LoginPayload,
-} from "../http_types";
-
-const BASE_URL = "http://127.0.0.1:8000";
+} from "../http_payload_types";
+export const SERVER_BASE_URL = "http://127.0.0.1:8000";
 
 const URLS = {
-  SESSION: `${BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
-  ROLE: `${BASE_URL}/user-auth/get_role`,
-  SIGNUP: `${BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
-  LOGIN: `${BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
-  LOGOUT: `${BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
-  REGISTER_SCHOOL: `${BASE_URL}/api/school/register-school`,
+  SESSION: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
+  ROLE: `${SERVER_BASE_URL}/user-auth/get_role`,
+  SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
+  LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
+  LOGOUT: `${SERVER_BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
+  REGISTER_SCHOOL: `${SERVER_BASE_URL}/api/school/register-school`,
 };
 
 // will return : {"role": "parennt"|"school"|"teacher"} or {"error":"No role for this user account"}
