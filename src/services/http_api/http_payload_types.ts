@@ -17,6 +17,22 @@ export type RegisterSchoolPayload = {
   description: string;
 };
 
+export type RegisterParentPayload = {
+  full_name: string;
+  phone_number: string;
+  address: string;
+  relationship_to_student: string;
+  //* : below will be discussed if creating student same time as parent or later
+  //number_of_students: 1;
+  // students: [
+  //   {
+  //     full_name: "student_01_parent_01_test";
+  //     date_of_birth: "2007-06-12";
+  //     school_name: "school_1";
+  //     class_group_name: "a1";
+  //   }
+  // ];
+};
 export type LoginPayload = {
   //   email: string;
   //   phone: string;

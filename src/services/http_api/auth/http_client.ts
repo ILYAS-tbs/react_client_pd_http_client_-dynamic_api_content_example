@@ -2,6 +2,7 @@ import {
   SignupPayload,
   RegisterSchoolPayload,
   LoginPayload,
+  RegisterParentPayload,
 } from "../http_payload_types";
 export const SERVER_BASE_URL = "http://127.0.0.1:8000";
 
@@ -11,7 +12,8 @@ const URLS = {
   SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
   LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
   LOGOUT: `${SERVER_BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
-  REGISTER_SCHOOL: `${SERVER_BASE_URL}/api/school/register-school`,
+  REGISTER_SCHOOL: `${SERVER_BASE_URL}/school/register-school/`,
+  REGISTER_PARENT: `${SERVER_BASE_URL}/parent/register-parent/`,
 };
 
 // will return : {"role": "parennt"|"school"|"teacher"} or {"error":"No role for this user account"}
@@ -118,10 +120,36 @@ async function register_school(
   }
 }
 
+//! register Parent :
+async function register_parent(
+  payload: RegisterParentPayload,
+  csrfToken: string
+) {
+  if (!csrfToken) {
+    throw new Error("CSRF Token is empty or null");
+  }
+  try {
+    const response = await fetch(URLS.REGISTER_PARENT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 export const http_client = {
   signup: signup,
   login: login,
   logout: logout,
   register_school: register_school,
+  register_parent: register_parent,
   get_role: get_role,
 };

@@ -1,4 +1,3 @@
-
 // Students
 export interface ResponseStudent {
   student_id: string;
@@ -54,7 +53,7 @@ export interface ResponseTeacher {
   full_name: string;
   phone_number: string;
   address: string;
-  profile_picture: null;
+  profile_picture?: string;
   hire_date: null;
   specialization: null;
   qualifications: null;
@@ -84,5 +83,3 @@ export interface ResponseParent {
     }
   ];
 }
-
-

@@ -6,8 +6,13 @@ import React, {
   ReactNode,
 } from "react";
 import { http_client } from "../services/http_api/auth/http_client";
-import { LoginPayload } from "../services/http_api/http_reponse_types";
 import { getCSRFToken } from "../lib/get_CSRFToken";
+import {
+  LoginPayload,
+  RegisterParentPayload,
+  RegisterSchoolPayload,
+  SignupPayload,
+} from "../services/http_api/http_payload_types";
 
 interface User {
   id: string;
@@ -21,7 +26,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, role: string) => Promise<boolean>;
-  register: (userData: any) => Promise<boolean>;
+  register: (userData: any, isCreatingSchool: boolean) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 
@@ -115,7 +120,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem("schoolManagementUser", JSON.stringify(newUser));
   }
 
-  const register = async (userData: any): Promise<boolean> => {
+  const register = async (
+    userData: any,
+    isCreatingSchool: boolean
+  ): Promise<boolean> => {
     setIsLoading(true);
 
     // Mock registration
@@ -130,6 +138,53 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       schoolType: userData.schoolType,
     };
 
+    // Real registry :
+    const user_payload: SignupPayload = {
+      email: userData.email,
+      phone: userData.phone,
+      username: userData.email,
+      password: userData.password,
+    };
+
+    // call01 : userCreation ()
+    // CSRF token
+    let latest_csrf = getCSRFToken()!;
+    const result = await http_client.signup(user_payload, latest_csrf);
+    // call02 School or parent linking with him
+    // CSRF token
+    latest_csrf = getCSRFToken()!;
+
+    if (isCreatingSchool) {
+      const school_payload: RegisterSchoolPayload = {
+        school_name: userData.name,
+        email: userData.email,
+        phone_number: userData.phone,
+        website: "",
+        address: "",
+        wilaya: "",
+        commun: "",
+        school_type: "",
+        established_year: 0,
+        description: "",
+      };
+
+      const school_result = await http_client.register_school(
+        school_payload,
+        latest_csrf
+      );
+    } else {
+      const parent_payload: RegisterParentPayload = {
+        full_name: userData.email,
+        phone_number: userData.phone,
+        address: "",
+        relationship_to_student: "",
+      };
+
+      const parent_result = await http_client.register_parent(
+        parent_payload,
+        latest_csrf
+      );
+    }
     setUser(newUser);
     localStorage.setItem("schoolManagementUser", JSON.stringify(newUser));
     setIsLoading(false);
