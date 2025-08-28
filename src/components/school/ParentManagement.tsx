@@ -63,7 +63,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({ parentsList }) => {
       name: parent_response.full_name,
       phone: parent_response.phone_number,
       email: parent_response.user.email,
-      students: parent_response.students.map((student) => student.full_name),
+      students: parent_response.students?.map((student) => student.full_name),
       address: "",
       classes: [],
     };
@@ -75,7 +75,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({ parentsList }) => {
     const matchesSearch =
       parent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       parent.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      parent.students.some((student) =>
+      parent.students?.some((student) =>
         student.toLowerCase().includes(searchTerm.toLowerCase())
       );
     const matchesClass =
@@ -178,7 +178,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({ parentsList }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {parent.students.join(", ")}
+                      {parent.students?.join(", ")}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

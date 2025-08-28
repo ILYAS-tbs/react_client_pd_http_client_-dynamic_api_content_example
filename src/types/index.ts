@@ -66,7 +66,7 @@ export interface Parent {
   name: string;
   phone: string;
   email: string;
-  students: string[];
+  students?: string[];
   address: string;
   classes: string[];
 }
