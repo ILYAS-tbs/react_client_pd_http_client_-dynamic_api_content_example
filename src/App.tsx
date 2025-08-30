@@ -13,6 +13,7 @@ import ParentDashboard from "./pages/dashboards/ParentDashboard";
 import ConfirmationCode from "./pages/ConfirmationPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
+import WebSocketConnector from "./components/testing_connections/websockets_connector";
 
 function App() {
   // ask for an initial CSRFToken from the server :
@@ -35,6 +36,8 @@ function App() {
           <NotificationProvider>
             <Router>
               <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+                {/* to test ws only */}
+                <WebSocketConnector />
                 <Routes>
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
