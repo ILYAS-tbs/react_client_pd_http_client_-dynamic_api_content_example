@@ -1,3 +1,5 @@
+import { ClassGroup } from "../models/ClassGroups";
+import { Student } from "../models/Student";
 import {
   ResponseParent,
   ResponseStudent,
@@ -38,16 +40,16 @@ export interface PricingPlan {
 }
 
 // Frontend Student shape in : StudentManagement
-export interface Student {
-  id: string;
-  name: string;
-  class?: string;
-  age: number;
-  parent?: string;
-  phone?: string;
-  average?: string;
-  attendance: string;
-}
+// export interface Student {
+//   id: string;
+//   name: string;
+//   class?: string;
+//   age: number;
+//   parent?: string;
+//   phone?: string;
+//   average?: string;
+//   attendance: string;
+// }
 // Frontend Teacher model : in TeacherManagement
 export interface Teacher {
   id: number;
@@ -72,13 +74,19 @@ export interface Parent {
 }
 
 export interface StudentManagementProps {
-  studentsList: ResponseStudent[];
+  studentsList: Student[];
+  setStudentsList: any;
 }
 
 export interface TeacherManagementProps {
   teachersList: ResponseTeacher[];
+  setTeacherList: any;
 }
 
 export interface ParentManagementProps {
   parentsList: ResponseParent[];
+}
+
+export interface ClassesManagementProps {
+  class_groups_list: ClassGroup[];
 }

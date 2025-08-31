@@ -25,54 +25,67 @@ export interface StudentJson {
   status: string;
   module_grade: {};
   notes: {};
-  trimester_grade: string;
+  trimester_grade?: string;
   parent?: ParentJson;
   class_group?: ClassGroupJson;
 }
 // Frontend Student shape in : StudentManagement
 interface StudentParams {
-  id: string;
-  name: string;
+  student_id: string;
+  full_name: string;
   age: number;
+  date_of_birth: string;
   attendance?: string;
   class_group?: ClassGroupJson;
   parent?: ParentJson;
   phone?: string;
+  trimester_grade?: number;
 }
 export class Student {
-  id: string;
-  name: string;
+  student_id: string;
+  full_name: string;
   age: number;
+  date_of_birth: string;
   attendance?: string;
   class_group?: ClassGroupJson;
   parent?: ParentJson;
   phone?: string;
+  trimester_grade?: number;
   constructor({
-    id,
-    name,
+    student_id,
+    full_name,
     age,
+    date_of_birth,
     attendance,
     class_group,
     parent,
     phone,
+    trimester_grade,
   }: StudentParams) {
-    this.id = id;
-    this.name = name;
+    this.student_id = student_id;
+    this.full_name = full_name;
     this.age = age;
+    this.date_of_birth = date_of_birth;
     this.attendance = attendance;
     this.class_group = class_group;
     this.parent = parent;
     this.phone = phone;
+    this.trimester_grade = trimester_grade;
   }
 
   static fromJson(json: StudentJson) {
     return new Student({
-      id: json.student_id,
-      name: json.full_name,
+      student_id: json.student_id,
+      full_name: json.full_name,
+      date_of_birth: json.date_of_birth,
       age: getAge(json.date_of_birth),
       attendance: undefined,
       class_group: json.class_group,
       parent: json.parent,
+      trimester_grade:
+        json.trimester_grade !== undefined && json.trimester_grade !== null
+          ? Number(json.trimester_grade)
+          : 0, // fallback
     });
   }
 }

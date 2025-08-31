@@ -12,21 +12,97 @@ import { Teacher, TeacherManagementProps } from "../../types";
 import { ModulesAndClassGroups } from "../../services/http_api/http_reponse_types";
 
 // Backend server :
-import { SERVER_BASE_URL } from "../../services/http_api/auth/http_client";
+import {
+  http_client,
+  SERVER_BASE_URL,
+} from "../../services/http_api/auth/http_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
+import {
+  RegisterTeacherPayload,
+  SignupPayload,
+} from "../../services/http_api/http_payload_types";
 
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
+  setTeacherList,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [modalError, SetModalError] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    subject: "",
+    email: "",
+    phone: "",
+    password1: "",
+    password2: "",
+    years_of_experience: 0,
+  });
 
-  const [file, setFile] = useState<File | null>();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(formData); // send to backend API here
+    setShowAddModal(false);
 
-  const handleChangeDataSumbit = async (e, id: string) => {
+    // basic validation :
+    if (formData.password1 !== formData.password2) {
+      SetModalError("كلمتا المرور غير متطابقتين. يجب أن تكونا متطابقتين.");
+      setTimeout(() => {
+        SetModalError("");
+      }, 5000);
+      return;
+    }
+
+    //! 1. signup an account
+    const teacher_signup_payload: SignupPayload = {
+      email: formData.email,
+      phone: formData.phone,
+      username: formData.email,
+      password: formData.password1,
+    };
+    let latest_csrf = getCSRFToken()!;
+    const teacher_signup_res = await http_client.teacher_signup(
+      teacher_signup_payload,
+      latest_csrf
+    );
+    console.log("teacher signup :");
+    console.log(teacher_signup_res);
+    //! 2. register a teacher account with that account
+    const register_teacher_payload: RegisterTeacherPayload = {
+      full_name: formData.name,
+      username: formData.email,
+    };
+    latest_csrf = getCSRFToken()!;
+    const register_teacher_res = await http_client.register_Teacher(
+      register_teacher_payload,
+      latest_csrf
+    );
+    console.log("teacher register :");
+    console.log(register_teacher_res);
+
+    //! 3. Sync/update data :
+    const res = await school_dashboard_client.get_current_school_teachers();
+    if (res.ok) {
+      setTeacherList(res.data);
+    }
+  };
+
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleChangeDataSumbit = async (e: any, id: string) => {
     const formData = new FormData();
-    formData.append("profile_picture", file);
+    if (file) {
+      formData.append("profile_picture", file);
+    }
     // CSRF
     const csrf_token = getCSRFToken()!;
     const data = school_dashboard_client.update_teacher(
@@ -203,7 +279,9 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 type="file"
                 className="mb-4"
                 name="change picture"
-                onChange={(e) => setFile(e.target.files?.[0])}
+                onChange={(e) =>
+                  setFile(e.target.files ? e.target.files[0] : null)
+                }
               />
               <input
                 type="submit"
@@ -281,13 +359,16 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               إضافة معلم جديد
             </h3>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   اسم المعلم
                 </label>
                 <input
+                  name="name"
                   type="text"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="الاسم الكامل"
                 />
@@ -297,7 +378,12 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   المادة
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
                   <option>اختر المادة</option>
                   {subjects.map((subject) => (
                     <option key={subject} value={subject}>
@@ -312,7 +398,10 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   البريد الإلكتروني
                 </label>
                 <input
+                  name="email"
                   type="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="teacher@school.dz"
                 />
@@ -323,9 +412,40 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   رقم الهاتف
                 </label>
                 <input
+                  name="phone"
                   type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="0555 XX XX XX"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  كلمة السر
+                </label>
+                <input
+                  name="password1"
+                  type="password"
+                  value={formData.password1}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="كلمة السر"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  تأكيد كلمة المرور
+                </label>
+                <input
+                  name="password2"
+                  type="password"
+                  value={formData.password2}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="تأكيد كلمة المرور"
                 />
               </div>
 
@@ -334,24 +454,35 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   سنوات الخبرة
                 </label>
                 <input
+                  name="years_of_experience"
                   type="number"
+                  value={formData.years_of_experience}
+                  onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="عدد السنوات"
                 />
               </div>
-            </form>
 
-            <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                إلغاء
-              </button>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                إضافة
-              </button>
-            </div>
+              {/* Modal Error */}
+              {modalError && (
+                <h1 className=" text-red-600 text-sm">{modalError}</h1>
+              )}
+
+              <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  إضافة
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

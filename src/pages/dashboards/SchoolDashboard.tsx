@@ -20,6 +20,8 @@ import AbsenceReviews from "../../components/school/AbsenceReviews";
 import GradeOverview from "../../components/school/GradeOverview";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
+import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
+import { Student, StudentJson } from "../../models/Student";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -34,33 +36,42 @@ const SchoolDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
 
   // to inspect some data we got from the server :
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [teachers, setTeachers] = useState([]);
-  const [class_groups, set_class_groups] = useState([]);
+  const [class_groups, set_class_groups] = useState<ClassGroup[] | []>([]);
   const [parents, setParents] = useState([]);
 
   const get_current_school_students = async () => {
-    const data = await school_dashboard_client.get_current_school_students();
-    console.log(data);
-    setStudents(data);
+    const res = await school_dashboard_client.get_current_school_students();
+    if (res.ok) {
+      const students_list: Student[] = res.data.map(
+        (studentJson: StudentJson) => Student.fromJson(studentJson)
+      );
+      setStudents(students_list);
+    }
   };
 
   const get_current_school_teachers = async () => {
-    const data = await school_dashboard_client.get_current_school_teachers();
-    console.log(data);
-    setTeachers(data);
+    const res = await school_dashboard_client.get_current_school_teachers();
+    if (res.ok) {
+      setTeachers(res.data);
+    }
   };
 
   const get_current_school_class_groups = async () => {
-    const data =
-      await school_dashboard_client.get_current_school_class_groups();
-    console.log(data);
-    set_class_groups(data);
+    const res = await school_dashboard_client.get_current_school_class_groups();
+    if (res.ok) {
+      const class_groups = res.data.map((classGroupJson: ClassGroupJson) =>
+        ClassGroup.formJson(classGroupJson)
+      );
+      set_class_groups(class_groups);
+    }
   };
   const get_current_school_parents = async () => {
-    const data = await school_dashboard_client.get_current_school_parents();
-    console.log(data);
-    setParents(data);
+    const res = await school_dashboard_client.get_current_school_parents();
+    if (res.ok) {
+      setParents(res.data);
+    }
   };
 
   useEffect(() => {
@@ -226,13 +237,19 @@ const SchoolDashboard: React.FC = () => {
       case "users":
         return (
           <div className="space-y-6">
-            <StudentManagement studentsList={students} />
-            <TeacherManagement teachersList={teachers} />
-            <ParentManagement parentsList={parents}/>
+            <StudentManagement
+              studentsList={students}
+              setStudentsList={setStudents}
+            />
+            <TeacherManagement
+              teachersList={teachers}
+              setTeacherList={setTeachers}
+            />
+            <ParentManagement parentsList={parents} />
           </div>
         );
       case "levels":
-        return <ClassesManagement />;
+        return <ClassesManagement class_groups_list={class_groups} />;
       case "schedules":
         return <ScheduleManagement />;
       case "exams":

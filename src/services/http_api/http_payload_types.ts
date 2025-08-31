@@ -33,6 +33,10 @@ export type RegisterParentPayload = {
   //   }
   // ];
 };
+export type RegisterTeacherPayload = {
+  full_name: string;
+  username: string;
+};
 export type LoginPayload = {
   //   email: string;
   //   phone: string;
@@ -51,4 +55,17 @@ export interface TeacherPayload {
   qualifications: string;
   years_of_experience: number;
   status: "active" | "pending";
+}
+
+// ClassGroup :
+export interface PostPutClassGroupPayload {
+  name: string;
+  teacher_list?: File | null;
+}
+
+// post student
+export interface PostStudentPayload {
+  full_name: string;
+  date_of_birth: string;
+  trimester_grade?: number;
 }

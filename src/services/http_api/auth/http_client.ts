@@ -3,6 +3,7 @@ import {
   RegisterSchoolPayload,
   LoginPayload,
   RegisterParentPayload,
+  RegisterTeacherPayload,
 } from "../http_payload_types";
 export const SERVER_BASE_URL = "http://127.0.0.1:8000";
 
@@ -10,10 +11,12 @@ const URLS = {
   SESSION: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
   ROLE: `${SERVER_BASE_URL}/user-auth/get_role`,
   SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
+  TEACHER_SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/app/v1/auth/signup`,
   LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
   LOGOUT: `${SERVER_BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
   REGISTER_SCHOOL: `${SERVER_BASE_URL}/school/register-school/`,
   REGISTER_PARENT: `${SERVER_BASE_URL}/parent/register-parent/`,
+  REGISTER_TEACHER: `${SERVER_BASE_URL}/teacher/register-teacher/`,
 };
 
 // will return : {"role": "parennt"|"school"|"teacher"} or {"error":"No role for this user account"}
@@ -47,7 +50,27 @@ async function signup(payload: SignupPayload, csrfToken: string) {
     return { ok: false, error: error };
   }
 }
+async function teacher_signup(payload: SignupPayload, csrfToken: string) {
+  if (!csrfToken) {
+    throw new Error("CSRF Token is empty or null");
+  }
+  try {
+    const response = await fetch(URLS.TEACHER_SIGNUP, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 async function login(payload: LoginPayload, csrfToken: string) {
   if (!csrfToken) {
     throw new Error("CSRF Token is empty or null");
@@ -145,11 +168,39 @@ async function register_parent(
     return { ok: false, error: error };
   }
 }
+
+//! register Teacehr :
+async function register_Teacher(
+  payload: RegisterTeacherPayload,
+  csrfToken: string
+) {
+  if (!csrfToken) {
+    throw new Error("CSRF Token is empty or null");
+  }
+  try {
+    const response = await fetch(URLS.REGISTER_TEACHER, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 export const http_client = {
   signup: signup,
+  teacher_signup: teacher_signup,
   login: login,
   logout: logout,
   register_school: register_school,
   register_parent: register_parent,
+  register_Teacher: register_Teacher,
   get_role: get_role,
 };
