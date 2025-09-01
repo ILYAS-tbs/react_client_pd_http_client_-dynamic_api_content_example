@@ -1,4 +1,7 @@
 import {
+  AddCurrectSchoolStudentsToParent,
+  AddorRemoveParentToSchoolPayload,
+  FindParentByIdPayload,
   PostPutClassGroupPayload as PostClassGroupPayload,
   PostStudentPayload,
   TeacherPayload,
@@ -11,6 +14,8 @@ const URLS = {
   get_current_school_teachers: `${BASE_URL}/school/schools/get_current_school_teachers`,
   get_current_school_class_groups: `${BASE_URL}/school/schools/get_current_school_class_groups`,
   get_current_school_parents: `${BASE_URL}/school/schools/get_current_school_parents`,
+  get_current_school_events: `${BASE_URL}/school/schools/get_current_school_events/`,
+
   patch_teacher: `${BASE_URL}/teacher/teachers/`,
 
   get_class_group: `${BASE_URL}/class-group/class-groups/`,
@@ -21,6 +26,14 @@ const URLS = {
   post_student: `${BASE_URL}/student/students/`,
   put_student: `${BASE_URL}/student/students/`,
   delete_student: `${BASE_URL}/student/students/`,
+
+  find_parent_by_email: `${BASE_URL}/school/schools/find_parent_by_email/`,
+  add_parent_to_school: `${BASE_URL}/school/schools/add_parent_to_school/`,
+  add_current_school_students_to_parent: `${BASE_URL}/school/schools/add_current_school_students_to_parent/`,
+  remove_parent_from_school: `${BASE_URL}/school/schools/remove_parent_from_school/`,
+
+  get_current_school_absence_reports: `${BASE_URL}/school/absence-reports/get_current_school_absence_reports/`,
+  get_current_school_behaviour_reports: `${BASE_URL}/school/behaviour-reports/get_current_school_behaviour_reports/`,
 };
 
 async function get_current_school_students() {
@@ -237,11 +250,144 @@ async function delete_student(id: string, csrfToken: string) {
     return { ok: false, error: error };
   }
 }
+
+//! Parent :
+async function find_parent_by_email(
+  payload: FindParentByIdPayload,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.find_parent_by_email, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function add_parent_to_school(
+  payload: AddorRemoveParentToSchoolPayload,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.add_parent_to_school, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function remove_parent_from_school(
+  payload: AddorRemoveParentToSchoolPayload,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.remove_parent_from_school, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function add_current_school_students_to_parent(
+  payload: AddCurrectSchoolStudentsToParent,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.add_current_school_students_to_parent, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//* EVENTS :
+async function get_current_school_events() {
+  try {
+    const response = await fetch(URLS.get_current_school_events, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+//! Absence Reports :
+export async function get_current_school_absence_reports() {
+  try {
+    const response = await fetch(URLS.get_current_school_absence_reports, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! BehaviourReports :
+export async function get_current_school_behaviour_reports() {
+  try {
+    const response = await fetch(URLS.get_current_school_behaviour_reports, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 export const school_dashboard_client = {
   get_current_school_students: get_current_school_students,
   get_current_school_teachers: get_current_school_teachers,
   get_current_school_class_groups: get_current_school_class_groups,
   get_current_school_parents: get_current_school_parents,
+  get_current_school_events: get_current_school_events,
 
   update_teacher: update_teacher,
 
@@ -253,4 +399,13 @@ export const school_dashboard_client = {
   post_student: post_student,
   put_student: put_student,
   delete_student: delete_student,
+
+  find_parent_by_email: find_parent_by_email,
+  add_parent_to_school: add_parent_to_school,
+  add_current_school_students_to_parent: add_current_school_students_to_parent,
+  remove_parent_from_school: remove_parent_from_school,
+
+  get_current_school_absence_reports: get_current_school_absence_reports,
+
+  get_current_school_behaviour_reports: get_current_school_behaviour_reports,
 };

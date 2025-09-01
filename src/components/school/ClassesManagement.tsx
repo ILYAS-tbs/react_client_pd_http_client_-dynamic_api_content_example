@@ -25,6 +25,7 @@ interface Class {
 
 const ClassesManagement: React.FC<ClassesManagementProps> = ({
   class_groups_list,
+  setClassGroupList,
 }) => {
   //! Map ClassGroup in models to Class here
   function mapClassGrpToClass(classes: ClassGroup[]): Class[] {
@@ -55,7 +56,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
         : null,
     })
   );
-  const [classes, setClasses] = useState<Class[]>(initial_classes);
+  // delete :  const [classes, setClasses] = useState<Class[]>(initial_classes);
   // mock data : [{ id: "1a", name: "الصف الأول - أ", students: 25, teachersPdf: null },]
   const [newClass, setNewClass] = useState({
     class_group_id: "",
@@ -77,8 +78,17 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       [e.target.name]: e.target.value,
     });
   };
+
+  //! keep classes in sync with parent prop
+  // / delete :
+  // useEffect(() => {
+  //   if (class_groups_list) {
+  //     setClasses(mapClassGrpToClass(class_groups_list));
+  //   }
+  // }, [class_groups_list]);
+
   const handleCreateSubmit = async (e: React.FormEvent) => {
-    // e.preventDefault(); FOR NOW I NEED THE DEFAULT BEHAVIOUR TO REFRESH
+    e.preventDefault();
     // the previous UI logic
     editingClass ? handleUpdateClass() : handleAddClass();
 
@@ -105,8 +115,21 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
         teachersPdf: null,
       };
 
-      // Update frontend
-      setClasses([...classes, mappedClass]);
+      // Update frontend - A call to fetch the fresh data from the API
+      // delete :: setClasses([...classes, mappedClass
+
+      const new_res =
+        await school_dashboard_client.get_current_school_class_groups();
+      if (new_res.ok) {
+        const new_class_groups_list: ClassGroupJson[] = new_res.data.map(
+          (classGroupJson: ClassGroupJson) =>
+            ClassGroup.formJson(classGroupJson)
+        );
+        console.log("new list");
+        console.log(new_class_groups_list);
+        // update parent state
+        setClassGroupList(new_class_groups_list);
+      }
 
       // Reset modal/input
       setNewClass({
@@ -129,13 +152,14 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
 
   const handleAddClass = () => {
     if (newClass.name && newClass.students >= 0) {
-      setClasses([...classes, newClass]);
-      setNewClass({
-        class_group_id: "",
-        name: "",
-        students: 0,
-        teachersPdf: null,
-      });
+      // delete :
+      // setClasses([...classes, newClass]);
+      // setNewClass({
+      //   class_group_id: "",
+      //   name: "",
+      //   students: 0,
+      //   teachersPdf: null,
+      // });
       setShowAddModal(false);
     }
   };
@@ -153,13 +177,14 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
 
   const handleUpdateClass = () => {
     if (editingClass && newClass.name && newClass.students >= 0) {
-      setClasses(
-        classes.map((cls) =>
-          cls.class_group_id === editingClass.class_group_id
-            ? { ...cls, ...newClass }
-            : cls
-        )
-      );
+      // delete :
+      // setClasses(
+      //   classes.map((cls) =>
+      //     cls.class_group_id === editingClass.class_group_id
+      //       ? { ...cls, ...newClass }
+      //       : cls
+      //   )
+      // );
       setEditingClass(null);
       setNewClass({
         class_group_id: "",
@@ -181,7 +206,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       formData_update.append("name", updated_class_title);
     } else {
       // in case the name is let empty
-      const chosen_class = classes.filter(
+      const chosen_class = class_groups_list.filter(
         (cls) => cls.class_group_id === chosen_class_id
       )[0];
       formData_update.append("name", chosen_class.name);
@@ -201,10 +226,21 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
     // * UPDATE THE DATA IN THE FRONTEND :
     if (res.ok) {
       // Re-fetch all classes from backend instead of patching one
-      const fresh_list =
+      const new_res =
         await school_dashboard_client.get_current_school_class_groups();
+      if (new_res.ok) {
+        const new_class_groups_list: ClassGroupJson[] = new_res.data.map(
+          (classGroupJson: ClassGroupJson) =>
+            ClassGroup.formJson(classGroupJson)
+        );
+        console.log("new list");
+        console.log(new_class_groups_list);
+        // update parent state
+        setClassGroupList(new_class_groups_list);
+      }
 
-      setClasses(mapClassGrpToClass(fresh_list.data.map(ClassGroup.formJson)));
+      // delete
+      // setClasses(mapClassGrpToClass(fresh_list.data.map(ClassGroup.formJson)));
 
       // reset temp states
       setEditingClass(null);
@@ -221,7 +257,9 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
 
   // Delete
   const handleDeleteClass = async (id: string) => {
-    setClasses(classes.filter((cls) => cls.class_group_id !== id));
+    setClassGroupList(
+      class_groups_list.filter((cls) => cls.class_group_id !== id)
+    );
     //*  API CALL
     const latest_csrf = getCSRFToken()!;
     const res = await school_dashboard_client.delete_class_group(
@@ -237,8 +275,8 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
     const file = event.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setClasses(
-        classes.map((cls) =>
+      setClassGroupList(
+        class_groups_list.map((cls) =>
           cls.class_group_id === id
             ? { ...cls, teachersPdf: { url, name: file.name } }
             : cls
@@ -248,17 +286,18 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
   };
 
   const handleRemovePdf = (id: string) => {
-    setClasses(
-      classes.map((cls) =>
+    setClassGroupList(
+      class_groups_list.map((cls) =>
         cls.class_group_id === id ? { ...cls, teachersPdf: null } : cls
       )
     );
   };
 
-  const filteredClasses = classes.filter(
-    (cls) =>
-      cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cls.students.toString().includes(searchTerm)
+  const filteredClasses = class_groups_list.filter(
+    (cls) => cls.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // delete
+    //  ||
+    // cls.students.toString().includes(searchTerm)
   );
 
   return (
@@ -328,19 +367,19 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {cls.students}
+                      {cls.students || 0}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {cls.teachersPdf ? (
-                      <div className="flex items-center space-x-2 justify-end rtl:space-x-reverse">
+                    {cls.teacher_list ? (
+                      <div className="flex items-center space-x-2 justify-start rtl:space-x-reverse">
                         <a
-                          href={SERVER_BASE_URL + cls.teachersPdf.url}
+                          href={SERVER_BASE_URL + cls.teacher_list}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:text-blue-300"
                         >
-                          {cls.teachersPdf.name}
+                          {cls.name + ".pdf"}
                         </a>
                         {/* <button
                           // onClick={() => handleRemovePdf(cls.id)}

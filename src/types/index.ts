@@ -1,4 +1,8 @@
+import { AbsenceReport } from "../models/AbsenceReports";
+import { BehaviourReport } from "../models/BehaviorReport";
 import { ClassGroup } from "../models/ClassGroups";
+import { Event } from "../models/Event";
+import { Parent, ParentJson } from "../models/ParenAndStudent";
 import { Student } from "../models/Student";
 import {
   ResponseParent,
@@ -63,30 +67,43 @@ export interface Teacher {
   profile_picture?: string | null;
 }
 // Frontend Parent :
-export interface Parent {
-  id: number;
-  name: string;
-  phone: string;
-  email: string;
-  students?: string[];
-  address: string;
-  classes: string[];
-}
 
 export interface StudentManagementProps {
   studentsList: Student[];
   setStudentsList: any;
+  class_groups_list: ClassGroup[];
 }
 
 export interface TeacherManagementProps {
   teachersList: ResponseTeacher[];
-  setTeacherList: any;
+  setTeacherList: any; // setState
 }
 
 export interface ParentManagementProps {
-  parentsList: ResponseParent[];
+  parentsList: Parent[];
+  setParentList: React.Dispatch<React.SetStateAction<Parent[]>>;
+  class_groups_list: ClassGroup[];
+  studentsList: Student[];
 }
 
 export interface ClassesManagementProps {
   class_groups_list: ClassGroup[];
+  setClassGroupList: any; // setState
+}
+
+export interface ScheduleManagementProps {
+  class_groups_list: ClassGroup[];
+  setClassGroupList: React.Dispatch<React.SetStateAction<ClassGroup[]>>; // setState
+}
+
+export interface ActivitiesManagementProps {
+  events_list: Event[];
+}
+
+export interface AbsenceReviewsProps {
+  absence_reports_list: AbsenceReport[];
+}
+
+export interface BehaviorReportsProps {
+  behaviour_reports_list: BehaviourReport[];
 }

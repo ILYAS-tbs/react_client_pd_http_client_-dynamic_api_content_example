@@ -22,6 +22,14 @@ import ClassesManagement from "../../components/school/ClassesManagement";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { Student, StudentJson } from "../../models/Student";
+import { Parent, ParentJson } from "../../models/ParenAndStudent";
+import { Event, EventJson } from "../../models/Event";
+import {
+  AbsenceReport,
+  AbsenceReportConvert,
+} from "../../models/AbsenceReports";
+import { getSearchParamsForLocation } from "react-router-dom/dist/dom";
+import { BehaviourReport } from "../../models/BehaviorReport";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -38,9 +46,13 @@ const SchoolDashboard: React.FC = () => {
   // to inspect some data we got from the server :
   const [students, setStudents] = useState<Student[]>([]);
   const [teachers, setTeachers] = useState([]);
-  const [class_groups, set_class_groups] = useState<ClassGroup[] | []>([]);
-  const [parents, setParents] = useState([]);
-
+  const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
+  const [parents, setParents] = useState<Parent[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [absence_reports, setAbsenceReports] = useState<AbsenceReport[]>([]);
+  const [behaviour_reports, setBehaviourReports] = useState<BehaviourReport[]>(
+    []
+  );
   const get_current_school_students = async () => {
     const res = await school_dashboard_client.get_current_school_students();
     if (res.ok) {
@@ -64,22 +76,52 @@ const SchoolDashboard: React.FC = () => {
       const class_groups = res.data.map((classGroupJson: ClassGroupJson) =>
         ClassGroup.formJson(classGroupJson)
       );
-      set_class_groups(class_groups);
+      setClassGroups(class_groups);
     }
   };
   const get_current_school_parents = async () => {
     const res = await school_dashboard_client.get_current_school_parents();
     if (res.ok) {
-      setParents(res.data);
+      const parent_list = res.data.map((parentJson: ParentJson) =>
+        Parent.fromJson(parentJson)
+      );
+      setParents(parent_list);
     }
   };
-
+  const get_current_school_events = async () => {
+    const res = await school_dashboard_client.get_current_school_events();
+    if (res.ok) {
+      const events_list = res.data.map((e: EventJson) => Event.fromJson(e));
+      setEvents(events_list);
+    }
+  };
+  const get_current_school_absence_reports = async () => {
+    const res =
+      await school_dashboard_client.get_current_school_absence_reports();
+    if (res.ok) {
+      const absence_reports: AbsenceReport[] = res.data;
+      console.log("absense_reporst list :");
+      console.log(absence_reports);
+      setAbsenceReports(absence_reports);
+    }
+  };
+  const get_current_school_behaviour_reports = async () => {
+    const res =
+      await school_dashboard_client.get_current_school_behaviour_reports();
+    if (res.ok) {
+      const behaviour_reports_list: BehaviourReport[] = res.data;
+      setBehaviourReports(behaviour_reports_list);
+    }
+  };
   useEffect(() => {
     //! fetching :
     get_current_school_students();
     get_current_school_teachers();
     get_current_school_class_groups();
     get_current_school_parents();
+    get_current_school_events();
+    get_current_school_absence_reports();
+    get_current_school_behaviour_reports();
   }, []);
   const stats = [
     {
@@ -240,31 +282,47 @@ const SchoolDashboard: React.FC = () => {
             <StudentManagement
               studentsList={students}
               setStudentsList={setStudents}
+              class_groups_list={class_groups}
             />
             <TeacherManagement
               teachersList={teachers}
               setTeacherList={setTeachers}
             />
-            <ParentManagement parentsList={parents} />
+            <ParentManagement
+              parentsList={parents}
+              setParentList={setParents}
+              class_groups_list={class_groups}
+              studentsList={students}
+            />
           </div>
         );
       case "levels":
-        return <ClassesManagement class_groups_list={class_groups} />;
+        return (
+          <ClassesManagement
+            class_groups_list={class_groups}
+            setClassGroupList={setClassGroups}
+          />
+        );
       case "schedules":
-        return <ScheduleManagement />;
+        return (
+          <ScheduleManagement
+            class_groups_list={class_groups}
+            setClassGroupList={setClassGroups}
+          />
+        );
       case "exams":
         return <ExamScheduleManagemen />;
       case "reports":
         return (
           <div className="space-y-6">
-            <AbsenceReviews />
-            <BehaviorReports />
+            <AbsenceReviews absence_reports_list={absence_reports} />
+            <BehaviorReports behaviour_reports_list={behaviour_reports} />
           </div>
         );
       case "grades":
         return <GradeOverview />;
       case "activities":
-        return <ActivitiesManagement />;
+        return <ActivitiesManagement events_list={events} />;
       default:
         return <PlaceholderPage title="صفحة غير موجودة" />;
     }

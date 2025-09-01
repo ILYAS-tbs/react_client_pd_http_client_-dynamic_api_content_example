@@ -68,4 +68,19 @@ export interface PostStudentPayload {
   full_name: string;
   date_of_birth: string;
   trimester_grade?: number;
+  class_group_id?: string;
+}
+
+// post getParentById
+export interface FindParentByIdPayload {
+  email: string;
+}
+
+export interface AddorRemoveParentToSchoolPayload {
+  parent_pk: number;
+}
+
+export interface AddCurrectSchoolStudentsToParent {
+  parent_pk: string;
+  students: string[];
 }

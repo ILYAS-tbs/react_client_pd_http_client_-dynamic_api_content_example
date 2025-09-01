@@ -3,11 +3,20 @@ interface User {
   username: string;
   email: string;
 }
-interface Student {
+export interface Student {
   student_id: string;
   full_name: string;
   date_of_birth: string;
+  class_group?: {
+    class_group_id: string;
+    name: string;
+    school: string;
+    teacher_list: null;
+    time_table: null;
+    academic_year: string;
+  };
 }
+
 export interface ParentJson {
   user: User;
   full_name: string;

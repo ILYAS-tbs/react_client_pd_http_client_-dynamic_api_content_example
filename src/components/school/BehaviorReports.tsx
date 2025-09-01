@@ -1,67 +1,134 @@
-import React, { useState } from 'react';
-import { FileText, Edit, Trash2, Plus, Search, BarChart2, Eye } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  FileText,
+  Edit,
+  Trash2,
+  Plus,
+  Search,
+  BarChart2,
+  Eye,
+} from "lucide-react";
+import { BehaviorReportsProps } from "../../types";
+import { BehaviourReport } from "../../models/BehaviorReport";
 
-interface BehaviorReport {
-  id: string;
-  studentName: string;
-  date: string;
-  category: string;
-  description: string;
-  actionTaken: string;
-}
+// interface BehaviorReport {
+//   id: string;
+//   studentName: string;
+//   date: string;
+//   category: string;
+//   description: string;
+//   actionTaken: string;
+// }
 
-const BehaviorReports: React.FC = () => {
-  const [reports, setReports] = useState<BehaviorReport[]>([
-    { id: 'r1', studentName: 'أحمد علي', date: '2025-06-14', category: 'سلوك إيجابي', description: 'مشاركة نشطة في الدرس', actionTaken: 'شهادة تقدير' },
-    { id: 'r2', studentName: 'فاطمة حسن', date: '2025-06-13', category: 'سلوك سلبي', description: 'عدم احترام المعلم', actionTaken: 'تحذير كتابي' },
-    { id: 'r3', studentName: 'محمد خالد', date: '2025-06-12', category: 'سلوك إيجابي', description: 'مساعدة زملائه', actionTaken: 'نقاط إضافية' },
-  ]);
-  const [newReport, setNewReport] = useState({ studentName: '', date: '', category: '', description: '', actionTaken: '' });
-  const [editingReport, setEditingReport] = useState<BehaviorReport | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+const BehaviorReports: React.FC<BehaviorReportsProps> = ({
+  behaviour_reports_list,
+}) => {
+  /* 
+ - mock data : 
+ {
+      id: "r1",
+      studentName: "أحمد علي",
+      date: "2025-06-14",
+      category: "سلوك إيجابي",
+      description: "مشاركة نشطة في الدرس",
+      actionTaken: "شهادة تقدير",
+    },
+*/
+  const [reports, setReports] = useState<BehaviourReport[]>(
+    behaviour_reports_list
+  );
+  const [newReport, setNewReport] = useState({
+    studentName: "",
+    date: "",
+    category: "",
+    description: "",
+    actionTaken: "",
+  });
+  const [editingReport, setEditingReport] = useState<BehaviourReport | null>(
+    null
+  );
+  const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewSummary, setViewSummary] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const handleAddReport = () => {
-    if (newReport.studentName && newReport.date && newReport.category && newReport.description && newReport.actionTaken) {
+    if (
+      newReport.studentName &&
+      newReport.date &&
+      newReport.category &&
+      newReport.description &&
+      newReport.actionTaken
+    ) {
       setReports([...reports, { id: `r-${Date.now()}`, ...newReport }]);
-      setNewReport({ studentName: '', date: '', category: '', description: '', actionTaken: '' });
+      setNewReport({
+        studentName: "",
+        date: "",
+        category: "",
+        description: "",
+        actionTaken: "",
+      });
       setShowAddModal(false);
     }
   };
 
   const handleEditReport = (report: BehaviorReport) => {
     setEditingReport(report);
-    setNewReport({ studentName: report.studentName, date: report.date, category: report.category, description: report.description, actionTaken: report.actionTaken });
+    setNewReport({
+      studentName: report.studentName,
+      date: report.date,
+      category: report.category,
+      description: report.description,
+      actionTaken: report.actionTaken,
+    });
     setShowAddModal(true);
   };
 
   const handleUpdateReport = () => {
-    if (editingReport && newReport.studentName && newReport.date && newReport.category && newReport.description && newReport.actionTaken) {
-      setReports(reports.map(rep => rep.id === editingReport.id ? { ...rep, ...newReport } : rep));
+    if (
+      editingReport &&
+      newReport.studentName &&
+      newReport.date &&
+      newReport.category &&
+      newReport.description &&
+      newReport.actionTaken
+    ) {
+      setReports(
+        reports.map((rep) =>
+          rep.id === editingReport.id ? { ...rep, ...newReport } : rep
+        )
+      );
       setEditingReport(null);
-      setNewReport({ studentName: '', date: '', category: '', description: '', actionTaken: '' });
+      setNewReport({
+        studentName: "",
+        date: "",
+        category: "",
+        description: "",
+        actionTaken: "",
+      });
       setShowAddModal(false);
     }
   };
 
   const handleDeleteReport = (id: string) => {
-    setReports(reports.filter(rep => rep.id !== id));
+    setReports(reports.filter((rep) => rep.id !== id));
   };
 
-  const filteredReports = reports.filter(rep =>
-    (rep.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     rep.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     rep.actionTaken.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (selectedCategory === 'all' || rep.category === selectedCategory)
+  const filteredReports = reports.filter(
+    (rep) =>
+      (rep.student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        rep.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        rep.conclusion.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedCategory === "all" || rep.type === selectedCategory)
   );
 
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">تقارير السلوك</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          تقارير السلوك
+        </h2>
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
             value={selectedCategory}
@@ -77,7 +144,7 @@ const BehaviorReports: React.FC = () => {
             className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <BarChart2 className="h-5 w-5" />
-            <span>{viewSummary ? 'عرض قائمة' : 'عرض ملخص'}</span>
+            <span>{viewSummary ? "عرض قائمة" : "عرض ملخص"}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
@@ -111,20 +178,42 @@ const BehaviorReports: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {viewSummary ? (
           <div className="p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">ملخص تقارير السلوك</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+              ملخص تقارير السلوك
+            </h3>
             <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">إجمالي التقارير: {filteredReports.length}</p>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">سلوك إيجابي: {filteredReports.filter(r => r.category === 'سلوك إيجابي').length}</p>
-                <p className="text-sm text-red-600 dark:text-red-400 mt-1">سلوك سلبي: {filteredReports.filter(r => r.category === 'سلوك سلبي').length}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  إجمالي التقارير: {filteredReports.length}
+                </p>
+                <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                  سلوك إيجابي:{" "}
+                  {
+                    filteredReports.filter((r) => r.type === "سلوك إيجابي")
+                      .length
+                  }
+                </p>
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                  سلوك سلبي:{" "}
+                  {filteredReports.filter((r) => r.type === "سلوك سلبي").length}
+                </p>
               </div>
               {filteredReports.map((report) => (
-                <div key={report.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow flex justify-between items-center">
+                <div
+                  key={report.behaviour_report_id}
+                  className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow flex justify-between items-center"
+                >
                   <div>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{report.studentName}</span>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{report.date}</p>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {report.student.full_name}
+                    </span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {new Date(report.date).toDateString()}
+                    </p>
                   </div>
-                  <span className="text-sm text-blue-600 dark:text-blue-400">{report.category}</span>
+                  <span className="text-sm text-blue-600 dark:text-blue-400">
+                    {report.type}
+                  </span>
                 </div>
               ))}
             </div>
@@ -156,28 +245,49 @@ const BehaviorReports: React.FC = () => {
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredReports.map((report) => (
-                  <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <tr
+                    key={report.behaviour_report_id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">{report.studentName}</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {report.student.full_name}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">{report.date}</div>
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {new Date(report.date).toDateString()}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">{report.category}</div>
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {report.type}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">{report.description}</div>
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {report.description}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">{report.actionTaken}</div>
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {report.conclusion}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                        <button onClick={() => handleEditReport(report)} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                        <button
+                          onClick={() => handleEditReport(report)}
+                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        >
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button onClick={() => handleDeleteReport(report.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                        <button
+                          onClick={() =>
+                            handleDeleteReport(report.behaviour_report_id)
+                          }
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                         <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
@@ -197,8 +307,10 @@ const BehaviorReports: React.FC = () => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{editingReport ? 'تعديل التقرير' : 'إضافة تقرير جديد'}</h3>
-            
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              {editingReport ? "تعديل التقرير" : "إضافة تقرير جديد"}
+            </h3>
+
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -207,12 +319,14 @@ const BehaviorReports: React.FC = () => {
                 <input
                   type="text"
                   value={newReport.studentName}
-                  onChange={(e) => setNewReport({ ...newReport, studentName: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, studentName: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="اسم الطالب"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   التاريخ
@@ -220,18 +334,22 @@ const BehaviorReports: React.FC = () => {
                 <input
                   type="date"
                   value={newReport.date}
-                  onChange={(e) => setNewReport({ ...newReport, date: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, date: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   الفئة
                 </label>
                 <select
                   value={newReport.category}
-                  onChange={(e) => setNewReport({ ...newReport, category: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, category: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="">اختر الفئة</option>
@@ -239,19 +357,21 @@ const BehaviorReports: React.FC = () => {
                   <option value="سلوك سلبي">سلوك سلبي</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   الوصف
                 </label>
                 <textarea
                   value={newReport.description}
-                  onChange={(e) => setNewReport({ ...newReport, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, description: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="تفاصيل السلوك"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   الإجراء
@@ -259,16 +379,28 @@ const BehaviorReports: React.FC = () => {
                 <input
                   type="text"
                   value={newReport.actionTaken}
-                  onChange={(e) => setNewReport({ ...newReport, actionTaken: e.target.value })}
+                  onChange={(e) =>
+                    setNewReport({ ...newReport, actionTaken: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="الإجراء المتخذ"
                 />
               </div>
             </form>
-            
+
             <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
               <button
-                onClick={() => { setShowAddModal(false); setEditingReport(null); setNewReport({ studentName: '', date: '', category: '', description: '', actionTaken: '' }); }}
+                onClick={() => {
+                  setShowAddModal(false);
+                  setEditingReport(null);
+                  setNewReport({
+                    studentName: "",
+                    date: "",
+                    category: "",
+                    description: "",
+                    actionTaken: "",
+                  });
+                }}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 إلغاء
@@ -277,7 +409,7 @@ const BehaviorReports: React.FC = () => {
                 onClick={editingReport ? handleUpdateReport : handleAddReport}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
-                {editingReport ? 'تحديث' : 'إضافة'}
+                {editingReport ? "تحديث" : "إضافة"}
               </button>
             </div>
           </div>
