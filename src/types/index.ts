@@ -2,8 +2,10 @@ import { AbsenceReport } from "../models/AbsenceReports";
 import { BehaviourReport } from "../models/BehaviorReport";
 import { ClassGroup } from "../models/ClassGroups";
 import { Event } from "../models/Event";
+import { ExamSchedule } from "../models/ExamSchedule";
 import { Parent, ParentJson } from "../models/ParenAndStudent";
 import { Student } from "../models/Student";
+import { Teacher } from "../models/Teacher";
 import {
   ResponseParent,
   ResponseStudent,
@@ -55,17 +57,18 @@ export interface PricingPlan {
 //   attendance: string;
 // }
 // Frontend Teacher model : in TeacherManagement
-export interface Teacher {
-  id: number;
-  name: string;
-  subject: string;
-  classes: string[];
-  phone: string;
-  email: string;
-  status: string;
-  experience: string | number;
-  profile_picture?: string | null;
-}
+
+// export interface Teacher {
+//   id: number;
+//   name: string;
+//   subject: string;
+//   classes: string[];
+//   phone: string;
+//   email: string;
+//   status: string;
+//   experience: string | number;
+//   profile_picture?: string | null;
+// }
 // Frontend Parent :
 
 export interface StudentManagementProps {
@@ -75,7 +78,7 @@ export interface StudentManagementProps {
 }
 
 export interface TeacherManagementProps {
-  teachersList: ResponseTeacher[];
+  teachersList: Teacher[];
   setTeacherList: any; // setState
 }
 
@@ -106,4 +109,10 @@ export interface AbsenceReviewsProps {
 
 export interface BehaviorReportsProps {
   behaviour_reports_list: BehaviourReport[];
+}
+
+export interface ExamScheduleManagementProps{
+  exam_schedules:ExamSchedule[];
+  setExamSchedules:React.Dispatch<React.SetStateAction<ExamSchedule[]>>
+
 }

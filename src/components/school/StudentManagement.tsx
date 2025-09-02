@@ -212,7 +212,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       full_name: full_name,
       date_of_birth: formData_update.date_of_birth,
       trimester_grade: formData_update.trimester_grade,
-      class_group_id: formData_update.class_group_id,
+      class_group_id:
+        formData_update.class_group_id ||
+        student_to_update?.class_group?.class_group_id,
     };
     const id = last_chosen_student;
     const latest_csrf = getCSRFToken()!;
@@ -365,9 +367,11 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      {/* hide student : disable for now  */}
+                      {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                         <Eye className="h-4 w-4" />
-                      </button>
+                      </button> */}
+
                       <button
                         onClick={() => {
                           setShowEditModal(true);
@@ -447,7 +451,8 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 />
               </div>
 
-              <div>
+              {/* parent name deleted for now */}
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   اسم ولي الأمر
                 </label>
@@ -456,7 +461,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="اسم ولي الأمر"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
