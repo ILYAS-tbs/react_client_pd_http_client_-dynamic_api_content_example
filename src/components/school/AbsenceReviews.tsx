@@ -179,7 +179,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                     {request.student.full_name}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    الصف {request.student.class_group.name} - ولي الأمر:{" "}
+                    الصف {request?.student?.class_group?.name} - ولي الأمر:{" "}
                     {request.parent.full_name}
                   </p>
                 </div>

@@ -38,7 +38,7 @@ export type RegisterTeacherPayload = {
   username: string;
 };
 export type LoginPayload = {
-  //   email: string;
+  email: string;
   //   phone: string;
   username: string; // Temporarily we will send : email as username
   password: string;

@@ -15,6 +15,7 @@ const URLS = {
   get_current_school_parents: `${BASE_URL}/school/schools/get_current_school_parents`,
   get_current_school_events: `${BASE_URL}/school/schools/get_current_school_events/`,
   get_current_school_exam_schedules: `${BASE_URL}/school/schools/get_current_school_exam_schedules/`,
+  get_current_school_stats: `${BASE_URL}/school/schools/get_current_school_stats/`,
 
   patch_teacher: `${BASE_URL}/teacher/teachers/`,
 
@@ -96,6 +97,20 @@ async function get_current_school_parents() {
 async function get_current_school_exam_schedules() {
   try {
     const response = await fetch(URLS.get_current_school_exam_schedules, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function get_current_school_stats() {
+  try {
+    const response = await fetch(URLS.get_current_school_stats, {
       method: "GET",
       credentials: "include", // ensures cookies like sessionid are sent
     });
@@ -407,6 +422,7 @@ export const school_dashboard_client = {
   get_current_school_parents: get_current_school_parents,
   get_current_school_events: get_current_school_events,
   get_current_school_exam_schedules: get_current_school_exam_schedules,
+  get_current_school_stats: get_current_school_stats,
 
   update_teacher: update_teacher,
 

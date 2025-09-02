@@ -74,6 +74,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const login_payload: LoginPayload = {
       username: email,
       password: password,
+      email: email,
     };
     const result = await http_client.login(login_payload, latest_csrf);
     if (result.ok) {

@@ -4,6 +4,7 @@ import { ClassGroup } from "../models/ClassGroups";
 import { Event } from "../models/Event";
 import { ExamSchedule } from "../models/ExamSchedule";
 import { Parent, ParentJson } from "../models/ParenAndStudent";
+import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
 import { Teacher } from "../models/Teacher";
 import {
@@ -111,8 +112,13 @@ export interface BehaviorReportsProps {
   behaviour_reports_list: BehaviourReport[];
 }
 
-export interface ExamScheduleManagementProps{
-  exam_schedules:ExamSchedule[];
-  setExamSchedules:React.Dispatch<React.SetStateAction<ExamSchedule[]>>
+export interface ExamScheduleManagementProps {
+  exam_schedules: ExamSchedule[];
+  setExamSchedules: React.Dispatch<React.SetStateAction<ExamSchedule[]>>;
+}
 
+export interface GradeOverviewProps {
+  school_stat: SchoolStat | null;
+  setSchoolStat: React.Dispatch<React.SetStateAction<SchoolStat | null>>;
+  class_groups: ClassGroup[];
 }
