@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap");
+@import "tailwindcss";
 
 /* RTL Support */
 [dir="rtl"] {
-  font-family: 'Cairo', 'Tajawal', 'Noto Sans Arabic', sans-serif;
+  font-family: "Cairo", "Tajawal", "Noto Sans Arabic", sans-serif;
 }
 
 /* Custom Scrollbar */
@@ -52,8 +50,13 @@ html {
 
 /* Custom animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .float-animation {
@@ -106,8 +109,12 @@ html {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive utilities */
@@ -156,11 +163,11 @@ html {
   .bg-primary-500 {
     background-color: #000000;
   }
-  
+
   .text-primary-500 {
     color: #000000;
   }
-  
+
   .border-primary-500 {
     border-color: #000000;
   }
@@ -175,4 +182,9 @@ html {
 ::-moz-selection {
   background-color: #39789b;
   color: white;
+}
+
+/* !  Custom Styling*/
+@theme {
+  --color-brand-blue: #39789b;
 }

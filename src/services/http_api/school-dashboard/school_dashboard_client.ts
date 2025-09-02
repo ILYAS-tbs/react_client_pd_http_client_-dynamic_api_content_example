@@ -103,6 +103,20 @@ async function update_teacher(
     throw new Error("update teacher : No CSRF TOKEN found..");
   }
 
+  /*
+  {
+  "full_name": "string",
+  "phone_number": "string",
+  "address": "string",
+  "profile_picture": "string",
+  "hire_date": "2025-09-02",
+  "specialization": "string",
+  "qualifications": "string",
+  "years_of_experience": 9223372036854776000,
+  "status": "active"
+}
+  */
+
   const PATCH_URL = URLS.patch_teacher + id + "/";
   //  do not set Content-Type manually, browser will set boundary for multipart (mutipart : data + files)
   const response = await fetch(PATCH_URL, {
