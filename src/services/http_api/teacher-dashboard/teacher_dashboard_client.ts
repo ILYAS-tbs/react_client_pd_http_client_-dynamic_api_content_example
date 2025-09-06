@@ -13,7 +13,6 @@ const URLS = {
   get_current_teacher_behaviour_reports: `${BASE_URL}/teacher/teachers/get_current_teacher_behaviour_reports/`,
   current_teacher_school_modules: `${BASE_URL}/teacher/teachers/current_teacher_school_modules/`,
   current_teacher_students_grades: `${BASE_URL}/teacher/teachers/current_teacher_students_grades/`,
-
   patch_student: `${BASE_URL}/student/students/`,
 
   post_absence: `${BASE_URL}/class-group/absences/`,
@@ -21,6 +20,9 @@ const URLS = {
   post_behaviour_report: `${BASE_URL}/school/behaviour-reports/`,
 
   post_mark: `${BASE_URL}/teacher/marks/`,
+
+  create_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/create_teacher_upload/`,
+  delete_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/`,
 };
 
 async function get_current_teacher_students() {
@@ -204,6 +206,42 @@ async function post_mark(payload: PostMarkPayload, csrfToken: string) {
     return { ok: false, error: error };
   }
 }
+
+//! Create  Teacher Upload :
+async function create_teacher_upload(formData: FormData, csrfToken: string) {
+  try {
+    const response = await fetch(URLS.create_teacher_upload, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Delete  Teacher Upload :
+async function delete_teacher_upload(id: number, csrfToken: string) {
+  const DELETE_URL = URLS.delete_teacher_upload + id + "/";
+  try {
+    const response = await fetch(DELETE_URL, {
+      method: "DELETE",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 export const teacher_dashboard_client = {
   get_current_teacher_students: get_current_teacher_students,
   get_current_teacher_modules_and_class_groups:
@@ -220,4 +258,7 @@ export const teacher_dashboard_client = {
   post_behaviour_report: post_behaviour_report,
 
   post_mark: post_mark,
+
+  create_teacher_upload: create_teacher_upload,
+  delete_teacher_upload: delete_teacher_upload,
 };

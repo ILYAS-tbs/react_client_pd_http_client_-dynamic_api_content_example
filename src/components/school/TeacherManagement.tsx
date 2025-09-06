@@ -14,10 +14,8 @@ import { TeacherManagementProps } from "../../types";
 import { ModulesAndClassGroups } from "../../services/http_api/http_reponse_types";
 
 // Backend server :
-import {
-  auth_http_client,
-  SERVER_BASE_URL,
-} from "../../services/http_api/auth/auth_http_client";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
+import { auth_http_client } from "../../services/http_api/auth/auth_http_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import {

@@ -193,6 +193,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         school_name: userData.name,
         email: userData.email,
         phone_number: userData.phone,
+        school_level: userData.school_level,
         website: "",
         address: "",
         wilaya: "",

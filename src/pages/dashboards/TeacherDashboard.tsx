@@ -139,7 +139,7 @@ const TeacherDashboard: React.FC = () => {
     },
     {
       title: "المواد المرفوعة",
-      value: "15",
+      value: teacher_uploads.length ?? "0",
       icon: Upload,
       color: "bg-orange-500",
     },
@@ -151,13 +151,29 @@ const TeacherDashboard: React.FC = () => {
     { id: "grades", label: "الدرجات", icon: FileText },
     { id: "resources", label: "المواد التعليمية", icon: BookOpen },
     { id: "chat", label: "التواصل", icon: MessageCircle },
-    { id: "schedule", label: "الجدول", icon: Calendar },
+    // { id: "schedule", label: "الجدول", icon: Calendar },
     {
       id: "absences",
       label: "الغيابات غير المبررة وتقارير السلوك",
       icon: FileX2,
     },
   ];
+
+  //! Mapping the Schedule from API to Frontendshape :
+  /* Frontend shape :
+  {[
+                    {
+                      time: "08:00 - 08:45",
+                      classes: [
+                        "رياضيات 5أ",
+                        "عربي 4ب",
+                        "علوم 6أ",
+                        "رياضيات 5ب",
+                        "عربي 4أ",
+                      ],
+                    },
+    ]
+  */
 
   const renderContent = () => {
     switch (activeTab) {
@@ -182,93 +198,99 @@ const TeacherDashboard: React.FC = () => {
           />
         );
       case "resources":
-        return <ResourceManager />;
+        return (
+          <ResourceManager
+            modules_class_groups={modules_class_groups}
+            teacher_uploads={teacher_uploads}
+            setTeacherUploads={setTeacherUploads}
+          />
+        );
       case "chat":
         return <ParentChat userType="teacher" />;
-    
-        // Might be implemented later : 
-        case "schedule":
-        return (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              الجدول الأسبوعي
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-700">
-                    <th className="border border-gray-200 dark:border-gray-600 px-4 py-2 text-right">
-                      الوقت
-                    </th>
-                    <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
-                      الأحد
-                    </th>
-                    <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
-                      الاثنين
-                    </th>
-                    <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
-                      الثلاثاء
-                    </th>
-                    <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
-                      الأربعاء
-                    </th>
-                    <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
-                      الخميس
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    {
-                      time: "08:00 - 08:45",
-                      classes: [
-                        "رياضيات 5أ",
-                        "عربي 4ب",
-                        "علوم 6أ",
-                        "رياضيات 5ب",
-                        "عربي 4أ",
-                      ],
-                    },
-                    {
-                      time: "08:45 - 09:30",
-                      classes: [
-                        "عربي 4أ",
-                        "رياضيات 5أ",
-                        "رياضيات 5ب",
-                        "علوم 6أ",
-                        "عربي 4ب",
-                      ],
-                    },
-                    {
-                      time: "10:00 - 10:45",
-                      classes: [
-                        "علوم 6أ",
-                        "عربي 4أ",
-                        "رياضيات 5أ",
-                        "عربي 4ب",
-                        "رياضيات 5ب",
-                      ],
-                    },
-                  ].map((slot, index) => (
-                    <tr key={index}>
-                      <td className="border border-gray-200 dark:border-gray-600 px-4 py-2 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700">
-                        {slot.time}
-                      </td>
-                      {slot.classes.map((cls, clsIndex) => (
-                        <td
-                          key={clsIndex}
-                          className="border border-gray-200 dark:border-gray-600 px-4 py-2 text-center text-sm text-gray-700 dark:text-gray-300"
-                        >
-                          {cls}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
+
+      // Might be implemented later :
+      // case "schedule":
+      //   return (
+      //     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      //       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      //         الجدول الأسبوعي
+      //       </h3>
+      //       <div className="overflow-x-auto">
+      //         <table className="w-full border-collapse">
+      //           <thead>
+      //             <tr className="bg-gray-50 dark:bg-gray-700">
+      //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2 text-right">
+      //                 الوقت
+      //               </th>
+      //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
+      //                 الأحد
+      //               </th>
+      //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
+      //                 الاثنين
+      //               </th>
+      //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
+      //                 الثلاثاء
+      //               </th>
+      //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
+      //                 الأربعاء
+      //               </th>
+      //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2">
+      //                 الخميس
+      //               </th>
+      //             </tr>
+      //           </thead>
+      //           <tbody>
+      //             {[
+      //               {
+      //                 time: "08:00 - 08:45",
+      //                 classes: [
+      //                   "رياضيات 5أ",
+      //                   "عربي 4ب",
+      //                   "علوم 6أ",
+      //                   "رياضيات 5ب",
+      //                   "عربي 4أ",
+      //                 ],
+      //               },
+      //               {
+      //                 time: "08:45 - 09:30",
+      //                 classes: [
+      //                   "عربي 4أ",
+      //                   "رياضيات 5أ",
+      //                   "رياضيات 5ب",
+      //                   "علوم 6أ",
+      //                   "عربي 4ب",
+      //                 ],
+      //               },
+      //               {
+      //                 time: "10:00 - 10:45",
+      //                 classes: [
+      //                   "علوم 6أ",
+      //                   "عربي 4أ",
+      //                   "رياضيات 5أ",
+      //                   "عربي 4ب",
+      //                   "رياضيات 5ب",
+      //                 ],
+      //               },
+      //             ].map((slot, index) => (
+      //               <tr key={index}>
+      //                 <td className="border border-gray-200 dark:border-gray-600 px-4 py-2 font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700">
+      //                   {slot.time}
+      //                 </td>
+      //                 {slot.classes.map((cls, clsIndex) => (
+      //                   <td
+      //                     key={clsIndex}
+      //                     className="border border-gray-200 dark:border-gray-600 px-4 py-2 text-center text-sm text-gray-700 dark:text-gray-300"
+      //                   >
+      //                     {cls}
+      //                   </td>
+      //                 ))}
+      //               </tr>
+      //             ))}
+      //           </tbody>
+      //         </table>
+      //       </div>
+      //     </div>
+      //   );
       case "absences":
         return (
           <TeacherAbsenceManager

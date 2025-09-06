@@ -38,7 +38,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
     confirmPassword: "",
     role: "parent",
     schoolType: "public",
-    schoolLevel: "primary", // New field for school level
+    school_level: "primary", // New field for school level
     phone: "",
     wilaya: "",
     commune: "",
@@ -223,7 +223,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           confirmPassword: "",
           role: "parent",
           schoolType: "public",
-          schoolLevel: "primary",
+          school_level: "",
           phone: "",
           wilaya: "",
           commune: "",
@@ -517,8 +517,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 {t("schoolLevel") || "School Level"}
               </label>
               <select
-                name="schoolLevel"
-                value={formData.schoolLevel}
+                name="school_level"
+                value={formData.school_level}
                 onChange={handleInputChange}
                 className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
                   isRTL ? "text-right" : "text-left"

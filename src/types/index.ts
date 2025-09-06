@@ -18,6 +18,7 @@ import {
 import { Module } from "../models/Module";
 import { Mark } from "../models/Mark";
 import { StudentGrade } from "../models/StudentGrade";
+import { TeacherUpload } from "../models/TeacherUpload";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -153,4 +154,10 @@ export interface GradeManagerProps {
   students_grades: StudentGrade[];
   setStudentsGrades: React.Dispatch<React.SetStateAction<StudentGrade[]>>;
   teacher_id: number;
+}
+
+export interface ResourceManagerProps {
+  modules_class_groups: TeacherModuleClassGroup[];
+  teacher_uploads: TeacherUpload[];
+  setTeacherUploads: React.Dispatch<React.SetStateAction<TeacherUpload[]>>;
 }

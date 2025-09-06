@@ -8,6 +8,7 @@ export type RegisterSchoolPayload = {
   school_name: string;
   email: string;
   phone_number: string;
+  school_level: string;
   website: string;
   address: string;
   wilaya: string;

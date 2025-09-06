@@ -5,7 +5,7 @@ import {
   RegisterParentPayload,
   RegisterTeacherPayload,
 } from "../payloads_types/school_client_payload_types";
-export const SERVER_BASE_URL = "http://127.0.0.1:8000";
+import { SERVER_BASE_URL } from "../server_constants";
 
 const URLS = {
   SESSION: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,

@@ -34,3 +34,10 @@ export interface PostMarkPayload {
   student_id: string;
   teacher_id: number;
 }
+
+// Will be "FormData"
+// export interface PostTeacherUploadPayload {
+//   title: string;
+//   description: string;
+//   upload_file: File | null;
+// }
