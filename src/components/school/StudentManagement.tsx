@@ -3,7 +3,7 @@ import { Plus, Search, Edit, Trash2, Eye, Filter } from "lucide-react";
 import { StudentManagementProps } from "../../types";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
-import { PostStudentPayload } from "../../services/http_api/http_payload_types";
+import { PostStudentPayload } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Student, StudentJson } from "../../models/Student";
 import { ClassGroup } from "../../models/ClassGroups";
 

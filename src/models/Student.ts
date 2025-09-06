@@ -18,6 +18,7 @@ interface ParentJson {
 export interface StudentJson {
   student_id: string;
   full_name: string;
+  is_absent:boolean;
   date_of_birth: string;
   gender: string;
   address: string;
@@ -33,6 +34,7 @@ export interface StudentJson {
 interface StudentParams {
   student_id: string;
   full_name: string;
+  is_absent: boolean;
   age: number;
   date_of_birth: string;
   attendance?: string;
@@ -44,6 +46,7 @@ interface StudentParams {
 export class Student {
   student_id: string;
   full_name: string;
+  is_absent: boolean;
   age: number;
   date_of_birth: string;
   attendance?: string;
@@ -54,6 +57,7 @@ export class Student {
   constructor({
     student_id,
     full_name,
+    is_absent,
     age,
     date_of_birth,
     attendance,
@@ -64,6 +68,7 @@ export class Student {
   }: StudentParams) {
     this.student_id = student_id;
     this.full_name = full_name;
+    this.is_absent = is_absent;
     this.age = age;
     this.date_of_birth = date_of_birth;
     this.attendance = attendance;
@@ -77,6 +82,7 @@ export class Student {
     return new Student({
       student_id: json.student_id,
       full_name: json.full_name,
+      is_absent:json.is_absent,
       date_of_birth: json.date_of_birth,
       age: getAge(json.date_of_birth),
       attendance: undefined,

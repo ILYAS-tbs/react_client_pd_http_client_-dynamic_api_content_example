@@ -10,10 +10,10 @@ export interface BehaviourReport {
   type: string;
   description: string;
   conclusion: string;
+  created_at: Date;
   school: School;
   teacher: Teacher;
   student: Student;
-  created_at: Date;
 }
 
 export interface School {
@@ -25,17 +25,9 @@ export interface School {
 export interface Student {
   student_id: string;
   full_name: string;
+  is_absent: boolean;
   date_of_birth: Date;
-  class_group: ClassGroup;
-}
-
-export interface ClassGroup {
-  class_group_id: string;
-  name: string;
-  school: string;
-  teacher_list: string;
-  time_table: string;
-  academic_year: string;
+  trimester_grade: number;
 }
 
 export interface Teacher {

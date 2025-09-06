@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { ScheduleManagementProps } from "../../types";
 import { ClassGroup } from "../../models/ClassGroups";
-import { SERVER_BASE_URL } from "../../services/http_api/auth/http_client";
+import { SERVER_BASE_URL } from "../../services/http_api/auth/auth_http_client";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 

@@ -5,7 +5,7 @@ import {
   PostPutClassGroupPayload as PostClassGroupPayload,
   PostStudentPayload,
   TeacherPayload,
-} from "../http_payload_types";
+} from "../payloads_types/school_client_payload_types";
 
 const BASE_URL = "http://127.0.0.1:8000";
 const URLS = {

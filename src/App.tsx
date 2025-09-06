@@ -50,25 +50,27 @@ function App() {
                   <Route
                     path="/school-dashboard"
                     element={
-                      // <ProtectedRoute allowedRoles={["school"]}>
-                      <SchoolDashboard />
-                      // </ProtectedRoute>
+                      <ProtectedRoute allowedRoles={["school"]}>
+                        <SchoolDashboard />
+                      </ProtectedRoute>
                     }
                   />
                   <Route
                     path="/teacher-dashboard"
                     element={
-                      // <ProtectedRoute allowedRoles={["teacher"]}>
-                      <TeacherDashboard />
-                      // </ProtectedRoute>
+                      <ProtectedRoute allowedRoles={["teacher"]}>
+                        <TeacherDashboard />
+                        //{" "}
+                      </ProtectedRoute>
                     }
                   />
                   <Route
                     path="/parent-dashboard"
                     element={
-                      // <ProtectedRoute allowedRoles={["parent"]}>
-                      <ParentDashboard />
-                      // </ProtectedRoute>
+                      <ProtectedRoute allowedRoles={["parent"]}>
+                        <ParentDashboard />
+                        //{" "}
+                      </ProtectedRoute>
                     }
                   />
                 </Routes>

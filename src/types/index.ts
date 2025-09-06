@@ -1,3 +1,4 @@
+import React from "react";
 import { AbsenceReport } from "../models/AbsenceReports";
 import { BehaviourReport } from "../models/BehaviorReport";
 import { ClassGroup } from "../models/ClassGroups";
@@ -7,11 +8,16 @@ import { Parent, ParentJson } from "../models/ParenAndStudent";
 import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
 import { Teacher } from "../models/Teacher";
+import { TeacherAbsence } from "../models/Absence";
+import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
 import {
   ResponseParent,
   ResponseStudent,
   ResponseTeacher,
 } from "../services/http_api/http_reponse_types";
+import { Module } from "../models/Module";
+import { Mark } from "../models/Mark";
+import { StudentGrade } from "../models/StudentGrade";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -121,4 +127,30 @@ export interface GradeOverviewProps {
   school_stat: SchoolStat | null;
   setSchoolStat: React.Dispatch<React.SetStateAction<SchoolStat | null>>;
   class_groups: ClassGroup[];
+}
+
+// ! Teacher Dashboard :
+export interface ClassManagementProps {
+  students_list: Student[];
+  setStudentsList: React.Dispatch<React.SetStateAction<Student[]>>;
+  modules_class_groups: TeacherModuleClassGroup[];
+  setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
+  teacher_id: number;
+}
+
+export interface TeacherAbsenceManagerProps {
+  absences: TeacherAbsence[];
+  setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
+  students_list: Student[];
+  teacher_id: number;
+  behaviour_reports: BehaviourReport[];
+  setBehaviourReports: React.Dispatch<React.SetStateAction<BehaviourReport[]>>;
+}
+
+export interface GradeManagerProps {
+  modules: Module[];
+  modules_class_groups: TeacherModuleClassGroup[];
+  students_grades: StudentGrade[];
+  setStudentsGrades: React.Dispatch<React.SetStateAction<StudentGrade[]>>;
+  teacher_id: number;
 }

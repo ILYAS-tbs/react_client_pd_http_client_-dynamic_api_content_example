@@ -15,15 +15,15 @@ import { ModulesAndClassGroups } from "../../services/http_api/http_reponse_type
 
 // Backend server :
 import {
-  http_client,
+  auth_http_client,
   SERVER_BASE_URL,
-} from "../../services/http_api/auth/http_client";
+} from "../../services/http_api/auth/auth_http_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import {
   RegisterTeacherPayload,
   SignupPayload,
-} from "../../services/http_api/http_payload_types";
+} from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Teacher } from "../../models/Teacher";
 
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
@@ -75,7 +75,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       password: formData.password1,
     };
     let latest_csrf = getCSRFToken()!;
-    const teacher_signup_res = await http_client.teacher_signup(
+    const teacher_signup_res = await auth_http_client.teacher_signup(
       teacher_signup_payload,
       latest_csrf
     );
@@ -87,7 +87,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       username: formData.email,
     };
     latest_csrf = getCSRFToken()!;
-    const register_teacher_res = await http_client.register_Teacher(
+    const register_teacher_res = await auth_http_client.register_Teacher(
       register_teacher_payload,
       latest_csrf
     );
