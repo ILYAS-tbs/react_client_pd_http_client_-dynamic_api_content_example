@@ -7,7 +7,7 @@ import {
   AddCurrectSchoolStudentsToParent,
   AddorRemoveParentToSchoolPayload,
   FindParentByIdPayload,
-} from "../../services/http_api/http_payload_types";
+} from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { ParentManagementProps } from "../../types";
 import { Student, StudentJson } from "../../models/Student";

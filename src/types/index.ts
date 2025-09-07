@@ -1,14 +1,25 @@
+import React from "react";
 import { AbsenceReport } from "../models/AbsenceReports";
 import { BehaviourReport } from "../models/BehaviorReport";
 import { ClassGroup } from "../models/ClassGroups";
 import { Event } from "../models/Event";
+import { ExamSchedule } from "../models/ExamSchedule";
 import { Parent, ParentJson } from "../models/ParenAndStudent";
+import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
+import { Teacher } from "../models/Teacher";
+import { TeacherAbsence } from "../models/TeacherAbsence";
+import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
 import {
   ResponseParent,
   ResponseStudent,
   ResponseTeacher,
 } from "../services/http_api/http_reponse_types";
+import { Module } from "../models/Module";
+import { Mark } from "../models/Mark";
+import { StudentGrade } from "../models/StudentGrade";
+import { TeacherUpload } from "../models/TeacherUpload";
+import { StudentPerformance } from "../models/StudentPerformance";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -55,17 +66,18 @@ export interface PricingPlan {
 //   attendance: string;
 // }
 // Frontend Teacher model : in TeacherManagement
-export interface Teacher {
-  id: number;
-  name: string;
-  subject: string;
-  classes: string[];
-  phone: string;
-  email: string;
-  status: string;
-  experience: string | number;
-  profile_picture?: string | null;
-}
+
+// export interface Teacher {
+//   id: number;
+//   name: string;
+//   subject: string;
+//   classes: string[];
+//   phone: string;
+//   email: string;
+//   status: string;
+//   experience: string | number;
+//   profile_picture?: string | null;
+// }
 // Frontend Parent :
 
 export interface StudentManagementProps {
@@ -75,7 +87,7 @@ export interface StudentManagementProps {
 }
 
 export interface TeacherManagementProps {
-  teachersList: ResponseTeacher[];
+  teachersList: Teacher[];
   setTeacherList: any; // setState
 }
 
@@ -106,4 +118,58 @@ export interface AbsenceReviewsProps {
 
 export interface BehaviorReportsProps {
   behaviour_reports_list: BehaviourReport[];
+}
+
+export interface ExamScheduleManagementProps {
+  exam_schedules: ExamSchedule[];
+  setExamSchedules: React.Dispatch<React.SetStateAction<ExamSchedule[]>>;
+}
+
+export interface GradeOverviewProps {
+  school_stat: SchoolStat | null;
+  setSchoolStat: React.Dispatch<React.SetStateAction<SchoolStat | null>>;
+  class_groups: ClassGroup[];
+}
+
+// ! Teacher Dashboard :
+export interface ClassManagementProps {
+  students_list: Student[];
+  setStudentsList: React.Dispatch<React.SetStateAction<Student[]>>;
+  modules_class_groups: TeacherModuleClassGroup[];
+  setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
+  teacher_id: number;
+}
+
+export interface TeacherAbsenceManagerProps {
+  absences: TeacherAbsence[];
+  setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
+  students_list: Student[];
+  teacher_id: number;
+  behaviour_reports: BehaviourReport[];
+  setBehaviourReports: React.Dispatch<React.SetStateAction<BehaviourReport[]>>;
+}
+
+export interface GradeManagerProps {
+  modules: Module[];
+  modules_class_groups: TeacherModuleClassGroup[];
+  students_grades: StudentGrade[];
+  setStudentsGrades: React.Dispatch<React.SetStateAction<StudentGrade[]>>;
+  teacher_id: number;
+}
+
+export interface ResourceManagerProps {
+  modules_class_groups: TeacherModuleClassGroup[];
+  teacher_uploads: TeacherUpload[];
+  setTeacherUploads: React.Dispatch<React.SetStateAction<TeacherUpload[]>>;
+}
+
+//! Parent Dashboard :
+export interface ChildrenOverviewProps {
+  students: Student[];
+  one_student_absences: (s: Student) => number | undefined;
+}
+
+export interface GradeReportsProps {
+  students: Student[];
+  studentPerformances: StudentPerformance[];
 }

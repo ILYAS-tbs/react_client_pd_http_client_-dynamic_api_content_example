@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import {
   Plus,
   Search,
@@ -10,20 +10,19 @@ import {
   EyeOff,
   FileUp,
 } from "lucide-react";
-import { Teacher, TeacherManagementProps } from "../../types";
+import { TeacherManagementProps } from "../../types";
 import { ModulesAndClassGroups } from "../../services/http_api/http_reponse_types";
 
 // Backend server :
-import {
-  http_client,
-  SERVER_BASE_URL,
-} from "../../services/http_api/auth/http_client";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
+import { auth_http_client } from "../../services/http_api/auth/auth_http_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import {
   RegisterTeacherPayload,
   SignupPayload,
-} from "../../services/http_api/http_payload_types";
+} from "../../services/http_api/payloads_types/school_client_payload_types";
+import { Teacher } from "../../models/Teacher";
 
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
@@ -43,12 +42,16 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     years_of_experience: 0,
   });
 
+<<<<<<< HEAD
   // Data For Edit :
   const [showEditModal, setShowEditModal] = useState(false);
   // from the "edit" pen :
   const [last_chosen_teacher, setLastChosenTeacher] = useState(-1);
   const [full_name_update_form, setTeacehrNameUpdateForm] = useState("");
   const [phone_number_update_form, setPhoneNumberUpdateForm] = useState("");
+=======
+  const [showPassword, setShowPassword] = useState(false);
+>>>>>>> temp-fix
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -80,7 +83,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       password: formData_creation.password1,
     };
     let latest_csrf = getCSRFToken()!;
-    const teacher_signup_res = await http_client.teacher_signup(
+    const teacher_signup_res = await auth_http_client.teacher_signup(
       teacher_signup_payload,
       latest_csrf
     );
@@ -92,7 +95,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       username: formData_creation.email,
     };
     latest_csrf = getCSRFToken()!;
-    const register_teacher_res = await http_client.register_Teacher(
+    const register_teacher_res = await auth_http_client.register_Teacher(
       register_teacher_payload,
       latest_csrf
     );
@@ -107,20 +110,6 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   };
 
   const [file, setFile] = useState<File | null>(null);
-
-  const handleChangeDataSumbit = async (e: any, id: string) => {
-    const formData = new FormData();
-    if (file) {
-      formData.append("profile_picture", file);
-    }
-    // CSRF
-    const csrf_token = getCSRFToken()!;
-    const data = school_dashboard_client.update_teacher(
-      id,
-      formData,
-      csrf_token
-    );
-  };
 
   // fake teachers data
   const teachers = [
@@ -175,22 +164,23 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     );
     return subject_list;
   };
-  const teachers_real: Teacher[] = teacherList.map((teacher_response) => {
-    const teacher: Teacher = {
-      id: teacher_response.user.id,
-      name: teacher_response.full_name,
-      subject:
-        teacher_response.modulesAndClassGroups?.[0]?.module.module_name ||
-        "unfound",
-      classes: map_subjects(teacher_response.modulesAndClassGroups || []),
-      phone: teacher_response.phone_number,
-      email: teacher_response.user.email,
-      experience: teacher_response.years_of_experience,
-      status: teacher_response.status === "pending" ? "معلق" : "نشط",
-      profile_picture: teacher_response.profile_picture,
-    };
-    return teacher;
-  });
+  //  Mock data
+  // const teachers_real: Teacher[] = teacherList.map((teacher_response) => {
+  //   const teacher: Teacher = {
+  //     id: teacher_response.id,
+  //     name: teacher_response.full_name,
+  //     subject:
+  //       teacher_response.modulesAndClassGroups?.[0]?.module.module_name ||
+  //       "unfound",
+  //     classes: map_subjects(teacher_response.modulesAndClassGroups || []),
+  //     phone: teacher_response.phone_number,
+  //     email: teacher_response.user.email,
+  //     experience: teacher_response.years_of_experience,
+  //     status: teacher_response.status === "pending" ? "معلق" : "نشط",
+  //     profile_picture: teacher_response.profile_picture,
+  //   };
+  //   return teacher;
+  // });
   const subjects = [
     "الرياضيات",
     "اللغة العربية",
@@ -201,12 +191,113 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     "الإنجليزية",
   ];
 
-  const filteredTeachers = teachers_real.filter(
+  const loopThroughClassGroups = (teacher: Teacher) => {
+    let exist: boolean = false;
+
+    teacher.modulesAndClassGroups?.[0].module.module_name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    if (!teacher.modulesAndClassGroups) {
+      return;
+    }
+
+    for (let i = 0; i < teacher.modulesAndClassGroups?.length; i++) {
+      exist =
+        exist ||
+        teacher.modulesAndClassGroups?.[i].class_group.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+    }
+
+    return exist;
+  };
+  const filteredTeachers = teacherList.filter(
     (teacher) =>
-      teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      teacher.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      teacher.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      loopThroughClassGroups(teacher)
   );
 
+  async function RefetchData() {
+    //! To sync the teachers with teacher in the server
+    const updated_data_res =
+      await school_dashboard_client.get_current_school_teachers();
+    if (updated_data_res.ok) {
+      const updated_teacher_list: Teacher[] = updated_data_res.data;
+      setTeacherList(updated_teacher_list);
+    }
+  }
+  //! Edit Teacher :
+  const [last_chosen_teacher_id, set_last_chosen_teacher_id] = useState(-1);
+  const [showEditModal, setShowEditModel] = useState(false);
+  const [profile_pic_update, setProfilPic_update] = useState<File | null>(null);
+  const [full_name_update, set_full_name_update] = useState("");
+  const [phone_number_update, set_phone_number_update] = useState("");
+  const [years_of_experience_update, set_years_of_experience_update] =
+    useState("0");
+  const handleEditSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+
+    // selected teacher to perform various checks
+    const selected_teacher = teacherList.find(
+      (t) => t.user.id === last_chosen_teacher_id
+    );
+
+    // empty name fall back to default
+    formData.append("full_name", full_name_update);
+    if (!full_name_update) {
+      formData.append("full_name", selected_teacher?.full_name ?? "");
+    }
+
+    formData.append("phone_number", phone_number_update);
+    // empty phone number fall back
+    if (!phone_number_update) {
+      formData.append("phone_number", selected_teacher?.phone_number ?? "");
+    }
+
+    if (profile_pic_update) {
+      formData.append("profile_picture", profile_pic_update);
+    }
+    if (years_of_experience_update !== "0") {
+      formData.append("years_of_experience", years_of_experience_update);
+    }
+
+    console.log(Object.fromEntries(formData.entries()));
+
+    //? API CALL
+    const latest_csrf = getCSRFToken()!;
+    const res = await school_dashboard_client.update_teacher(
+      last_chosen_teacher_id,
+      formData,
+      latest_csrf
+    );
+    // Refresh Data if successful update :
+    if (res.ok) {
+      setShowEditModel(false);
+      console.log(res);
+      RefetchData();
+    }
+  };
+  //! Activate teacher :
+  const handleActivateTeacher = async (id: number, activate: boolean) => {
+    // selected teacher to perform various checks
+    // const selected_teacher = teacherList.find(
+    //   (t) => t.user.id === last_chosen_teacher_id
+    // );
+    const latest_csrf = getCSRFToken()!;
+    const formData = new FormData();
+    formData.append("status", activate ? "active" : "pending");
+    const patch_res = await school_dashboard_client.update_teacher(
+      id,
+      formData,
+      latest_csrf
+    );
+    // Sync data with the server
+    if (patch_res.ok) {
+      RefetchData();
+    }
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -241,7 +332,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTeachers.map((teacher) => (
           <div
-            key={teacher.id}
+            key={teacher.user.id}
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
           >
             <div className="flex items-center justify-between mb-4">
@@ -261,44 +352,25 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {teacher.name}
+                    {teacher.full_name}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {teacher.subject}
+                    {teacher.modulesAndClassGroups?.[0]?.module.module_name}
                   </p>
                 </div>
               </div>
               <span
                 className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  teacher.status === "نشط"
+                  teacher.status === "نشط" || teacher.status === "active"
                     ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                     : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                 }`}
               >
-                {teacher.status}
+                {teacher.status === "نشط" || teacher.status === "active"
+                  ? "نشط"
+                  : "معطل"}
               </span>
             </div>
-            {/* SIMPLE FORM EXAMPLE TO PATCH REQEST */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleChangeDataSumbit(e, teacher.id.toString());
-              }}
-            >
-              <input
-                type="file"
-                className="mb-4"
-                name="change picture"
-                onChange={(e) =>
-                  setFile(e.target.files ? e.target.files[0] : null)
-                }
-              />
-              <input
-                type="submit"
-                value="change data"
-                className="bg-blue-800 p-2 my-4 text-white rounded cursor-pointer "
-              />
-            </form>
 
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
@@ -306,7 +378,9 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   الفصول:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {teacher.classes.join(", ")}
+                  {teacher.modulesAndClassGroups
+                    ?.map((x) => x.class_group.name)
+                    .join(", ")}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -314,7 +388,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   الخبرة:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {teacher.experience}
+                  {teacher.years_of_experience}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -322,7 +396,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   الهاتف:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {teacher.phone}
+                  {teacher.phone_number}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -330,15 +404,17 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   البريد:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white text-left">
-                  {teacher.email}
+                  {teacher.user.email}
                 </span>
               </div>
             </div>
 
             <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                {/* hide teacher removed for now  */}
+                {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                   <Eye className="h-4 w-4" />
+<<<<<<< HEAD
                 </button>
                 <button
                   onClick={() => setShowEditModal(true)}
@@ -348,20 +424,44 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     onClick={() => setLastChosenTeacher(teacher.id)}
                     className="h-4 w-4"
                   />
+=======
+                </button> */}
+
+                <button
+                  onClick={() => {
+                    setShowEditModel(true);
+                    set_last_chosen_teacher_id(teacher.user.id);
+                  }}
+                  className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                >
+                  <Edit className="h-4 w-4" />
+>>>>>>> temp-fix
                 </button>
-                <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                {/* Delete teacher removed for now  */}
+                {/* <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                   <Trash2 className="h-4 w-4" />
+                </button> */}
+              </div>
+
+              <div className="activation-buttons">
+                <button
+                  onClick={() => handleActivateTeacher(teacher.user.id, true)}
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                    teacher.status === "نشط"
+                      ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
+                      : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
+                  }`}
+                >
+                  {teacher.status === "نشط" ? "تعليق" : "تفعيل"}
+                </button>
+
+                <button
+                  onClick={() => handleActivateTeacher(teacher.user.id, false)}
+                  className={`px-3 mx-1 py-1 text-xs font-medium rounded-lg transition-colors ${"bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"}`}
+                >
+                  {"تعليق"}
                 </button>
               </div>
-              <button
-                className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
-                  teacher.status === "نشط"
-                    ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
-                    : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
-                }`}
-              >
-                {teacher.status === "نشط" ? "تعليق" : "تفعيل"}
-              </button>
             </div>
           </div>
         ))}
@@ -444,7 +544,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="password1"
                   type={showPassword ? "text" : "password"}
+<<<<<<< HEAD
                   value={formData_creation.password1}
+=======
+                  value={formData.password1}
+>>>>>>> temp-fix
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="كلمة السر"
@@ -453,7 +557,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+<<<<<<< HEAD
                   className="absolute mt-2.5 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+=======
+                  className="absolute mt-3 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+>>>>>>> temp-fix
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -470,7 +578,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="password2"
                   type={showPassword ? "text" : "password"}
+<<<<<<< HEAD
                   value={formData_creation.password2}
+=======
+                  value={formData.password2}
+>>>>>>> temp-fix
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="تأكيد كلمة المرور"
@@ -479,7 +591,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+<<<<<<< HEAD
                   className="absolute mt-2.5 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+=======
+                  className="absolute mt-3 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+>>>>>>> temp-fix
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -527,7 +643,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
         </div>
       )}
 
+<<<<<<< HEAD
       {/* Edit Teacher Modal */}
+=======
+      {/* Edit Parent Modal */}
+>>>>>>> temp-fix
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
@@ -535,6 +655,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               تحديث بيانات المعلم
             </h3>
 
+<<<<<<< HEAD
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="Profile Picture">
                 <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -556,6 +677,30 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="file"
                   id="img-update-form"
                   name="image_uploads"
+=======
+            <form className="space-y-4" onSubmit={handleEditSubmit}>
+              {/* Profil Pic */}
+              <div className="profile-picture-container">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  صورة الملف الشخصي
+                </label>
+                <label
+                  htmlFor="img-file-update"
+                  className="flex text-gray-300 bg-brand-blue w-1/4 p-2 mt-2 rounded cursor-pointer "
+                >
+                  <FileUp />
+                  <div className="text">تحميل</div>
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const uploaded_file = e.target.files
+                      ? e.target.files?.[0]
+                      : null;
+                    setProfilPic_update(uploaded_file);
+                  }}
+                  id="img-file-update"
+>>>>>>> temp-fix
                   style={{ display: "none" }}
                 />
               </div>
@@ -567,21 +712,34 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="name"
                   type="text"
+<<<<<<< HEAD
                   value={formData_creation.name}
                   onChange={handleChange}
+=======
+                  value={full_name_update}
+                  onChange={(e) => set_full_name_update(e.target.value)}
+>>>>>>> temp-fix
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="الاسم الكامل"
                 />
               </div>
 
+<<<<<<< HEAD
               {/* For later when we have : Modules */}
               {/* <div>
+=======
+              <div>
+>>>>>>> temp-fix
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   المادة
                 </label>
                 <select
                   name="subject"
+<<<<<<< HEAD
                   value={formData_creation.subject}
+=======
+                  value={formData.subject}
+>>>>>>> temp-fix
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
@@ -592,7 +750,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     </option>
                   ))}
                 </select>
+<<<<<<< HEAD
               </div> */}
+=======
+              </div>
+>>>>>>> temp-fix
 
               {/* <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -601,7 +763,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="email"
                   type="email"
+<<<<<<< HEAD
                   value={formData_creation.email}
+=======
+                  value={formData.email}
+>>>>>>> temp-fix
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="teacher@school.dz"
@@ -615,8 +781,13 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="phone"
                   type="tel"
+<<<<<<< HEAD
                   value={formData_creation.phone}
                   onChange={handleChange}
+=======
+                  value={phone_number_update}
+                  onChange={(e) => set_phone_number_update(e.target.value)}
+>>>>>>> temp-fix
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="0555 XX XX XX"
                 />
@@ -629,7 +800,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="password1"
                   type={showPassword ? "text" : "password"}
+<<<<<<< HEAD
                   value={formData_creation.password1}
+=======
+                  value={formData.password1}
+>>>>>>> temp-fix
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="كلمة السر"
@@ -638,7 +813,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+<<<<<<< HEAD
                   className="absolute mt-2.5 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+=======
+                  className="absolute mt-3 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+>>>>>>> temp-fix
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -655,7 +834,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="password2"
                   type={showPassword ? "text" : "password"}
+<<<<<<< HEAD
                   value={formData_creation.password2}
+=======
+                  value={formData.password2}
+>>>>>>> temp-fix
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="تأكيد كلمة المرور"
@@ -664,7 +847,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+<<<<<<< HEAD
                   className="absolute mt-2.5 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+=======
+                  className="absolute mt-3 right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+>>>>>>> temp-fix
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -681,8 +868,17 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <input
                   name="years_of_experience"
                   type="number"
+<<<<<<< HEAD
                   value={formData_creation.years_of_experience}
                   onChange={handleChange}
+=======
+                  value={years_of_experience_update}
+                  onChange={(e) =>
+                    set_years_of_experience_update(e.target.value)
+                  }
+                  min={0}
+                  max={20}
+>>>>>>> temp-fix
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="عدد السنوات"
                 />
@@ -695,10 +891,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+<<<<<<< HEAD
                   onClick={() => {
                     setShowEditModal(false);
                     setLastChosenTeacher(-1);
                   }}
+=======
+                  onClick={() => setShowEditModel(false)}
+>>>>>>> temp-fix
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   إلغاء

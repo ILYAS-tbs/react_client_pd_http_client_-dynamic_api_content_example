@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { X, Eye, EyeOff, Users, School, GraduationCap } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
-import { http_client } from "../services/http_api/auth/http_client";
+import { auth_http_client } from "../services/http_api/auth/auth_http_client";
 
 interface LoginProps {
   isOpen?: boolean;
@@ -17,7 +17,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>("");
-  const { login, change_role } = useAuth();
+  const { login, change_role, logout } = useAuth();
   const { t, language, isRTL } = useLanguage();
   const navigate = useNavigate();
 
@@ -27,16 +27,15 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
     setError("");
 
     try {
-      // call 01 - authenticate user
-      const success = await login(email, password, role);
-      // call 02 - role of this user
-      const role_data = await http_client.get_role();
-      const role_from_server = role_data.role; // actual role from server
-      setRole(role_from_server); // this compoennt state role
-      change_role(role_from_server); // auth context rule
+      // Call 00 : logout first - removing the session_id if it was there from signup
+      const logout_res = logout();
 
-      if (success) {
-        navigate(`/${role_from_server}-dashboard`);
+      // call 01 - authenticate user
+      const success_result = await login(email, password, role);
+      const user_role = success_result?.user?.role;
+
+      if (success_result) {
+        navigate(`/${user_role}-dashboard`);
         onClose?.();
       }
     } catch (error) {

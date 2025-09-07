@@ -21,7 +21,7 @@ import GradeOverview from "../../components/school/GradeOverview";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
-import { Student, StudentJson } from "../../models/Student";
+import { Student } from "../../models/Student";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { Event, EventJson } from "../../models/Event";
 import {
@@ -30,6 +30,9 @@ import {
 } from "../../models/AbsenceReports";
 import { getSearchParamsForLocation } from "react-router-dom/dist/dom";
 import { BehaviourReport } from "../../models/BehaviorReport";
+import { Teacher } from "../../models/Teacher";
+import { ExamSchedule } from "../../models/ExamSchedule";
+import { SchoolStat } from "../../models/SchoolStat";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -45,7 +48,7 @@ const SchoolDashboard: React.FC = () => {
 
   // to inspect some data we got from the server :
   const [students, setStudents] = useState<Student[]>([]);
-  const [teachers, setTeachers] = useState([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
   const [parents, setParents] = useState<Parent[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
@@ -53,12 +56,13 @@ const SchoolDashboard: React.FC = () => {
   const [behaviour_reports, setBehaviourReports] = useState<BehaviourReport[]>(
     []
   );
+  const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
+  const [school_stat, setSchoolStat] = useState<SchoolStat | null>(null);
+
   const get_current_school_students = async () => {
     const res = await school_dashboard_client.get_current_school_students();
     if (res.ok) {
-      const students_list: Student[] = res.data.map(
-        (studentJson: StudentJson) => Student.fromJson(studentJson)
-      );
+      const students_list: Student[] = res.data;
       setStudents(students_list);
     }
   };
@@ -66,7 +70,8 @@ const SchoolDashboard: React.FC = () => {
   const get_current_school_teachers = async () => {
     const res = await school_dashboard_client.get_current_school_teachers();
     if (res.ok) {
-      setTeachers(res.data);
+      const teachers_list: Teacher[] = res.data;
+      setTeachers(teachers_list);
     }
   };
 
@@ -105,12 +110,28 @@ const SchoolDashboard: React.FC = () => {
       setAbsenceReports(absence_reports);
     }
   };
+  const get_current_school_exam_schedules = async () => {
+    const res =
+      await school_dashboard_client.get_current_school_exam_schedules();
+
+    if (res.ok) {
+      const exam_schedules_list: ExamSchedule[] = res.data;
+      setExamSchedules(exam_schedules_list);
+    }
+  };
   const get_current_school_behaviour_reports = async () => {
     const res =
       await school_dashboard_client.get_current_school_behaviour_reports();
     if (res.ok) {
       const behaviour_reports_list: BehaviourReport[] = res.data;
       setBehaviourReports(behaviour_reports_list);
+    }
+  };
+  const get_current_school_stats = async () => {
+    const res = await school_dashboard_client.get_current_school_stats();
+    if (res.ok) {
+      const school_stat: SchoolStat = res.data;
+      setSchoolStat(school_stat);
     }
   };
   useEffect(() => {
@@ -122,6 +143,8 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_events();
     get_current_school_absence_reports();
     get_current_school_behaviour_reports();
+    get_current_school_exam_schedules();
+    get_current_school_stats();
   }, []);
   const stats = [
     {
@@ -311,7 +334,12 @@ const SchoolDashboard: React.FC = () => {
           />
         );
       case "exams":
-        return <ExamScheduleManagemen />;
+        return (
+          <ExamScheduleManagemen
+            exam_schedules={exam_schedules}
+            setExamSchedules={setExamSchedules}
+          />
+        );
       case "reports":
         return (
           <div className="space-y-6">
@@ -320,7 +348,13 @@ const SchoolDashboard: React.FC = () => {
           </div>
         );
       case "grades":
-        return <GradeOverview />;
+        return (
+          <GradeOverview
+            school_stat={school_stat}
+            setSchoolStat={setSchoolStat}
+            class_groups={class_groups}
+          />
+        );
       case "activities":
         return <ActivitiesManagement events_list={events} />;
       default:

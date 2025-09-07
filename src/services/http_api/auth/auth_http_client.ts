@@ -4,8 +4,8 @@ import {
   LoginPayload,
   RegisterParentPayload,
   RegisterTeacherPayload,
-} from "../http_payload_types";
-export const SERVER_BASE_URL = "http://127.0.0.1:8000";
+} from "../payloads_types/school_client_payload_types";
+import { SERVER_BASE_URL } from "../server_constants";
 
 const URLS = {
   SESSION: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
@@ -13,7 +13,7 @@ const URLS = {
   SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
   TEACHER_SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/app/v1/auth/signup`,
   LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
-  LOGOUT: `${SERVER_BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
+  LOGOUT: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
   REGISTER_SCHOOL: `${SERVER_BASE_URL}/school/register-school/`,
   REGISTER_PARENT: `${SERVER_BASE_URL}/parent/register-parent/`,
   REGISTER_TEACHER: `${SERVER_BASE_URL}/teacher/register-teacher/`,
@@ -194,7 +194,7 @@ async function register_Teacher(
     return { ok: false, error: error };
   }
 }
-export const http_client = {
+export const auth_http_client = {
   signup: signup,
   teacher_signup: teacher_signup,
   login: login,

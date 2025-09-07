@@ -12,9 +12,9 @@ import {
 import { ClassesManagementProps } from "../../types";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
-import { PostPutClassGroupPayload } from "../../services/http_api/http_payload_types";
+import { PostPutClassGroupPayload } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
-import { SERVER_BASE_URL } from "../../services/http_api/auth/http_client";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 
 interface Class {
   class_group_id: string;

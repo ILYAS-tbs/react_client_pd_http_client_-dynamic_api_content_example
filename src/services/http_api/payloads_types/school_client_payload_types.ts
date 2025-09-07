@@ -8,6 +8,7 @@ export type RegisterSchoolPayload = {
   school_name: string;
   email: string;
   phone_number: string;
+  school_level: string;
   website: string;
   address: string;
   wilaya: string;
@@ -38,7 +39,7 @@ export type RegisterTeacherPayload = {
   username: string;
 };
 export type LoginPayload = {
-  //   email: string;
+  email: string;
   //   phone: string;
   username: string; // Temporarily we will send : email as username
   password: string;

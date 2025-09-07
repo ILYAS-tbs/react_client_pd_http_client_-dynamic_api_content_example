@@ -1,91 +1,79 @@
-import { getAge } from "../lib/dateUtils";
+// To parse this data:
+//
+//   import { Convert, Student } from "./file";
+//
+//   const student = Convert.toStudent(json);
 
-export interface ClassGroupJson {
+export interface Student {
+  student_id: string;
+  full_name: string;
+  is_absent: boolean;
+  academic_state: string;
+  date_of_birth: Date;
+  gender: null;
+  address: string;
+  enrollment_date: Date;
+  status: string;
+  module_grades: ModuleGrades;
+  notes: Notes;
+  trimester_grade: number;
+  parent: Parent;
+  school: School;
+  class_group?: ClassGroup;
+}
+
+export interface ClassGroup {
   class_group_id: string;
   name: string;
   school: string;
+  teacher_list: null;
+  time_table: null;
   academic_year: string;
-  description: string;
+  schedule: Schedule[];
 }
 
-// private for inside this module .. detailed Parent will be a model class
-interface ParentJson {
+export interface Schedule {
+  day: string;
+  time: string;
+}
+
+export interface ModuleGrades {
+  s1: { [key: string]: S1 }[];
+  s2: any[];
+}
+
+export interface S1 {
+  average: number;
+  teacher_name: string;
+}
+
+export interface Notes {}
+
+export interface Parent {
   user: number;
   full_name: string;
   phone_number: string;
+  address: string;
+  relationship_to_student: string;
+  profile_picture: null;
+  emergency_contact: null;
+  emergency_phone: null;
 }
 
-export interface StudentJson {
-  student_id: string;
-  full_name: string;
-  date_of_birth: string;
-  gender: string;
-  address: string;
-  enrollment_date: string;
-  status: string;
-  module_grade: {};
-  notes: {};
-  trimester_grade?: string;
-  parent?: ParentJson;
-  class_group?: ClassGroupJson;
+export interface School {
+  school_id: string;
+  school_name: string;
+  email: string;
+  school_level: string;
 }
-// Frontend Student shape in : StudentManagement
-interface StudentParams {
-  student_id: string;
-  full_name: string;
-  age: number;
-  date_of_birth: string;
-  attendance?: string;
-  class_group?: ClassGroupJson;
-  parent?: ParentJson;
-  phone?: string;
-  trimester_grade?: number;
-}
-export class Student {
-  student_id: string;
-  full_name: string;
-  age: number;
-  date_of_birth: string;
-  attendance?: string;
-  class_group?: ClassGroupJson;
-  parent?: ParentJson;
-  phone?: string;
-  trimester_grade?: number;
-  constructor({
-    student_id,
-    full_name,
-    age,
-    date_of_birth,
-    attendance,
-    class_group,
-    parent,
-    phone,
-    trimester_grade,
-  }: StudentParams) {
-    this.student_id = student_id;
-    this.full_name = full_name;
-    this.age = age;
-    this.date_of_birth = date_of_birth;
-    this.attendance = attendance;
-    this.class_group = class_group;
-    this.parent = parent;
-    this.phone = phone;
-    this.trimester_grade = trimester_grade;
+
+// Converts JSON strings to/from your types
+export class StudentConvert {
+  public static toStudent(json: string): Student {
+    return JSON.parse(json);
   }
 
-  static fromJson(json: StudentJson) {
-    return new Student({
-      student_id: json.student_id,
-      full_name: json.full_name,
-      date_of_birth: json.date_of_birth,
-      age: getAge(json.date_of_birth),
-      attendance: undefined,
-      class_group: json.class_group,
-      parent: json.parent,
-      trimester_grade:
-        json.trimester_grade !== undefined && json.trimester_grade !== null
-          ? Number(json.trimester_grade)
-          : 0, // fallback
-    });
+  public static studentToJson(value: Student): string {
+    return JSON.stringify(value);
   }
 }

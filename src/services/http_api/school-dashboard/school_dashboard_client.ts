@@ -5,16 +5,17 @@ import {
   PostPutClassGroupPayload as PostClassGroupPayload,
   PostStudentPayload,
   TeacherPayload,
-} from "../http_payload_types";
+} from "../payloads_types/school_client_payload_types";
 
 const BASE_URL = "http://127.0.0.1:8000";
-
 const URLS = {
   get_current_school_students: `${BASE_URL}/school/schools/get_current_school_students`,
   get_current_school_teachers: `${BASE_URL}/school/schools/get_current_school_teachers`,
   get_current_school_class_groups: `${BASE_URL}/school/schools/get_current_school_class_groups`,
   get_current_school_parents: `${BASE_URL}/school/schools/get_current_school_parents`,
   get_current_school_events: `${BASE_URL}/school/schools/get_current_school_events/`,
+  get_current_school_exam_schedules: `${BASE_URL}/school/schools/get_current_school_exam_schedules/`,
+  get_current_school_stats: `${BASE_URL}/school/schools/get_current_school_stats/`,
 
   patch_teacher: `${BASE_URL}/teacher/teachers/`,
 
@@ -93,9 +94,37 @@ async function get_current_school_parents() {
   }
 }
 
+async function get_current_school_exam_schedules() {
+  try {
+    const response = await fetch(URLS.get_current_school_exam_schedules, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function get_current_school_stats() {
+  try {
+    const response = await fetch(URLS.get_current_school_stats, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 // POST / PATCH  requests :
 async function update_teacher(
-  id: string,
+  id: number,
   formData: FormData,
   csrf_token: string
 ) {
@@ -118,17 +147,21 @@ async function update_teacher(
   */
 
   const PATCH_URL = URLS.patch_teacher + id + "/";
-  //  do not set Content-Type manually, browser will set boundary for multipart (mutipart : data + files)
-  const response = await fetch(PATCH_URL, {
-    method: "PATCH",
-    headers: {
-      "X-CSRFTOKEN": csrf_token,
-    },
-    credentials: "include",
-    body: formData,
-  });
-  const data = await response.json();
-  return data;
+  try {
+    //  do not set Content-Type manually, browser will set boundary for multipart (mutipart : data + files)
+    const response = await fetch(PATCH_URL, {
+      method: "PATCH",
+      headers: {
+        "X-CSRFTOKEN": csrf_token,
+      },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
 }
 
 // POST class_group
@@ -402,6 +435,8 @@ export const school_dashboard_client = {
   get_current_school_class_groups: get_current_school_class_groups,
   get_current_school_parents: get_current_school_parents,
   get_current_school_events: get_current_school_events,
+  get_current_school_exam_schedules: get_current_school_exam_schedules,
+  get_current_school_stats: get_current_school_stats,
 
   update_teacher: update_teacher,
 
