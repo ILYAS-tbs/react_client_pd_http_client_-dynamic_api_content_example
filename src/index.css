@@ -1,11 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap");
-<<<<<<< HEAD
-@import "tailwindcss";
-=======
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
->>>>>>> temp-fix
 
 /* RTL Support */
 [dir="rtl"] {
@@ -189,11 +185,8 @@ html {
   background-color: #39789b;
   color: white;
 }
-<<<<<<< HEAD
 
 /* !  Custom Styling*/
 @theme {
   --color-brand-blue: #39789b;
 }
-=======
->>>>>>> temp-fix
