@@ -11,7 +11,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { TeacherAbsenceManagerProps } from "../../types";
-import { TeacherAbsence } from "../../models/Absence";
+import { TeacherAbsence } from "../../models/TeacherAbsence";
 import { User } from "../../contexts/AuthContext";
 import { Student } from "../../models/Student";
 import { PostBehaviourReportPayload } from "../../services/http_api/payloads_types/teacher_client_payload_types";

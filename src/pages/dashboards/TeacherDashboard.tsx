@@ -21,7 +21,7 @@ import { Mark } from "../../models/Mark";
 import { TeacherUpload } from "../../models/TeacherUpload";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import TeacherAbsenceManager from "../../components/teacher/TeacherAbsenceManager";
-import { TeacherAbsence } from "../../models/Absence";
+import { TeacherAbsence } from "../../models/TeacherAbsence";
 import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
 import { User } from "../../contexts/AuthContext";
 import { BehaviourReport } from "../../models/BehaviorReport";

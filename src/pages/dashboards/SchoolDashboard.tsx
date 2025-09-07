@@ -21,7 +21,7 @@ import GradeOverview from "../../components/school/GradeOverview";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
-import { Student, StudentJson } from "../../models/Student";
+import { Student } from "../../models/Student";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { Event, EventJson } from "../../models/Event";
 import {
@@ -62,9 +62,7 @@ const SchoolDashboard: React.FC = () => {
   const get_current_school_students = async () => {
     const res = await school_dashboard_client.get_current_school_students();
     if (res.ok) {
-      const students_list: Student[] = res.data.map(
-        (studentJson: StudentJson) => Student.fromJson(studentJson)
-      );
+      const students_list: Student[] = res.data;
       setStudents(students_list);
     }
   };

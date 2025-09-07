@@ -17,7 +17,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>("");
-  const { login, change_role } = useAuth();
+  const { login, change_role, logout } = useAuth();
   const { t, language, isRTL } = useLanguage();
   const navigate = useNavigate();
 
@@ -27,6 +27,9 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
     setError("");
 
     try {
+      // Call 00 : logout first - removing the session_id if it was there from signup
+      const logout_res = logout();
+
       // call 01 - authenticate user
       const success_result = await login(email, password, role);
       const user_role = success_result?.user?.role;

@@ -30,7 +30,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       return 0;
     }
     if (!school_stat.failed_students_number) {
-      return 100;
+      return 1;
     }
 
     percentage =

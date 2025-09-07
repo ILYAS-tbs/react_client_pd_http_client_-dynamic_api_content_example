@@ -17,7 +17,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   setStudentsGrades,
 }) => {
   const [selectedClass, setSelectedClass] = useState(
-    modules_class_groups?.[0].class_group.name
+    modules_class_groups?.[0]?.class_group.name
   );
   const [selectedSubject, setSelectedSubject] = useState("الرياضيات");
   const [selectedModule, setSelectedModule] = useState(""); // Add module filter state

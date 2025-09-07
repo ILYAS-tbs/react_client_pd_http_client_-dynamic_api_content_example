@@ -22,7 +22,7 @@ import {
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { User } from "../../contexts/AuthContext";
 import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
-import { TeacherAbsence } from "../../models/Absence";
+import { TeacherAbsence } from "../../models/TeacherAbsence";
 
 const ClassManagement: React.FC<ClassManagementProps> = ({
   students_list,
@@ -32,7 +32,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
   teacher_id,
 }) => {
   const default_first_class =
-    modules_class_groups?.[0].class_group.class_group_id;
+    modules_class_groups?.[0]?.class_group.class_group_id;
   const [selectedClass, setSelectedClass] = useState(default_first_class);
 
   const [showAbsenseTakingModal, setShowAbsenseTakingModal] = useState(false);

@@ -8,7 +8,7 @@ import { Parent, ParentJson } from "../models/ParenAndStudent";
 import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
 import { Teacher } from "../models/Teacher";
-import { TeacherAbsence } from "../models/Absence";
+import { TeacherAbsence } from "../models/TeacherAbsence";
 import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
 import {
   ResponseParent,
@@ -19,6 +19,7 @@ import { Module } from "../models/Module";
 import { Mark } from "../models/Mark";
 import { StudentGrade } from "../models/StudentGrade";
 import { TeacherUpload } from "../models/TeacherUpload";
+import { StudentPerformance } from "../models/StudentPerformance";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -160,4 +161,15 @@ export interface ResourceManagerProps {
   modules_class_groups: TeacherModuleClassGroup[];
   teacher_uploads: TeacherUpload[];
   setTeacherUploads: React.Dispatch<React.SetStateAction<TeacherUpload[]>>;
+}
+
+//! Parent Dashboard :
+export interface ChildrenOverviewProps {
+  students: Student[];
+  one_student_absences: (s: Student) => number | undefined;
+}
+
+export interface GradeReportsProps {
+  students: Student[];
+  studentPerformances: StudentPerformance[];
 }
