@@ -32,6 +32,7 @@ import { BehaviourReport } from "../../models/BehaviorReport";
 import { Teacher } from "../../models/Teacher";
 import { ExamSchedule } from "../../models/ExamSchedule";
 import { SchoolStat } from "../../models/SchoolStat";
+import TeacherManagement from "../../components/school/TeacherManagement";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
