@@ -173,3 +173,11 @@ export interface GradeReportsProps {
   students: Student[];
   studentPerformances: StudentPerformance[];
 }
+
+export interface AbsenceManagerProps {
+  students: Student[];
+  absence_reports: AbsenceReport[];
+  setAbsenceReports: React.Dispatch<React.SetStateAction<AbsenceReport[]>>;
+  behaviour_reports: BehaviourReport[];
+  setBehabiourReports: React.Dispatch<React.SetStateAction<BehaviourReport[]>>;
+}

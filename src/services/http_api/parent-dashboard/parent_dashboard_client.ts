@@ -1,3 +1,5 @@
+import { PostAbsenceReportPayload } from "../payloads_types/parent_client_payload_types";
+
 const BASE_URL = "http://127.0.0.1:8000";
 
 const URLS = {
@@ -7,6 +9,8 @@ const URLS = {
   get_current_parent_all_students_uploads: `${BASE_URL}/parent/parents/get_current_parent_all_students_uploads/`,
   current_parent_students_absences: `${BASE_URL}/parent/parents/current_parent_students_absences/`,
   get_current_parent_students_performances: `${BASE_URL}/parent/parents/get_current_parent_students_performances/`,
+
+  post_absence_report: `${BASE_URL}/school/absence-reports/`,
 };
 
 async function get_current_parent_students() {
@@ -93,6 +97,37 @@ async function get_current_parent_students_performances() {
   }
 }
 
+async function post_absence_report(
+  payload: PostAbsenceReportPayload,
+  csrf_token: string
+) {
+  const formData: FormData = new FormData();
+  formData.append("absence_date", payload.absence_date);
+  formData.append("absence_reason", payload.absence_reason);
+  formData.append("more_details", payload.more_details);
+  formData.append("is_urgent", String(payload.is_urgent));
+  formData.append("student_id", payload.student_id);
+
+  if (payload.proof_document) {
+    formData.append("proof_document", payload.proof_document);
+  }
+
+  try {
+    const response = await fetch(URLS.post_absence_report, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrf_token,
+      },
+      credentials: "include",
+      body: formData,
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 export const parent_dashboard_client = {
   get_current_parent_students: get_current_parent_students,
   get_current_parent_absence_reports: get_current_parent_absence_reports,
@@ -103,4 +138,6 @@ export const parent_dashboard_client = {
 
   get_current_parent_students_performances:
     get_current_parent_students_performances,
+
+  post_absence_report: post_absence_report,
 };

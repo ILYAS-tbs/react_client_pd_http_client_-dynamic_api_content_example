@@ -182,7 +182,15 @@ const ParentDashboard: React.FC = () => {
           />
         );
       case "absences":
-        return <AbsenceManager />;
+        return (
+          <AbsenceManager
+            students={students}
+            absence_reports={absence_reports}
+            setAbsenceReports={setAbsenceReports}
+            behaviour_reports={behaviour_reports}
+            setBehabiourReports={setBehabiourReports}
+          />
+        );
       case "chat":
         return <ParentChat userType="parent" />;
       case "announcements":

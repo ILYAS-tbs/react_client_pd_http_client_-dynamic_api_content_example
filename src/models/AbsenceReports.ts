@@ -11,7 +11,10 @@ export interface AbsenceReport {
   submit_date: Date;
   absence_reason: string;
   proof_document: string;
-  status: "pending" | "accepted" | "refused";
+  status: "pending" | "approved" | "rejected";
+  adminComment?: string;
+  reviewDate?: Date;
+
   class_group: ClassGroup;
   student: Student;
   parent: Parent;
