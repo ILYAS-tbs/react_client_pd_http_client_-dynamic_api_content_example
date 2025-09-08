@@ -20,6 +20,7 @@ import { Mark } from "../models/Mark";
 import { StudentGrade } from "../models/StudentGrade";
 import { TeacherUpload } from "../models/TeacherUpload";
 import { StudentPerformance } from "../models/StudentPerformance";
+import { ParentStudentEvent } from "../models/ParentStudentEvent";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -180,4 +181,12 @@ export interface AbsenceManagerProps {
   setAbsenceReports: React.Dispatch<React.SetStateAction<AbsenceReport[]>>;
   behaviour_reports: BehaviourReport[];
   setBehabiourReports: React.Dispatch<React.SetStateAction<BehaviourReport[]>>;
+}
+
+export interface ActivitiesViewProps {
+  parentStudentsEvents: ParentStudentEvent[];
+}
+
+export interface ResourceLibraryProps {
+  uploads: TeacherUpload[];
 }

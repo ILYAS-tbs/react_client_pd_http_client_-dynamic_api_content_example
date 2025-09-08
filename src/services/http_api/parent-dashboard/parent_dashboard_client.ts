@@ -11,6 +11,7 @@ const URLS = {
   get_current_parent_students_performances: `${BASE_URL}/parent/parents/get_current_parent_students_performances/`,
 
   post_absence_report: `${BASE_URL}/school/absence-reports/`,
+  parent_students_events: `${BASE_URL}/parent/parents/parent_students_events/`,
 };
 
 async function get_current_parent_students() {
@@ -96,6 +97,19 @@ async function get_current_parent_students_performances() {
     return { ok: false, error: error };
   }
 }
+async function parent_students_events() {
+  try {
+    const response = await fetch(URLS.parent_students_events, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json(); // Automatically parse the response data
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 
 async function post_absence_report(
   payload: PostAbsenceReportPayload,
@@ -135,6 +149,7 @@ export const parent_dashboard_client = {
   get_current_parent_all_students_uploads:
     get_current_parent_all_students_uploads,
   current_parent_students_absences: current_parent_students_absences,
+  parent_students_events: parent_students_events,
 
   get_current_parent_students_performances:
     get_current_parent_students_performances,

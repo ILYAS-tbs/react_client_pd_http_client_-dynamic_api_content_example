@@ -12,7 +12,6 @@ import DashboardLayout from "../../components/DashboardLayout";
 import StudentManagement from "../../components/school/StudentManagement";
 import ScheduleManagement from "../../components/school/ScheduleManagement";
 import ParentManagement from "../../components/school/ParentManagement";
-import TeacherManagement from "../../components/school/TeacherManagement";
 import ActivitiesManagement from "../../components/school/ActivitiesManagement";
 import BehaviorReports from "../../components/school/BehaviorReports";
 import ExamScheduleManagemen from "../../components/school/ExamScheduleManagemen";

@@ -29,6 +29,7 @@ import { TeacherUpload } from "../../models/TeacherUpload.ts";
 import { parent_dashboard_client } from "../../services/http_api/parent-dashboard/parent_dashboard_client.ts";
 import { ParentAbsence } from "../../models/ParentAbsence.ts";
 import { StudentPerformance } from "../../models/StudentPerformance.ts";
+import { ParentStudentEvent } from "../../models/ParentStudentEvent.ts";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -45,6 +46,10 @@ const ParentDashboard: React.FC = () => {
 
   const [studentPerformances, setStudentPerformances] = useState<
     StudentPerformance[]
+  >([]);
+
+  const [parentStudentsEvents, setParentStudentsEvents] = useState<
+    ParentStudentEvent[]
   >([]);
 
   const get_current_parent_students = async () => {
@@ -99,6 +104,14 @@ const ParentDashboard: React.FC = () => {
       setStudentPerformances(performances_list);
     }
   };
+
+  const parent_students_events = async () => {
+    const res = await parent_dashboard_client.parent_students_events();
+    if (res.ok) {
+      const new_events_list: ParentStudentEvent[] = res.data;
+      setParentStudentsEvents(new_events_list);
+    }
+  };
   useEffect(() => {
     get_current_parent_students();
     get_current_parent_absence_reports();
@@ -106,6 +119,7 @@ const ParentDashboard: React.FC = () => {
     get_current_parent_all_students_uploads();
     current_parent_students_absences();
     get_current_parent_students_performances();
+    parent_students_events();
   }, []);
 
   const one_student_absences = (s: Student) => {
@@ -201,9 +215,9 @@ const ParentDashboard: React.FC = () => {
       case "homework":
         return <ParentScheduleTable />;
       case "calendar":
-        return <ResourceLibrary />;
+        return <ResourceLibrary uploads={uploads} />;
       case "events":
-        return <ActivitiesView />;
+        return <ActivitiesView parentStudentsEvents={parentStudentsEvents} />;
       default:
         return (
           <div className="space-y-6">
