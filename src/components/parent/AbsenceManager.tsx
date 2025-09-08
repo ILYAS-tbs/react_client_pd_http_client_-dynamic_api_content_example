@@ -108,55 +108,83 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
     reviewDate: report.reviewDate ? new Date(report.reviewDate) : null,
   }));
 
-  const attitudeReports = [
-    {
-      id: 1,
-      childId: "child1",
-      childName: "أحمد محمد علي",
-      date: "2024-01-15",
-      behaviorRating: "ممتاز",
-      participation: "نشط جداً",
-      teacherComment:
-        "أحمد يظهر اهتماماً كبيراً في الدروس ويشارك بنشاط في النقاشات الصفية.",
-      submittedBy: "الأستاذة فاطمة حسن",
-      submittedDate: "2024-01-16",
-    },
-    {
-      id: 2,
-      childId: "child1",
-      childName: "أحمد محمد علي",
-      date: "2024-01-10",
-      behaviorRating: "جيد",
-      participation: "نشط",
-      teacherComment:
-        "أحمد يحتاج إلى التركيز أكثر أثناء الشرح لكنه يظهر تحسناً.",
-      submittedBy: "أ. محمد السعيد",
-      submittedDate: "2024-01-11",
-    },
-    {
-      id: 3,
-      childId: "child2",
-      childName: "فاطمة محمد علي",
-      date: "2024-01-08",
-      behaviorRating: "ممتاز",
-      participation: "نشط جداً",
-      teacherComment:
-        "فاطمة متعاونة للغاية وتساعد زملاءها في المشاريع الجماعية.",
-      submittedBy: "الأستاذة سارة أحمد",
-      submittedDate: "2024-01-09",
-    },
-    {
-      id: 4,
-      childId: "child2",
-      childName: "فاطمة محمد علي",
-      date: "2024-01-05",
-      behaviorRating: "جيد جداً",
-      participation: "نشط",
-      teacherComment: "فاطمة تظهر تقدماً ملحوظاً في التفاعل مع الدروس.",
-      submittedBy: "أ. علي حسن",
-      submittedDate: "2024-01-06",
-    },
-  ];
+  //! Mock Date to map the API to :
+  // const attitudeReports = [
+  //   {
+  //     id: 1,
+  //     childId: "child1",
+  //     childName: "أحمد محمد علي",
+  //     date: "2024-01-15",
+  //     behaviorRating: "ممتاز",
+  //     participation: "نشط جداً",
+  //     teacherComment:
+  //       "أحمد يظهر اهتماماً كبيراً في الدروس ويشارك بنشاط في النقاشات الصفية.",
+  //     submittedBy: "الأستاذة فاطمة حسن",
+  //     submittedDate: "2024-01-16",
+  //   },
+  //   {
+  //     id: 2,
+  //     childId: "child1",
+  //     childName: "أحمد محمد علي",
+  //     date: "2024-01-10",
+  //     behaviorRating: "جيد",
+  //     participation: "نشط",
+  //     teacherComment:
+  //       "أحمد يحتاج إلى التركيز أكثر أثناء الشرح لكنه يظهر تحسناً.",
+  //     submittedBy: "أ. محمد السعيد",
+  //     submittedDate: "2024-01-11",
+  //   },
+  //   {
+  //     id: 3,
+  //     childId: "child2",
+  //     childName: "فاطمة محمد علي",
+  //     date: "2024-01-08",
+  //     behaviorRating: "ممتاز",
+  //     participation: "نشط جداً",
+  //     teacherComment:
+  //       "فاطمة متعاونة للغاية وتساعد زملاءها في المشاريع الجماعية.",
+  //     submittedBy: "الأستاذة سارة أحمد",
+  //     submittedDate: "2024-01-09",
+  //   },
+  //   {
+  //     id: 4,
+  //     childId: "child2",
+  //     childName: "فاطمة محمد علي",
+  //     date: "2024-01-05",
+  //     behaviorRating: "جيد جداً",
+  //     participation: "نشط",
+  //     teacherComment: "فاطمة تظهر تقدماً ملحوظاً في التفاعل مع الدروس.",
+  //     submittedBy: "أ. علي حسن",
+  //     submittedDate: "2024-01-06",
+  //   },
+  // ];
+
+  const mapBehaviourRating = (rating: string) => {
+    switch (rating) {
+      case "excellent":
+        return "ممتاز";
+
+      case "very good":
+        return "جيد جداً";
+
+      case "good":
+        return "جيد";
+
+      default:
+        return "ضعيف";
+    }
+  };
+  const attitudeReports = behaviour_reports.map((report) => ({
+    id: report.behaviour_report_id,
+    childId: report.student.student_id,
+    childName: report.student.full_name,
+    date: new Date(report.date),
+    behaviorRating: mapBehaviourRating(report.type),
+    participation: report.conclusion,
+    teacherComment: report.description,
+    submittedBy: report.teacher.full_name,
+    submittedDate: new Date(report.created_at),
+  }));
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -194,10 +222,13 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const getBehaviorColor = (rating: string) => {
     switch (rating) {
       case "ممتاز":
+      case "excellent":
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
       case "جيد جداً":
+      case "very good":
         return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
       case "جيد":
+      case "good":
         return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
       default:
         return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
@@ -222,13 +253,14 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const attitudeStats = {
     total: filteredAttitudeReports.length,
     excellent: filteredAttitudeReports.filter(
-      (r) => r.behaviorRating === "ممتاز"
+      (r) => r.behaviorRating === "ممتاز" || r.behaviorRating === "excellent"
     ).length,
     veryGood: filteredAttitudeReports.filter(
-      (r) => r.behaviorRating === "جيد جداً"
+      (r) => r.behaviorRating === "جيد جداً" || r.behaviorRating === "very good"
     ).length,
-    good: filteredAttitudeReports.filter((r) => r.behaviorRating === "جيد")
-      .length,
+    good: filteredAttitudeReports.filter(
+      (r) => r.behaviorRating === "جيد" || r.behaviorRating === "good"
+    ).length,
   };
 
   //! PostAbsenceReport modal & Form :
@@ -555,10 +587,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       {report.childName}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ التقرير: {report.date}
+                      تاريخ التقرير: {report.date.toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ التقديم: {report.submittedDate}
+                      تاريخ التقديم: {report.submittedDate.toLocaleDateString()}
                     </p>
                   </div>
                 </div>
