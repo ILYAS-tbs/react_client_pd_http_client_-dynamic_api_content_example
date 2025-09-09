@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Send,
   Search,
@@ -10,23 +10,32 @@ import {
   User,
   Clock,
 } from "lucide-react";
-import { chat_http_client } from "../../services/chat/chat_http_client";
+import {
+  chat_http_client,
+  WEBSOCKET_BASEURL,
+} from "../../services/chat/chat_http_client";
 import { Teacher } from "../../models/Teacher";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import {
   GetConversationIDResponse,
+  GetConvesationMessagesPayload,
   PrivateConversationIDPayload,
 } from "../../services/chat/chat_http_payload_types";
+import { BounceLoader, MoonLoader, SyncLoader } from "react-spinners";
+import { Message } from "../../models/chat_system/Message";
 
 interface ParentChatProps {
   userType: "parent" | "teacher";
   teachers_list: Teacher[];
+  parent_id: number;
 }
 
-const ParentChat: React.FC<ParentChatProps> = ({ userType, teachers_list }) => {
-  const [selectedChat, setSelectedChat] = useState(
-    teachers_list?.[0]?.user?.id ?? -1
-  );
+const ParentChat: React.FC<ParentChatProps> = ({
+  userType,
+  teachers_list,
+  parent_id,
+}) => {
+  const [selectedChat, setSelectedChat] = useState<string | number>();
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -83,64 +92,76 @@ const ParentChat: React.FC<ParentChatProps> = ({ userType, teachers_list }) => {
 
     return chat;
   });
-  const messages = [
-    {
-      id: 1,
-      sender: userType === "parent" ? "teacher" : "parent",
-      content: "السلام عليكم ورحمة الله وبركاته",
-      timestamp: "09:00",
+
+  //! mock data
+  // const messages = [
+  //   {
+  //     id: 1,
+  //     sender: userType === "parent" ? "teacher" : "parent",
+  //     content: "السلام عليكم ورحمة الله وبركاته",
+  //     timestamp: "09:00",
+  //     date: "اليوم",
+  //     type: "text",
+  //   },
+  //   {
+  //     id: 2,
+  //     sender: userType === "parent" ? "parent" : "teacher",
+  //     content: "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً",
+  //     timestamp: "09:02",
+  //     date: "اليوم",
+  //     type: "text",
+  //   },
+  //   {
+  //     id: 3,
+  //     sender: userType === "parent" ? "teacher" : "parent",
+  //     content:
+  //       userType === "parent"
+  //         ? "أود أن أناقش معك أداء أحمد في مادة اللغة العربية. لاحظت تحسناً ملحوظاً في درجاته الأخيرة"
+  //         : "أريد أن أستفسر عن أداء ابني أحمد في الصف. هل هناك أي ملاحظات خاصة؟",
+  //     timestamp: "09:05",
+  //     date: "اليوم",
+  //     type: "text",
+  //   },
+  //   {
+  //     id: 4,
+  //     sender: userType === "parent" ? "parent" : "teacher",
+  //     content:
+  //       userType === "parent"
+  //         ? "الحمد لله، هذا يسعدني جداً. هل من نصائح إضافية لمساعدته على الاستمرار في هذا التقدم؟"
+  //         : "أحمد طالب مجتهد ومهذب. أداؤه ممتاز في الصف ويشارك بفعالية. أنصح بمواصلة تشجيعه على القراءة في البيت",
+  //     timestamp: "09:10",
+  //     date: "اليوم",
+  //     type: "text",
+  //   },
+  //   {
+  //     id: 5,
+  //     sender: userType === "parent" ? "teacher" : "parent",
+  //     content:
+  //       "نعم، أنصح بقراءة 15 دقيقة يومياً من كتب القصص المناسبة لعمره، وحل تمارين الإملاء بانتظام",
+  //     timestamp: "09:15",
+  //     date: "اليوم",
+  //     type: "text",
+  //   },
+  //   {
+  //     id: 6,
+  //     sender: userType === "parent" ? "parent" : "teacher",
+  //     content:
+  //       "شكراً لك على المتابعة المستمرة والاهتمام. سأطبق نصائحك بإذن الله",
+  //     timestamp: "10:30",
+  //     date: "اليوم",
+  //     type: "text",
+  //   },
+  // ];
+  function mapAPIMessagesToFrontMessage(messages_list: Message[]) {
+    return messages_list.map((message: Message) => ({
+      id: message.message_id,
+      sender: message.from_user === parent_id ? "parent" : "teacher",
+      content: message.content,
+      timestamp: new Date(message.timestamp),
       date: "اليوم",
       type: "text",
-    },
-    {
-      id: 2,
-      sender: userType === "parent" ? "parent" : "teacher",
-      content: "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً",
-      timestamp: "09:02",
-      date: "اليوم",
-      type: "text",
-    },
-    {
-      id: 3,
-      sender: userType === "parent" ? "teacher" : "parent",
-      content:
-        userType === "parent"
-          ? "أود أن أناقش معك أداء أحمد في مادة اللغة العربية. لاحظت تحسناً ملحوظاً في درجاته الأخيرة"
-          : "أريد أن أستفسر عن أداء ابني أحمد في الصف. هل هناك أي ملاحظات خاصة؟",
-      timestamp: "09:05",
-      date: "اليوم",
-      type: "text",
-    },
-    {
-      id: 4,
-      sender: userType === "parent" ? "parent" : "teacher",
-      content:
-        userType === "parent"
-          ? "الحمد لله، هذا يسعدني جداً. هل من نصائح إضافية لمساعدته على الاستمرار في هذا التقدم؟"
-          : "أحمد طالب مجتهد ومهذب. أداؤه ممتاز في الصف ويشارك بفعالية. أنصح بمواصلة تشجيعه على القراءة في البيت",
-      timestamp: "09:10",
-      date: "اليوم",
-      type: "text",
-    },
-    {
-      id: 5,
-      sender: userType === "parent" ? "teacher" : "parent",
-      content:
-        "نعم، أنصح بقراءة 15 دقيقة يومياً من كتب القصص المناسبة لعمره، وحل تمارين الإملاء بانتظام",
-      timestamp: "09:15",
-      date: "اليوم",
-      type: "text",
-    },
-    {
-      id: 6,
-      sender: userType === "parent" ? "parent" : "teacher",
-      content:
-        "شكراً لك على المتابعة المستمرة والاهتمام. سأطبق نصائحك بإذن الله",
-      timestamp: "10:30",
-      date: "اليوم",
-      type: "text",
-    },
-  ];
+    }));
+  }
 
   const currentChat = chats.find((chat) => chat.id === selectedChat);
   const filteredChats = chats.filter(
@@ -155,6 +176,9 @@ const ParentChat: React.FC<ParentChatProps> = ({ userType, teachers_list }) => {
       console.log("Sending message:", message);
       setMessage("");
     }
+
+    //? Message to the backend Comsumer :
+    sendMessage(message);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -166,25 +190,120 @@ const ParentChat: React.FC<ParentChatProps> = ({ userType, teachers_list }) => {
 
   //! Chat system :
   const [conv_id, setConvID] = useState("");
+  //? messages from the backend
+  const [conv_messages, setConvMessages] = useState<Message[]>([]);
+  //? messages used by the frontend
+  const messages = mapAPIMessagesToFrontMessage(conv_messages);
+
   const [isChatLoading, setIsChatLoading] = useState(true);
 
   const handleSelectingAChat = async (user_id: string | number) => {
+    setIsChatLoading(true);
+
     //? user_id : is the other user's id who we want to chat with
-    const latest_csrf = getCSRFToken()!;
+    let latest_csrf = getCSRFToken()!;
     const get_convID_payload: PrivateConversationIDPayload = {
       type: "private",
       other_user_id: user_id,
     };
+
     const res = await chat_http_client.get_conversation_id(
       get_convID_payload,
       latest_csrf
     );
     if (!res.ok) {
+      console.error("Failed to get the conversation ID");
       return;
     }
     const data: GetConversationIDResponse = res.data;
-    setConvID(data.conversation_id);
+    const latest_conv_id = data.conversation_id;
+    setConvID(latest_conv_id);
+
+    //! Fetch the messages for that conversation
+    latest_csrf = getCSRFToken()!;
+    const get_messages_payload: GetConvesationMessagesPayload = {
+      conversation_id: latest_conv_id,
+    };
+
+    const get_messages_res = await chat_http_client.get_conversation_messages(
+      get_messages_payload,
+      latest_csrf
+    );
+    if (!get_messages_res.ok) {
+      console.error("Failed to fetch the conversation messages");
+    }
+    const new_messages_list: Message[] = get_messages_res.data;
+    setConvMessages(new_messages_list);
+
+    setIsChatLoading(false);
   };
+
+  //! WebSocket protocole :
+  const socketRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    let websocket: WebSocket | null = null;
+
+    //? 0.creating a new websocket connection - only when the conv-id changes
+    const CHAT_WEBSOCKET_URL = `${WEBSOCKET_BASEURL}/ws/conversation/${conv_id}/`;
+    websocket = new WebSocket(CHAT_WEBSOCKET_URL);
+
+    //? 1.When connection opens
+    websocket.onopen = function (event) {
+      console.log("Connected to WebSocket server");
+      // we can send a message right away
+      // websocket.send(JSON.stringify({ message: "Hello from client!" }));
+    };
+
+    //? 2.When recieving a message :
+    websocket.onmessage = function (event) {
+      const new_msg: Message = JSON.parse(event.data);
+      console.log(`Message received:`);
+      console.log(new_msg);
+
+      setConvMessages((prev) => [...prev, new_msg]);
+    };
+
+    //? 3.Handle errors
+    websocket.onerror = function (error) {
+      console.error("WebSocket error:", error);
+    };
+
+    //? 4.When connection closes
+    websocket.onclose = function (event) {
+      console.log("WebSocket closed:", event);
+    };
+
+    //? Accessing the socket outside :
+    socketRef.current = websocket;
+
+    // cleanup: close socket when component unmounts
+    return () => {
+      websocket.close();
+    };
+  }, [conv_id]);
+
+  function sendMessage(message: string) {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current?.send(
+        JSON.stringify({
+          message_type: "chat_message",
+          message: message,
+        })
+      );
+    } else {
+      console.log("Socket not ready yet.");
+    }
+  }
+
+  //! CHAT UI IMPROVEMENTS :
+  const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // Scroll to the bottom whenever messages change
+    endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 h-[600px] flex">
       {/* Sidebar - Chat List */}
@@ -318,36 +437,47 @@ const ParentChat: React.FC<ParentChatProps> = ({ userType, teachers_list }) => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${
-                    msg.sender ===
-                    (userType === "parent" ? "parent" : "teacher")
-                      ? "justify-end"
-                      : "justify-start"
-                  }`}
-                >
+            {isChatLoading ? (
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 flex justify-center items-center">
+                <SyncLoader color="#16a34a" />
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.map((msg) => (
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    key={msg.id}
+                    className={`flex ${
                       msg.sender ===
                       (userType === "parent" ? "parent" : "teacher")
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        ? "justify-start"
+                        : "justify-end"
                     }`}
                   >
-                    <p className="text-sm">{msg.content}</p>
-                    <div className="flex items-center justify-end mt-1 space-x-1 rtl:space-x-reverse">
-                      <Clock className="h-3 w-3 opacity-70" />
-                      <span className="text-xs opacity-70">
-                        {msg.timestamp}
-                      </span>
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        msg.sender ===
+                        (userType === "parent" ? "parent" : "teacher")
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                      }`}
+                    >
+                      <p className="text-sm">{msg.content}</p>
+                      <div className="flex items-center justify-end mt-1 space-x-1 rtl:space-x-reverse">
+                        <Clock className="h-3 w-3 opacity-70" />
+                        <span className="text-xs opacity-70">
+                          {msg.timestamp.toLocaleString("en", {
+                            dateStyle: "medium", // or "medium" | "long"
+                            timeStyle: "short", // or "medium" | "long"
+                          })}
+                        </span>
+                      </div>
                     </div>
+                    {/* Scrolling till the end  */}
+                    <div ref={endOfMessagesRef} />
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Message Input */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700">

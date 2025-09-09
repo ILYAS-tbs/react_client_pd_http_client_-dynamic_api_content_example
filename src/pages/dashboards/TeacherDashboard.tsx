@@ -27,6 +27,9 @@ import { User } from "../../contexts/AuthContext";
 import { BehaviourReport } from "../../models/BehaviorReport";
 import { Module, ModuleClass } from "../../models/Module";
 import { StudentGrade } from "../../models/StudentGrade";
+import { chat_http_client } from "../../services/chat/chat_http_client";
+import TeacherChat from "../../components/shared/TeacherChat";
+import { Parent } from "../../models/Parent";
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -108,6 +111,19 @@ const TeacherDashboard: React.FC = () => {
       setModules(modules_list);
     }
   };
+
+  //? Chat system :
+  //? list for all the parents this teacher can chat with
+  const [parents_list, setParentsList] = useState<Parent[]>([]);
+
+  //! API CALL : 1. retrieving the teachers for this parent
+  const get_current_teacher_school_parents = async () => {
+    const res = await chat_http_client.get_current_teacher_school_parents();
+    if (res.ok) {
+      const new_parents_list: Parent[] = res.data;
+      setParentsList(new_parents_list);
+    }
+  };
   useEffect(() => {
     get_current_teacher_students();
     get_current_teacher_modules_and_class_groups();
@@ -116,6 +132,9 @@ const TeacherDashboard: React.FC = () => {
     get_current_teacher_behaviour_reports();
     current_teacher_school_modules();
     current_teacher_students_grades();
+
+    //? chat system :
+    get_current_teacher_school_parents();
   }, []);
 
   const stats = [
@@ -206,7 +225,13 @@ const TeacherDashboard: React.FC = () => {
           />
         );
       case "chat":
-        return <ParentChat userType="teacher" />;
+        return (
+          <TeacherChat
+            userType="teacher"
+            parents_list={parents_list}
+            teacher_id={teacher_id}
+          />
+        );
 
       // Might be implemented later :
       // case "schedule":

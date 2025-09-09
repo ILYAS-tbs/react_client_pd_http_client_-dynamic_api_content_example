@@ -8,3 +8,7 @@ export interface GetConversationIDResponse {
   name: string;
   type: "private" | "group";
 }
+
+export interface GetConvesationMessagesPayload {
+  conversation_id: string;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  User,
+  User as UserIcon,
   GraduationCap,
   MessageCircle,
   FileText,
@@ -33,9 +33,21 @@ import { ParentStudentEvent } from "../../models/ParentStudentEvent.ts";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups.ts";
 import { chat_http_client } from "../../services/chat/chat_http_client.ts";
 import { Teacher } from "../../models/Teacher.ts";
+import { User } from "../../contexts/AuthContext.tsx";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
+
+  // ! Fetching the parent's id (which is the user id)
+  const lc_user: User = JSON.parse(
+    localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
+  );
+  if (!lc_user) {
+    console.error("TeacherAbsenceMAnagement lc_user is null");
+    // return
+  }
+  const parent_id: number = JSON.parse(lc_user.id);
+  console.log("parent_id's id : ", parent_id);
 
   // ! Fetch from the API
   const [students, setStudents] = useState<Student[]>([]);
@@ -176,7 +188,7 @@ const ParentDashboard: React.FC = () => {
     {
       title: "أطفالي",
       value: students.length || "0",
-      icon: User,
+      icon: UserIcon,
       color: "bg-blue-500",
     },
     {
@@ -201,7 +213,7 @@ const ParentDashboard: React.FC = () => {
 
   const tabs = [
     { id: "overview", label: "نظرة عامة", icon: TrendingUp },
-    { id: "children", label: "أطفالي", icon: User },
+    { id: "children", label: "أطفالي", icon: UserIcon },
     { id: "grades", label: "المعدل", icon: FileText },
     { id: "absences", label: "تقارير وغيابات", icon: Calendar },
     { id: "chat", label: "دردشة", icon: MessageCircle },
@@ -239,7 +251,7 @@ const ParentDashboard: React.FC = () => {
           />
         );
       case "chat":
-        return <ParentChat userType="parent" teachers_list={teachers_list} />;
+        return <ParentChat userType="parent" teachers_list={teachers_list}  parent_id={parent_id}/>;
       case "announcements":
         return <SchoolAnnouncements />;
       case "timetable":
@@ -304,7 +316,7 @@ const ParentDashboard: React.FC = () => {
                 >
                   <div className="flex items-center space-x-4 rtl:space-x-reverse mb-4">
                     <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                      <User className="h-6 w-6 text-blue-600" />
+                      <UserIcon className="h-6 w-6 text-blue-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
