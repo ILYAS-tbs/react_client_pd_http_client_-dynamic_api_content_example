@@ -190,3 +190,8 @@ export interface ActivitiesViewProps {
 export interface ResourceLibraryProps {
   uploads: TeacherUpload[];
 }
+export interface ScheduleManagementParentProps {
+  students: Student[];
+  class_groups_list: ClassGroup[];
+  setClassGroupList: React.Dispatch<React.SetStateAction<ClassGroup[]>>;
+}

@@ -30,12 +30,17 @@ import { parent_dashboard_client } from "../../services/http_api/parent-dashboar
 import { ParentAbsence } from "../../models/ParentAbsence.ts";
 import { StudentPerformance } from "../../models/StudentPerformance.ts";
 import { ParentStudentEvent } from "../../models/ParentStudentEvent.ts";
+import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups.ts";
+import { chat_http_client } from "../../services/chat/chat_http_client.ts";
+import { Teacher } from "../../models/Teacher.ts";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   // ! Fetch from the API
   const [students, setStudents] = useState<Student[]>([]);
+  const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
+
   const [absence_reports, setAbsenceReports] = useState<AbsenceReport[]>([]);
   const [behaviour_reports, setBehabiourReports] = useState<BehaviourReport[]>(
     []
@@ -112,6 +117,30 @@ const ParentDashboard: React.FC = () => {
       setParentStudentsEvents(new_events_list);
     }
   };
+
+  const get_parent_class_groups = async () => {
+    const res = await parent_dashboard_client.get_parent_class_groups();
+    if (res.ok) {
+      const class_groups = res.data.map((classGroupJson: ClassGroupJson) =>
+        ClassGroup.formJson(classGroupJson)
+      );
+      setClassGroups(class_groups);
+    }
+  };
+
+  //? Chat system :
+  //? list for all the teachers this parent can chat with
+  const [teachers_list, setTeachersList] = useState<Teacher[]>([]);
+
+  //! API CALL : 1. retrieving the teachers for this parent
+  const get_current_parent_schools_teachers = async () => {
+    const res = await chat_http_client.get_current_parent_schools_teachers();
+    if (res.ok) {
+      const new_teachers_list: Teacher[] = res.data;
+      setTeachersList(new_teachers_list);
+    }
+  };
+
   useEffect(() => {
     get_current_parent_students();
     get_current_parent_absence_reports();
@@ -120,6 +149,10 @@ const ParentDashboard: React.FC = () => {
     current_parent_students_absences();
     get_current_parent_students_performances();
     parent_students_events();
+    get_parent_class_groups();
+
+    //? chat
+    get_current_parent_schools_teachers();
   }, []);
 
   const one_student_absences = (s: Student) => {
@@ -206,11 +239,17 @@ const ParentDashboard: React.FC = () => {
           />
         );
       case "chat":
-        return <ParentChat userType="parent" />;
+        return <ParentChat userType="parent" teachers_list={teachers_list} />;
       case "announcements":
         return <SchoolAnnouncements />;
       case "timetable":
-        return <ScheduleManagement />;
+        return (
+          <ScheduleManagement
+            students={students}
+            class_groups_list={class_groups}
+            setClassGroupList={setClassGroups}
+          />
+        );
 
       case "homework":
         return <ParentScheduleTable />;
