@@ -25,7 +25,10 @@ import { TeacherAbsence } from "../../models/TeacherAbsence";
 import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
 import { User } from "../../contexts/AuthContext";
 import { BehaviourReport } from "../../models/BehaviorReport";
-import { Module, ModuleClass } from "../../models/Module";
+import {
+  TeacherModuleClassGrp,
+  ModuleClass,
+} from "../../models/TeacherModuleClassGrp";
 import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
@@ -55,7 +58,7 @@ const TeacherDashboard: React.FC = () => {
   const [behaviour_reports, setBehaviourReports] = useState<BehaviourReport[]>(
     []
   );
-  const [modules, setModules] = useState<Module[]>([]);
+  const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
 
   const get_current_teacher_students = async () => {
@@ -107,7 +110,7 @@ const TeacherDashboard: React.FC = () => {
   const current_teacher_school_modules = async () => {
     const res = await teacher_dashboard_client.current_teacher_school_modules();
     if (res.ok) {
-      const modules_list: Module[] = res.data;
+      const modules_list: TeacherModuleClassGrp[] = res.data;
       setModules(modules_list);
     }
   };

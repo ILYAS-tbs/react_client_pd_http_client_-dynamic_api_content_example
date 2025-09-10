@@ -33,6 +33,7 @@ import { Teacher } from "../../models/Teacher";
 import { ExamSchedule } from "../../models/ExamSchedule";
 import { SchoolStat } from "../../models/SchoolStat";
 import TeacherManagement from "../../components/school/TeacherManagement";
+import { Module } from "../../models/Module";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -58,6 +59,7 @@ const SchoolDashboard: React.FC = () => {
   );
   const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
   const [school_stat, setSchoolStat] = useState<SchoolStat | null>(null);
+  const [modules, SetModules] = useState<Module[]>([]);
 
   const get_current_school_students = async () => {
     const res = await school_dashboard_client.get_current_school_students();
@@ -134,6 +136,14 @@ const SchoolDashboard: React.FC = () => {
       setSchoolStat(school_stat);
     }
   };
+  const get_modules = async () => {
+    const res = await school_dashboard_client.get_modules();
+    if (res.ok) {
+      const modules_list: Module[] = res.data;
+      SetModules(modules_list);
+    }
+  };
+
   useEffect(() => {
     //! fetching :
     get_current_school_students();
@@ -145,6 +155,7 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_behaviour_reports();
     get_current_school_exam_schedules();
     get_current_school_stats();
+    get_modules();
   }, []);
   const stats = [
     {
@@ -310,6 +321,8 @@ const SchoolDashboard: React.FC = () => {
             <TeacherManagement
               teachersList={teachers}
               setTeacherList={setTeachers}
+              modules={modules}
+              SetModules={SetModules}
             />
             <ParentManagement
               parentsList={parents}

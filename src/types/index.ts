@@ -15,12 +15,13 @@ import {
   ResponseStudent,
   ResponseTeacher,
 } from "../services/http_api/http_reponse_types";
-import { Module } from "../models/Module";
+import { TeacherModuleClassGrp } from "../models/TeacherModuleClassGrp";
 import { Mark } from "../models/Mark";
 import { StudentGrade } from "../models/StudentGrade";
 import { TeacherUpload } from "../models/TeacherUpload";
 import { StudentPerformance } from "../models/StudentPerformance";
 import { ParentStudentEvent } from "../models/ParentStudentEvent";
+import { Module } from "../models/Module";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -90,7 +91,10 @@ export interface StudentManagementProps {
 export interface TeacherManagementProps {
   teachersList: Teacher[];
   setTeacherList: any; // setState
+  modules:Module[],
+  SetModules:React.Dispatch<React.SetStateAction<Module[]>>
 }
+
 
 export interface ParentManagementProps {
   parentsList: Parent[];
@@ -151,7 +155,7 @@ export interface TeacherAbsenceManagerProps {
 }
 
 export interface GradeManagerProps {
-  modules: Module[];
+  modules: TeacherModuleClassGrp[];
   modules_class_groups: TeacherModuleClassGroup[];
   students_grades: StudentGrade[];
   setStudentsGrades: React.Dispatch<React.SetStateAction<StudentGrade[]>>;

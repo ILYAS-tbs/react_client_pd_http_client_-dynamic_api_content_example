@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Plus, Search, Edit, Trash2, Eye, Filter } from "lucide-react";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { StudentManagementProps } from "../../types";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { PostStudentPayload } from "../../services/http_api/payloads_types/school_client_payload_types";
-import { Student, StudentJson } from "../../models/Student";
-import { ClassGroup } from "../../models/ClassGroups";
+import { Student } from "../../models/Student";
 
 const StudentManagement: React.FC<StudentManagementProps> = ({
   studentsList,
@@ -22,58 +21,58 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
   const [last_chosen_student, set_last_chosen_student] = useState("");
 
   // fake data :
-  const students = [
-    {
-      id: 1,
-      name: "أحمد محمد علي",
-      class: "5أ",
-      age: 11,
-      parent: "محمد علي",
-      phone: "0555123456",
-      average: "16.5/20",
-      attendance: "95%",
-    },
-    {
-      id: 2,
-      name: "فاطمة حسن",
-      class: "4ب",
-      age: 10,
-      parent: "حسن أحمد",
-      phone: "0555234567",
-      average: "17.2/20",
-      attendance: "98%",
-    },
-    {
-      id: 3,
-      name: "عمر السعيد",
-      class: "6أ",
-      age: 12,
-      parent: "السعيد محمد",
-      phone: "0555345678",
-      average: "15.8/20",
-      attendance: "92%",
-    },
-    {
-      id: 4,
-      name: "زينب العلي",
-      class: "5أ",
-      age: 11,
-      parent: "علي حسن",
-      phone: "0555456789",
-      average: "18.1/20",
-      attendance: "97%",
-    },
-    {
-      id: 5,
-      name: "يوسف الأمين",
-      class: "3ب",
-      age: 9,
-      parent: "الأمين يوسف",
-      phone: "0555567890",
-      average: "14.9/20",
-      attendance: "89%",
-    },
-  ];
+  // const students = [
+  //   {
+  //     id: 1,
+  //     name: "أحمد محمد علي",
+  //     class: "5أ",
+  //     age: 11,
+  //     parent: "محمد علي",
+  //     phone: "0555123456",
+  //     average: "16.5/20",
+  //     attendance: "95%",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "فاطمة حسن",
+  //     class: "4ب",
+  //     age: 10,
+  //     parent: "حسن أحمد",
+  //     phone: "0555234567",
+  //     average: "17.2/20",
+  //     attendance: "98%",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "عمر السعيد",
+  //     class: "6أ",
+  //     age: 12,
+  //     parent: "السعيد محمد",
+  //     phone: "0555345678",
+  //     average: "15.8/20",
+  //     attendance: "92%",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "زينب العلي",
+  //     class: "5أ",
+  //     age: 11,
+  //     parent: "علي حسن",
+  //     phone: "0555456789",
+  //     average: "18.1/20",
+  //     attendance: "97%",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "يوسف الأمين",
+  //     class: "3ب",
+  //     age: 9,
+  //     parent: "الأمين يوسف",
+  //     phone: "0555567890",
+  //     average: "14.9/20",
+  //     attendance: "89%",
+  //   },
+  // ];
   function getAge(dateString: string) {
     const today = new Date();
     const birthDate = new Date(dateString);
@@ -99,12 +98,26 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       student_id: response_student.student_id,
       full_name: response_student.full_name,
       class_group: response_student.class_group,
-      age: getAge(response_student.date_of_birth),
+      age: getAge(
+        new Date(response_student?.date_of_birth ?? "2000-03-04").toDateString()
+      ),
       date_of_birth: response_student.date_of_birth,
       parent: response_student?.parent,
       phone: response_student?.parent?.phone_number,
       trimester_grade: response_student.trimester_grade ?? 0,
-      attendance: "89%",
+      attendance: response_student.number_of_absences || "0",
+      is_absent: false,
+      number_of_absences: response_student.number_of_absences,
+      academic_state: response_student.academic_state,
+      gender: response_student.gender,
+      address: response_student.address,
+      enrollment_date: new Date(
+        response_student.enrollment_date ?? "2020-09-09"
+      ),
+      status: response_student?.status,
+      module_grades: response_student?.module_grades,
+      notes: response_student?.notes,
+      school: response_student?.school,
     };
     return student;
   });
@@ -128,6 +141,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     full_name: "",
     date_of_birth: "2020-08-09",
     class_group_id: "",
+    phone: "",
   });
 
   const handleChange_creation = (
@@ -154,6 +168,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       full_name: formData_creation.full_name,
       date_of_birth: formData_creation.date_of_birth,
       class_group_id: formData_creation.class_group_id,
+      phone: formData_creation.phone,
     };
     const latest_csrf = getCSRFToken()!;
     const res = await school_dashboard_client.post_student(
@@ -182,6 +197,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     date_of_birth: "2020-08-09",
     trimester_grade: 0,
     class_group_id: "",
+    phone: "",
   });
 
   const handleChange_update = (
@@ -207,6 +223,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     // fallback to existing name if empty
     const full_name =
       formData_update.full_name.trim() || student_to_update?.full_name || "";
+    // fall back to existing number if empty :
+    const phone_num =
+      formData_update.phone.trim() || student_to_update?.phone || "empty";
     // API CALL
     const student_payload: PostStudentPayload = {
       full_name: full_name,
@@ -215,6 +234,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       class_group_id:
         formData_update.class_group_id ||
         student_to_update?.class_group?.class_group_id,
+      phone: phone_num,
     };
     const id = last_chosen_student;
     const latest_csrf = getCSRFToken()!;
@@ -237,10 +257,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
   //! 3. Delete Student :
   const handleDeleteStudent = async (student_id: string) => {
     const latest_csrf = getCSRFToken()!;
-    const res = await school_dashboard_client.delete_student(
-      student_id,
-      latest_csrf
-    );
+
+    await school_dashboard_client.delete_student(student_id, latest_csrf);
+
     // Refresh Frontend data :
     //  res.ok isn't checking correct for "DELETE"
     const get_students_res =
@@ -321,7 +340,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   المعدل
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الحضور
+                  عدد الغيابات
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   الإجراءات
@@ -329,7 +348,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredStudents.map((student, index) => (
+              {filteredStudents.map((student) => (
                 <tr
                   key={student.student_id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -469,6 +488,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </label>
                 <input
                   type="tel"
+                  name="phone"
+                  value={formData_creation.phone}
+                  onChange={handleChange_creation}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="0555 XX XX XX"
                 />
@@ -586,6 +608,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </label>
                 <input
                   type="tel"
+                  name="phone"
+                  value={formData_update.phone}
+                  onChange={handleChange_update}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="0555 XX XX XX"
                 />

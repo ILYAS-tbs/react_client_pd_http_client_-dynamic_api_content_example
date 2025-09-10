@@ -27,15 +27,17 @@ import { Teacher } from "../../models/Teacher";
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
   setTeacherList,
+  modules,
+  SetModules,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalError, SetModalError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    subject: "",
+    module_id: "",
     email: "",
-    phone: "",
+    phone_number: "",
     password1: "",
     password2: "",
     years_of_experience: 0,
@@ -68,7 +70,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     //! 1. signup an account
     const teacher_signup_payload: SignupPayload = {
       email: formData.email,
-      phone: formData.phone,
+      phone: formData.phone_number,
       username: formData.email,
       password: formData.password1,
     };
@@ -83,6 +85,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     const register_teacher_payload: RegisterTeacherPayload = {
       full_name: formData.name,
       username: formData.email,
+      phone_number: formData.phone_number,
     };
     latest_csrf = getCSRFToken()!;
     const register_teacher_res = await auth_http_client.register_Teacher(
@@ -102,48 +105,48 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [file, setFile] = useState<File | null>(null);
 
   // fake teachers data
-  const teachers = [
-    {
-      id: 1,
-      name: "أحمد بن علي",
-      subject: "الرياضيات",
-      classes: ["5أ", "5ب", "6أ"],
-      phone: "0555123456",
-      email: "ahmed@school.dz",
-      status: "نشط",
-      experience: "8 سنوات",
-    },
-    {
-      id: 2,
-      name: "فاطمة حسن",
-      subject: "اللغة العربية",
-      classes: ["4أ", "4ب"],
-      phone: "0555234567",
-      email: "fatima@school.dz",
-      status: "نشط",
-      experience: "5 سنوات",
-    },
-    {
-      id: 3,
-      name: "محمد السعيد",
-      subject: "العلوم",
-      classes: ["6أ", "6ب"],
-      phone: "0555345678",
-      email: "mohammed@school.dz",
-      status: "معلق",
-      experience: "12 سنة",
-    },
-    {
-      id: 4,
-      name: "زينب العلي",
-      subject: "التاريخ",
-      classes: ["5أ", "6أ"],
-      phone: "0555456789",
-      email: "zeinab@school.dz",
-      status: "نشط",
-      experience: "6 سنوات",
-    },
-  ];
+  // const teachers = [
+  //   {
+  //     id: 1,
+  //     name: "أحمد بن علي",
+  //     subject: "الرياضيات",
+  //     classes: ["5أ", "5ب", "6أ"],
+  //     phone: "0555123456",
+  //     email: "ahmed@school.dz",
+  //     status: "نشط",
+  //     experience: "8 سنوات",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "فاطمة حسن",
+  //     subject: "اللغة العربية",
+  //     classes: ["4أ", "4ب"],
+  //     phone: "0555234567",
+  //     email: "fatima@school.dz",
+  //     status: "نشط",
+  //     experience: "5 سنوات",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "محمد السعيد",
+  //     subject: "العلوم",
+  //     classes: ["6أ", "6ب"],
+  //     phone: "0555345678",
+  //     email: "mohammed@school.dz",
+  //     status: "معلق",
+  //     experience: "12 سنة",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "زينب العلي",
+  //     subject: "التاريخ",
+  //     classes: ["5أ", "6أ"],
+  //     phone: "0555456789",
+  //     email: "zeinab@school.dz",
+  //     status: "نشط",
+  //     experience: "6 سنوات",
+  //   },
+  // ];
 
   // real teachers data
   const map_subjects = (modulesAndClassGroupsList: ModulesAndClassGroups[]) => {
@@ -171,15 +174,18 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   //   };
   //   return teacher;
   // });
-  const subjects = [
-    "الرياضيات",
-    "اللغة العربية",
-    "العلوم",
-    "التاريخ",
-    "الجغرافيا",
-    "الفرنسية",
-    "الإنجليزية",
-  ];
+  // const subjects = [
+  //   "الرياضيات",
+  //   "اللغة العربية",
+  //   "العلوم",
+  //   "التاريخ",
+  //   "الجغرافيا",
+  //   "الفرنسية",
+  //   "الإنجليزية",
+  // ];
+  const subjects = modules;
+
+  modules;
 
   const loopThroughClassGroups = (teacher: Teacher) => {
     let exist: boolean = false;
@@ -267,7 +273,15 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       setShowEditModel(false);
       console.log(res);
       RefetchData();
+      // empty form data
+      resetUpdateForm();
     }
+  };
+  const resetUpdateForm = () => {
+    setProfilPic_update(null);
+    set_full_name_update("");
+    set_phone_number_update("");
+    set_years_of_experience_update("0");
   };
   //! Activate teacher :
   const handleActivateTeacher = async (id: number, activate: boolean) => {
@@ -468,7 +482,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 />
               </div>
 
-              <div>
+              {/* will be changed - additional data on the update*/}
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   المادة
                 </label>
@@ -485,7 +500,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -506,9 +521,9 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   رقم الهاتف
                 </label>
                 <input
-                  name="phone"
+                  name="phone_number"
                   type="tel"
-                  value={formData.phone}
+                  value={formData.phone_number}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="0555 XX XX XX"
@@ -658,15 +673,15 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   المادة
                 </label>
                 <select
-                  name="subject"
-                  value={formData.subject}
+                  name="module_id"
+                  value={formData.module_id}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option>اختر المادة</option>
                   {subjects.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
+                    <option key={subject.module_id} value={subject.module_id}>
+                      {subject.module_name}
                     </option>
                   ))}
                 </select>
@@ -691,7 +706,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   رقم الهاتف
                 </label>
                 <input
-                  name="phone"
+                  name="phone_number"
                   type="tel"
                   value={phone_number_update}
                   onChange={(e) => set_phone_number_update(e.target.value)}
@@ -777,7 +792,10 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
-                  onClick={() => setShowEditModel(false)}
+                  onClick={() => {
+                    setShowEditModel(false);
+                    resetUpdateForm();
+                  }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   إلغاء

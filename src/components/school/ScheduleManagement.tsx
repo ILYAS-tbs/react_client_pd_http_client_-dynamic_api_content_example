@@ -9,7 +9,7 @@ import {
   Upload,
 } from "lucide-react";
 import { ScheduleManagementProps } from "../../types";
-import { ClassGroup } from "../../models/ClassGroups";
+import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
@@ -50,30 +50,62 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  const [last_selected_schedule, set_last_selected_schedule] =
+    useState<ScheduleItem | null>(null);
+
+  //? API CALL PUT class_group
+  async function handleUpdateSubmit() {
+    const formData_update = new FormData();
+
+    if (!last_selected_schedule) {
+      console.error("No Schedule  was set");
+      return;
+    }
+
+    const name = last_selected_schedule.className;
+    formData_update.append("name", name);
+
+    if (selectedFile) {
+      formData_update.append("time_table", selectedFile);
+    }
+
+    const latest_csrf = getCSRFToken()!;
+    const id = last_selected_schedule.id;
+    // * API CALL UPDATE IN THE BACKEND
+    const res = await school_dashboard_client.put_class_group(
+      id,
+      formData_update,
+      latest_csrf
+    );
+    // * UPDATE THE DATA IN THE FRONTEND :
+    if (res.ok) {
+      // Re-fetch all classes from backend instead of patching one
+      const new_res =
+        await school_dashboard_client.get_current_school_class_groups();
+      if (new_res.ok) {
+        console.log("ScheduleManageemnt updating classgroups OK");
+        const new_class_groups_list: ClassGroupJson[] = new_res.data.map(
+          (classGroupJson: ClassGroupJson) =>
+            ClassGroup.formJson(classGroupJson)
+        );
+        console.log("new list");
+        console.log(new_class_groups_list);
+        //? update parent state
+        setClassGroupList(new_class_groups_list);
+        //? Update the local state from it
+        setSchedules(mapClassGroupToSchedule(new_class_groups_list));
+      }
+    }
+  }
+
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const pdfUrl = reader.result as string;
-      if (editingSchedule) {
-        setSchedules(
-          schedules.map((sch) =>
-            sch.id === editingSchedule.id
-              ? { ...sch, pdfUrl, uploadedAt: new Date().toISOString() }
-              : sch
-          )
-        );
-      } else if (newSchedule.className) {
-        setSchedules([
-          ...schedules,
-          {
-            id: `s-${Date.now()}`,
-            ...newSchedule,
-            pdfUrl,
-            uploadedAt: new Date().toISOString(),
-          },
-        ]);
-        setNewSchedule({ className: "", pdfUrl: null });
-      }
+
+      //* API CALL
+      handleUpdateSubmit();
+
       setSelectedFile(null);
       setShowUploadModal(false);
       setEditingSchedule(null);
@@ -235,7 +267,11 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                           </button>
                         )} */}
                         <button
-                          onClick={() => handleEditSchedule(schedule)}
+                          onClick={() => {
+                            handleEditSchedule(schedule);
+                            // latest clicked schedule
+                            set_last_selected_schedule(schedule);
+                          }}
                           className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                         >
                           <Upload className="h-5 w-5" />

@@ -8,15 +8,21 @@ export interface Student {
   student_id: string;
   full_name: string;
   is_absent: boolean;
-  academic_state: string;
-  date_of_birth: Date;
-  gender: null;
-  address: string;
-  enrollment_date: Date;
-  status: string;
-  module_grades: ModuleGrades;
-  notes: Notes;
-  trimester_grade: number;
+  phone?: string;
+  number_of_absences?: number;
+
+  age?: number | string; // not from the backend - calculated here
+  attendance?: number | string; // not from the backend - calculated here
+
+  academic_state?: string;
+  date_of_birth?: Date;
+  gender?: null;
+  address?: string;
+  enrollment_date?: Date;
+  status?: string;
+  module_grades?: ModuleGrades;
+  notes?: Notes;
+  trimester_grade?: number;
   parent: Parent;
   school: School;
   class_group?: ClassGroup;

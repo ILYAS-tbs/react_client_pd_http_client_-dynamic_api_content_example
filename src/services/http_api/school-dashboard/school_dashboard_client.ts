@@ -3,6 +3,7 @@ import {
   AddorRemoveParentToSchoolPayload,
   FindParentByIdPayload,
   PostPutClassGroupPayload as PostClassGroupPayload,
+  PostPutTeacherModuleClassGrpPayload,
   PostStudentPayload,
   TeacherPayload,
 } from "../payloads_types/school_client_payload_types";
@@ -16,6 +17,7 @@ const URLS = {
   get_current_school_events: `${BASE_URL}/school/schools/get_current_school_events/`,
   get_current_school_exam_schedules: `${BASE_URL}/school/schools/get_current_school_exam_schedules/`,
   get_current_school_stats: `${BASE_URL}/school/schools/get_current_school_stats/`,
+  get_modules: `${BASE_URL}/school/modules/`,
 
   patch_teacher: `${BASE_URL}/teacher/teachers/`,
 
@@ -35,6 +37,8 @@ const URLS = {
 
   get_current_school_absence_reports: `${BASE_URL}/school/absence-reports/get_current_school_absence_reports/`,
   get_current_school_behaviour_reports: `${BASE_URL}/school/behaviour-reports/get_current_school_behaviour_reports/`,
+
+  create_or_update_TeacherModuleClassGroup: `${BASE_URL}/teacher/create_or_update_TeacherModuleClassGroup/`,
 };
 
 async function get_current_school_students() {
@@ -429,6 +433,46 @@ export async function get_current_school_behaviour_reports() {
   }
 }
 
+//! fetch modules : english,arabic .. :
+export async function get_modules() {
+  try {
+    const response = await fetch(URLS.get_modules, {
+      method: "GET",
+      credentials: "include", // ensures cookies like sessionid are sent
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+//! Link a teacher with ClassGroup and Module:
+async function create_or_update_TeacherModuleClassGroup(
+  payload: PostPutTeacherModuleClassGrpPayload,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(
+      URLS.create_or_update_TeacherModuleClassGroup,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 export const school_dashboard_client = {
   get_current_school_students: get_current_school_students,
   get_current_school_teachers: get_current_school_teachers,
@@ -437,6 +481,7 @@ export const school_dashboard_client = {
   get_current_school_events: get_current_school_events,
   get_current_school_exam_schedules: get_current_school_exam_schedules,
   get_current_school_stats: get_current_school_stats,
+  get_modules: get_modules,
 
   update_teacher: update_teacher,
 
@@ -457,4 +502,7 @@ export const school_dashboard_client = {
   get_current_school_absence_reports: get_current_school_absence_reports,
 
   get_current_school_behaviour_reports: get_current_school_behaviour_reports,
+
+  create_or_update_TeacherModuleClassGroup:
+    create_or_update_TeacherModuleClassGroup,
 };

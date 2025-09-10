@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Plus, Edit, X, Filter, Download } from "lucide-react";
 import { GradeManagerProps } from "../../types";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
-import { Module } from "../../models/Module";
+import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
 import { StudentGrade } from "../../models/StudentGrade";
 
 import { PostMarkPayload } from "../../services/http_api/payloads_types/teacher_client_payload_types";
@@ -108,7 +108,9 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
   */
   //! Filtering Grades For each module
-  const module_names = modules.map((m: Module) => m.module.module_name);
+  const module_names = modules.map(
+    (m: TeacherModuleClassGrp) => m.module.module_name
+  );
 
   const initial_studetents_grades = students_grades.map(
     (grade: StudentGrade) => {
@@ -246,7 +248,9 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
   //? mock data : const subjects = ["الرياضيات", "العلوم", "اللغة العربية"];
   const subjects = [
-    ...new Set(modules.map((module: Module) => module.module.module_name)),
+    ...new Set(
+      modules.map((module: TeacherModuleClassGrp) => module.module.module_name)
+    ),
   ];
 
   // Get unique modules from grades data

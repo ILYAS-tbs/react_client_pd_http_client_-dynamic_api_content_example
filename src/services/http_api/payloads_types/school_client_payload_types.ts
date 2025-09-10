@@ -37,6 +37,7 @@ export type RegisterParentPayload = {
 export type RegisterTeacherPayload = {
   full_name: string;
   username: string;
+  phone_number: string;
 };
 export type LoginPayload = {
   email: string;
@@ -70,6 +71,7 @@ export interface PostStudentPayload {
   date_of_birth: string;
   trimester_grade?: number;
   class_group_id?: string;
+  phone: string;
 }
 
 // post getParentById
@@ -84,4 +86,10 @@ export interface AddorRemoveParentToSchoolPayload {
 export interface AddCurrectSchoolStudentsToParent {
   parent_pk: string;
   students: string[];
+}
+
+export interface PostPutTeacherModuleClassGrpPayload {
+  teacher_id: string;
+  class_group_id: string;
+  module_id: string;
 }

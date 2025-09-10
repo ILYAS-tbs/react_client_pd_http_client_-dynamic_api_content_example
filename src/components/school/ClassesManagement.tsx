@@ -47,7 +47,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       class_group_id: class_group.class_group_id,
       id: class_group.class_group_id,
       name: `${class_group.name}`,
-      students: 25,
+      students: class_group.students_number,
       teachersPdf: class_group.teacher_list
         ? {
             url: class_group.teacher_list,
@@ -164,7 +164,8 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
     }
   };
 
-  const handleEditClass = (cls: Class) => {
+  const handleEditClass = (cls: Class | ClassGroup) => {
+    cls = cls as Class; // will be a class from the UI that's what we pass to it
     setEditingClass(cls);
     setNewClass({
       class_group_id: cls.class_group_id,
@@ -367,7 +368,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {cls.students || 0}
+                      {cls.students_number || 0}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -436,7 +437,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
 
       {/* Add/Edit Class Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="!mt-0 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {editingClass ? "تعديل الصف" : "إضافة صف جديد"}
