@@ -28,6 +28,14 @@ interface Assessment {
   weight: number;
 }
 
+interface ChildPerformance {
+  overall: number;
+  trend: string;
+  position: number;
+  totalStudents: number;
+  subjects: Subject[];
+}
+
 const translateMarkType = (type: string): string => {
   const parts = type.split("_");
   if (parts.length !== 2) return type || "غير محدد";
@@ -99,58 +107,65 @@ const GradeReports: React.FC<GradeReportsProps> = ({
     { id: "year", label: "السنة الدراسية" },
   ];
 
-  const gradeData = students.reduce((acc, student, index) => {
-    const perf = studentPerformances[index];
-    if (!perf) return acc;
+  const gradeData: Record<string, ChildPerformance> = students.reduce(
+    (acc, student, index) => {
+      const perf = studentPerformances[index];
+      if (!perf) return acc;
 
-    const mapped_subjects: Subject[] = perf.modules_stats.map((module_stat) => {
-      // Flatten all Mark[] from all ModuleMark entries
-      const allMarks: Mark[] = module_stat.module_marks
-        ? module_stat.module_marks.flatMap((mm) =>
-            Object.values(mm.module_marks || {}).flat()
-          )
-        : [];
+      const mapped_subjects: Subject[] = perf.modules_stats.map(
+        (module_stat) => {
+          // Flatten all Mark[] from all ModuleMark entries
+          const allMarks: Mark[] = module_stat.module_marks
+            ? module_stat.module_marks.flatMap((mm) =>
+                Object.values(mm.module_marks || {}).flat()
+              )
+            : [];
 
-      const assessments: Assessment[] = allMarks.map((mark) => ({
-        name: translateMarkType(mark.mark_type || "غير محدد"),
-        grade: mark.mark_degree,
-        max: 20, // replace if backend provides max
-        date: new Date(mark.date),
-        weight: mark.mark_weight,
-      }));
+          const assessments: Assessment[] = allMarks.map((mark) => ({
+            name: translateMarkType(mark.mark_type || "غير محدد"),
+            grade: mark.mark_degree,
+            max: 20, // replace if backend provides max
+            date: new Date(mark.date),
+            weight: mark.mark_weight,
+          }));
 
-      // Take averages from the first ModuleMark (or compute an average if you prefer)
-      const firstMark = module_stat.module_marks[0];
-      console.log("first mark :");
-      console.log(module_stat);
+          // Take averages from the first ModuleMark (or compute an average if you prefer)
+          const firstMark = module_stat.module_marks[0];
+          console.log("first mark :");
+          console.log(module_stat);
 
-      const subject: Subject = {
-        name: module_stat.module_name,
-        current: module_stat.student_average,
-        previous: 0, // TODO: compute from older periods
-        average: module_stat.class_average,
-        assessments,
+          const subject: Subject = {
+            name: module_stat.module_name,
+            current: module_stat.student_average,
+            previous: 0, // TODO: compute from older periods
+            average: module_stat.class_average,
+            assessments,
+          };
+
+          return subject;
+        }
+      );
+
+      acc[student.student_id] = {
+        overall: perf.student_overall_avg,
+        trend: "+0.8",
+        position: perf.student_rank,
+        totalStudents: perf.class_group_students_number,
+        subjects: mapped_subjects,
       };
 
-      return subject;
-    });
+      return acc;
+    },
+    {} as Record<string, any>
+  );
 
-    acc[student.student_id] = {
-      overall: perf.student_overall_avg,
-      trend: "+0.8",
-      position: perf.student_rank,
-      totalStudents: perf.class_group_students_number,
-      subjects: mapped_subjects,
-    };
-
-    return acc;
-  }, {} as Record<string, any>);
-
-  const currentData = gradeData[selectedChild];
+  const currentData: ChildPerformance | undefined = gradeData[selectedChild];
   const filteredSubjects =
     selectedSubject === "all"
-      ? currentData.subjects
-      : currentData.subjects.filter((s: Subject) => s.name === selectedSubject);
+      ? currentData?.subjects
+      : currentData?.subjects.filter(
+          (s: Subject) => s.name === selectedSubject
+        );
 
   const getGradeColor = (grade: number) => {
     if (grade >= 16) return "text-green-600";
@@ -175,10 +190,10 @@ const GradeReports: React.FC<GradeReportsProps> = ({
   };
 
   const maxGrade = Math.max(
-    ...currentData.subjects.map((s: Subject) => s.current)
+    ...(currentData?.subjects?.map((s: Subject) => s.current) ?? [])
   );
   const maxSubject =
-    currentData.subjects.find((s: Subject) => s.current === maxGrade)?.name ||
+    currentData?.subjects?.find((s: Subject) => s.current === maxGrade)?.name ||
     "";
 
   return (
@@ -241,7 +256,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="all">جميع المواد</option>
-              {currentData.subjects.map((subject: Subject) => (
+              {currentData?.subjects.map((subject: Subject) => (
                 <option key={subject.name} value={subject.name}>
                   {subject.name}
                 </option>
@@ -267,7 +282,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                 المعدل العام
               </p>
               <p className="text-2xl font-bold text-green-600">
-                {currentData.overall}/20
+                {currentData?.overall ?? "0"}/20
               </p>
             </div>
             <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
@@ -276,7 +291,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           </div>
           <div className="flex items-center mt-2">
             <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-sm text-green-500">{currentData.trend}</span>
+            <span className="text-sm text-green-500">{currentData?.trend}</span>
           </div>
         </div>
 
@@ -287,7 +302,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                 الترتيب
               </p>
               <p className="text-2xl font-bold text-blue-600">
-                {currentData.position}
+                {currentData?.position}
               </p>
             </div>
             <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
@@ -295,7 +310,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            من أصل {currentData.totalStudents} طالب
+            من أصل {currentData?.totalStudents} طالب
           </p>
         </div>
 
@@ -306,7 +321,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                 عدد المواد
               </p>
               <p className="text-2xl font-bold text-purple-600">
-                {currentData.subjects.length}
+                {currentData?.subjects?.length}
               </p>
             </div>
             <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
@@ -342,7 +357,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           أداء المواد
         </h3>
         <div className="space-y-4">
-          {filteredSubjects.map((subject: Subject, index: number) => (
+          {filteredSubjects?.map((subject: Subject, index: number) => (
             <div
               key={index}
               className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"

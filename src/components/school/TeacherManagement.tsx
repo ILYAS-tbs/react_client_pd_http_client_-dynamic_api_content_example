@@ -3,15 +3,12 @@ import {
   Plus,
   Search,
   Edit,
-  Trash2,
   Eye,
   UserCheck,
-  UserX,
   EyeOff,
   FileUp,
 } from "lucide-react";
 import { TeacherManagementProps } from "../../types";
-import { ModulesAndClassGroups } from "../../services/http_api/http_reponse_types";
 
 // Backend server :
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
@@ -19,6 +16,7 @@ import { auth_http_client } from "../../services/http_api/auth/auth_http_client"
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import {
+  PostPutTeacherModuleClassGrpPayload,
   RegisterTeacherPayload,
   SignupPayload,
 } from "../../services/http_api/payloads_types/school_client_payload_types";
@@ -28,14 +26,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
   setTeacherList,
   modules,
-  SetModules,
+
+  class_groups_list,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalError, SetModalError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    module_id: "",
     email: "",
     phone_number: "",
     password1: "",
@@ -53,6 +51,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       [e.target.name]: e.target.value,
     });
   };
+  //? 1.Creation
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData); // send to backend API here
@@ -102,7 +101,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     }
   };
 
-  const [file, setFile] = useState<File | null>(null);
+  // const [file, setFile] = useState<File | null>(null);
 
   // fake teachers data
   // const teachers = [
@@ -149,14 +148,15 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   // ];
 
   // real teachers data
-  const map_subjects = (modulesAndClassGroupsList: ModulesAndClassGroups[]) => {
-    if (!modulesAndClassGroupsList) return [];
+  // const map_subjects = (modulesAndClassGroupsList: ModulesAndClassGroups[]) => {
+  //   if (!modulesAndClassGroupsList) return [];
 
-    const subject_list = modulesAndClassGroupsList.map(
-      (modulesAndClassGroups) => modulesAndClassGroups.class_group.name
-    );
-    return subject_list;
-  };
+  //   const subject_list = modulesAndClassGroupsList.map(
+  //     (modulesAndClassGroups) => modulesAndClassGroups.class_group.name
+  //   );
+  //   return subject_list;
+  // };
+
   //  Mock data
   // const teachers_real: Teacher[] = teacherList.map((teacher_response) => {
   //   const teacher: Teacher = {
@@ -185,7 +185,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   // ];
   const subjects = modules;
 
-  modules;
+  // modules;
 
   const loopThroughClassGroups = (teacher: Teacher) => {
     let exist: boolean = false;
@@ -223,7 +223,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       setTeacherList(updated_teacher_list);
     }
   }
-  //! Edit Teacher :
+
+  //? 2.Edit Teacher :
   const [last_chosen_teacher_id, set_last_chosen_teacher_id] = useState(-1);
   const [showEditModal, setShowEditModel] = useState(false);
   const [profile_pic_update, setProfilPic_update] = useState<File | null>(null);
@@ -231,6 +232,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [phone_number_update, set_phone_number_update] = useState("");
   const [years_of_experience_update, set_years_of_experience_update] =
     useState("0");
+
+  const [modules_id, setModuleID] = useState<string>("");
+  const [class_group_id, setClassGrpID] = useState<string>("");
+  const [editModalError, setEditModalError] = useState("");
+
   const handleEditSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
@@ -240,6 +246,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       (t) => t.user.id === last_chosen_teacher_id
     );
 
+    //* Basic Validations :
     // empty name fall back to default
     formData.append("full_name", full_name_update);
     if (!full_name_update) {
@@ -261,17 +268,53 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
     console.log(Object.fromEntries(formData.entries()));
 
-    //? API CALL
+    // basic validations
+    if (!class_group_id) {
+      showEditModalError("يرجى تحديد  الصف");
+      return;
+    }
+    if (!modules_id) {
+      showEditModalError("يرجى اختيار المادة");
+      return;
+    }
+
+    //? API CALL 01 : updating teacher fields
     const latest_csrf = getCSRFToken()!;
     const res = await school_dashboard_client.update_teacher(
       last_chosen_teacher_id,
       formData,
       latest_csrf
     );
-    // Refresh Data if successful update :
+
     if (res.ok) {
-      setShowEditModel(false);
       console.log(res);
+
+      //? API CALL 02 : Creating a relation between  teacher-classGrp-module
+
+      const teacherModuleClass_payload: PostPutTeacherModuleClassGrpPayload = {
+        teacher_id: String(last_chosen_teacher_id),
+        class_group_id: class_group_id,
+        module_id: modules_id,
+      };
+      const latest_csrf = getCSRFToken()!;
+
+      console.log("teacherModuleClass_payload : ");
+      console.log(teacherModuleClass_payload);
+
+      const teacherModuleClass_res =
+        await school_dashboard_client.create_or_update_TeacherModuleClassGroup(
+          teacherModuleClass_payload,
+          latest_csrf
+        );
+      if (teacherModuleClass_res.ok) {
+        console.info("TeacherManagement.tsx : teacherModuleClass_res OK!");
+        // reset
+        setShowEditModel(false);
+        setClassGrpID("");
+        setModuleID("");
+      }
+
+      // Refresh Data if successful update :
       RefetchData();
       // empty form data
       resetUpdateForm();
@@ -282,6 +325,12 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     set_full_name_update("");
     set_phone_number_update("");
     set_years_of_experience_update("0");
+  };
+  const showEditModalError = (error: string) => {
+    setEditModalError(error);
+    setTimeout(() => {
+      setEditModalError("");
+    }, 7000);
   };
   //! Activate teacher :
   const handleActivateTeacher = async (id: number, activate: boolean) => {
@@ -382,11 +431,16 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   الفصول:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {teacher.modulesAndClassGroups
-                    ?.map((x) => x.class_group.name)
-                    .join(", ")}
+                  <ul className="flex flex-col items-end">
+                    {teacher.modulesAndClassGroups?.map((x) => (
+                      <li>
+                        {x.module.module_name} - {x.class_group.name}
+                      </li>
+                    ))}
+                  </ul>
                 </span>
               </div>
+
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   الخبرة:
@@ -482,26 +536,6 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 />
               </div>
 
-              {/* will be changed - additional data on the update*/}
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  المادة
-                </label>
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option>اختر المادة</option>
-                  {subjects.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </select>
-              </div> */}
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   البريد الإلكتروني
@@ -582,7 +616,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </button>
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   سنوات الخبرة
                 </label>
@@ -594,7 +628,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="عدد السنوات"
                 />
-              </div>
+              </div> */}
 
               {/* Modal Error */}
               {modalError && (
@@ -620,7 +654,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
         </div>
       )}
 
-      {/* Edit Parent Modal */}
+      {/* Edit Teacher Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
@@ -668,17 +702,37 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 />
               </div>
 
+              {/* will be changed - additional data on the update*/}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  الصف
+                </label>
+                <select
+                  name="class_group_id"
+                  value={class_group_id}
+                  onChange={(e) => setClassGrpID(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value={""}>اختر الفصل</option>
+                  {class_groups_list.map((cls) => (
+                    <option key={cls.class_group_id} value={cls.class_group_id}>
+                      {cls.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   المادة
                 </label>
                 <select
-                  name="module_id"
-                  value={formData.module_id}
-                  onChange={handleChange}
+                  name="modules_id"
+                  value={modules_id}
+                  onChange={(e) => setModuleID(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  <option>اختر المادة</option>
+                  <option value={""}>اختر المادة</option>
                   {subjects.map((subject) => (
                     <option key={subject.module_id} value={subject.module_id}>
                       {subject.module_name}
@@ -715,7 +769,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 />
               </div>
 
-              <div className="relative">
+              {/* <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   كلمة السر
                 </label>
@@ -739,9 +793,9 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     <Eye className="w-4 h-4" />
                   )}
                 </button>
-              </div>
+              </div> */}
 
-              <div className="relative">
+              {/* <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   تأكيد كلمة المرور
                 </label>
@@ -765,7 +819,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     <Eye className="w-4 h-4" />
                   )}
                 </button>
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -786,13 +840,15 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </div>
 
               {/* Modal Error */}
-              {modalError && (
-                <h1 className=" text-red-600 text-sm">{modalError}</h1>
+              {editModalError && (
+                <h1 className=" text-red-600 text-sm">{editModalError}</h1>
               )}
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
                   onClick={() => {
+                    setClassGrpID("");
+                    setModuleID("");
                     setShowEditModel(false);
                     resetUpdateForm();
                   }}

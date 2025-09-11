@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Search, Edit, Trash2, Eye, Filter } from "lucide-react";
-import { ResponseParent } from "../../services/http_api/http_reponse_types";
+import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import {
@@ -10,13 +9,13 @@ import {
 } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { ParentManagementProps } from "../../types";
-import { Student, StudentJson } from "../../models/Student";
 
 const ParentManagement: React.FC<ParentManagementProps> = ({
   parentsList,
   setParentList,
   class_groups_list,
   studentsList,
+  RefetchStudents,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClass, setSelectedClass] = useState("all");
@@ -74,7 +73,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
   // real parent data
   const parents_real: Parent[] = parentsList;
 
-  const classes = ["الكل", "3أ", "3ب", "4أ", "4ب", "5أ", "5ب", "6أ", "6ب"];
+  // const classes = ["الكل", "3أ", "3ب", "4أ", "4ب", "5أ", "5ب", "6أ", "6ب"];
 
   const filteredParents = parents_real.filter((parent) => {
     const matchesSearch =
@@ -153,7 +152,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
           );
 
         if (add_students_to_parent_res.ok) {
-          // ALL SUCCESSFUL RE-FRESH DATA
+          //* ALL SUCCESSFUL RE-FRESH DATA
           const new_res =
             await school_dashboard_client.get_current_school_parents();
           if (new_res.ok) {
@@ -163,6 +162,8 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
             setParentList(new_parents_list);
             setShowAddModal(false);
           }
+          //* New Student
+          RefetchStudents();
         } else {
           setErrorAddParent(
             "حدث خطأ غير متوقع أثناء معالجة طلبك، يرجى المحاولة لاحقًا. إذا استمر هذا الأمر، يرجى التواصل معنا."
@@ -202,6 +203,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
       return;
     }
 
+    //* Fetch New Parents List
     const parents_res =
       await school_dashboard_client.get_current_school_parents();
     if (parents_res.ok) {
@@ -210,6 +212,8 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
       );
       setParentList(new_parents_list);
     }
+    //* Fetch New Students List :
+    RefetchStudents();
   };
   return (
     <div className="space-y-6">

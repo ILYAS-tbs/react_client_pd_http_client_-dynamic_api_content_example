@@ -17,7 +17,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   students,
   one_student_absences,
 }) => {
-  const [selectedChild, setSelectedChild] = useState(students?.[0].student_id);
+  const [selectedChild, setSelectedChild] = useState(students?.[0]?.student_id);
 
   //! MOCK DATA :
   // const children = [
@@ -149,13 +149,13 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
     id: student.student_id,
     name: student.full_name,
     class: student.class_group?.name,
-    age: getAge(student.date_of_birth.toString()),
+    age: getAge(new Date(student.date_of_birth ?? "2000-01-01").toString()),
     school: student.school.school_name,
     teacher: "الأستاذة فاطمة حسن",
     overallGrade: student.trimester_grade || 0,
     attendance: one_student_absences(student),
     behavior: student.academic_state,
-    subjects: student.module_grades?.["s1"].map((module_grade) => {
+    subjects: student.module_grades?.["s1"]?.map((module_grade) => {
       const key = Object.keys(module_grade)[0]; // e.g. "الرياضيات"
       const value = module_grade[key];
 
@@ -304,7 +304,8 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                     </p>
                   ) : (
                     <p className="text-2xl font-bold text-red-600">
-                      {mapBehaviour(currentChild.behavior)}
+                      {currentChild.behavior &&
+                        mapBehaviour(currentChild.behavior)}
                     </p>
                   )}
                 </div>
@@ -333,7 +334,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                     عدد المواد
                   </p>
                   <p className="text-2xl font-bold text-purple-600">
-                    {currentChild.subjects.length}
+                    {currentChild.subjects?.length}
                   </p>
                 </div>
                 <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
@@ -351,7 +352,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                 أداء المواد
               </h3>
               <div className="space-y-4">
-                {currentChild.subjects.map((subject, index) => (
+                {currentChild.subjects?.map((subject, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"

@@ -6,6 +6,7 @@ export interface ExamSchedule {
   time: string;
   duration: number;
   school: string;
+  room: string;
 }
 
 // Converts JSON strings to/from your types

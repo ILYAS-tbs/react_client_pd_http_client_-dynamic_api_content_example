@@ -3,9 +3,9 @@ import {
   AddorRemoveParentToSchoolPayload,
   FindParentByIdPayload,
   PostPutClassGroupPayload as PostClassGroupPayload,
+  PostExamSchedule,
   PostPutTeacherModuleClassGrpPayload,
   PostStudentPayload,
-  TeacherPayload,
 } from "../payloads_types/school_client_payload_types";
 
 const BASE_URL = "http://127.0.0.1:8000";
@@ -29,6 +29,8 @@ const URLS = {
   post_student: `${BASE_URL}/student/students/`,
   put_student: `${BASE_URL}/student/students/`,
   delete_student: `${BASE_URL}/student/students/`,
+
+  post_exam_schedule: `${BASE_URL}/school/exam-schedules/`,
 
   find_parent_by_email: `${BASE_URL}/school/schools/find_parent_by_email/`,
   add_parent_to_school: `${BASE_URL}/school/schools/add_parent_to_school/`,
@@ -189,6 +191,7 @@ async function post_class_group(
     return { ok: false, error: error };
   }
 }
+
 async function put_class_group(
   id: string,
   payload: FormData,
@@ -294,6 +297,27 @@ async function delete_student(id: string, csrfToken: string) {
         "X-CSRFToken": csrfToken,
       },
       credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+//! Post Exam schedule
+async function post_exam_schedule(
+  payload: PostExamSchedule,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.post_exam_schedule, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
     });
     const data = await response.json();
     return { ok: response.ok, status: response.status, data: data };
@@ -493,6 +517,8 @@ export const school_dashboard_client = {
   post_student: post_student,
   put_student: put_student,
   delete_student: delete_student,
+
+  post_exam_schedule: post_exam_schedule,
 
   find_parent_by_email: find_parent_by_email,
   add_parent_to_school: add_parent_to_school,

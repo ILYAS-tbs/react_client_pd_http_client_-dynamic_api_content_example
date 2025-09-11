@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Calendar, Edit, Trash2, Plus, Search, Clock, Eye } from "lucide-react";
 import { ExamScheduleManagementProps } from "../../types";
+import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
+import { PostExamSchedule } from "../../services/http_api/payloads_types/school_client_payload_types";
+import { getCSRFToken } from "../../lib/get_CSRFToken";
 
 interface Exam {
   id: string;
@@ -15,6 +18,8 @@ interface Exam {
 const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
   exam_schedules,
   setExamSchedules,
+  RefetchExams,
+  school_id,
 }) => {
   /* 
    mock data model :
@@ -66,79 +71,87 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
       room: "ص 11",
     },
   ]);
-  const [newExam, setNewExam] = useState({
-    subject: "",
+
+  const [newExamForm, setNewExamForm] = useState({
+    module_name: "",
     date: "",
     time: "",
     duration: 0,
-    className: "",
+    class_group_name: "",
     room: "",
+    school_id: school_id,
   });
+  const handleNewExamFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setNewExamForm({
+      ...newExamForm,
+      [e.target.name]: e.target.value,
+    });
+  };
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewTimeline, setViewTimeline] = useState(false);
   const [selectedClass, setSelectedClass] = useState("all");
 
-  const handleAddExam = () => {
-    if (
-      newExam.subject &&
-      newExam.date &&
-      newExam.time &&
-      newExam.duration > 0 &&
-      newExam.className &&
-      newExam.room
-    ) {
-      setExams([...exams, { id: `e-${Date.now()}`, ...newExam }]);
-      setNewExam({
-        subject: "",
-        date: "",
-        time: "",
-        duration: 0,
-        className: "",
-        room: "",
-      });
-      setShowAddModal(false);
-    }
-  };
+  // const handleAddExam = () => {
+  //   if (
+  //     newExamForm.module_name &&
+  //     newExamForm.date &&
+  //     newExamForm.time &&
+  //     newExamForm.duration > 0 &&
+  //     newExamForm.class_group_name &&
+  //     newExamForm.room
+  //   ) {
+  //     // setExams([...exams, { id: `e-${Date.now()}`, ...newExamForm }]);
+  //     // setNewExamForm({
+  //     //   module_name: "",
+  //     //   date: "",
+  //     //   time: "",
+  //     //   duration: 0,
+  //     //   class_group_name: "",
+  //     //   room: "",
+  //     // });
+  //   }
+  // };
 
-  const handleEditExam = (exam: Exam) => {
-    setEditingExam(exam);
-    setNewExam({
-      subject: exam.subject,
-      date: exam.date,
-      time: exam.time,
-      duration: exam.duration,
-      className: exam.className,
-      room: exam.room,
-    });
-    setShowAddModal(true);
-  };
+  // const handleEditExam = (exam: Exam) => {
+  // setEditingExam(exam);
+  // setNewExamForm({
+  //   module_name: exam.subject,
+  //   date: exam.date,
+  //   time: exam.time,
+  //   duration: exam.duration,
+  //   class_group_name: exam.className,
+  //   room: exam.room,
+  // });
+  // };
 
   const handleUpdateExam = () => {
     if (
       editingExam &&
-      newExam.subject &&
-      newExam.date &&
-      newExam.time &&
-      newExam.duration > 0 &&
-      newExam.className &&
-      newExam.room
+      newExamForm.module_name &&
+      newExamForm.date &&
+      newExamForm.time &&
+      newExamForm.duration > 0 &&
+      newExamForm.class_group_name &&
+      newExamForm.room
     ) {
       setExams(
         exams.map((ex) =>
-          ex.id === editingExam.id ? { ...ex, ...newExam } : ex
+          ex.id === editingExam.id ? { ...ex, ...newExamForm } : ex
         )
       );
-      setEditingExam(null);
-      setNewExam({
-        subject: "",
-        date: "",
-        time: "",
-        duration: 0,
-        className: "",
-        room: "",
-      });
+      // setEditingExam(null);
+      // setNewExamForm({
+      //   module_name: "",
+      //   date: "",
+      //   time: "",
+      //   duration: 0,
+      //   class_group_name: "",
+      //   room: "",
+      // });
       setShowAddModal(false);
     }
   };
@@ -155,6 +168,42 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
       (selectedClass === "all" || ex.class_group_name === selectedClass)
   );
 
+  //! Post Exam
+  const handlePostExam = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // form inspection :
+    console.log("ExamScheduleManagement post exam payload is :");
+    console.log(newExamForm);
+
+    //! API CALL
+    const latest_csrf = getCSRFToken()!;
+    const post_exam_payload: PostExamSchedule = {
+      school_id: school_id,
+      module_name: newExamForm.module_name,
+      class_group_name: newExamForm.class_group_name,
+      date: newExamForm.date,
+      time: newExamForm.time,
+      duration: newExamForm.duration,
+      room: newExamForm.room,
+    };
+    const post_exam_res = await school_dashboard_client.post_exam_schedule(
+      post_exam_payload,
+      latest_csrf
+    );
+
+    if (!post_exam_res.ok) {
+      console.error("ExamSchedule : post_exam_res Failed!");
+    }
+    // refresh exams :
+    RefetchExams();
+    setShowAddModal(false);
+  };
+
+  //! Patch Exam
+  const handlePatchExam = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
@@ -191,7 +240,6 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
           </button>
         </div>
       </div>
-
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row gap-4">
@@ -209,7 +257,6 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
           </div>
         </div>
       </div>
-
       {/* Exam Schedule Table or Timeline */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {viewTimeline ? (
@@ -228,13 +275,14 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                       {exam.class_group_name}
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {new Date(
-                          "2025-09-03T00:00:00.000Z"
-                        ).toLocaleDateString("ar", {
+                      {new Date("2025-09-03T00:00:00.000Z").toLocaleDateString(
+                        "ar",
+                        {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
-                        })}
+                        }
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-2">
@@ -285,7 +333,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {exam.class_group_name}
+                        {exam.module_name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -316,19 +364,22 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">
-                        {exam.class_group_name}
+                        {exam.room}
                       </div>
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2 rtl:space-x-reverse">
                         <button
-                          onClick={() => handleEditExam(exam)}
+                          onClick={() => setShowAddModal(true)}
                           className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteExam(exam.id)}
+                          onClick={() =>
+                            handleDeleteExam(exam.exam_schedule_id)
+                          }
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -354,17 +405,19 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
               {editingExam ? "تعديل الامتحان" : "إضافة امتحان جديد"}
             </h3>
 
-            <form className="space-y-4">
+            <form
+              className="space-y-4"
+              onSubmit={editingExam ? handlePatchExam : handlePostExam}
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   المادة
                 </label>
                 <input
                   type="text"
-                  value={newExam.subject}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, subject: e.target.value })
-                  }
+                  name="module_name"
+                  value={newExamForm.module_name}
+                  onChange={handleNewExamFormChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="اسم المادة"
                 />
@@ -376,10 +429,9 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={newExam.className}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, className: e.target.value })
-                  }
+                  name="class_group_name"
+                  value={newExamForm.class_group_name}
+                  onChange={handleNewExamFormChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="اسم الصف (مثل: الصف الخامس - أ)"
                 />
@@ -391,10 +443,9 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 </label>
                 <input
                   type="date"
-                  value={newExam.date}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, date: e.target.value })
-                  }
+                  name="date"
+                  value={newExamForm.date}
+                  onChange={handleNewExamFormChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -405,10 +456,9 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 </label>
                 <input
                   type="time"
-                  value={newExam.time}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, time: e.target.value })
-                  }
+                  name="time"
+                  value={newExamForm.time}
+                  onChange={handleNewExamFormChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -419,13 +469,10 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 </label>
                 <input
                   type="number"
-                  value={newExam.duration}
-                  onChange={(e) =>
-                    setNewExam({
-                      ...newExam,
-                      duration: parseInt(e.target.value) || 0,
-                    })
-                  }
+                  name="duration"
+                  min={0}
+                  value={newExamForm.duration}
+                  onChange={handleNewExamFormChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="مدة الامتحان"
                 />
@@ -437,41 +484,32 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={newExam.room}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, room: e.target.value })
-                  }
+                  name="room"
+                  value={newExamForm.room}
+                  onChange={handleNewExamFormChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="رقم القاعة (مثل: ص 10)"
                 />
               </div>
-            </form>
 
-            <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
-              <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setEditingExam(null);
-                  setNewExam({
-                    subject: "",
-                    date: "",
-                    time: "",
-                    duration: 0,
-                    className: "",
-                    room: "",
-                  });
-                }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                إلغاء
-              </button>
-              <button
-                onClick={editingExam ? handleUpdateExam : handleAddExam}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                {editingExam ? "تحديث" : "إضافة"}
-              </button>
-            </div>
+              <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
+                <button
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setEditingExam(null);
+                  }}
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  {editingExam ? "تحديث" : "إضافة"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

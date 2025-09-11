@@ -229,7 +229,7 @@ const ParentDashboard: React.FC = () => {
       case "children":
         return (
           <ChildrenOverview
-            students={students}
+            students={students ?? []}
             one_student_absences={one_student_absences}
           />
         );
@@ -251,7 +251,13 @@ const ParentDashboard: React.FC = () => {
           />
         );
       case "chat":
-        return <ParentChat userType="parent" teachers_list={teachers_list}  parent_id={parent_id}/>;
+        return (
+          <ParentChat
+            userType="parent"
+            teachers_list={teachers_list}
+            parent_id={parent_id}
+          />
+        );
       case "announcements":
         return <SchoolAnnouncements />;
       case "timetable":

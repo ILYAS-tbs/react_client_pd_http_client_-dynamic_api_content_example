@@ -537,7 +537,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           )}
 
           {/* Number of Children (for parents) */}
-          {formData.role === "parent" && (
+          {/* {formData.role === "parent" && (
             <div>
               <label
                 className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
@@ -562,11 +562,11 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 ))}
               </select>
             </div>
-          )}
+          )} */}
 
           {/* Child Forms (for parents) */}
           {/* Modification : children fields not required for now */}
-          {formData.role === "parent" &&
+          {/* {formData.role === "parent" &&
             formData.children.map((child, index) => (
               <div
                 key={index}
@@ -703,7 +703,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                   </div>
                 )}
               </div>
-            ))}
+            ))} */}
 
           {/* Password */}
           <div>

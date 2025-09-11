@@ -23,17 +23,14 @@ import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { Student } from "../../models/Student";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { Event, EventJson } from "../../models/Event";
-import {
-  AbsenceReport,
-  AbsenceReportConvert,
-} from "../../models/AbsenceReports";
-import { getSearchParamsForLocation } from "react-router-dom/dist/dom";
+import { AbsenceReport } from "../../models/AbsenceReports";
 import { BehaviourReport } from "../../models/BehaviorReport";
 import { Teacher } from "../../models/Teacher";
 import { ExamSchedule } from "../../models/ExamSchedule";
 import { SchoolStat } from "../../models/SchoolStat";
 import TeacherManagement from "../../components/school/TeacherManagement";
 import { Module } from "../../models/Module";
+import { User } from "../../contexts/AuthContext";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -46,6 +43,17 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 
 const SchoolDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
+
+  //! Getting the schools's id (which is the user id)
+  const lc_user: User = JSON.parse(
+    localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
+  );
+  if (!lc_user) {
+    console.error("TeacherAbsenceMAnagement lc_user is null");
+    // return
+  }
+  const school_id: number = JSON.parse(lc_user.id);
+  console.log("schools's id : ", school_id);
 
   // to inspect some data we got from the server :
   const [students, setStudents] = useState<Student[]>([]);
@@ -157,6 +165,23 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_stats();
     get_modules();
   }, []);
+
+  const total_num_of_absences = () => {
+    let sum = 0;
+    students.forEach((s) => {
+      sum += s.number_of_absences ?? 0;
+    });
+    return sum;
+  };
+
+  //! Passed Down function to refetch & Sync with the server :
+  function RefetchStudents() {
+    get_current_school_students();
+  }
+  function RefetchExams() {
+    get_current_school_exam_schedules();
+  }
+
   const stats = [
     {
       title: "إجمالي الطلاب",
@@ -177,8 +202,8 @@ const SchoolDashboard: React.FC = () => {
       color: "bg-purple-500",
     },
     {
-      title: "الحضور اليومي",
-      value: "94%",
+      title: "اجمالي الغيابات",
+      value: total_num_of_absences() ?? "0",
       icon: BarChart2,
       color: "bg-orange-500",
     },
@@ -323,12 +348,15 @@ const SchoolDashboard: React.FC = () => {
               setTeacherList={setTeachers}
               modules={modules}
               SetModules={SetModules}
+              class_groups_list={class_groups}
             />
             <ParentManagement
               parentsList={parents}
               setParentList={setParents}
               class_groups_list={class_groups}
               studentsList={students}
+              //? Re-Sync with the server functions:
+              RefetchStudents={RefetchStudents}
             />
           </div>
         );
@@ -351,6 +379,9 @@ const SchoolDashboard: React.FC = () => {
           <ExamScheduleManagemen
             exam_schedules={exam_schedules}
             setExamSchedules={setExamSchedules}
+            school_id={school_id}
+            //? Re-Sync with the server functions:
+            RefetchExams={RefetchExams}
           />
         );
       case "reports":

@@ -267,32 +267,35 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       id,
       latest_csrf
     );
-  };
-
-  const handleFileUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    id: string
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setClassGroupList(
-        class_groups_list.map((cls) =>
-          cls.class_group_id === id
-            ? { ...cls, teachersPdf: { url, name: file.name } }
-            : cls
-        )
-      );
+    if (res.ok) {
+      console.log("ClassManagement delete_class_group res: OK");
     }
   };
 
-  const handleRemovePdf = (id: string) => {
-    setClassGroupList(
-      class_groups_list.map((cls) =>
-        cls.class_group_id === id ? { ...cls, teachersPdf: null } : cls
-      )
-    );
-  };
+  // const handleFileUpload = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  //   id: string
+  // ) => {
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     const url = URL.createObjectURL(file);
+  //     setClassGroupList(
+  //       class_groups_list.map((cls) =>
+  //         cls.class_group_id === id
+  //           ? { ...cls, teachersPdf: { url, name: file.name } }
+  //           : cls
+  //       )
+  //     );
+  //   }
+  // };
+
+  // const handleRemovePdf = (id: string) => {
+  //   setClassGroupList(
+  //     class_groups_list.map((cls) =>
+  //       cls.class_group_id === id ? { ...cls, teachersPdf: null } : cls
+  //     )
+  //   );
+  // };
 
   const filteredClasses = class_groups_list.filter(
     (cls) => cls.name.toLowerCase().includes(searchTerm.toLowerCase())

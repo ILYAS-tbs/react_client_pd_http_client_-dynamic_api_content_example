@@ -93,3 +93,13 @@ export interface PostPutTeacherModuleClassGrpPayload {
   class_group_id: string;
   module_id: string;
 }
+
+export interface PostExamSchedule {
+  school_id: number;
+  module_name: string;
+  class_group_name: string;
+  date: string;
+  time: string;
+  duration: number;
+  room: string;
+}

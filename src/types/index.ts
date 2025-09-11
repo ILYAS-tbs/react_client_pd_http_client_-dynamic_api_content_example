@@ -4,17 +4,13 @@ import { BehaviourReport } from "../models/BehaviorReport";
 import { ClassGroup } from "../models/ClassGroups";
 import { Event } from "../models/Event";
 import { ExamSchedule } from "../models/ExamSchedule";
-import { Parent, ParentJson } from "../models/ParenAndStudent";
+import { Parent } from "../models/ParenAndStudent";
 import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
 import { Teacher } from "../models/Teacher";
 import { TeacherAbsence } from "../models/TeacherAbsence";
 import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
-import {
-  ResponseParent,
-  ResponseStudent,
-  ResponseTeacher,
-} from "../services/http_api/http_reponse_types";
+
 import { TeacherModuleClassGrp } from "../models/TeacherModuleClassGrp";
 import { Mark } from "../models/Mark";
 import { StudentGrade } from "../models/StudentGrade";
@@ -91,16 +87,18 @@ export interface StudentManagementProps {
 export interface TeacherManagementProps {
   teachersList: Teacher[];
   setTeacherList: any; // setState
-  modules:Module[],
-  SetModules:React.Dispatch<React.SetStateAction<Module[]>>
+  modules: Module[];
+  SetModules: React.Dispatch<React.SetStateAction<Module[]>>;
+  class_groups_list: ClassGroup[];
 }
-
 
 export interface ParentManagementProps {
   parentsList: Parent[];
   setParentList: React.Dispatch<React.SetStateAction<Parent[]>>;
   class_groups_list: ClassGroup[];
   studentsList: Student[];
+  //? Re-Sync with the server functions
+  RefetchStudents: () => void;
 }
 
 export interface ClassesManagementProps {
@@ -128,6 +126,9 @@ export interface BehaviorReportsProps {
 export interface ExamScheduleManagementProps {
   exam_schedules: ExamSchedule[];
   setExamSchedules: React.Dispatch<React.SetStateAction<ExamSchedule[]>>;
+  school_id: number;
+  //? Re-Sync with the server functions:
+  RefetchExams: () => void;
 }
 
 export interface GradeOverviewProps {
