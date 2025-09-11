@@ -18,7 +18,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    
+    //? My Custom settings :
+    "noUncheckedIndexedAccess": true,     // Array indexing is T | undefined
   },
   "include": ["src"]
 }
