@@ -10,7 +10,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { ChildrenOverviewProps } from "../../types";
-import { S1, Student } from "../../models/Student";
+import { Student } from "../../models/Student";
 import { getAge } from "../../lib/dateUtils";
 
 const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
@@ -156,8 +156,9 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
     attendance: one_student_absences(student),
     behavior: student.academic_state,
     subjects: student.module_grades?.["s1"]?.map((module_grade) => {
-      const key = Object.keys(module_grade)[0]; // e.g. "الرياضيات"
-      const value = module_grade[key];
+      const key = Object.keys(module_grade)[0]!; // e.g. "الرياضيات"
+
+      const value = module_grade[key]!;
 
       const grade = {
         name: key,

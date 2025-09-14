@@ -190,7 +190,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const loopThroughClassGroups = (teacher: Teacher) => {
     let exist: boolean = false;
 
-    teacher.modulesAndClassGroups?.[0].module.module_name
+    teacher.modulesAndClassGroups?.[0]?.module.module_name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
@@ -200,10 +200,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
     for (let i = 0; i < teacher.modulesAndClassGroups?.length; i++) {
       exist =
-        exist ||
-        teacher.modulesAndClassGroups?.[i].class_group.name
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+        (exist ||
+          teacher.modulesAndClassGroups?.[i]?.class_group.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())) ??
+        false;
     }
 
     return exist;
@@ -681,7 +682,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     const uploaded_file = e.target.files
                       ? e.target.files?.[0]
                       : null;
-                    setProfilPic_update(uploaded_file);
+                    setProfilPic_update(uploaded_file ?? null);
                   }}
                   id="img-file-update"
                   style={{ display: "none" }}
