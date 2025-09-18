@@ -35,8 +35,10 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
       const user_role = success_result?.user?.role;
 
       if (success_result) {
-        navigate(`/${user_role}-dashboard`);
-        onClose?.();
+        if (user_role) {
+          navigate(`/${user_role}-dashboard`);
+          onClose?.();
+        }
       }
     } catch (error) {
       console.error("Login failed:", error);

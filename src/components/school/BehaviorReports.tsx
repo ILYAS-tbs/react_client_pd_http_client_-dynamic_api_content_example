@@ -22,6 +22,7 @@ import { BehaviourReport } from "../../models/BehaviorReport";
 
 const BehaviorReports: React.FC<BehaviorReportsProps> = ({
   behaviour_reports_list,
+  students_list,
 }) => {
   /* 
  - mock data : 
@@ -52,67 +53,67 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
   const [viewSummary, setViewSummary] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const handleAddReport = () => {
-    if (
-      newReport.studentName &&
-      newReport.date &&
-      newReport.category &&
-      newReport.description &&
-      newReport.actionTaken
-    ) {
-      setReports([...reports, { id: `r-${Date.now()}`, ...newReport }]);
-      setNewReport({
-        studentName: "",
-        date: "",
-        category: "",
-        description: "",
-        actionTaken: "",
-      });
-      setShowAddModal(false);
-    }
-  };
+  // const handleAddReport = () => {
+  //   if (
+  //     newReport.studentName &&
+  //     newReport.date &&
+  //     newReport.category &&
+  //     newReport.description &&
+  //     newReport.actionTaken
+  //   ) {
+  //     setReports([...reports, { id: `r-${Date.now()}`, ...newReport }]);
+  //     setNewReport({
+  //       studentName: "",
+  //       date: "",
+  //       category: "",
+  //       description: "",
+  //       actionTaken: "",
+  //     });
+  //     setShowAddModal(false);
+  //   }
+  // };
 
-  const handleEditReport = (report: BehaviorReport) => {
-    setEditingReport(report);
-    setNewReport({
-      studentName: report.studentName,
-      date: report.date,
-      category: report.category,
-      description: report.description,
-      actionTaken: report.actionTaken,
-    });
-    setShowAddModal(true);
-  };
+  // const handleEditReport = (report: BehaviorReport) => {
+  //   setEditingReport(report);
+  //   setNewReport({
+  //     studentName: report.studentName,
+  //     date: report.date,
+  //     category: report.category,
+  //     description: report.description,
+  //     actionTaken: report.actionTaken,
+  //   });
+  //   setShowAddModal(true);
+  // };
 
-  const handleUpdateReport = () => {
-    if (
-      editingReport &&
-      newReport.studentName &&
-      newReport.date &&
-      newReport.category &&
-      newReport.description &&
-      newReport.actionTaken
-    ) {
-      setReports(
-        reports.map((rep) =>
-          rep.id === editingReport.id ? { ...rep, ...newReport } : rep
-        )
-      );
-      setEditingReport(null);
-      setNewReport({
-        studentName: "",
-        date: "",
-        category: "",
-        description: "",
-        actionTaken: "",
-      });
-      setShowAddModal(false);
-    }
-  };
+  // const handleUpdateReport = () => {
+  //   if (
+  //     editingReport &&
+  //     newReport.studentName &&
+  //     newReport.date &&
+  //     newReport.category &&
+  //     newReport.description &&
+  //     newReport.actionTaken
+  //   ) {
+  //     setReports(
+  //       reports.map((rep) =>
+  //         rep.id === editingReport.id ? { ...rep, ...newReport } : rep
+  //       )
+  //     );
+  //     setEditingReport(null);
+  //     setNewReport({
+  //       studentName: "",
+  //       date: "",
+  //       category: "",
+  //       description: "",
+  //       actionTaken: "",
+  //     });
+  //     setShowAddModal(false);
+  //   }
+  // };
 
-  const handleDeleteReport = (id: string) => {
-    setReports(reports.filter((rep) => rep.id !== id));
-  };
+  // const handleDeleteReport = (id: string) => {
+  //   setReports(reports.filter((rep) => rep.id !== id));
+  // };
 
   const filteredReports = reports.filter(
     (rep) =>
@@ -122,6 +123,23 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
       (selectedCategory === "all" || rep.type === selectedCategory)
   );
 
+  const isNegative = (type: string) => {
+    if (type === "سلوك سلبي" || type === "bad") {
+      return true;
+    }
+    return false;
+  };
+  const isPositive = (type: string) => {
+    if (
+      type === "سلوك إيجابي" ||
+      type === "excellent" ||
+      type === "very good" ||
+      type === "good"
+    ) {
+      return true;
+    }
+    return false;
+  };
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
@@ -129,6 +147,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           تقارير السلوك
         </h2>
+
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
             value={selectedCategory}
@@ -136,8 +155,8 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="all">الكل</option>
-            <option value="سلوك إيجابي">سلوك إيجابي</option>
-            <option value="سلوك سلبي">سلوك سلبي</option>
+            <option value="good">سلوك إيجابي</option>
+            <option value="bad">سلوك سلبي</option>
           </select>
           <button
             onClick={() => setViewSummary(!viewSummary)}
@@ -146,13 +165,15 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
             <BarChart2 className="h-5 w-5" />
             <span>{viewSummary ? "عرض قائمة" : "عرض ملخص"}</span>
           </button>
-          <button
+
+          {/* For now : adding is only possible by the teacher not school */}
+          {/* <button
             onClick={() => setShowAddModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
             <span>إضافة تقرير</span>
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -184,18 +205,14 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
             <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  إجمالي التقارير: {filteredReports.length}
+                  إجمالي التقارير: {reports.length}
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400 mt-1">
                   سلوك إيجابي:{" "}
-                  {
-                    filteredReports.filter((r) => r.type === "سلوك إيجابي")
-                      .length
-                  }
+                  {reports.filter((r) => isPositive(r.type)).length}
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                  سلوك سلبي:{" "}
-                  {filteredReports.filter((r) => r.type === "سلوك سلبي").length}
+                  سلوك سلبي: {reports.filter((r) => isNegative(r.type)).length}
                 </p>
               </div>
               {filteredReports.map((report) => (
@@ -212,7 +229,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                     </p>
                   </div>
                   <span className="text-sm text-blue-600 dark:text-blue-400">
-                    {report.type}
+                    {isNegative(report.type) ? "سلوك سلبي" : " سلوك إيجابي"}
                   </span>
                 </div>
               ))}
@@ -238,9 +255,10 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     الإجراء
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {/* For now : actions disallowed for from school for now */}
+                  {/* <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     الإجراءات
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -261,7 +279,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">
-                        {report.type}
+                        {isNegative(report.type) ? "سلوك سلبي" : " سلوك إيجابي"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -274,7 +292,9 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                         {report.conclusion}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+
+                    {/* For now : actions are disallowed from school */}
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2 rtl:space-x-reverse">
                         <button
                           onClick={() => handleEditReport(report)}
@@ -294,7 +314,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                           <Eye className="h-4 w-4" />
                         </button>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -314,17 +334,19 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  اسم الطالب
+                  اختر الطالب
                 </label>
-                <input
-                  type="text"
-                  value={newReport.studentName}
-                  onChange={(e) =>
-                    setNewReport({ ...newReport, studentName: e.target.value })
-                  }
+                <select
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="اسم الطالب"
-                />
+                  name=""
+                  id=""
+                >
+                  {students_list.map((student) => (
+                    <option key={student.student_id} value={student.student_id}>
+                      {student.full_name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -406,7 +428,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                 إلغاء
               </button>
               <button
-                onClick={editingReport ? handleUpdateReport : handleAddReport}
+                // onClick={editingReport ? handleUpdateReport : handleAddReport}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 {editingReport ? "تحديث" : "إضافة"}

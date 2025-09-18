@@ -113,20 +113,25 @@ export interface ScheduleManagementProps {
 
 export interface ActivitiesManagementProps {
   events_list: Event[];
+  school_id: number;
+  RefetchEvents: () => void;
 }
 
 export interface AbsenceReviewsProps {
   absence_reports_list: AbsenceReport[];
+  RefetchReports: () => void;
 }
 
 export interface BehaviorReportsProps {
   behaviour_reports_list: BehaviourReport[];
+  students_list: Student[];
 }
 
 export interface ExamScheduleManagementProps {
   exam_schedules: ExamSchedule[];
   setExamSchedules: React.Dispatch<React.SetStateAction<ExamSchedule[]>>;
   school_id: number;
+  class_groups: ClassGroup[];
   //? Re-Sync with the server functions:
   RefetchExams: () => void;
 }

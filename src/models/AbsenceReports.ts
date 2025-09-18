@@ -11,7 +11,7 @@ export interface AbsenceReport {
   submit_date: Date;
   absence_reason: string;
   proof_document: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "accepted" | "rejected";
   adminComment?: string;
   reviewDate?: Date;
 

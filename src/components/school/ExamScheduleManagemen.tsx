@@ -20,6 +20,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
   setExamSchedules,
   RefetchExams,
   school_id,
+  class_groups,
 }) => {
   /* 
    mock data model :
@@ -33,44 +34,57 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
       room: "ص 10",
     },
   */
-  const [exams, setExams] = useState<Exam[]>([
-    {
-      id: "e1",
-      subject: "الرياضيات",
-      date: "2025-06-20",
-      time: "09:00",
-      duration: 90,
-      className: "الصف الخامس - أ",
-      room: "ص 10",
-    },
-    {
-      id: "e2",
-      subject: "العلوم",
-      date: "2025-06-21",
-      time: "10:00",
-      duration: 60,
-      className: "الصف الرابع - ب",
-      room: "ص 12",
-    },
-    {
-      id: "e3",
-      subject: "اللغة العربية",
-      date: "2025-06-22",
-      time: "13:00",
-      duration: 75,
-      className: "الصف الثالث - أ",
-      room: "ص 15",
-    },
-    {
-      id: "e4",
-      subject: "الدراسات الاجتماعية",
-      date: "2025-06-23",
-      time: "09:00",
-      duration: 90,
-      className: "الصف السادس - ب",
-      room: "ص 11",
-    },
-  ]);
+
+  // const [exams, setExams] = useState<Exam[]>([
+  //   {
+  //     id: "e1",
+  //     subject: "الرياضيات",
+  //     date: "2025-06-20",
+  //     time: "09:00",
+  //     duration: 90,
+  //     className: "الصف الخامس - أ",
+  //     room: "ص 10",
+  //   },
+  //   {
+  //     id: "e2",
+  //     subject: "العلوم",
+  //     date: "2025-06-21",
+  //     time: "10:00",
+  //     duration: 60,
+  //     className: "الصف الرابع - ب",
+  //     room: "ص 12",
+  //   },
+  //   {
+  //     id: "e3",
+  //     subject: "اللغة العربية",
+  //     date: "2025-06-22",
+  //     time: "13:00",
+  //     duration: 75,
+  //     className: "الصف الثالث - أ",
+  //     room: "ص 15",
+  //   },
+  //   {
+  //     id: "e4",
+  //     subject: "الدراسات الاجتماعية",
+  //     date: "2025-06-23",
+  //     time: "09:00",
+  //     duration: 90,
+  //     className: "الصف السادس - ب",
+  //     room: "ص 11",
+  //   },
+  // ]);
+  //? mapped to the mock shape above
+  const [exams, setExams] = useState<Exam[]>(
+    exam_schedules.map((exam) => ({
+      id: exam.exam_schedule_id,
+      subject: exam.module_name,
+      date: new Date(exam.date).toString(),
+      time: exam.time,
+      duration: exam.duration,
+      className: exam.class_group_name,
+      room: exam.room,
+    }))
+  );
 
   const [newExamForm, setNewExamForm] = useState({
     module_name: "",
@@ -156,9 +170,9 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
     }
   };
 
-  const handleDeleteExam = (id: string) => {
-    setExams(exams.filter((ex) => ex.id !== id));
-  };
+  // const handleDeleteExam = (id: string) => {
+  //   setExams(exams.filter((ex) => ex.id !== id));
+  // };
 
   const filteredExams = exam_schedules.filter(
     (ex) =>
@@ -204,6 +218,18 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
   const handlePatchExam = (e: React.FormEvent) => {
     e.preventDefault();
   };
+
+  //! Delete Exam :
+  const handleDeleteExam = async (id: string) => {
+    const delete_exam_res = await school_dashboard_client.delete_exam_schedule(
+      id,
+      getCSRFToken()!
+    );
+
+    // Referech exams ::
+    RefetchExams();
+  };
+
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
@@ -370,12 +396,14 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                        <button
+                        {/* For now : no edit */}
+                        {/* <button
                           onClick={() => setShowAddModal(true)}
                           className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
+                        */}
                         <button
                           onClick={() =>
                             handleDeleteExam(exam.exam_schedule_id)
@@ -384,9 +412,11 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+
+                        {/* For now : no eye */}
+                        {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                           <Eye className="h-4 w-4" />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>

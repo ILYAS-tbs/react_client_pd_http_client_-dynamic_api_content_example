@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Check, X, Eye, Calendar, User } from "lucide-react";
 import { AbsenceReviewsProps } from "../../types";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
+import { getCSRFToken } from "../../lib/get_CSRFToken";
+import { PatchAbsenceReportPayload } from "../../services/http_api/payloads_types/school_client_payload_types";
+import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 
 const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
   absence_reports_list,
+  RefetchReports,
 }) => {
   const [filter, setFilter] = useState("pending");
 
@@ -74,7 +79,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
     switch (status) {
       case "accepted":
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
-      case "refused":
+      case "rejected":
         return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
       default:
         return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
@@ -85,13 +90,30 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
     switch (status) {
       case "accepted":
         return "مقبول";
-      case "refused":
+      case "rejected":
         return "مرفوض";
       default:
         return "قيد المراجعة";
     }
   };
 
+  const handleAcceptance = async (report_id: string, accept: boolean) => {
+    const latest_csrf = getCSRFToken()!;
+    const patch_payload: PatchAbsenceReportPayload = {
+      status: accept ? "accepted" : "rejected",
+    };
+    //! API CALL
+    const patch_report_res = await school_dashboard_client.patch_absence_report(
+      report_id,
+      patch_payload,
+      latest_csrf
+    );
+    if (patch_report_res.ok) {
+      //! Update data
+      console.log("patch reports successful");
+      RefetchReports();
+    }
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -111,7 +133,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
             <option value="all">الكل</option>
             <option value="pending">قيد المراجعة</option>
             <option value="accepted">مقبول</option>
-            <option value="refused">مرفوض</option>
+            <option value="rejected">مرفوض</option>
           </select>
         </div>
       </div>
@@ -137,7 +159,8 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
           },
           {
             label: "مرفوض",
-            value: absenceRequests.filter((r) => r.status === "refused").length,
+            value: absenceRequests.filter((r) => r.status === "rejected")
+              .length,
             color: "bg-red-500",
           },
         ].map((stat, index) => (
@@ -216,7 +239,9 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 سبب الغياب:
               </p>
-              <p className="text-gray-900 dark:text-white">{request.reason}</p>
+              <p className="text-gray-900 dark:text-white">
+                {request.absence_reason}
+              </p>
             </div>
 
             <div className="flex items-center justify-between">
@@ -235,27 +260,53 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                     {request.proof_document ? "متوفرة" : "غير متوفرة"}
                   </span>
                 </div>
-                {request.status === "refused" && request.rejectionReason && (
+
+                {/* maybe for later implement a way to insert rejection reason  */}
+                {/* {request.status === "rejected" && request.absence_reason && (
                   <div className="text-sm text-red-600 dark:text-red-400">
-                    سبب الرفض: {request.rejectionReason}
+                    سبب الرفض: {request.}
                   </div>
-                )}
+                )} */}
               </div>
 
               {request.status === "pending" && (
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                  <button
+                    onClick={() =>
+                      handleAcceptance(request.absence_report_id, true)
+                    }
+                    className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
                     <Check className="h-4 w-4" />
                     <span>قبول</span>
                   </button>
-                  <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+
+                  <button
+                    onClick={() =>
+                      handleAcceptance(request.absence_report_id, false)
+                    }
+                    className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
                     <X className="h-4 w-4" />
                     <span>رفض</span>
                   </button>
-                  <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                    <Eye className="h-4 w-4" />
-                    <span>تفاصيل</span>
-                  </button>
+
+                  {/* show the proof document if exist else error */}
+                  {request.proof_document ? (
+                    <a
+                      href={SERVER_BASE_URL + request.proof_document}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>تفاصيل</span>
+                    </a>
+                  ) : (
+                    <div className="  space-x-1 rtl:space-x-reverse px-3 py-2 text-red-600  rounded-lg hover:text-red-500 transition-colors">
+                      لا توجد أي تفاصيل أو مستند إثبات
+                    </div>
+                  )}
                 </div>
               )}
             </div>

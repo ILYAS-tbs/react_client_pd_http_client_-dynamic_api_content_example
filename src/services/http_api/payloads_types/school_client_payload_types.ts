@@ -103,3 +103,32 @@ export interface PostExamSchedule {
   duration: number;
   room: string;
 }
+
+export interface PatchAbsenceReportPayload {
+  absence_date?: string;
+  more_details?: string;
+  is_urgent?: boolean;
+  adminComment?: string;
+  absence_reason?: string;
+  proof_document?: string;
+  status?: "pending" | "accepted" | "rejected";
+  student_id?: string;
+}
+// ! Events
+export interface PostEventPayload {
+  title: string;
+  category: string;
+  date: string;
+  time: string;
+  place: string;
+  desc: string;
+  school_id: number;
+}
+
+export interface PatchEventPayload {
+  title: string;
+  category: string;
+  date: string;
+  time: string;
+  place: string;
+}

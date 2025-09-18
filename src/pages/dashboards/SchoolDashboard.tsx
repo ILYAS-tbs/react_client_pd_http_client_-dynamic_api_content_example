@@ -181,6 +181,12 @@ const SchoolDashboard: React.FC = () => {
   function RefetchExams() {
     get_current_school_exam_schedules();
   }
+  function RefetchReports() {
+    get_current_school_absence_reports();
+  }
+  function RefetchEvents() {
+    get_current_school_events();
+  }
 
   const stats = [
     {
@@ -380,6 +386,7 @@ const SchoolDashboard: React.FC = () => {
             exam_schedules={exam_schedules}
             setExamSchedules={setExamSchedules}
             school_id={school_id}
+            class_groups={class_groups}
             //? Re-Sync with the server functions:
             RefetchExams={RefetchExams}
           />
@@ -387,8 +394,14 @@ const SchoolDashboard: React.FC = () => {
       case "reports":
         return (
           <div className="space-y-6">
-            <AbsenceReviews absence_reports_list={absence_reports} />
-            <BehaviorReports behaviour_reports_list={behaviour_reports} />
+            <AbsenceReviews
+              absence_reports_list={absence_reports}
+              RefetchReports={RefetchReports}
+            />
+            <BehaviorReports
+              behaviour_reports_list={behaviour_reports}
+              students_list={students}
+            />
           </div>
         );
       case "grades":
@@ -400,7 +413,13 @@ const SchoolDashboard: React.FC = () => {
           />
         );
       case "activities":
-        return <ActivitiesManagement events_list={events} />;
+        return (
+          <ActivitiesManagement
+            events_list={events}
+            school_id={school_id}
+            RefetchEvents={RefetchEvents}
+          />
+        );
       default:
         return <PlaceholderPage title="صفحة غير موجودة" />;
     }

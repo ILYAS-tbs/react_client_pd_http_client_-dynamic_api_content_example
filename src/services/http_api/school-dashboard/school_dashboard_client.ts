@@ -2,7 +2,10 @@ import {
   AddCurrectSchoolStudentsToParent,
   AddorRemoveParentToSchoolPayload,
   FindParentByIdPayload,
+  PatchAbsenceReportPayload,
+  PatchEventPayload,
   PostPutClassGroupPayload as PostClassGroupPayload,
+  PostEventPayload,
   PostExamSchedule,
   PostPutTeacherModuleClassGrpPayload,
   PostStudentPayload,
@@ -31,6 +34,7 @@ const URLS = {
   delete_student: `${BASE_URL}/student/students/`,
 
   post_exam_schedule: `${BASE_URL}/school/exam-schedules/`,
+  delete_exam_schedule: `${BASE_URL}/school/exam-schedules/`,
 
   find_parent_by_email: `${BASE_URL}/school/schools/find_parent_by_email/`,
   add_parent_to_school: `${BASE_URL}/school/schools/add_parent_to_school/`,
@@ -38,11 +42,16 @@ const URLS = {
   remove_parent_from_school: `${BASE_URL}/school/schools/remove_parent_from_school/`,
 
   get_current_school_absence_reports: `${BASE_URL}/school/absence-reports/get_current_school_absence_reports/`,
+  patch_absence_report: `${BASE_URL}/school/absence-reports/`,
+
   get_current_school_behaviour_reports: `${BASE_URL}/school/behaviour-reports/get_current_school_behaviour_reports/`,
 
   create_or_update_TeacherModuleClassGroup: `${BASE_URL}/teacher/create_or_update_TeacherModuleClassGroup/`,
-};
 
+  post_event: `${BASE_URL}/school/events/`,
+  patch_event: `${BASE_URL}/school/events/`,
+  delete_event: `${BASE_URL}/school/events/`,
+};
 async function get_current_school_students() {
   try {
     const response = await fetch(URLS.get_current_school_students, {
@@ -325,6 +334,23 @@ async function post_exam_schedule(
     return { ok: false, error: error };
   }
 }
+async function delete_exam_schedule(id: string, csrfToken: string) {
+  try {
+    const DELETE_URL = URLS.delete_exam_schedule + id + "/";
+    const response = await fetch(DELETE_URL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 
 //! Parent :
 async function find_parent_by_email(
@@ -413,7 +439,7 @@ async function add_current_school_students_to_parent(
   }
 }
 
-//* EVENTS :
+//! EVENTS :
 async function get_current_school_events() {
   try {
     const response = await fetch(URLS.get_current_school_events, {
@@ -421,6 +447,64 @@ async function get_current_school_events() {
       credentials: "include", // ensures cookies like sessionid are sent
     });
 
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function post_event(payload: PostEventPayload, csrfToken: string) {
+  try {
+    const response = await fetch(URLS.post_event, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function patch_event(
+  id: string,
+  payload: PatchEventPayload,
+  csrf_token: string
+) {
+  const PATCH_URL = URLS.patch_event + id + "/";
+  try {
+    const response = await fetch(PATCH_URL, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrf_token,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function delete_event(id: string, csrfToken: string) {
+  try {
+    const DELETE_URL = URLS.delete_event + id + "/";
+    const response = await fetch(DELETE_URL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
     const data = await response.json();
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
@@ -441,7 +525,29 @@ export async function get_current_school_absence_reports() {
     return { ok: false, error: error };
   }
 }
+export async function patch_absence_report(
+  id: string,
+  payload: PatchAbsenceReportPayload,
+  csrf_token: string
+) {
+  const PATCH_URL = URLS.patch_absence_report + id + "/";
+  try {
+    const response = await fetch(PATCH_URL, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrf_token,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 //! BehaviourReports :
 export async function get_current_school_behaviour_reports() {
   try {
@@ -519,6 +625,7 @@ export const school_dashboard_client = {
   delete_student: delete_student,
 
   post_exam_schedule: post_exam_schedule,
+  delete_exam_schedule: delete_exam_schedule,
 
   find_parent_by_email: find_parent_by_email,
   add_parent_to_school: add_parent_to_school,
@@ -531,4 +638,10 @@ export const school_dashboard_client = {
 
   create_or_update_TeacherModuleClassGroup:
     create_or_update_TeacherModuleClassGroup,
+
+  patch_absence_report: patch_absence_report,
+
+  post_event: post_event,
+  patch_event: patch_event,
+  delete_event: delete_event,
 };

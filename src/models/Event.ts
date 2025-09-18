@@ -5,6 +5,7 @@ export interface EventJson {
   date: string;
   place: string;
   time: string;
+  desc: string | null;
   schools: string[];
 }
 
@@ -15,6 +16,8 @@ interface EventParams {
   date: string;
   place: string;
   time: string;
+  desc: string | null;
+
   schools: string[];
 }
 export class Event {
@@ -23,6 +26,8 @@ export class Event {
   category: string;
   date: string;
   time: string;
+  desc: string | null;
+
   place: string;
   schools: string[];
 
@@ -32,6 +37,7 @@ export class Event {
     category,
     date,
     time,
+    desc,
     place,
     schools,
   }: EventParams) {
@@ -40,7 +46,7 @@ export class Event {
     this.category = category;
     this.date = date;
     this.time = time;
-
+    this.desc = desc;
     this.place = place;
     this.schools = schools;
   }
@@ -52,6 +58,7 @@ export class Event {
       category: json.category,
       date: json.date,
       time: json.time,
+      desc: json.desc,
       place: json.place,
       schools: json.schools,
     });

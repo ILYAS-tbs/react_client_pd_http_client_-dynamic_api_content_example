@@ -210,7 +210,10 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       const chosen_class = class_groups_list.filter(
         (cls) => cls.class_group_id === chosen_class_id
       )[0];
-      formData_update.append("name", chosen_class.name);
+
+      if (chosen_class) {
+        formData_update.append("name", chosen_class.name);
+      }
     }
 
     if (file_teachers) {
