@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BarChart3, TrendingUp, Users, BookOpen, Filter } from "lucide-react";
 import { GradeOverviewProps } from "../../types";
-import { GroupsStat } from "../../models/SchoolStat";
+import { GroupsStat, SchoolStat } from "../../models/SchoolStat";
 
 const GradeOverview: React.FC<GradeOverviewProps> = ({
   school_stat,
@@ -10,18 +10,27 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
 }) => {
   const [selectedClass, setSelectedClass] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
-
+  const [selectedSemester, setSelectedSemester] = useState("s1");
   // mock data : classses->class_groups
   // const classes = ["الكل", "3أ", "3ب", "4أ", "4ب", "5أ", "5ب", "6أ", "6ب"];
 
+  // const subjects = [
+  //   "الكل",
+  //   "الرياضيات",
+  //   "اللغة العربية",
+  //   "العلوم",
+  //   "التاريخ",
+  //   "الجغرافيا",
+  // ];
   const subjects = [
-    "الكل",
-    "الرياضيات",
-    "اللغة العربية",
-    "العلوم",
-    "التاريخ",
-    "الجغرافيا",
+    "all",
+    ...new Set(
+      school_stat?.semesters_stats.map(
+        (semesters_stats) => semesters_stats.module_name
+      )
+    ),
   ];
+  const semesters = ["all", "s1", "s2"];
 
   function calculateSuccessPercentage() {
     let percentage = 0;
@@ -39,6 +48,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
 
     return percentage;
   }
+
   const gradeStats = [
     {
       label: "متوسط المدرسة",
@@ -78,38 +88,69 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
   */
   const classPerformance: GroupsStat[] = school_stat?.groups_stats ?? [];
 
-  const subjectPerformance = [
-    {
-      subject: "الرياضيات",
-      average: "15.8",
-      difficulty: "صعب",
-      improvement: "+0.4",
-    },
-    {
-      subject: "اللغة العربية",
-      average: "16.9",
-      difficulty: "متوسط",
-      improvement: "+0.2",
-    },
-    {
-      subject: "العلوم",
-      average: "16.2",
-      difficulty: "متوسط",
-      improvement: "+0.6",
-    },
-    {
-      subject: "التاريخ",
-      average: "17.1",
-      difficulty: "سهل",
-      improvement: "+0.1",
-    },
-    {
-      subject: "الجغرافيا",
-      average: "16.5",
-      difficulty: "متوسط",
+  // const subjectPerformance = [
+  //   {
+  //     subject: "الرياضيات",
+  //     average: "15.8",
+  //     difficulty: "صعب",
+  //     improvement: "+0.4",
+  //   },
+  //   {
+  //     subject: "اللغة العربية",
+  //     average: "16.9",
+  //     difficulty: "متوسط",
+  //     improvement: "+0.2",
+  //   },
+  //   {
+  //     subject: "العلوم",
+  //     average: "16.2",
+  //     difficulty: "متوسط",
+  //     improvement: "+0.6",
+  //   },
+  //   {
+  //     subject: "التاريخ",
+  //     average: "17.1",
+  //     difficulty: "سهل",
+  //     improvement: "+0.1",
+  //   },
+  //   {
+  //     subject: "الجغرافيا",
+  //     average: "16.5",
+  //     difficulty: "متوسط",
+  //     improvement: "+0.3",
+  //   },
+  // ];
+  //! Map to mock data above
+  const determineModuleDifficulty = (module_average: number) => {
+    if (module_average <= 10) {
+      return "Difficult";
+    }
+    if (module_average <= 15) {
+      return "Medium";
+    }
+    return "Easy";
+  };
+  const subjectPerformance = school_stat?.semesters_stats.map(
+    (module_stat) => ({
+      subject: module_stat.module_name,
+      average: module_stat.module_average,
+      difficulty: determineModuleDifficulty(module_stat.module_average),
       improvement: "+0.3",
-    },
-  ];
+      semester: module_stat.semester,
+      class_group: module_stat.class_group,
+    })
+  );
+
+  const FilteredSubjectPerformance =
+    subjectPerformance?.filter(
+      (module_stat) =>
+        (selectedSemester === "all" ||
+          module_stat.semester === selectedSemester) &&
+        (selectedSubject === "all" ||
+          module_stat.subject === selectedSubject) &&
+        (selectedClass === "all" ||
+          module_stat.class_group.includes(selectedClass))
+    ) ?? [];
 
   return (
     <div className="space-y-6">
@@ -144,7 +185,25 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
                 key={subject}
                 value={subject === "الكل" ? "all" : subject}
               >
-                {subject}
+                {subject === "all" ? "الكل" : subject}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedSemester}
+            onChange={(e) => setSelectedSemester(e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            {semesters.map((semester) => (
+              <option
+                key={semester}
+                value={semester === "الكل" ? "all" : semester}
+              >
+                {semester === "all"
+                  ? "الكل"
+                  : semester === "s1"
+                  ? "الفصل الاول"
+                  : "الفصل الثاني"}
               </option>
             ))}
           </select>
@@ -245,7 +304,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
           أداء المواد
         </h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {subjectPerformance.map((subject, index) => (
+          {FilteredSubjectPerformance?.map((subject, index) => (
             <div
               key={index}
               className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"

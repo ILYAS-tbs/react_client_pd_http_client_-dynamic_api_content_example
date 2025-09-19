@@ -3,6 +3,7 @@ import {
   PostAbsencePayload,
   PostBehaviourReportPayload,
   PostMarkPayload,
+  PostStudentGradesPayload,
 } from "../payloads_types/teacher_client_payload_types";
 
 const BASE_URL = "http://127.0.0.1:8000";
@@ -20,6 +21,8 @@ const URLS = {
   post_behaviour_report: `${BASE_URL}/school/behaviour-reports/`,
 
   post_mark: `${BASE_URL}/teacher/marks/`,
+  post_grades: `${BASE_URL}/teacher/student-grades/`,
+  patch_grades: `${BASE_URL}/teacher/student-grades/`,
 
   create_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/create_teacher_upload/`,
   delete_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/`,
@@ -188,11 +191,53 @@ async function post_behaviour_report(
   }
 }
 
-//! Post Mark :
+//! Post Mark => migrated to student-grades :
 async function post_mark(payload: PostMarkPayload, csrfToken: string) {
   try {
     const response = await fetch(URLS.post_mark, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function post_grades(
+  payload: PostStudentGradesPayload,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.post_grades, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+async function patch_grades(
+  id: number,
+  payload: PatchStudentPayload,
+  csrfToken: string
+) {
+  const PATCH_GRADE_URL = URLS.patch_grades + id + "/";
+  try {
+    const response = await fetch(PATCH_GRADE_URL, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
@@ -258,6 +303,8 @@ export const teacher_dashboard_client = {
   post_behaviour_report: post_behaviour_report,
 
   post_mark: post_mark,
+  post_grades: post_grades,
+  patch_grades: patch_grades,
 
   create_teacher_upload: create_teacher_upload,
   delete_teacher_upload: delete_teacher_upload,

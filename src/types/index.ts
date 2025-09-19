@@ -161,11 +161,14 @@ export interface TeacherAbsenceManagerProps {
 }
 
 export interface GradeManagerProps {
+  students: Student[];
   modules: TeacherModuleClassGrp[];
   modules_class_groups: TeacherModuleClassGroup[];
   students_grades: StudentGrade[];
   setStudentsGrades: React.Dispatch<React.SetStateAction<StudentGrade[]>>;
   teacher_id: number;
+  //? Re-Sync with the server functions:
+  RefetchGrades: () => void;
 }
 
 export interface ResourceManagerProps {

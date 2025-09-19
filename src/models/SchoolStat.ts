@@ -1,3 +1,9 @@
+// To parse this data:
+//
+//   import { Convert, SchoolStat } from "./file";
+//
+//   const schoolStat = Convert.toSchoolStat(json);
+
 export interface SchoolStat {
   school_average: number;
   school_max_average: number;
@@ -5,49 +11,45 @@ export interface SchoolStat {
   number_of_students: number;
   failed_students_number: number;
   groups_stats: GroupsStat[];
+  semesters_stats: SemestersStat[];
 }
 
 export interface GroupsStat {
   class_group: string;
-  students?: Student[];
+  students: Student[];
   number_of_students: number;
   students_average: number;
   max_average: number;
-  top_student?: Student;
+  top_student: Student;
   failed_student_number: number;
   success_ratio: number;
 }
 
 export interface Student {
-  student_id: null | string;
+  student_id: string;
   full_name: string;
-  date_of_birth: Date | null;
-  class_group?: ClassGroup;
-  trimester_grade: number | null;
+  is_absent: boolean;
+  phone: string;
+  academic_state: string;
+  date_of_birth: Date;
+  trimester_grade: number;
 }
 
-export interface ClassGroup {
-  class_group_id: string;
-  name: Name;
-  school: string;
-  teacher_list: null | string;
-  time_table: null | string;
-  academic_year: string;
-}
-
-export enum Name {
-  A13 = "A1-3",
-  S5 = "S5",
-  الفصلالثاني = "الفصل الثاني",
+export interface SemestersStat {
+  semester: string;
+  module_id: string;
+  module_name: string;
+  class_group: string[];
+  module_average: number;
 }
 
 // Converts JSON strings to/from your types
 export class SchoolStatConvert {
-  public static toStat(json: string): SchoolStat {
+  public static toSchoolStat(json: string): SchoolStat {
     return JSON.parse(json);
   }
 
-  public static statToJson(value: SchoolStat): string {
+  public static schoolStatToJson(value: SchoolStat): string {
     return JSON.stringify(value);
   }
 }

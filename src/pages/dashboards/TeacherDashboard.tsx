@@ -140,6 +140,11 @@ const TeacherDashboard: React.FC = () => {
     get_current_teacher_school_parents();
   }, []);
 
+  //? SYNC WITH THE SERVER
+  function RefetchGrades() {
+    current_teacher_students_grades();
+  }
+
   const stats = [
     {
       title: "طلابي",
@@ -217,6 +222,8 @@ const TeacherDashboard: React.FC = () => {
             students_grades={students_grades}
             teacher_id={teacher_id}
             setStudentsGrades={setStudentsGrades}
+            RefetchGrades={RefetchGrades}
+            students={students}
           />
         );
       case "resources":
