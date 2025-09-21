@@ -10,8 +10,9 @@ import {
   PostPutTeacherModuleClassGrpPayload,
   PostStudentPayload,
 } from "../payloads_types/school_client_payload_types";
+import { SERVER_BASE_URL } from "../server_constants";
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = SERVER_BASE_URL;
 const URLS = {
   get_current_school_students: `${BASE_URL}/school/schools/get_current_school_students`,
   get_current_school_teachers: `${BASE_URL}/school/schools/get_current_school_teachers`,

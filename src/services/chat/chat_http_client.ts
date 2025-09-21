@@ -4,7 +4,9 @@ import {
   PrivateConversationIDPayload,
 } from "./chat_http_payload_types";
 
-export const WEBSOCKET_BASEURL = "ws://127.0.0.1:8000";
+// export const WEBSOCKET_BASEURL = "ws://127.0.0.1:8000";
+export const WEBSOCKET_BASEURL = "http://35.159.119.195";
+
 const URLS = {
   get_current_parent_schools_teachers: `${SERVER_BASE_URL}/parent/parents/get_current_parent_schools_teachers/`,
   get_conversation_id: `${SERVER_BASE_URL}/chat/get_conversation_id/`,

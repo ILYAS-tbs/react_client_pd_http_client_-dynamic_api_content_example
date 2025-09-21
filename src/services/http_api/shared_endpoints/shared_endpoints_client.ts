@@ -1,5 +1,7 @@
+import { SERVER_BASE_URL } from "../server_constants";
+
 //! Endpoint that are needed by more than one dashboard
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = SERVER_BASE_URL;
 
 const URLS = {
   absences_for_current_school_or_teacher: `${BASE_URL}/class-group/absences/absences_for_current_school_or_teacher/`,
