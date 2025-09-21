@@ -14,13 +14,14 @@ import ConfirmationCode from "./pages/ConfirmationPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 import WebSocketConnector from "./components/testing_connections/websockets_connector";
+import { SERVER_BASE_URL } from "./services/http_api/server_constants";
 
 function App() {
   // ask for an initial CSRFToken from the server :
   useEffect(() => {
     async function seed() {
       await fetch(
-        "http://127.0.0.1:8000/user-auth/_allauth/browser/v1/auth/session",
+        `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
         {
           method: "GET",
           credentials: "include",
