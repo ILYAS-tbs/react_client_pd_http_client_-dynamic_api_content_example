@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     async function seed() {
       await fetch(
-        `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
+        `${SERVER_BASE_URL}user-auth/_allauth/browser/v1/auth/session`,
         {
           method: "GET",
           credentials: "include",
