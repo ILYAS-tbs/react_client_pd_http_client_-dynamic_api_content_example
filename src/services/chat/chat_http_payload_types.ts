@@ -12,3 +12,4 @@ export interface GetConversationIDResponse {
 export interface GetConvesationMessagesPayload {
   conversation_id: string;
 }
+

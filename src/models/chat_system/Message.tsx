@@ -5,6 +5,8 @@ export interface Message {
   read: boolean;
   conversation: string;
   from_user: number;
+  type: "text" | "file";
+  file: string;
 }
 
 // Converts JSON strings to/from your types

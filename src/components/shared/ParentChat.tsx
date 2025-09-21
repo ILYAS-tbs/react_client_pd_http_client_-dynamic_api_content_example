@@ -6,9 +6,9 @@ import {
   Video,
   MoreVertical,
   Paperclip,
-  Smile,
   User,
   Clock,
+  X,
 } from "lucide-react";
 import {
   chat_http_client,
@@ -21,8 +21,12 @@ import {
   GetConvesationMessagesPayload,
   PrivateConversationIDPayload,
 } from "../../services/chat/chat_http_payload_types";
-import { BounceLoader, MoonLoader, SyncLoader } from "react-spinners";
+import { SyncLoader } from "react-spinners";
 import { Message } from "../../models/chat_system/Message";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
+import { FilePreview } from "./file_preview";
+import { EmojiComponent } from "./emoji_component";
+import { TeacherChat } from "../../models/chat_system/TeacherChat";
 
 interface ParentChatProps {
   userType: "parent" | "teacher";
@@ -38,6 +42,19 @@ const ParentChat: React.FC<ParentChatProps> = ({
   const [selectedChat, setSelectedChat] = useState<string | number>();
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [teachersChats, setTeachersChats] = useState<TeacherChat[]>([]);
+  const get_current_parent_teachers_chats = async () => {
+    const res = await chat_http_client.get_current_parent_teachers_chats();
+
+    if (res.ok) {
+      const teacher_chats: TeacherChat[] = res.data;
+      setTeachersChats(teacher_chats);
+    }
+  };
+  useEffect(() => {
+    get_current_parent_teachers_chats();
+  }, []);
 
   //! MOCK DATA to map to and extend the API
   // const chats = [
@@ -77,21 +94,27 @@ const ParentChat: React.FC<ParentChatProps> = ({
   //   },
   // ];
 
-  const chats = teachers_list?.map((teacher) => {
-    const chat = {
-      id: teacher.user.id,
-      name: teacher.full_name,
-      subject: teacher.modulesAndClassGroups?.[0]?.module.module_name ?? "",
-      lastMessage: "شكراً لك على المتابعة المستمرة",
-      timestamp: "10:30",
-      unread: 2,
-      online: true,
-      avatar: teacher.profile_picture,
-      studentName: userType === "teacher" ? "أحمد محمد" : null,
-    };
-
-    return chat;
-  });
+  const [chats, setChats] = useState<any[]>([]);
+  useEffect(() => {
+    if (teachersChats && teachersChats.length > 0) {
+      const mappedChats = teachersChats.map((teacher_chat) => ({
+        id: teacher_chat.teacher_id ?? "",
+        name: teacher_chat.name ?? "مستخدم مجهول",
+        lastMessage: teacher_chat?.lastMessage?.content ?? "",
+        timestamp:
+          new Date(teacher_chat.timestamp!).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }) ?? "10:30",
+        unread: teacher_chat.unread ?? 0,
+        online: teacher_chat.online ?? false,
+        avatar: teacher_chat.avatar ?? "",
+        // studentName: userType === "teacher" ? parent_chat.studentName : null,
+      }));
+      setChats(mappedChats);
+    }
+  }, [teachersChats]);
 
   //! mock data
   // const messages = [
@@ -156,37 +179,20 @@ const ParentChat: React.FC<ParentChatProps> = ({
     return messages_list.map((message: Message) => ({
       id: message.message_id,
       sender: message.from_user === parent_id ? "parent" : "teacher",
-      content: message.content,
-      timestamp: new Date(message.timestamp),
+      content: message.content ?? "",
+      timestamp: message.timestamp ? new Date(message.timestamp) : null,
       date: "اليوم",
-      type: "text",
+      type: message.type ?? "text",
+      file: message.file ?? "",
     }));
   }
 
-  const currentChat = chats.find((chat) => chat.id === selectedChat);
+  const currentChat = chats?.find((chat) => chat.id === selectedChat);
   const filteredChats = chats.filter(
-    (chat) =>
-      chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chat.subject.toLowerCase().includes(searchTerm.toLowerCase())
+    (chat) => chat.name.toLowerCase().includes(searchTerm.toLowerCase())
+
+    // ||  chat.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      // Handle sending message
-      console.log("Sending message:", message);
-      setMessage("");
-    }
-
-    //? Message to the backend Comsumer :
-    sendMessage(message);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
 
   //! Chat system :
   const [conv_id, setConvID] = useState("");
@@ -220,9 +226,15 @@ const ParentChat: React.FC<ParentChatProps> = ({
     setConvID(latest_conv_id);
 
     //! Fetch the messages for that conversation
-    latest_csrf = getCSRFToken()!;
+    FetchMessages(latest_conv_id);
+
+    setIsChatLoading(false);
+  };
+
+  async function FetchMessages(latest_conv_id?: string) {
+    const latest_csrf = getCSRFToken()!;
     const get_messages_payload: GetConvesationMessagesPayload = {
-      conversation_id: latest_conv_id,
+      conversation_id: latest_conv_id || conv_id,
     };
 
     const get_messages_res = await chat_http_client.get_conversation_messages(
@@ -234,9 +246,7 @@ const ParentChat: React.FC<ParentChatProps> = ({
     }
     const new_messages_list: Message[] = get_messages_res.data;
     setConvMessages(new_messages_list);
-
-    setIsChatLoading(false);
-  };
+  }
 
   //! WebSocket protocole :
   const socketRef = useRef<WebSocket | null>(null);
@@ -283,7 +293,7 @@ const ParentChat: React.FC<ParentChatProps> = ({
     };
   }, [conv_id]);
 
-  function sendMessage(message: string) {
+  function sendTextTypeMessage(message: string) {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current?.send(
         JSON.stringify({
@@ -295,6 +305,68 @@ const ParentChat: React.FC<ParentChatProps> = ({
       console.log("Socket not ready yet.");
     }
   }
+  function sendFileTypeMessage(message_id: string) {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current?.send(
+        JSON.stringify({
+          message_type: "chat_file_message",
+          message_id: message_id, // message_id in case of file
+        })
+      );
+    } else {
+      console.log("Socket not ready yet.");
+    }
+  }
+
+  //! FILE SENDING SUPPORT
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  const handleSendMessage = async () => {
+    if (message.trim()) {
+      // Handle sending message
+      console.log("Sending message:", message);
+      setMessage("");
+
+      //? Message to the backend Comsumer :
+      sendTextTypeMessage(message);
+    }
+
+    if (uploadedFile) {
+      // handle sendind file-type message
+      console.log("Sending File message:");
+
+      const formData = new FormData();
+      formData.append("conversation_id", conv_id);
+      formData.append("file", uploadedFile);
+      const latest_csrf = getCSRFToken()!;
+
+      const upload_res = await chat_http_client.upload_chat_file(
+        formData,
+        latest_csrf
+      );
+
+      if (upload_res.ok) {
+        console.log("upload_res OK");
+        const message = upload_res.data;
+
+        //? Notify the channel-layer
+        sendFileTypeMessage(message.message_id);
+        // FetchMessages();
+      }
+
+      setUploadedFile(null);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  //! Emoji support ::
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   //! CHAT UI IMPROVEMENTS :
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
@@ -355,20 +427,22 @@ const ParentChat: React.FC<ParentChatProps> = ({
                       {chat.name}
                     </h4>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {chat.timestamp}
+                      {chat?.timestamp ?? ""}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+
+                  {/* <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
                     {chat.subject}
-                  </p>
+                  </p> */}
+
                   {chat.studentName && (
                     <p className="text-xs text-green-600 dark:text-green-400 mb-1">
-                      الطالب: {chat.studentName}
+                      الطالب: {chat?.studentName ?? ""}
                     </p>
                   )}
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                      {chat.lastMessage}
+                      {chat?.lastMessage ?? ""}
                     </p>
                     {chat.unread > 0 && (
                       <span className="bg-green-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
@@ -410,16 +484,17 @@ const ParentChat: React.FC<ParentChatProps> = ({
                     </h3>
                   )}
 
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {/* <p className="text-sm text-gray-600 dark:text-gray-400">
                     {currentChat.subject}
-                  </p>
+                  </p> */}
+
                   {currentChat.studentName && (
                     <p className="text-xs text-green-600 dark:text-green-400">
-                      الطالب: {currentChat.studentName}
+                      الطالب: {currentChat?.studentName ?? ""}
                     </p>
                   )}
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {currentChat.online ? "متصل الآن" : "آخر ظهور منذ ساعة"}
+                    {currentChat?.online ? "متصل الآن" : "آخر ظهور منذ ساعة"}
                   </p>
                 </div>
               </div>
@@ -453,25 +528,33 @@ const ParentChat: React.FC<ParentChatProps> = ({
                         : "justify-end"
                     }`}
                   >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        msg.sender ===
-                        (userType === "parent" ? "parent" : "teacher")
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
-                      }`}
-                    >
-                      <p className="text-sm">{msg.content}</p>
-                      <div className="flex items-center justify-end mt-1 space-x-1 rtl:space-x-reverse">
-                        <Clock className="h-3 w-3 opacity-70" />
-                        <span className="text-xs opacity-70">
-                          {msg.timestamp.toLocaleString("en", {
-                            dateStyle: "medium", // or "medium" | "long"
-                            timeStyle: "short", // or "medium" | "long"
-                          })}
-                        </span>
+                    {msg.type === "text" ? (
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          msg.sender ===
+                          (userType === "parent" ? "parent" : "teacher")
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        }`}
+                      >
+                        <p className="text-sm">{msg?.content ?? ""}</p>
+                        <div className="flex items-center justify-end mt-1 space-x-1 rtl:space-x-reverse">
+                          <Clock className="h-3 w-3 opacity-70" />
+                          <span className="text-xs opacity-70">
+                            {msg.timestamp && (
+                              <span className="text-xs opacity-70">
+                                {msg.timestamp.toLocaleString("en", {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                              </span>
+                            )}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <FilePreview url={SERVER_BASE_URL + msg.file} />
+                    )}
                     {/* Scrolling till the end  */}
                     <div ref={endOfMessagesRef} />
                   </div>
@@ -482,25 +565,66 @@ const ParentChat: React.FC<ParentChatProps> = ({
             {/* Message Input */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <button className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                {/* FILE UPLOAD */}
+                <label
+                  htmlFor="message_file"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                >
                   <Paperclip className="h-5 w-5" />
-                </button>
+                </label>
+                <input
+                  type="file"
+                  name="message_file"
+                  onChange={(e) =>
+                    setUploadedFile(e.target?.files?.[0] ?? null)
+                  }
+                  id="message_file"
+                  className="hidden"
+                />
+
+                {/* A message or File in case a file is uploaded */}
                 <div className="flex-1 relative">
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="اكتب رسالتك..."
-                    rows={1}
-                    className="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                  />
-                  <button className="absolute left-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-                    <Smile className="h-4 w-4" />
-                  </button>
+                  {!uploadedFile ? (
+                    <>
+                      <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="اكتب رسالتك..."
+                        rows={1}
+                        className="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                      />
+                      {/* <button
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                      >
+                        <Smile className="h-4 w-4" />
+                      </button> */}
+                      {/* {showEmojiPicker && (
+                        <div className="absolute bottom-12 left-0 z-50">
+                          <Picker
+                            data={data}
+                            onEmojiSelect={(emoji: any) =>
+                              setMessage((prev) => prev + emoji.native)
+                            }
+                            autoFocus={true}
+                          />
+                        </div>
+                      )} */}
+                      <EmojiComponent setMessage={setMessage} />
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setUploadedFile(null)}
+                      className="absolute   left-1 top-1/2 transform -translate-y-1/2 p-1 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-700 rounded"
+                    >
+                      <X />
+                    </button>
+                  )}
                 </div>
                 <button
                   onClick={handleSendMessage}
-                  disabled={!message.trim()}
+                  disabled={!message.trim() && !uploadedFile}
                   className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Send className="h-5 w-5" />
