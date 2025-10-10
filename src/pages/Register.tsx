@@ -207,10 +207,13 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
       const success = await register(
         {
           ...formData,
-          role: formData.role === "school" ? "schoolAdmin" : formData.role,
+          role: formData.role === "school" ? "school" : formData.role,
         },
         formData.role === "school"
       );
+      //?: LocalStorage:: Account Role Global
+      localStorage.setItem("role",formData.role)
+
       if (success) {
         setSuccess(t("registrationSuccess") || "Successfully signed up!");
         navigate("/confirmation-code");

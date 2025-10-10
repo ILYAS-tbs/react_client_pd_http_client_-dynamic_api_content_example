@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { X, Mail, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { auth_http_client } from '../services/http_api/auth/auth_http_client';
+import { getCSRFToken } from '../lib/get_CSRFToken';
+import { RegisterParentPayload, RegisterSchoolPayload, VefiryEmailPayload } from '../services/http_api/payloads_types/school_client_payload_types';
 
 interface ConfirmationCodeProps {
   isOpen?: boolean;
@@ -42,7 +45,9 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return; // Prevent multiple characters
-    if (!/^[0-9]*$/.test(value)) return; // Only allow numbers
+    
+    // commented - allow all ::
+    // if (!/^[0-9]*$/.test(value)) return; // Only allow numbers
 
     const newCode = [...code];
     newCode[index] = value;
@@ -98,16 +103,68 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
     }
 
     setIsLoading(true);
+    //! API CALL : Verify Email
+    const csrfToken= getCSRFToken()!
+    const verify_payload:VefiryEmailPayload={
+      key:finalCode
+    }  
+    const res = await auth_http_client.verify_email(verify_payload,csrfToken)
+
+ 
     setError('');
     setSuccess('');
+    
+  
 
     try {
-      if (success) {
+
+      const role = localStorage.getItem("role")
+      if (res.ok) {
+
+        //? Case Of Valid Key-Code 
         setSuccess(t('emailConfirmed') || 'تم تأكيد البريد الإلكتروني بنجاح!');
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate(`/${role}-dashboard`);
         }, 1500);
       }
+      const isCreatingSchool = role ==="school"
+      const userData = JSON.parse(localStorage.getItem('user_data')??"")
+
+      if (isCreatingSchool) {
+      const school_payload: RegisterSchoolPayload = {
+        school_name: userData.name,
+        email: userData.email,
+        phone_number: userData.phone,
+        school_level: userData.school_level,
+        website: "",
+        address: "",
+        wilaya: "",
+        commun: "",
+        school_type: "",
+        established_year: 0,
+        description: "",
+      };
+
+      const latest_csrf = getCSRFToken()!
+
+      const school_result = await auth_http_client.register_school(
+        school_payload,
+        latest_csrf
+      );
+    } else {
+      const parent_payload: RegisterParentPayload = {
+        full_name: userData.email,
+        phone_number: userData.phone,
+        address: "",
+        relationship_to_student: "",
+      };
+      const latest_csrf = getCSRFToken()!
+      const parent_result = await auth_http_client.register_parent(
+        parent_payload,
+        latest_csrf
+      );
+    }
+
     } catch (error) {
       console.error('Confirmation failed:', error);
       setError(t('invalidCode') || 'رمز غير صحيح أو منتهي الصلاحية. يرجى المحاولة مرة أخرى.');
@@ -212,7 +269,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
             <label className={`block text-sm font-medium text-gray-700 dark:text-gray-300 text-center`}>
               {t('enterConfirmationCode') || 'أدخل رمز التأكيد'}
             </label>
-            <div className="flex justify-center space-x-2 rtl:space-x-reverse" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="flex justify-center space-x-2 rtl:space-x-reverse" dir='ltr'>
               {code.map((digit, index) => (
                 <input
                   key={index}

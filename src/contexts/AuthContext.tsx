@@ -180,46 +180,49 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       password: userData.password,
     };
 
-    // call01 : userCreation ()
+    //? call01 : userCreation ()
     // CSRF token
     let latest_csrf = getCSRFToken()!;
     const result = await auth_http_client.signup(user_payload, latest_csrf);
-    // call02 School or parent linking with him
+    
+    //? call02 School or parent linking with him
     // CSRF token
     latest_csrf = getCSRFToken()!;
 
-    if (isCreatingSchool) {
-      const school_payload: RegisterSchoolPayload = {
-        school_name: userData.name,
-        email: userData.email,
-        phone_number: userData.phone,
-        school_level: userData.school_level,
-        website: "",
-        address: "",
-        wilaya: "",
-        commun: "",
-        school_type: "",
-        established_year: 0,
-        description: "",
-      };
+    //* Migrated to :: "verify email" & store in LC
+    localStorage.setItem("user_data",JSON.stringify(userData))
+    // if (isCreatingSchool) {
+    //   const school_payload: RegisterSchoolPayload = {
+    //     school_name: userData.name,
+    //     email: userData.email,
+    //     phone_number: userData.phone,
+    //     school_level: userData.school_level,
+    //     website: "",
+    //     address: "",
+    //     wilaya: "",
+    //     commun: "",
+    //     school_type: "",
+    //     established_year: 0,
+    //     description: "",
+    //   };
 
-      const school_result = await auth_http_client.register_school(
-        school_payload,
-        latest_csrf
-      );
-    } else {
-      const parent_payload: RegisterParentPayload = {
-        full_name: userData.email,
-        phone_number: userData.phone,
-        address: "",
-        relationship_to_student: "",
-      };
+    //   const school_result = await auth_http_client.register_school(
+    //     school_payload,
+    //     latest_csrf
+    //   );
+    // } else {
+    //   const parent_payload: RegisterParentPayload = {
+    //     full_name: userData.email,
+    //     phone_number: userData.phone,
+    //     address: "",
+    //     relationship_to_student: "",
+    //   };
 
-      const parent_result = await auth_http_client.register_parent(
-        parent_payload,
-        latest_csrf
-      );
-    }
+    //   const parent_result = await auth_http_client.register_parent(
+    //     parent_payload,
+    //     latest_csrf
+    //   );
+    // }
     setUser(newUser);
     localStorage.setItem(
       "schoolParentOrTeacherManagementUser",

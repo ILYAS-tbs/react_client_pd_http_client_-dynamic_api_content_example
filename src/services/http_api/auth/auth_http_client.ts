@@ -4,6 +4,7 @@ import {
   LoginPayload,
   RegisterParentPayload,
   RegisterTeacherPayload,
+  VefiryEmailPayload,
 } from "../payloads_types/school_client_payload_types";
 import { SERVER_BASE_URL } from "../server_constants";
 
@@ -11,6 +12,8 @@ const URLS = {
   SESSION: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
   ROLE: `${SERVER_BASE_URL}/user-auth/get_role`,
   SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
+  VERIFY_EMAIL:`${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/email/verify`,
+  
   TEACHER_SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/app/v1/auth/signup`,
   LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
   LOGOUT: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
@@ -48,6 +51,29 @@ async function signup(payload: SignupPayload, csrfToken: string) {
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
+  }
+}
+async function verify_email(payload:VefiryEmailPayload,csrfToken:string){
+  if(!csrfToken){
+    throw new Error("Error No Csrf Token Passed")
+  }
+
+  try {
+    const response = await fetch(URLS.VERIFY_EMAIL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-CSRFToken":csrfToken
+      },
+      credentials:"include",
+      body:JSON.stringify(payload)
+    })
+
+    const data = await response.json()
+    return {ok:response.ok,status:response.status,data:data}
+
+  } catch (error) {
+    return {ok:false , error:error}
   }
 }
 async function teacher_signup(payload: SignupPayload, csrfToken: string) {
@@ -196,6 +222,7 @@ async function register_Teacher(
 }
 export const auth_http_client = {
   signup: signup,
+  verify_email:verify_email,
   teacher_signup: teacher_signup,
   login: login,
   logout: logout,
