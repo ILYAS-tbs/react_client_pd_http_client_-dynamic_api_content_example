@@ -110,17 +110,13 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
     }  
     const res = await auth_http_client.verify_email(verify_payload,csrfToken)
 
- 
     setError('');
     setSuccess('');
     
-  
-
     try {
-
       const role = localStorage.getItem("role")
+      
       if (res.ok) {
-
         //? Case Of Valid Key-Code 
         setSuccess(t('emailConfirmed') || 'تم تأكيد البريد الإلكتروني بنجاح!');
         setTimeout(() => {
@@ -275,7 +271,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
                   key={index}
                   ref={(el) => (inputRefs.current[index] = el)}
                   type="text"
-                  inputMode="numeric"
+                  inputMode="text"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
