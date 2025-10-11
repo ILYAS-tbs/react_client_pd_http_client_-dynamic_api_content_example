@@ -196,7 +196,12 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
     setError("");
     setSuccess("");
 
+    const {  logout } = useAuth();
+
     try {
+      //? Call 00 : logout first - removing the session_id if it was there from signup
+      const logout_res = logout();
+
       //?: turned validation off for now - because of students data
       // const validationError = validateForm();
       // if (validationError) {
