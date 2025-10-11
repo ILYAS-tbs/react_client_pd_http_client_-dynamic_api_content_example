@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Moon, Sun, Globe, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
+import { auth_http_client } from '../services/http_api/auth/auth_http_client';
 
 interface HeaderProps {
   activeSection: string;
@@ -39,6 +40,16 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
     }
     setIsMobileMenuOpen(false);
   };
+
+  const handleLogoutAndNavigate = async (url: string) => {
+  try {
+    // await auth_http_client.handleDeleteSession(); // wait for server to delete session
+    navigate(url); // only navigate after deletion
+  } catch (err) {
+    console.error("Failed to delete session:", err);
+  }
+};
+
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
@@ -122,13 +133,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             {/* Auth Buttons */}
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
               <button 
-                onClick={() => navigate('/login')}
+                onClick={() => handleLogoutAndNavigate("/login")}
                 className="px-4 py-2 text-sm font-medium text-[#39789b] hover:text-[#2d5f7d] transition-colors"
               >
                 {getTranslation('login', language)}
               </button>
               <button 
-                onClick={() => navigate('/register')}
+                onClick={() => handleLogoutAndNavigate('/register')}
                 className="px-6 py-2 bg-[#39789b] hover:bg-[#2d5f7d] text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {getTranslation('register', language)}

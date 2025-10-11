@@ -20,7 +20,21 @@ const URLS = {
   REGISTER_SCHOOL: `${SERVER_BASE_URL}/school/register-school/`,
   REGISTER_PARENT: `${SERVER_BASE_URL}/parent/register-parent/`,
   REGISTER_TEACHER: `${SERVER_BASE_URL}/teacher/register-teacher/`,
+
+  DeleteSession:`${SERVER_BASE_URL}/user-auth/delete-session/`
 };
+async function handleDeleteSession() {
+ try {
+  const response =  await fetch(URLS.DeleteSession, {
+    method: "GET",  // or GET if you prefer
+    credentials: "include", // important to include cookies
+  }  )
+  const data = await response.json()
+  return {ok:response.ok,status:response.status,data:data}
+ } catch (error) {
+  return {ok:false,error:error}
+ }
+}
 
 // will return : {"role": "parennt"|"school"|"teacher"} or {"error":"No role for this user account"}
 async function get_role() {
@@ -230,4 +244,6 @@ export const auth_http_client = {
   register_parent: register_parent,
   register_Teacher: register_Teacher,
   get_role: get_role,
+
+  handleDeleteSession:handleDeleteSession
 };

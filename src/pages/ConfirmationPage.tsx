@@ -45,9 +45,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
 
   const handleInputChange = (index: number, value: string) => {
     if (value.length > 1) return; // Prevent multiple characters
-    
-    // commented - allow all ::
-    // if (!/^[0-9]*$/.test(value)) return; // Only allow numbers
+    if (!/^[0-9]*$/.test(value)) return; // Only allow numbers
 
     const newCode = [...code];
     newCode[index] = value;
@@ -271,7 +269,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
                   key={index}
                   ref={(el) => (inputRefs.current[index] = el)}
                   type="text"
-                  inputMode="text"
+                  inputMode="numeric"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
