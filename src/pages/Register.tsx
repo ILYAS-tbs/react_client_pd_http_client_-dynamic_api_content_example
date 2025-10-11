@@ -190,13 +190,14 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
     return "";
   };
 
+  const {  logout } = useAuth();
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setSuccess("");
 
-    const {  logout } = useAuth();
 
     try {
       //? Call 00 : logout first - removing the session_id if it was there from signup
