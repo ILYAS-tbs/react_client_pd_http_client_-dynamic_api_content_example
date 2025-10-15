@@ -56,10 +56,6 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
 
   if (!isOpen) return null;
 
-  //? REMOVE THE SESSION ID :
-  function deleteSessionIdCookie() {
-  document.cookie = "sessionid=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">

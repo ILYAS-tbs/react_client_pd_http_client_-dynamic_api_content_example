@@ -90,7 +90,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
+          <div className="hidden md:flex items-center dark:text-gray-300 space-x-4 rtl:space-x-reverse">
             {/* Language Selector */}
             <div className="relative">
               <button
@@ -98,7 +98,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 className="flex items-center space-x-2 rtl:space-x-reverse px-3 py-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
               >
                 <Globe className="w-4 h-4" />
-                <span className="text-sm">{languages.find(lang => lang.code === language)?.flag}</span>
+                <span className="text-sm m-4">{languages.find(lang => lang.code === language)?.flag}</span>
               </button>
               
               {isLanguageMenuOpen && (
@@ -134,13 +134,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
               <button 
                 onClick={() => handleLogoutAndNavigate("/login")}
-                className="px-4 py-2 text-sm font-medium text-[#39789b] hover:text-[#2d5f7d] transition-colors"
+                className="px-4 py-2 text-sm font-medium text-sky-500 hover:text-[#2d5f7d] transition-colors"
               >
                 {getTranslation('login', language)}
               </button>
               <button 
                 onClick={() => handleLogoutAndNavigate('/register')}
-                className="px-6 py-2 bg-[#39789b] hover:bg-[#2d5f7d] text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 py-2 bg-sky-600 hover:bg-[#2d5f7d] text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {getTranslation('register', language)}
               </button>
@@ -150,7 +150,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-[#edeff3] dark:text-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -179,7 +179,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center dark:text-gray-200 space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
                 >
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                   <span className="text-sm">{isDark ? 'Light Mode' : 'Dark Mode'}</span>

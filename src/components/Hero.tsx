@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, ArrowLeft, Play, BookOpen, Users, Trophy, BarChart3, GraduationCap } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
+import ChargilyPayment from './components_for_testing/chargily_component';
 
 interface HeroProps {
   onGetStarted: () => void;
@@ -23,6 +24,7 @@ export function Hero({ onGetStarted }: HeroProps) {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
+
           {/* Content */}
           <div className={`${isRTL ? 'lg:order-2' : 'lg:order-1'} space-y-8`}>
             <div className="space-y-6">
@@ -33,7 +35,7 @@ export function Hero({ onGetStarted }: HeroProps) {
                   {getTranslation('heroSlogan', language)}
                 </span>
               </div>
-
+                      
               {/* Main Title */}
               <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                 <span className="text-gray-900 dark:text-white">

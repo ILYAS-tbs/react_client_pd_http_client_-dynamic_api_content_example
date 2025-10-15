@@ -34,6 +34,7 @@ import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups.ts";
 import { chat_http_client } from "../../services/chat/chat_http_client.ts";
 import { Teacher } from "../../models/Teacher.ts";
 import { User } from "../../contexts/AuthContext.tsx";
+import ChargilyPayment from "../../components/components_for_testing/chargily_component.tsx";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -165,6 +166,8 @@ const ParentDashboard: React.FC = () => {
 
     //? chat
     get_current_parent_schools_teachers();
+
+    //?
   }, []);
 
   const one_student_absences = (s: Student) => {
@@ -278,6 +281,9 @@ const ParentDashboard: React.FC = () => {
       default:
         return (
           <div className="space-y-6">
+            {/* Experementing component - remove later  */}
+            <ChargilyPayment/>
+              
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (

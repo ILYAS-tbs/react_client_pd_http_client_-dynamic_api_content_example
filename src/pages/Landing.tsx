@@ -8,6 +8,7 @@ import { Pricing } from "../components/Pricing";
 import { Contact } from "../components/Contact";
 import { Footer } from "../components/Footer";
 import { useLanguage } from "../contexts/LanguageContext";
+import ChargilyPayment from "../components/components_for_testing/chargily_component";
 
 const Landing: React.FC = () => {
   const { t, isRTL } = useLanguage();

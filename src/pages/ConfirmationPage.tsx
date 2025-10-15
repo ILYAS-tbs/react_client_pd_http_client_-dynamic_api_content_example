@@ -92,6 +92,8 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
     }
   };
 
+  const {userData} = useAuth()
+
   const handleSubmit = async (codeToSubmit?: string) => {
     const finalCode = codeToSubmit || code.join('');
     
@@ -110,7 +112,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
 
     setError('');
     setSuccess('');
-    
+   
     try {
       const role = localStorage.getItem("role")
       
@@ -118,18 +120,17 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
         //? Case Of Valid Key-Code 
         setSuccess(t('emailConfirmed') || 'تم تأكيد البريد الإلكتروني بنجاح!');
         setTimeout(() => {
-          navigate(`/${role}-dashboard`);
+          navigate(`/login`);
         }, 1500);
       }
       const isCreatingSchool = role ==="school"
-      const userData = JSON.parse(localStorage.getItem('user_data')??"")
 
       if (isCreatingSchool) {
       const school_payload: RegisterSchoolPayload = {
-        school_name: userData.name,
-        email: userData.email,
-        phone_number: userData.phone,
-        school_level: userData.school_level,
+        school_name: userData?.name ?? "",
+        email: userData?.email ??"",
+        phone_number: userData?.phone ??"",
+        school_level: userData?.school_level ??"",
         website: "",
         address: "",
         wilaya: "",
@@ -147,8 +148,8 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
       );
     } else {
       const parent_payload: RegisterParentPayload = {
-        full_name: userData.email,
-        phone_number: userData.phone,
+        full_name: userData?.email ??"",
+        phone_number: userData?.phone ??"",
         address: "",
         relationship_to_student: "",
       };

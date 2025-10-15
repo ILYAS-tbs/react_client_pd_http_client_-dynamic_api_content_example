@@ -18,6 +18,10 @@ export type RegisterSchoolPayload = {
   description: string;
 };
 
+export interface VefiryEmailPayload { 
+  key: string
+}
+
 export type RegisterParentPayload = {
   full_name: string;
   phone_number: string;

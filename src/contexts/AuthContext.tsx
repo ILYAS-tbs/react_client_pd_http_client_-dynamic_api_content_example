@@ -14,6 +14,7 @@ import {
   SignupPayload,
 } from "../services/http_api/payloads_types/school_client_payload_types";
 import { BackendUser } from "../models/BackendUser";
+import { SERVER_BASE_URL } from "../services/http_api/server_constants";
 
 export interface User {
   id: string;
@@ -23,6 +24,19 @@ export interface User {
   schoolId?: string;
   schoolType?: "public" | "private";
 }
+export interface UserData {
+  commune?: string;
+  confirmPassword?: string;
+  email:string;
+  name: string;
+  numberOfChildren?: number;
+  password: string;
+  phone?: string;
+  role?:"school" | "teacher" | "parent";
+  schoolType?: string;
+  school_level?: string;
+  wilaya?: string;
+}
 interface LoginResponse {
   ok: boolean;
   status: number | undefined;
@@ -31,6 +45,7 @@ interface LoginResponse {
 
 interface AuthContextType {
   user: User | null;
+  userData : UserData | null ;
   login: (
     email: string,
     password: string,
@@ -58,6 +73,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  //! USERDATA USED with Registrations
+  const [ userData,setUserData] = useState<UserData|null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -71,6 +88,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoading(false);
   }, []);
 
+
   const login = async (
     email: string,
     password: string
@@ -78,7 +96,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setIsLoading(true);
 
     // Mock authentication - in production, this would be an API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
 
     //!1. Real login
     const latest_csrf = getCSRFToken()!;
@@ -154,28 +172,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     );
   }
 
+    const get_session = async()=>{
+    const response=  await fetch(
+        `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      const data = await response.json()
+      return data
+  }
   const register = async (
-    userData: any,
+    userData: UserData,
     isCreatingSchool: boolean
   ): Promise<boolean> => {
     setIsLoading(true);
 
     // Mock registration
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: userData.name,
-      email: userData.email,
-      role: userData.role,
-      schoolId: userData.schoolId,
-      schoolType: userData.schoolType,
-    };
+ 
 
     // Real registry :
     const user_payload: SignupPayload = {
       email: userData.email,
-      phone: userData.phone,
+      phone: userData.phone ?? "",
       username: userData.email,
       password: userData.password,
     };
@@ -189,8 +211,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     // CSRF token
     latest_csrf = getCSRFToken()!;
 
+    //* Migrated to :: state .. from LC
     //* Migrated to :: "verify email" & store in LC
-    localStorage.setItem("user_data",JSON.stringify(userData))
+    setUserData(userData)
+    // localStorage.setItem("user_data",JSON.stringify(userData))
     // if (isCreatingSchool) {
     //   const school_payload: RegisterSchoolPayload = {
     //     school_name: userData.name,
@@ -223,11 +247,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     //     latest_csrf
     //   );
     // }
-    setUser(newUser);
-    localStorage.setItem(
-      "schoolParentOrTeacherManagementUser",
-      JSON.stringify(newUser)
-    );
+
+        
+    //! BETTER TO TAKE THE USER TO LOGIN AFTER THE REGISTER 
+    //! AND NOT DIRECTLY TO THE DASHBOARD
+    //?: CAll03 : getting the use data (ID from the backend)
+    //   const res_session = await get_session()
+    //   const newUser: User = {
+    //   id: res_session.data?.user?.id,
+    //   name: userData.name,
+    //   email: userData.email,
+    //   role: userData.role ??'school' ,
+    //   //   schoolId?: string;
+    //   // schoolType: userData.schoolType,
+    // };
+    // setUser(newUser);
+    // localStorage.setItem(
+    //   "schoolParentOrTeacherManagementUser",
+    //   JSON.stringify(newUser)
+    // );
     setIsLoading(false);
     return true;
   };
@@ -245,7 +283,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isLoading, change_role }}
+      value={{ user,userData, login, register, logout, isLoading, change_role }}
     >
       {children}
     </AuthContext.Provider>

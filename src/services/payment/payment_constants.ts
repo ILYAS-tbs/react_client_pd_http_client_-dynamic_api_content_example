@@ -1,0 +1,1 @@
+export const CHARGILY_TEST_URL = 'https://pay.chargily.net/test/api/pay-v2'

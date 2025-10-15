@@ -13,8 +13,9 @@ import ParentDashboard from "./pages/dashboards/ParentDashboard";
 import ConfirmationCode from "./pages/ConfirmationPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
-import WebSocketConnector from "./components/testing_connections/websockets_connector";
+import WebSocketConnector from "./components/components_for_testing/websockets_connector";
 import { SERVER_BASE_URL } from "./services/http_api/server_constants";
+import ChargilyPayment from "./components/components_for_testing/chargily_component";
 
 function App() {
   // ask for an initial CSRFToken from the server :
