@@ -7,14 +7,20 @@ import { payment_http_client } from "../services/payment/payment_http_client";
 export function Pricing() {
   const { language, isRTL } = useLanguage();
 
-  //! Payment Function :: 
-  const user = JSON.parse(
-    localStorage.getItem("schoolParentOrTeacherManagementUser") ?? ""
-  );
+  //! Payment Function ::
+  const user = (() => {
+    try {
+      const raw = localStorage.getItem("schoolParentOrTeacherManagementUser");
+      return raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      console.error("Failed to parse user from localStorage", err);
+      return null;
+    }
+  })();
   const user_id = user?.id;
 
-  const pay_func = async (amount:number) => {
-    const res = await payment_http_client.chargily_pay(user_id,amount);
+  const pay_func = async (amount: number) => {
+    const res = await payment_http_client.chargily_pay(user_id, amount);
     if (res.ok) {
       const data = res.data;
       window.location = data?.checkout_url;
@@ -211,7 +217,7 @@ export function Pricing() {
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {plans.map((plan, index) => (
             <div
-              key={plan.id}              
+              key={plan.id}
               className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${
                 plan.popular ? "ring-2 ring-[#39789b] scale-105" : ""
               } ${isRTL ? "text-right" : "text-left"}`}
@@ -294,7 +300,7 @@ export function Pricing() {
 
                 {/* CTA Button */}
                 <button
-                  onClick={()=>pay_func(1000)}
+                  onClick={() => pay_func(1000)}
                   className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 ${
                     plan.popular
                       ? "bg-[#39789b] hover:bg-[#2d5f7d] text-white shadow-lg hover:shadow-xl"
