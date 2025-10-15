@@ -1,7 +1,6 @@
 import { Webhook } from "lucide-react";
-import { CHARGILY_TEST_URL } from "./payment_constants";
+import { CHARGILY_TEST_URL, WEBHOOK_URL } from "./payment_constants";
 
-const WEBHOOK_URL = 'https://9ccbfdab81d0.ngrok-free.app/payment/payment-webhook/'
 const URLS = {
   chargily_pay: CHARGILY_TEST_URL,
   
