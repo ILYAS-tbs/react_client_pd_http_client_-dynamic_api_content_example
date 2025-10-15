@@ -3,7 +3,11 @@ import { School, Users, GraduationCap, MessageSquare, BarChart3, FileText, Clock
 import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
 
-export function Services() {
+interface HeroProps {
+  onGetStarted: () => void;
+}
+
+export function Services({ onGetStarted }: HeroProps) {
   const { language, isRTL } = useLanguage();
 
   const services = [
@@ -205,7 +209,9 @@ export function Services() {
                  language === 'fr' ? 'Rejoignez des milliers d\'écoles et de parents qui font confiance à PedaConnect pour un succès assuré' :
                  'Join thousands of schools and parents who trust PedaConnect for assured success'}
               </p>
-              <button className="bg-white text-[#39789b] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg">
+              <button 
+              onClick={onGetStarted}
+              className="bg-white text-[#39789b] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg">
                 {getTranslation('getStarted', language)}
               </button>
             </div>

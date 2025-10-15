@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Hero } from "../components/Hero";
 import { About } from "../components/About";
@@ -8,12 +8,27 @@ import { Pricing } from "../components/Pricing";
 import { Contact } from "../components/Contact";
 import { Footer } from "../components/Footer";
 import { useLanguage } from "../contexts/LanguageContext";
-import ChargilyPayment from "../components/components_for_testing/chargily_component";
+import myScrollTo from "../lib/scroll_to_section";
 
 const Landing: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const [activeSection, setActiveSection] = useState("home");
   const navigate = useNavigate();
+
+  const onGetStarted = ()=>{
+    navigate('/login')
+  }
+  //?: CASE WHEN I COME TO THE PAGE FROM THE PAY(STAR) BUtton
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      // Wait a tick to ensure section is rendered
+      setTimeout(() => {
+        myScrollTo(location.state.scrollTo);
+      }, 50);
+    }
+  }, [location]);
 
   // Handle scroll to update active section
   useEffect(() => {
@@ -56,9 +71,9 @@ const Landing: React.FC = () => {
       />
 
       <main>
-        <Hero />
+        <Hero onGetStarted={onGetStarted}/>
         <About />
-        <Services />
+        <Services  onGetStarted={onGetStarted}/>
         <Pricing />
         <Contact />
       </main>

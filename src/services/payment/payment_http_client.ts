@@ -6,11 +6,11 @@ const URLS = {
   chargily_pay: CHARGILY_TEST_URL,
   
 };
-async function chargily_pay(user_id:string) {
+async function chargily_pay(user_id:string,amount:number) {
     const body = JSON.stringify({
-    amount: 2000,
+    amount: amount,
     currency: "dzd",
-    success_url: "https://your-cool-website.com/payments/success",
+    success_url: "https://pd-client.ilyastech.me",
     webhook_endpoint: WEBHOOK_URL,
     metadata: {
         user_id:user_id, 

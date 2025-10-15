@@ -2,7 +2,6 @@ import React from 'react';
 import { ArrowRight, ArrowLeft, Play, BookOpen, Users, Trophy, BarChart3, GraduationCap } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
-import ChargilyPayment from './components_for_testing/chargily_component';
 
 interface HeroProps {
   onGetStarted: () => void;
@@ -11,7 +10,13 @@ interface HeroProps {
 export function Hero({ onGetStarted }: HeroProps) {
   const { language, isRTL } = useLanguage();
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
-
+  
+  const scrollTo = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
+};
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-[#edeff3] to-[#bcc6d2] dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 overflow-hidden">
       {/* Background Decorations */}
@@ -63,7 +68,10 @@ export function Hero({ onGetStarted }: HeroProps) {
                 <ArrowIcon className="w-5 h-5 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
               </button>
               
-              <button className="group flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-[#bcc6d2] dark:border-gray-700 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+              <button
+              onClick={()=>scrollTo("about")}
+              className="group flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-[#bcc6d2] dark:border-gray-700 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                
                 <Play className="w-5 h-5 mr-2 rtl:mr-0 rtl:ml-2 text-[#39789b] group-hover:scale-110 transition-transform" />
                 <span>{getTranslation('learnMore', language)}</span>
               </button>

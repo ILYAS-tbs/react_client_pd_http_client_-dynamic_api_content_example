@@ -3,7 +3,10 @@ import { LogOut, Bell, Moon, Sun, Globe, Menu, X ,Star} from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNotifications } from "../contexts/NotificationContext";
 import { useTheme } from "../hooks/useTheme";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../hooks/useLanguage";
+import myScrollTo from "../lib/scroll_to_section";
+
 
 interface Tab {
   id: string;
@@ -42,6 +45,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
+  const navigate = useNavigate()
   return (
     <div
       className="min-h-screen bg-gray-50 dark:bg-gray-900"
@@ -119,7 +123,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   title={isRTL ?"الاشتراك" : "subscribe"}
                 >
-                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
+                  <Star 
+                    onClick={() =>{
+                        navigate("/", { state: { scrollTo: "pricing" } });
+
+
+                    }}
+
+                  className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
                 </button>
               </div>}
              

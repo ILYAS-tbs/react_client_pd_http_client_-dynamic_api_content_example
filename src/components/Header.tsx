@@ -5,6 +5,7 @@ import { useTheme } from '../hooks/useTheme';
 import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
 import { auth_http_client } from '../services/http_api/auth/auth_http_client';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   activeSection: string;
@@ -50,7 +51,8 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
   }
 };
 
-
+  const {user} = useAuth()
+  const role = localStorage.getItem('role')
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,7 +133,16 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             </button>
 
             {/* Auth Buttons */}
-            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            {user?
+             <button 
+                onClick={() => handleLogoutAndNavigate(`/${role}-dashboard`)}
+  className="px-6 py-2 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {/* {getTranslation('register', language)} */}
+               لوحة البيانات
+              </button>
+
+            :    <div className="flex items-center space-x-3 rtl:space-x-reverse">
               <button 
                 onClick={() => handleLogoutAndNavigate("/login")}
                 className="px-4 py-2 text-sm font-medium text-sky-500 hover:text-[#2d5f7d] transition-colors"
@@ -144,7 +155,8 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               >
                 {getTranslation('register', language)}
               </button>
-            </div>
+            </div>}
+            
           </div>
 
           {/* Mobile Menu Button */}
@@ -186,7 +198,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 </button>
               </div>
               
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <button 
                   onClick={() => navigate('/login')}
                   className="block w-full px-4 py-3 text-center font-medium text-[#39789b] hover:bg-[#edeff3] dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -200,6 +212,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                   {getTranslation('register', language)}
                 </button>
               </div>
+              
             </div>
           </div>
         </div>
