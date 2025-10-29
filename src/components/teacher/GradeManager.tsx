@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Plus, Edit, X, Filter, Download } from "lucide-react";
 import { GradeManagerProps } from "../../types";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
-import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
+// import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
 import { StudentGrade } from "../../models/StudentGrade";
 
 import {
   PatchStudentGradesPayload,
-  PostMarkPayload,
   PostStudentGradesPayload,
 } from "../../services/http_api/payloads_types/teacher_client_payload_types";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
@@ -125,6 +124,13 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       studentName: grade.student.full_name,
       grades: {
         // -------- الفصل الأول --------
+        "تقويم الفصل الأول": {
+          score: grade.s1_evaluation,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
         "فرض الفصل الأول 1": {
           score: grade.s1_devoir_1,
           max: 20,
@@ -162,6 +168,13 @@ const GradeManager: React.FC<GradeManagerProps> = ({
         },
 
         // -------- الفصل الثاني --------
+        "تقويم الفصل الثاني": {
+          score: grade.s2_evaluation,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
         "فرض الفصل الثاني 1": {
           score: grade.s2_devoir_1,
           max: 20,
@@ -205,6 +218,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   // usage
   const initial_students_grades = students_grades.map(mapStudentGrade);
   const [grades, setGrades] = useState(initial_students_grades);
+
   //? SYNC WITH THE SERVER
   useEffect(() => {
     const mappedGrades = students_grades.map(mapStudentGrade);
@@ -212,11 +226,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   }, [students_grades]);
 
   const gradeKeys = [
+    "تقويم الفصل الأول",
     "فرض الفصل الأول 1",
     "فرض الفصل الأول 2",
     "واجبات الفصل الأول",
     "امتحان الفصل الأول",
     "معدل الفصل الأول",
+
+    "تقويم الفصل الثاني",
     "فرض الفصل الثاني 1",
     "فرض الفصل الثاني 2",
     "واجبات الفصل الثاني",
@@ -407,6 +424,8 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s1_devoir_2: 0,
       s1_tests: 0,
       s1_homeworks: 0,
+      s1_evaluation: 0,
+
       s1_exam: 0,
       s1_average: 0,
 
@@ -414,6 +433,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s2_devoir_2: 0,
       s2_tests: 0,
       s2_homeworks: 0,
+      s2_evaluation: 0,
       s2_exam: 0,
       s2_average: 0,
     });
@@ -448,6 +468,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s1_devoir_2: postStudentGradeForm.s1_devoir_2 ?? null,
       s1_tests: postStudentGradeForm.s1_tests ?? null,
       s1_homeworks: postStudentGradeForm.s1_homeworks ?? null,
+      s1_evaluation:postStudentGradeForm.s1_evaluation ?? null,
       s1_exam: postStudentGradeForm.s1_exam ?? null,
       s1_average: postStudentGradeForm.s1_average ?? null,
 
@@ -456,6 +477,8 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s2_devoir_2: postStudentGradeForm.s2_devoir_2 ?? null,
       s2_tests: postStudentGradeForm.s2_tests ?? null,
       s2_homeworks: postStudentGradeForm.s2_homeworks ?? null,
+      s2_evaluation:postStudentGradeForm.s2_evaluation ?? null,
+
       s2_exam: postStudentGradeForm.s2_exam ?? null,
       s2_average: postStudentGradeForm.s2_average ?? null,
     };
@@ -480,6 +503,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s1_devoir_2: undefined,
       s1_tests: undefined,
       s1_homeworks: undefined,
+      s1_evaluation : undefined,
       s1_exam: undefined,
       s1_average: undefined,
 
@@ -487,6 +511,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s2_devoir_2: undefined,
       s2_tests: undefined,
       s2_homeworks: undefined,
+      s2_evaluation : undefined,
       s2_exam: undefined,
       s2_average: undefined,
     });
@@ -538,6 +563,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s1_devoir_2: patchStudentGradeForm.s1_devoir_2,
       s1_tests: patchStudentGradeForm.s1_tests,
       s1_homeworks: patchStudentGradeForm.s1_homeworks,
+      s1_evaluation:patchStudentGradeForm.s1_evaluation,
       s1_exam: patchStudentGradeForm.s1_exam,
       s1_average: patchStudentGradeForm.s1_average,
 
@@ -546,6 +572,8 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s2_devoir_2: patchStudentGradeForm.s2_devoir_2,
       s2_tests: patchStudentGradeForm.s2_tests,
       s2_homeworks: patchStudentGradeForm.s2_homeworks,
+      s2_evaluation:patchStudentGradeForm.s2_evaluation,
+
       s2_exam: patchStudentGradeForm.s2_exam,
       s2_average: patchStudentGradeForm.s2_average,
     };
@@ -688,6 +716,9 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   الطالب
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  تقويم الفصل الأول
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   فرض الفصل الأول 1
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -703,6 +734,9 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   معدل الفصل الأول
                 </th>
                 {/* Second semester  */}
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  تقويم الفصل الثاني
+                </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   فرض الفصل الثاني 1
                 </th>
@@ -895,6 +929,22 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 <div>
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      تقويم الفصل الأول
+                    </label>
+                    <input
+                      name="s1_evaluation"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      value={postStudentGradeForm.s1_evaluation ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       فرض الفصل الأول 1
                     </label>
                     <input
@@ -975,6 +1025,22 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 </div>
               ) : (
                 <div>
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      تقويم الفصل الثاني
+                    </label>
+                    <input
+                      name="s2_evaluation"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      value={postStudentGradeForm.s2_evaluation ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       فرض الفصل الثاني 1
@@ -1168,6 +1234,22 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               {gradeSemester === "s1" ? (
                 <div>
                   <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        تقويم الفصل الأول
+                      </label>
+                      <input
+                        name="s1_evaluation"
+                        type="number"
+                        min="0"
+                        max={gradeSystem}
+                        value={patchStudentGradeForm.s1_evaluation ?? 0}
+                        onChange={handleStudentGradePatchFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="0"
+                      />
+                  </div>
+
+                  <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       فرض الفصل الأول 1
                     </label>
@@ -1249,6 +1331,22 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 </div>
               ) : (
                 <div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        تقويم الفصل الثاني
+                      </label>
+                      <input
+                        name="s2_evaluation"
+                        type="number"
+                        min="0"
+                        max={gradeSystem}
+                        value={patchStudentGradeForm.s2_evaluation ?? 0}
+                        onChange={handleStudentGradePatchFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="0"
+                      />
+                  </div>
+
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       فرض الفصل الثاني 1

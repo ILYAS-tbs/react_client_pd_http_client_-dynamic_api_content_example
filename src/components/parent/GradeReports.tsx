@@ -36,15 +36,66 @@ interface ChildPerformance {
   subjects: Subject[];
 }
 
+// const translateMarkType = (type: string): string => {
+//   const parts = type.split("_");
+//   if (parts.length !== 2) return type || "غير محدد";
+
+//   const base = parts[0].toLowerCase();
+//   const numStr = parts[1];
+//   const num = parseInt(numStr);
+
+//   if (isNaN(num)) return type || "غير محدد";
+
+//   let baseAr: string;
+//   switch (base) {
+//     case "devoir":
+//       baseAr = "الفرض";
+//       break;
+//     case "exam":
+//       baseAr = "امتحان الفصل";
+//       break;
+//     case "test":
+//       baseAr = "استجواب";
+//       break;
+//     case "homework":
+//       baseAr = "عمل منزلي";
+//       break;
+//     // Add more cases as needed, e.g.:
+//     // case 'quiz': baseAr = 'اختبار قصير'; break;
+//     default:
+//       return type || "غير محدد";
+//   }
+
+//   const numbersAr = [
+//     "", // index 0 unused
+//     "الأول",
+//     "الثاني",
+//     "الثالث",
+//     "الرابع",
+//     "الخامس",
+//     "السادس",
+//     "السابع",
+//     "الثامن",
+//     "التاسع",
+//     "العاشر",
+//   ];
+
+//   if (num < 1 || num >= numbersAr.length) {
+//     return `${baseAr} ${num}`;
+//   }
+
+//   return `${baseAr} ${numbersAr[num]}`;
+// };
 const translateMarkType = (type: string): string => {
-  const parts = type.split("_");
-  if (parts.length !== 2) return type || "غير محدد";
+  // Normalize type: remove semester prefix (s1_, s2_) if still present
+  type = type.replace(/^s\d_/, "").trim().toLowerCase();
 
-  const base = parts[0].toLowerCase();
-  const numStr = parts[1];
-  const num = parseInt(numStr);
+  // Handle types with or without underscore (e.g., devoir_1 or devoir1)
+  const match = type.match(/([a-zA-Z]+)_?(\d*)/);
+  if (!match) return type || "غير محدد";
 
-  if (isNaN(num)) return type || "غير محدد";
+  const base = match[1];
+  const num = parseInt(match[2]) || 0;
 
   let baseAr: string;
   switch (base) {
@@ -52,22 +103,57 @@ const translateMarkType = (type: string): string => {
       baseAr = "الفرض";
       break;
     case "exam":
-      baseAr = "امتحان الفصل";
+      baseAr = "الامتحان";
       break;
     case "test":
-      baseAr = "استجواب";
+    case "tests":
+      baseAr = "الاختبار";
       break;
     case "homework":
-      baseAr = "عمل منزلي";
+    case "homeworks":
+      baseAr = "الواجب المنزلي";
       break;
-    // Add more cases as needed, e.g.:
-    // case 'quiz': baseAr = 'اختبار قصير'; break;
+    case "evaluation":
+      baseAr = "التقييم المستمر";
+      break;
+    case "quiz":
+      baseAr = "الاختبار القصير";
+      break;
+    case "project":
+      baseAr = "المشروع";
+      break;
+    case "assignment":
+      baseAr = "التكليف";
+      break;
+    case "presentation":
+      baseAr = "العرض الشفوي";
+      break;
+    case "participation":
+      baseAr = "المشاركة الصفية";
+      break;
+    case "oral":
+      baseAr = "الشفهي";
+      break;
+    case "practical":
+      baseAr = "العملي";
+      break;
+    case "final":
+      baseAr = "الامتحان النهائي";
+      break;
+    case "midterm":
+      baseAr = "الامتحان النصفي";
+      break;
+    case "average":
+      baseAr = "المعدل";
+      break;
     default:
-      return type || "غير محدد";
+      // Return unchanged if not a known type (e.g., year, teacher)
+      return type;
   }
 
+  // Arabic ordinals for numbered assessments
   const numbersAr = [
-    "", // index 0 unused
+    "",
     "الأول",
     "الثاني",
     "الثالث",
@@ -80,11 +166,10 @@ const translateMarkType = (type: string): string => {
     "العاشر",
   ];
 
-  if (num < 1 || num >= numbersAr.length) {
-    return `${baseAr} ${num}`;
-  }
-
-  return `${baseAr} ${numbersAr[num]}`;
+  // Append ordinal if number exists
+  return num > 0 && num < numbersAr.length
+    ? `${baseAr} ${numbersAr[num]}`
+    : baseAr;
 };
 
 const GradeReports: React.FC<GradeReportsProps> = ({
@@ -107,57 +192,118 @@ const GradeReports: React.FC<GradeReportsProps> = ({
     { id: "year", label: "السنة الدراسية" },
   ];
 
+  // const gradeData: Record<string, ChildPerformance> = students.reduce(
+  //   (acc, student, index) => {
+  //     const perf = studentPerformances[index];
+  //     if (!perf) return acc;
+
+  //     const mapped_subjects: Subject[] = perf.modules_stats.map(
+  //       (module_stat) => {
+  //         // Flatten all Mark[] from all ModuleMark entries
+  //         const allMarks: Mark[] = module_stat.module_marks
+  //           ? module_stat.module_marks.flatMap((mm) =>
+  //               Object.values(mm.module_marks || {}).flat()
+  //             )
+  //           : [];
+
+  //         const assessments: Assessment[] = allMarks.map((mark) => ({
+  //           name: translateMarkType(mark.mark_type || "غير محدد"),
+  //           grade: mark.mark_degree,
+  //           max: 20, // replace if backend provides max
+  //           date: new Date(mark.date),
+  //           weight: mark.mark_weight,
+  //         }));
+
+  //         // Take averages from the first ModuleMark (or compute an average if you prefer)
+  //         const firstMark = module_stat.module_marks[0];
+  //         console.log("first mark :");
+  //         console.log(module_stat);
+
+  //         const subject: Subject = {
+  //           name: module_stat.module_name,
+  //           current: module_stat.student_average,
+  //           previous: 0, // TODO: compute from older periods
+  //           average: module_stat.class_average,
+  //           assessments,
+  //         };
+
+  //         return subject;
+  //       }
+  //     );
+
+  //     acc[student.student_id] = {
+  //       overall: perf.student_overall_avg,
+  //       trend: "+0.8",
+  //       position: perf.student_rank,
+  //       totalStudents: perf.class_group_students_number,
+  //       subjects: mapped_subjects,
+  //     };
+
+  //     return acc;
+  //   },
+  //   {} as Record<string, any>
+  // );
+
   const gradeData: Record<string, ChildPerformance> = students.reduce(
-    (acc, student, index) => {
-      const perf = studentPerformances[index];
-      if (!perf) return acc;
+  (acc, student, index) => {
+    const perf = studentPerformances[index];
+    if (!perf) return acc;
 
-      const mapped_subjects: Subject[] = perf.modules_stats.map(
-        (module_stat) => {
-          // Flatten all Mark[] from all ModuleMark entries
-          const allMarks: Mark[] = module_stat.module_marks
-            ? module_stat.module_marks.flatMap((mm) =>
-                Object.values(mm.module_marks || {}).flat()
-              )
-            : [];
+    const mapped_subjects: Subject[] = perf.modules_stats.map((module_stat) => {
+      // For each module, pick the first ModuleMark entry (each subject has one per student)
+      const moduleMark = module_stat.module_marks[0];
+      if (!moduleMark) return null;
 
-          const assessments: Assessment[] = allMarks.map((mark) => ({
-            name: translateMarkType(mark.mark_type || "غير محدد"),
-            grade: mark.mark_degree,
-            max: 20, // replace if backend provides max
-            date: new Date(mark.date),
-            weight: mark.mark_weight,
-          }));
+      // Determine which semester is selected
+      const prefix = selectedPeriod === "semester2" ? "s2_" : "s1_";
 
-          // Take averages from the first ModuleMark (or compute an average if you prefer)
-          const firstMark = module_stat.module_marks[0];
-          console.log("first mark :");
-          console.log(module_stat);
+      // Dynamically extract marks for the selected semester
+      const fields = Object.entries(moduleMark)
+        .filter(([key]) => key.startsWith(prefix))
+        .map(([key, value]) => ({ key, value }));
 
-          const subject: Subject = {
-            name: module_stat.module_name,
-            current: module_stat.student_average,
-            previous: 0, // TODO: compute from older periods
-            average: module_stat.class_average,
-            assessments,
-          };
+      const assessments: Assessment[] = fields
+        .filter(
+          (f) =>
+            !f.key.endsWith("average") &&
+            typeof f.value === "number" &&
+            f.value !== null
+        )
+        .map((f) => ({
+          name: translateMarkType(f.key.replace(prefix, "")),
+          grade: f.value as number,
+          max: 20,
+          date: new Date(), // Backend doesn't provide dates anymore
+          weight: 0, // You can set weights later if needed
+        }));
 
-          return subject;
-        }
-      );
+      // Extract averages
+      const currentAverage =
+        (moduleMark as any)[`${prefix}average`] ?? 0;
 
-      acc[student.student_id] = {
-        overall: perf.student_overall_avg,
-        trend: "+0.8",
-        position: perf.student_rank,
-        totalStudents: perf.class_group_students_number,
-        subjects: mapped_subjects,
+      const subject: Subject = {
+        name: module_stat.module_name,
+        current: currentAverage,
+        previous: 0, // you can later compare s1 vs s2
+        average: module_stat.class_average,
+        assessments,
       };
 
-      return acc;
-    },
-    {} as Record<string, any>
-  );
+      return subject;
+    }).filter(Boolean) as Subject[];
+
+    acc[student.student_id] = {
+      overall: perf.student_overall_avg,
+      trend: "+0.8",
+      position: perf.student_rank,
+      totalStudents: perf.class_group_students_number,
+      subjects: mapped_subjects,
+    };
+
+    return acc;
+  },
+  {} as Record<string, ChildPerformance>
+);
 
   const currentData: ChildPerformance | undefined = gradeData[selectedChild];
   const filteredSubjects =
@@ -339,7 +485,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 أعلى درجة
               </p>
-              <p className="text-2xl font-bold text-green-600">{maxGrade}/20</p>
+              <p className="text-2xl font-bold text-green-600">{currentData?.overall ?? 0}/20</p>
             </div>
             <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
               <TrendingUp className="h-6 w-6 text-green-600" />
