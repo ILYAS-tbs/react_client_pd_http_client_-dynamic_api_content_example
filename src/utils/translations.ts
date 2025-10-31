@@ -758,8 +758,46 @@ export const translations: Translations = {
     ar: 'بريد إلكتروني خاطئ؟',
     en: 'Wrong email?',
     fr: 'Mauvais email ?'
-  }
+  },
+  //?: My translations : 
+
+//! SchoolDashboard : 
+ // General / Layout
+  UnderDevelopment: { ar: "هذه الصفحة قيد التطوير.", en: "This page is under development.", fr: "Cette page est en cours de développement." },
+  SchoolDashboard: { ar: "لوحة تحكم المدرسة", en: "School Dashboard", fr: "Tableau de bord de l'école" },
+  WelcomeSubtitle: { ar: "مرحباً بك في نظام إدارة مدرسة الأمل الابتدائية", en: "Welcome to Al-Amal Primary School Management System", fr: "Bienvenue dans le système de gestion de l'école primaire Al-Amal" },
+  PageNotFound: { ar: "صفحة غير موجودة", en: "Page not found", fr: "Page non trouvée" },
+
+  // Stats
+  TotalStudents: { ar: "إجمالي الطلاب", en: "Total Students", fr: "Nombre total d'élèves" },
+  Teachers: { ar: "المعلمون", en: "Teachers", fr: "Enseignants" },
+  Classes: { ar: "الفصول", en: "Classes", fr: "Classes" },
+  TotalAbsences: { ar: "اجمالي الغيابات", en: "Total Absences", fr: "Total des absences" },
+  NewStudents: { ar: "طلاب جدد", en: "New Students", fr: "Nouveaux élèves" },
+  AttendanceRate: { ar: "معدل الحضور", en: "Attendance Rate", fr: "Taux de présence" },
+  PublishedAnnouncements: { ar: "الإعلانات المنشورة", en: "Published Announcements", fr: "Annonces publiées" },
+  ReviewedAbsenceRequests: { ar: "طلبات الغياب المراجعة", en: "Reviewed Absence Requests", fr: "Demandes d'absence examinées" },
+
+  // Tabs / Menu
+  Home: { ar: "الرئيسية", en: "Home", fr: "Accueil" },
+  UserManagement: { ar: "إدارة المستخدمين", en: "User Management", fr: "Gestion des utilisateurs" },
+  ClassManagement: { ar: "إدارة الصفوف", en: "Class Management", fr: "Gestion des classes" },
+  ScheduleManagement: { ar: "جداول توقيت", en: "Time Schedules", fr: "Emplois du temps" },
+  ExamSchedule: { ar: "رزنامة الامتحانات", en: "Exam Schedule", fr: "Calendrier des examens" },
+  Reports: { ar: "تقارير", en: "Reports", fr: "Rapports" },
+  GradeOverview: { ar: "المعدل الفصلي", en: "Grade Overview", fr: "Vue des notes" },
+  Activities: { ar: "فعاليات", en: "Activities", fr: "Activités" },
+  // Notifications (examples, dynamic keys can be added)
+  NewStudentRegistered: { ar: "تم تسجيل طالب جديد", en: "New student registered", fr: "Nouvel élève inscrit" },
+  LeaveRequestSent: { ar: "طلب إجازة مرسل", en: "Leave request sent", fr: "Demande de congé envoyée" },
+  NewAnnouncement: { ar: "إعلان جديد", en: "New announcement", fr: "Nouvelle annonce" },
+
+  // Difficulty example (already exists in your format)
+  Easy: { ar: "سهل", en: "Easy", fr: "Facile" },
+  Medium: { ar: "متوسط", en: "Medium", fr: "Moyen" },
+  Difficult: { ar: "صعب", en: "Difficult", fr: "Difficile" },
 };
+
 
 export function getTranslation(key: string, language: string): string {
   const entry = translations[key];
@@ -771,4 +809,4 @@ export function getTranslation(key: string, language: string): string {
   return entry[language] 
     || entry.ar 
     || key;
-}
+} 

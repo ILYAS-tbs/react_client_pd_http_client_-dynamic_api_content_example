@@ -1,7 +1,8 @@
 import React from 'react';
 import { ArrowRight, ArrowLeft, Play, BookOpen, Users, Trophy, BarChart3, GraduationCap } from 'lucide-react';
-import { useLanguage } from '../hooks/useLanguage';
+// import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeroProps {
   onGetStarted: () => void;

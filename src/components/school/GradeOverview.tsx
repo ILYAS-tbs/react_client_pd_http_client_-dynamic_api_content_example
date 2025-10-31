@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import { BarChart3, TrendingUp, Users, BookOpen, Filter } from "lucide-react";
 import { GradeOverviewProps } from "../../types";
 import { GroupsStat, SchoolStat } from "../../models/SchoolStat";
+import { useLanguage } from "../../hooks/useLanguage";
+import { getTranslation } from "../../utils/translations";
 
 const GradeOverview: React.FC<GradeOverviewProps> = ({
   school_stat,
   setSchoolStat,
   class_groups,
 }) => {
+
+  const {language} = useLanguage()
+
   const [selectedClass, setSelectedClass] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("s1");
@@ -123,12 +128,12 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
   //! Map to mock data above
   const determineModuleDifficulty = (module_average: number) => {
     if (module_average <= 10) {
-      return "Difficult";
+      return getTranslation("Difficult",language);
     }
     if (module_average <= 15) {
-      return "Medium";
+      return getTranslation("Medium",language);
     }
-    return "Easy";
+    return getTranslation("Easy",language)
   };
   const subjectPerformance = school_stat?.semesters_stats.map(
     (module_stat) => ({

@@ -3,6 +3,8 @@ import { Language } from '../types';
 
 export function useLanguage() {
   const [language, setLanguage] = useState<Language>('ar');
+  
+
   const [isRTL, setIsRTL] = useState(true);
 
   useEffect(() => {

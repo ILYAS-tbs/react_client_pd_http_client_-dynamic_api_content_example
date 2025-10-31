@@ -4,10 +4,10 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNotifications } from "../contexts/NotificationContext";
 import { useTheme } from "../hooks/useTheme";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "../hooks/useLanguage";
 import myScrollTo from "../lib/scroll_to_section";
 import { timeAgoArabic } from "../lib/timeAgoArabic";
 import NotificationsDropdown from "./Notifications";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface Tab {
   id: string;
@@ -35,7 +35,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const { user, logout } = useAuth();
   const { notifications,notifications_data, unreadCount } = useNotifications();
   const { isDark, toggleTheme } = useTheme();
-  const { language, isRTL, changeLanguage } = useLanguage();
+  const { language, isRTL, setLanguage } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const languageOptions = [
@@ -51,6 +51,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   //! Notifications
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
+
+   const handleLanguageChange = (newLang: 'ar' | 'en' | 'fr') => {
+    console.log('🌍 Changing language to:', newLang);
+    setLanguage(newLang);
+    // localStorage.setItem('language', newLang); // ✅ Save to localStorage
+    // setIsLanguageMenuOpen(false);
+  };
   return (
     <div
       className="min-h-screen bg-gray-50 dark:bg-gray-900"
@@ -76,7 +83,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <select
                   value={language}
                   onChange={(e) =>
-                    changeLanguage(e.target.value as "ar" | "en" | "fr")
+                    // changeLanguage(e.target.value as "ar" | "en" | "fr")
+                    handleLanguageChange(e.target.value as "ar" | "en" | "fr")
                   }
                   className="appearance-none bg-transparent border-none pl-6 sm:pl-8 pr-6 sm:pr-8 py-1.5 sm:py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-gray-600 dark:text-gray-400 text-xs sm:text-sm"
                 >

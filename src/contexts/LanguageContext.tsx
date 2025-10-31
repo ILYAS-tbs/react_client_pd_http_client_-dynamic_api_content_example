@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { translations, getTranslation } from '../utils/translations'; // Import from your translations file
+// src/contexts/LanguageContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { translations, getTranslation } from '../utils/translations';
 
 type Language = 'ar' | 'en' | 'fr';
 
@@ -21,7 +22,34 @@ export const useLanguage = () => {
 };
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('ar');
+  const [language, setLanguageState] = useState<Language>('ar');
+
+  // ✅ Load from localStorage on mount
+  useEffect(() => {
+    console.log('🔧 LanguageContext: Initializing...');
+    const savedLanguage = localStorage.getItem('language') as Language;
+    if (savedLanguage && ['ar', 'en', 'fr'].includes(savedLanguage)) {
+      console.log('✅ Loaded language from localStorage:', savedLanguage);
+      setLanguageState(savedLanguage);
+      document.documentElement.dir = savedLanguage === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.lang = savedLanguage;
+    }
+  }, []);
+
+  // ✅ Log whenever language changes
+  useEffect(() => {
+    console.log('🌍 LanguageContext: Language changed to:', language);
+  }, [language]);
+
+  // ✅ Wrapper function that updates state AND localStorage
+  const setLanguage = (newLang: Language) => {
+    console.log('🔄 LanguageContext: setLanguage called with:', newLang);
+    setLanguageState(newLang);
+    localStorage.setItem('language', newLang);
+    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = newLang;
+    console.log('✅ Language updated in context');
+  };
 
   const t = (key: string): string => {
     return getTranslation(key, language);

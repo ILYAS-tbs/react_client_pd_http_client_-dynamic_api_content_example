@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import {
   Home,
   Users,
@@ -37,6 +37,9 @@ import { NotificationAPI } from "../../models/notifications/NotificationAPI";
 import { timeAgoArabic } from "../../lib/timeAgoArabic";
 import { useNotifications } from "../../contexts/NotificationContext";
 
+import { getTranslation } from "../../utils/translations";
+import { useLanguage } from "../../contexts/LanguageContext";
+
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -48,7 +51,11 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 
 const SchoolDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
-
+  
+  const { language } = useLanguage();
+    
+  
+  
   //! Getting the schools's id (which is the user id)
   const lc_user: User = JSON.parse(
     localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
@@ -240,37 +247,55 @@ const SchoolDashboard: React.FC = () => {
     );
   }, [notifications_data]);
 
-  const stats = [
-    {
-      title: "إجمالي الطلاب",
-      value: students.length || "0",
-      icon: Users,
-      color: "bg-blue-500",
-    },
-    {
-      title: "المعلمون",
-      value: teachers.length || "0",
-      icon: Users,
-      color: "bg-green-500",
-    },
-    {
-      title: "الفصول",
-      value: class_groups.length || "0",
-      icon: FileText,
-      color: "bg-purple-500",
-    },
-    {
-      title: "اجمالي الغيابات",
-      value: total_num_of_absences() ?? "0",
-      icon: BarChart2,
-      color: "bg-orange-500",
-    },
-  ];
+  // const stats = [
+  //   {
+  //     title: "TotalStudents",
+  //     value: students.length || "0",
+  //     icon: Users,
+  //     color: "bg-blue-500",
+  //   },
+  //   {
+  //     title: getTranslation("المعلمون",language),
+  //     value: teachers.length || "0",
+  //     icon: Users,
+  //     color: "bg-green-500",
+  //   },
+  //   {
+  //     title: getTranslation("الفصول",language),
+  //     value: class_groups.length || "0",
+  //     icon: FileText,
+  //     color: "bg-purple-500",
+  //   },
+  //   {
+  //     title: getTranslation("اجمالي الغيابات",language),
+  //     value: total_num_of_absences() ?? "0",
+  //     icon: BarChart2,
+  //     color: "bg-orange-500",
+  //   },
+  // ];
+
+  //? Cached Array (no rerender)
+  //    const stats = [
+  //   { title:getTranslation("TotalStudents",language), value: students.length || "0", icon: Users, color: "bg-blue-500" },
+  //   { title: getTranslation("Teachers",language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
+  //   { title: getTranslation("ClassGroups",language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
+  //   { title: getTranslation("TotalAbsences",language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
+  // ];
+  
+console.log('📊 SchoolDashboard rendering with language:', language);
+
+const stats =  [
+    { title:getTranslation("TotalStudents",language), value: students.length || "0", icon: Users, color: "bg-blue-500" },
+    { title: getTranslation("Teachers",language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
+    { title: getTranslation("ClassGroups",language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
+    { title: getTranslation("TotalAbsences",language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
+   ]
+
 
   const tabs = [
-    { id: "home", label: "الرئيسية", icon: Home },
-    { id: "users", label: "إدارة المستخدمين", icon: Users },
-    { id: "levels", label: "إدارة الصفوف", icon: Layers },
+    { id: "home", label: getTranslation("home",language), icon: Home },
+    { id: "users", label: getTranslation("UserManagement",language), icon: Users },
+    { id: "levels", label: getTranslation("ClassManagement",language), icon: Layers },
     { id: "schedules", label: "جداول توقيت", icon: Calendar },
     { id: "exams", label: "رزنامة الامتحانات", icon: FileText },
     { id: "reports", label: "تقارير", icon: BarChart2 },
@@ -279,6 +304,9 @@ const SchoolDashboard: React.FC = () => {
   ];
 
   const renderContent = () => {
+
+   
+
     switch (activeTab) {
       case "home":
         return (
@@ -296,7 +324,7 @@ const SchoolDashboard: React.FC = () => {
                         {stat.title}
                       </p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {stat.value}
+                        {getTranslation(stat.value,language)}
                       </p>
                     </div>
                     <div className={`${stat.color} p-3 rounded-lg`}>
