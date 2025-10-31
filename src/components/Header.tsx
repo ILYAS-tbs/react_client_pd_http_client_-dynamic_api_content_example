@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { Moon, Sun, Globe, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-import { useLanguage } from '../contexts/LanguageContext'; // ✅ Import from context, not hook
 import { getTranslation } from '../utils/translations';
+import { auth_http_client } from '../services/http_api/auth/auth_http_client';
+import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeaderProps {
   activeSection: string;
@@ -16,8 +18,10 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = React.useState(false);
   const navigate = useNavigate();
 
+
   // ✅ FIXED: Use setLanguage instead of changeLanguage
-  const { language, setLanguage, isRTL } = useLanguage();
+    const { language, setLanguage, isRTL } = useLanguage();
+    
 
   const navigationItems = [
     { id: 'home', label: getTranslation('home', language) },
@@ -42,7 +46,21 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
     setIsMobileMenuOpen(false);
   };
 
-  const handleLanguageChange = (newLang: 'ar' | 'en' | 'fr') => {
+  const handleLogoutAndNavigate = async (url: string) => {
+  try {
+    // await auth_http_client.handleDeleteSession(); // wait for server to delete session
+    navigate(url); // only navigate after deletion
+  } catch (err) {
+    console.error("Failed to delete session:", err);
+  }
+};
+
+  const {user} = useAuth()
+  const role = localStorage.getItem('role')
+
+  
+
+   const handleLanguageChange = (newLang: 'ar' | 'en' | 'fr') => {
     console.log('🌍 Changing language to:', newLang);
     setLanguage(newLang);
     // localStorage.setItem('language', newLang); // ✅ Save to localStorage
@@ -104,7 +122,9 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => handleLanguageChange(lang.code as any)}
+                      onClick={() => {
+                        handleLanguageChange(lang.code as any)
+                      }}
                       className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors flex items-center space-x-3 rtl:space-x-reverse ${
                         language === lang.code ? 'bg-[#edeff3] dark:bg-gray-700 text-[#39789b] dark:text-blue-300' : ''
                       } first:rounded-t-lg last:rounded-b-lg`}
@@ -125,7 +145,31 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            {/* Auth buttons remain the same */}
+            {/* Auth Buttons */}
+            {user?
+             <button 
+                onClick={() => handleLogoutAndNavigate(`/${role}-dashboard`)}
+  className="px-6 py-2 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {/* {getTranslation('register', language)} */}
+               لوحة البيانات
+              </button>
+
+            :    <div className="flex items-center space-x-3 rtl:space-x-reverse">
+              <button 
+                onClick={() => handleLogoutAndNavigate("/login")}
+                className="px-4 py-2 text-sm font-medium text-sky-500 hover:text-[#2d5f7d] transition-colors"
+              >
+                {getTranslation('login', language)}
+              </button>
+              <button 
+                onClick={() => handleLogoutAndNavigate('/register')}
+                className="px-6 py-2 bg-sky-600 hover:bg-[#2d5f7d] text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                {getTranslation('register', language)}
+              </button>
+            </div>}
+            
           </div>
 
           {/* Mobile Menu Button */}
@@ -137,6 +181,55 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-4 space-y-3">
+            {navigationItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() =>{ scrollToSection(item.id)}}
+                className={`block w-full px-4 py-3 rounded-lg text-left rtl:text-right font-medium transition-all duration-200 ${
+                  activeSection === item.id
+                    ? 'bg-[#39789b] text-white'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-[#edeff3] dark:hover:bg-gray-700'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center dark:text-gray-200 space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
+                >
+                  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  <span className="text-sm">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+              </div>
+              
+            <div className="space-y-2">
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="block w-full px-4 py-3 text-center font-medium text-[#39789b] hover:bg-[#edeff3] dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  {getTranslation('login', language)}
+                </button>
+                <button 
+                  onClick={() => navigate('/register')}
+                  className="block w-full px-4 py-3 bg-[#39789b] hover:bg-[#2d5f7d] text-white text-center font-medium rounded-lg transition-colors"
+                >
+                  {getTranslation('register', language)}
+                </button>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -5,6 +5,8 @@ import { school_dashboard_client } from "../../services/http_api/school-dashboar
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { PostStudentPayload } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Student } from "../../models/Student";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 const StudentManagement: React.FC<StudentManagementProps> = ({
   studentsList,
@@ -19,6 +21,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
   const [showEditModal, setShowEditModal] = useState(false);
   // to be able to provide student_id when updating
   const [last_chosen_student, set_last_chosen_student] = useState("");
+
+  //! Translation
+  const { language } = useLanguage();
 
   // fake data :
   // const students = [
@@ -273,14 +278,14 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          إدارة الطلاب
+          {getTranslation("studentManagement", language)}
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
-          <span>إضافة طالب</span>
+          <span>{getTranslation('addStudent',language)}</span>
         </button>
       </div>
 
@@ -292,7 +297,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث عن الطلاب أو الأولياء..."
+                placeholder={getTranslation('searchStudentsOrParents',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -324,26 +329,26 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الطالب
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('student',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الصف
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('class',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  العمر
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('age',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  ولي الأمر
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('parent',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  المعدل
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('grade',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  عدد الغيابات
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('absences',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الإجراءات
+                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('actions',language)}
                 </th>
               </tr>
             </thead>
@@ -364,7 +369,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {student.age} سنة
+                    {student.age} {getTranslation('years',language)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
@@ -420,13 +425,13 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              إضافة طالب جديد
+              {getTranslation('addNewStudent',language)}
             </h3>
 
             <form className="space-y-4" onSubmit={handleCreationSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  اسم الطالب
+                  {getTranslation('studentName',language)}
                 </label>
                 <input
                   name="full_name"
@@ -440,7 +445,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الصف
+                  {getTranslation('class',language)}
                 </label>
                 <select
                   name="class_group_id"
@@ -459,7 +464,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تاريخ الميلاد
+                  {getTranslation('dateOfBirth',language)}
                 </label>
                 <input
                   name="date_of_birth"
@@ -484,7 +489,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  رقم الهاتف
+                  {getTranslation('phoneNumber',language)}
                 </label>
                 <input
                   type="tel"
@@ -506,13 +511,13 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   onClick={() => setShowAddModal(false)}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {getTranslation('cancel',language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  إضافة
+                  {getTranslation('add',language)}
                 </button>
               </div>
             </form>
