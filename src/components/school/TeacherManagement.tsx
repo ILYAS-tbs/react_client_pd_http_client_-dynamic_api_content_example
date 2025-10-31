@@ -434,7 +434,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   <ul className="flex flex-col items-end">
                     {teacher.modulesAndClassGroups?.map((x) => (
-                      <li>
+                    <li key={`${x.module.module_id}-${x.class_group.class_group_id}`}>
                         {x.module.module_name} - {x.class_group.name}
                       </li>
                     ))}

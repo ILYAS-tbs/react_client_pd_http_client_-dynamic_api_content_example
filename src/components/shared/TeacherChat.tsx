@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import {
   chat_http_client,
-  WEBSOCKET_BASEURL,
 } from "../../services/chat/chat_http_client";
 import { Teacher } from "../../models/Teacher";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
@@ -25,7 +24,7 @@ import {
 import { BounceLoader, MoonLoader, SyncLoader } from "react-spinners";
 import { Message } from "../../models/chat_system/Message";
 import { Parent } from "../../models/Parent";
-import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
+import { SERVER_BASE_URL, WEBSOCKET_BASEURL } from "../../services/http_api/server_constants";
 import { FilePreview } from "./file_preview";
 
 import data from "@emoji-mart/data";

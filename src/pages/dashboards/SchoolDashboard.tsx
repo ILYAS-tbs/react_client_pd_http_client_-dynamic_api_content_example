@@ -31,6 +31,11 @@ import { SchoolStat } from "../../models/SchoolStat";
 import TeacherManagement from "../../components/school/TeacherManagement";
 import { Module } from "../../models/Module";
 import { User } from "../../contexts/AuthContext";
+import { notifications_client } from "../../services/http_api/notifications/notifications_client";
+import { timeAgo } from "../../lib/timeago";
+import { NotificationAPI } from "../../models/notifications/NotificationAPI";
+import { timeAgoArabic } from "../../lib/timeAgoArabic";
+import { useNotifications } from "../../contexts/NotificationContext";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -68,6 +73,7 @@ const SchoolDashboard: React.FC = () => {
   const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
   const [school_stat, setSchoolStat] = useState<SchoolStat | null>(null);
   const [modules, SetModules] = useState<Module[]>([]);
+
 
   const get_current_school_students = async () => {
     const res = await school_dashboard_client.get_current_school_students();
@@ -152,6 +158,8 @@ const SchoolDashboard: React.FC = () => {
     }
   };
 
+  
+
   useEffect(() => {
     //! fetching :
     get_current_school_students();
@@ -164,6 +172,7 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_exam_schedules();
     get_current_school_stats();
     get_modules();
+   
   }, []);
 
   const total_num_of_absences = () => {
@@ -187,6 +196,49 @@ const SchoolDashboard: React.FC = () => {
   function RefetchEvents() {
     get_current_school_events();
   }
+
+  //?: Notifications ::
+  /*
+  Frontend shape to map to
+  [
+                    {
+                      action: "تم تسجيل طالب جديد",
+                      name: "أحمد محمد",
+                      time: "منذ ساعة",
+                    },
+                    {
+                      action: "طلب إجازة مرسل",
+                      name: "الأستاذة فاطمة",
+                      time: "منذ 2 ساعة",
+                    },
+                    {
+                      action: "إعلان جديد",
+                      name: "امتحانات الفصل الأول",
+                      time: "منذ 3 ساعات",
+                    },
+                  ].map
+  */
+
+  const {notifications_data}=useNotifications()
+  
+  const [actions, setActions] = useState(
+    notifications_data?.map((not) => ({
+      action: not.title,
+      name: not.message,
+      time: timeAgo(not.created_at),
+    }))
+  );
+
+  useEffect(() => {
+    setActions(
+      notifications_data?.map((not) => ({
+        key: not.id,
+        action: not.title,
+        name: not.message,
+        time: timeAgoArabic(not.created_at),
+      }))
+    );
+  }, [notifications_data]);
 
   const stats = [
     {
@@ -257,28 +309,12 @@ const SchoolDashboard: React.FC = () => {
 
             {/* Recent Activity */}
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+              <div className=" h-64 overflow-y-scroll bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   الأنشطة الأخيرة
                 </h3>
                 <div className="space-y-4">
-                  {[
-                    {
-                      action: "تم تسجيل طالب جديد",
-                      name: "أحمد محمد",
-                      time: "منذ ساعة",
-                    },
-                    {
-                      action: "طلب إجازة مرسل",
-                      name: "الأستاذة فاطمة",
-                      time: "منذ 2 ساعة",
-                    },
-                    {
-                      action: "إعلان جديد",
-                      name: "امتحانات الفصل الأول",
-                      time: "منذ 3 ساعات",
-                    },
-                  ].map((activity, index) => (
+                  {actions?.map((activity, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"

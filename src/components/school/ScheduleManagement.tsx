@@ -52,7 +52,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
 
   const [last_selected_schedule, set_last_selected_schedule] =
     useState<ScheduleItem | null>(null);
-
+  
   //? API CALL PUT class_group
   async function handleUpdateSubmit() {
     const formData_update = new FormData();
@@ -162,7 +162,9 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           إدارة الجداول
         </h2>
-        <div className="flex space-x-2 rtl:space-x-reverse">
+        
+        {/* Hide Creation For Now it isnt working */}
+        {/* <div className="flex space-x-2 rtl:space-x-reverse">
           <button
             onClick={() => setShowUploadModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
@@ -170,7 +172,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
             <Plus className="h-5 w-5" />
             <span>إضافة جدول</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Filters */}

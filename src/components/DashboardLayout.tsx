@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { LogOut, Bell, Moon, Sun, Globe, Menu, X ,Star} from "lucide-react";
+import { LogOut, Bell, Moon, Sun, Globe, Menu, X, Star } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNotifications } from "../contexts/NotificationContext";
 import { useTheme } from "../hooks/useTheme";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../hooks/useLanguage";
 import myScrollTo from "../lib/scroll_to_section";
-
+import { timeAgoArabic } from "../lib/timeAgoArabic";
+import NotificationsDropdown from "./Notifications";
 
 interface Tab {
   id: string;
@@ -32,7 +33,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
 }) => {
   const { user, logout } = useAuth();
-  const { notifications, unreadCount } = useNotifications();
+  const { notifications,notifications_data, unreadCount } = useNotifications();
   const { isDark, toggleTheme } = useTheme();
   const { language, isRTL, changeLanguage } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,7 +46,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  //! Notifications
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
   return (
     <div
       className="min-h-screen bg-gray-50 dark:bg-gray-900"
@@ -98,42 +103,39 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
               {/* Notifications */}
               <div className="relative">
-                <button className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
+                <NotificationsDropdown
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  timeAgoArabic={timeAgoArabic}
+                />
               </div>
 
-                {/* Account Subscribtion (parent) */}
-                 {user?.role ==="parent" && <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
-                <div className="text-right rtl:text-left">
-                  <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                    حالة الحساب
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                    مفعّل
-                  </p>
-                </div>
-                <button
-                  onClick={()=>{}}
-                  className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title={isRTL ?"الاشتراك" : "subscribe"}
-                >
-                  <Star 
-                    onClick={() =>{
+              {/* Account Subscribtion (parent) */}
+              {user?.role === "parent" && (
+                <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
+                  <div className="text-right rtl:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
+                      حالة الحساب
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+                      مفعّل
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {}}
+                    className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    title={isRTL ? "الاشتراك" : "subscribe"}
+                  >
+                    <Star
+                      onClick={() => {
                         navigate("/", { state: { scrollTo: "pricing" } });
+                      }}
+                      className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400"
+                    />
+                  </button>
+                </div>
+              )}
 
-
-                    }}
-
-                  className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
-                </button>
-              </div>}
-             
               {/* User Menu */}
               <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
                 <div className="text-right rtl:text-left">
@@ -162,7 +164,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   <LogOut className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
-
             </div>
           </div>
         </div>
@@ -196,7 +197,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-gray-600 dark:text-gray-400"  />
+                <X className="h-6 w-6 text-gray-600 dark:text-gray-400" />
               ) : (
                 <Menu className="h-6 w-6 text-gray-600 dark:text-gray-400" />
               )}
