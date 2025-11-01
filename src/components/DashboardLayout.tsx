@@ -8,6 +8,7 @@ import myScrollTo from "../lib/scroll_to_section";
 import { timeAgoArabic } from "../lib/timeAgoArabic";
 import NotificationsDropdown from "./Notifications";
 import { useLanguage } from "../contexts/LanguageContext";
+import { getTranslation } from "../utils/translations";
 
 interface Tab {
   id: string;
@@ -123,10 +124,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
                   <div className="text-right rtl:text-left">
                     <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                      حالة الحساب
+                      {getTranslation('accountStatus',language)}
                     </p>
                     <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                      مفعّل
+                      {getTranslation('accountActive',language)}
                     </p>
                   </div>
                   <button

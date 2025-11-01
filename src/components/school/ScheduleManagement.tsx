@@ -13,6 +13,8 @@ import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 interface ScheduleItem {
   id: string;
@@ -35,6 +37,9 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       uploadedAt: "",
     }));
   }
+
+  //! Translation:
+  const {language}=useLanguage()
   // mock schedule data : { id: "s1", className: "الصف الخامس أ", pdfUrl: null, uploadedAt: "" },
 
   const [schedules, setSchedules] = useState<ScheduleItem[]>(
@@ -160,7 +165,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          إدارة الجداول
+          {getTranslation('schedulesManagement',language)}
         </h2>
         
         {/* Hide Creation For Now it isnt working */}
@@ -183,7 +188,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث عن الفصل..."
+                placeholder={getTranslation('searchClass',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -196,24 +201,24 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       {/* Schedule Display */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            جدول الفصول
+          <h3 className="ltr:text-left text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+            {getTranslation('classSchedule',language)}
           </h3>
           <div className="min-w-full">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-700">
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    اسم الفصل
+                    {getTranslation('className',language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    حالة الرفع
+                    {getTranslation('uploadStatus',language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    جدول الحصص
+                    {getTranslation('lessonSchedule',language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    الإجراءات
+                    {getTranslation('actions',language)}
                   </th>
                 </tr>
               </thead>

@@ -965,6 +965,471 @@ searchStudentsOrParents: {
   fr: 'Ajouter un nouvel élève',
 },
 
+//?: TeacherManagement.tsx
+teacherManagement: {
+  ar: 'إدارة المعلمين',
+  en: 'Teacher Management',
+  fr: 'Gestion des enseignants',
+},
+addTeacher: {
+  ar: 'إضافة معلم',
+  en: 'Add Teacher',
+  fr: 'Ajouter un enseignant',
+},
+searchTeachers: {
+  ar: 'البحث عن المعلمين...',
+  en: 'Search for teachers...',
+  fr: 'Rechercher des enseignants...',
+},
+active: {
+  ar: 'نشط',
+  en: 'Active',
+  fr: 'Actif',
+},
+inactive: {
+  ar: 'معطل',
+  en: 'Inactive',
+  fr: 'Inactif',
+},
+experience: {
+  ar: 'الخبرة',
+  en: 'Experience',
+  fr: 'Expérience',
+},
+suspend: {
+  ar: 'تعليق',
+  en: 'Suspend',
+  fr: 'Suspendre',
+},
+activate: {
+  ar: 'تفعيل',
+  en: 'Activate',
+  fr: 'Activer',
+},
+//? ParentManagement : 
+parentManagement: {
+  ar: 'إدارة أولياء الأمور',
+  en: 'Parent Management',
+  fr: 'Gestion des parents',
+},
+addParent: {
+  ar: 'إضافة ولي أمر',
+  en: 'Add Parent',
+  fr: 'Ajouter un parent',
+},
+searchParentsStudentsOrEmail: {
+  ar: 'البحث عن أولياء الأمور أو الطلاب أو البريد الإلكتروني...',
+  en: 'Search for parents, students, or email...',
+  fr: 'Rechercher des parents, des élèves ou un e-mail...',
+},
+children: {
+  ar: 'الأبناء',
+  en: 'Children',
+  fr: 'Enfants',
+},
+//?: ClassesManagement ::
+classManagement: {
+  ar: 'إدارة الصفوف',
+  en: 'Class Management',
+  fr: 'Gestion des classes',
+},
+addClass: {
+  ar: 'إضافة صف',
+  en: 'Add Class',
+  fr: 'Ajouter une classe',
+},
+searchClassesOrStudentsCount: {
+  ar: 'البحث عن الصفوف أو عدد الطلاب...',
+  en: 'Search for classes or number of students...',
+  fr: 'Rechercher des classes ou le nombre d’élèves...',
+},
+name: {
+  ar: 'الاسم',
+  en: 'Name',
+  fr: 'Nom',
+},
+studentsCount: {
+  ar: 'عدد الطلاب',
+  en: 'Number of Students',
+  fr: 'Nombre d’élèves',
+},
+teachersList: {
+  ar: 'قائمة المعلمين',
+  en: 'Teachers List',
+  fr: 'Liste des enseignants',
+},
+//? : ScheduleManagement ::
+schedulesManagement: {
+  ar: 'إدارة الجداول',
+  en: 'Schedule Management',
+  fr: 'Gestion des emplois du temps',
+},
+searchClass: {
+  ar: 'البحث عن الفصل...',
+  en: 'Search for class...',
+  fr: 'Rechercher une classe...',
+},
+classSchedule: {
+  ar: 'جدول الفصول',
+  en: 'Class Schedule',
+  fr: 'Emploi du temps des classes',
+},
+lessonSchedule: {
+  ar: 'جدول الحصص',
+  en: 'Lesson Schedule',
+  fr: 'Emploi du temps des cours',
+},
+//?: ExamScheduleManagemen::
+examCalendar: {
+  ar: 'رزنامة الامتحانات',
+  en: 'Exam Calendar',
+  fr: 'Calendrier des examens',
+},
+TimeView: {
+  ar: "عرض زمني",
+  en: "Time View",
+  fr: "Vue Chronologique"
+},
+ViewSchedule: {
+  ar: "عرض جدول",
+  en: "View Schedule",
+  fr: "Afficher l'emploi du temps"
+},
+AddExam: {
+  ar: "إضافة امتحان",
+  en: "Add Exam",
+  fr: "Ajouter un examen"
+},
+SearchSubjectClassOrRoom: {
+  ar: "البحث عن المادة أو الصف أو القاعة...",
+  en: "Search for subject, class, or room...",
+  fr: "Rechercher une matière, une classe ou une salle..."
+},
+ExamTimeline: {
+  ar: "عرض زمني للامتحانات",
+  en: "Exam Timeline",
+  fr: "Vue chronologique des examens"
+},
+Subject: {
+  ar: "المادة",
+  en: "Subject",
+  fr: "Matière"
+},
+Date: {
+  ar: "التاريخ",
+  en: "Date",
+  fr: "Date"
+},
+Time: {
+  ar: "الوقت",
+  en: "Time",
+  fr: "Heure"
+},
+DurationMinutes: {
+  ar: "المدة (دقيقة)",
+  en: "Duration (minutes)",
+  fr: "Durée (minutes)"
+},
+Room: {
+  ar: "القاعة",
+  en: "Room",
+  fr: "Salle"
+},
+//?: AbsenceReviews ::
+ReviewAbsenceRequests: {
+  ar: "مراجعة طلبات الغياب",
+  en: "Review Absence Requests",
+  fr: "Examiner les demandes d'absence"
+},
+Filtering: {
+  ar: "الفلترة",
+  en: "Filtering",
+  fr: "Filtrage"
+},
+TotalRequests: {
+  ar: "إجمالي الطلبات",
+  en: "Total Requests",
+  fr: "Nombre total de demandes"
+},
+UnderReview: {
+  ar: "قيد المراجعة",
+  en: "Under Review",
+  fr: "En cours d'examen"
+},
+Accepted: {
+  ar: "مقبول",
+  en: "Accepted",
+  fr: "Accepté"
+},
+Rejected: {
+  ar: "مرفوض",
+  en: "Rejected",
+  fr: "Refusé"
+},
+AbsenceDate: {
+  ar: "تاريخ الغياب:",
+  en: "Absence Date",
+  fr: "Date d'absence"
+},
+SubmissionDate: {
+  ar: "تاريخ التقديم",
+  en: "Submission Date",
+  fr: "Date de soumission"
+},
+AbsenceReason: {
+  ar: "سبب الغياب",
+  en: "Reason for Absence",
+  fr: "Raison de l'absence"
+},
+Documents: {
+  ar: "مستندات:",
+  en: "Documents:",
+  fr: "Documents :"
+},
+Available: {
+  ar: "متوفرة",
+  en: "Available",
+  fr: "Disponible"
+},
+NotAvailable: {
+  ar: "غير متوفرة",
+  en: "Not Available",
+  fr: "Indisponible"
+},
+Accept: {
+  ar: "قبول",
+  en: "Accept",
+  fr: "Accepter"
+},
+Reject: {
+  ar: "رفض",
+  en: "Reject",
+  fr: "Refuser"
+},
+Details: {
+  ar: "تفاصيل",
+  en: "Details",
+  fr: "Détails"
+},
+NoDetailsOrDocuments: {
+  ar: "لا توجد أي تفاصيل أو مستند إثبات",
+  en: "No details or supporting documents available",
+  fr: "Aucun détail ou document justificatif disponible"
+},
+//?: BehaviorReports.tsx :: 
+BehaviorReports: {
+  ar: "تقارير السلوك",
+  en: "Behavior Reports",
+  fr: "Rapports de comportement"
+},
+PositiveBehavior: {
+  ar: "سلوك إيجابي",
+  en: "Positive Behavior",
+  fr: "Comportement positif"
+},
+NegativeBehavior: {
+  ar: "سلوك سلبي",
+  en: "Negative Behavior",
+  fr: "Comportement négatif"
+},
+ViewList: {
+  ar: "عرض قائمة",
+  en: "View List",
+  fr: "Afficher la liste"
+},
+ViewSummary: {
+  ar: "عرض ملخص",
+  en: "View Summary",
+  fr: "Afficher le résumé"
+},
+searchStudentOrDescriptionOrAction: {
+  ar: "البحث عن الطالب أو الوصف أو الإجراء...",
+  en: "Search for student, description, or action...",
+  fr: "Rechercher un élève, une description ou une action..."
+},
+behaviorReportsSummary: {
+  ar: "ملخص تقارير السلوك",
+  en: "Behavior Reports Summary",
+  fr: "Résumé des rapports de comportement"
+},
+totalReports: {
+  ar: "إجمالي التقارير",
+  en: "Total Reports",
+  fr: "Nombre total de rapports"
+},
+category: {
+  ar: "الفئة",
+  en: "Category",
+  fr: "Catégorie"
+},
+description: {
+  ar: "الوصف",
+  en: "Description",
+  fr: "Description"
+},
+action: {
+  ar: "الإجراء",
+  en: "Action",
+  fr: "Action"
+},
+//? GradeOverview :: 
+schoolAverage: {
+  ar: "متوسط المدرسة",
+  en: "School Average",
+  fr: "Moyenne de l'école"
+},
+highestGrade: {
+  ar: "أعلى معدل",
+  en: "Highest Grade",
+  fr: "Note la plus élevée"
+},
+lowestGrade: {
+  ar: "أقل معدل",
+  en: "Lowest Grade",
+  fr: "Note la plus basse"
+},
+passingRate: {
+  ar: "معدل النجاح",
+  en: "Passing Rate",
+  fr: "Taux de réussite"
+},
+gradeOverview: {
+  ar: "نظرة عامة على الدرجات",
+  en: "Grade Overview",
+  fr: "Vue d'ensemble des notes"
+},
+classPerformance: {
+  ar: "أداء الفصول",
+  en: "Class Performance",
+  fr: "Performance des classes"
+},
+average: {
+  ar: "المتوسط",
+  en: "Average",
+  fr: "Moyenne"
+},
+numberOfStudents: {
+  ar: "عدد الطلاب",
+  en: "Number of Students",
+  fr: "Nombre d'élèves"
+},
+topStudent: {
+  ar: "أفضل طالب",
+  en: "Top Student",
+  fr: "Meilleur Élève"
+},
+subjectPerformance: {
+  ar: "أداء المواد",
+  en: "Subject Performance",
+  fr: "Performance des Matières"
+},
+//? ActivitiesManagement :: 
+eventManagement: {
+  ar: "إدارة الفعاليات",
+  en: "Event Management",
+  fr: "Gestion des Événements"
+},
+sports: { ar: "رياضية", en: "Sports", fr: "Sportives" },
+science: { ar: "علمية", en: "Science", fr: "Scientifiques" },
+cultural: { ar: "ثقافية", en: "Cultural", fr: "Culturelles" },
+viewCalendar: { ar: "عرض تقويم", en: "View Calendar", fr: "Voir le Calendrier" },
+addActivity: { ar: "إضافة فعالية", en: "Add Activity", fr: "Ajouter une activité" },
+searchActivity: { ar: "البحث عن العنوان أو الوصف أو الموقع...", en: "Search by title, description, or location...", fr: "Rechercher par titre, description ou lieu..." },
+eventsCalendar: { ar: "تقويم الفعاليات", en: "Events Calendar", fr: "Calendrier des Événements" },
+
+titleColumn: { ar: "العنوان", en: "Title", fr: "Titre" },
+categoryColumn: { ar: "الفئة", en: "Category", fr: "Catégorie" },
+dateColumn: { ar: "التاريخ", en: "Date", fr: "Date" },
+timeColumn: { ar: "الوقت", en: "Time", fr: "Heure" },
+locationColumn: { ar: "الموقع", en: "Location", fr: "Emplacement" },
+actionsColumn: { ar: "الإجراءات", en: "Actions", fr: "Actions" },
+
+//! ParentDashoard :
+myChildren: { ar: "أطفالي", en: "My Children", fr: "Mes Enfants" },
+totalAbsences: { ar: "إجمالي عدد الغيابات", en: "Total Absences", fr: "Total des Absences" },
+newMessages: { ar: "رسائل جديدة", en: "New Messages", fr: "Nouveaux Messages" },
+notifications: { ar: "إشعارات", en: "Notifications", fr: "Notifications" },
+
+overview: { ar: "نظرة عامة", en: "Overview", fr: "Aperçu" },
+absencesAndReports: { ar: "تقارير وغيابات", en: "Reports & Absences", fr: "Rapports & Absences" },
+chat: { ar: "دردشة", en: "Chat", fr: "Discussion" },
+notificationsAndAlarms: { ar: "إشعارات وتنبيهات", en: "Notifications & Alerts", fr: "Notifications & Alertes" },
+timetable: { ar: "جدول التوقيت", en: "Timetable", fr: "Emploi du Temps" },
+homeworks: { ar: "الواجبات", en: "Homework", fr: "Devoirs" },
+digitalLibrary: { ar: "مكتبة رقمية", en: "Digital Library", fr: "Bibliothèque Numérique" },
+events: { ar: "فعاليات", en: "Events", fr: "Événements" },
+
+parentDashboard: { ar: "لوحة تحكم ولي الأمر", en: "Parent Dashboard", fr: "Tableau de Bord Parent" },
+welcomeMessage: { ar: "مرحباً بك، هنا يمكنك متابعة تقدم أطفالك الأكاديمي", en: "Welcome, here you can track your children's academic progress", fr: "Bienvenue, ici vous pouvez suivre les progrès académiques de vos enfants" },
+
+//? Dashboard Layout :
+accountStatus: { ar: "حالة الحساب", en: "Account Status", fr: "État du Compte" },
+accountActive: { ar: "مفعّل", en: "Active", fr: "Actif" },
+
+//? Overview (default) :: 
+academicStatus: { ar: "الحالة الأكاديمية", en: "Academic Status", fr: "Statut Académique" },
+latestUpdates: { ar: "آخر التحديثات", en: "Latest Updates", fr: "Dernières Mises à Jour" },
+requiredTasks: { ar: "المهام المطلوبة", en: "Required Tasks", fr: "Tâches Requises" },
+
+//? ChildrenOverview ::
+excellent: { ar: "ممتاز", en: "Excellent", fr: "Excellent" },
+veryGood: { ar: "جيد جداً", en: "Very Good", fr: "Très Bien" },
+good: { ar: "جيد", en: "Good", fr: "Bien" },
+poorPerformance: { ar: "أداء ضعيف", en: "Poor Performance", fr: "Performance Faible" },
+childrenOverview: { ar: "نظرة عامة على الأطفال", en: "Children Overview", fr: "Vue d'ensemble des enfants" },
+selectChild: { ar: "اختر الطفل", en: "Select Child", fr: "Sélectionner l'enfant" },
+mainTeacher: { ar: "المعلم الرئيسي", en: "Main Teacher", fr: "Enseignant Principal " },
+overallGrade: { ar: "المعدل العام", en: "Overall Grade", fr: "Moyenne Générale" },
+behavior: { ar: "السلوك", en: "Behavior", fr: "Comportement" },
+numberOfSubjects: { ar: "عدد المواد", en: "Number of Subjects", fr: "Nombre de matières" },
+recentActivities: { ar: "النشاطات الأخيرة", en: "Recent Activities", fr: "Activités Récentes" },
+quickActions: { ar: "إجراءات سريعة", en: "Quick Actions", fr: "Actions Rapides" },
+viewGrades: { ar: "عرض الدرجات", en: "View Grades", fr: "Afficher les Notes" },
+attendanceRecord: { ar: "سجل الحضور", en: "Attendance Record", fr: "Registre de Présence" },
+justifyAbsence: { ar: "تبرير غياب", en: "Justify Absence", fr: "Justifier l'Absence" },
+contactTeacher: { ar: "تواصل مع المعلم", en: "Contact Teacher", fr: "Contacter l'Enseignant" },
+
+//? GradeReports.tsx ::
+currentSemester: { ar: "الفصل الحالي", en: "Current Semester", fr: "Semestre Actuel" },
+firstSemester: { ar: "الفصل الأول", en: "First Semester", fr: "1er Semestre" },
+secondSemester: { ar: "الفصل الثاني", en: "Second Semester", fr: "2ème Semestre" },
+academicYear: { ar: "السنة الدراسية", en: "Academic Year", fr: "Année Scolaire" },
+gradeReports: { ar: "تقارير الدرجات", en: "Grade Reports", fr: "Rapports de Notes" },
+exportReport: { ar: "تصدير التقرير", en: "Export Report", fr: "Exporter le Rapport" },
+child: { ar: "الطفل", en: "Child", fr: "Enfant" },
+allSubjects: { ar: "جميع المواد", en: "All Subjects", fr: "Toutes les matières" },
+apply: { ar: "تطبيق", en: "Apply", fr: "Appliquer" },
+rank: { ar: "الترتيب", en: "Rank", fr: "Rang" },
+outOf: { ar: "من أصل", en: "Out of", fr: "Sur" },
+subjects: { ar: "مواد دراسية", en: "Subjects", fr: "Matières" },
+highestScore: { ar: "أعلى درجة", en: "Highest Score", fr: "Meilleure Note" },
+in: { ar: "في", en: "In", fr: "Dans" },
+currentGrade: { ar: "الدرجة الحالية", en: "Current Grade", fr: "Note Actuelle" },
+classAverage: { ar: "متوسط الصف", en: "Class Average", fr: "Moyenne de la Classe" },
+gradeReviewRequests: { ar: "طلبات مراجعة الدرجات", en: "Grade Review Requests", fr: "Demandes de Révision des Notes" },
+submitReviewRequest: { ar: "تقديم طلب مراجعة", en: "Submit Review Request", fr: "Soumettre une Demande de Révision" },
+noGradeReviewRequests: { ar: "لا توجد طلبات مراجعة درجات حالياً", en: "No grade review requests at the moment", fr: "Aucune demande de révision de notes pour le moment" },
+gradeReviewInstruction: { 
+  ar: "يمكنك تقديم طلب مراجعة إذا كنت تعتقد أن هناك خطأ في التقييم", 
+  en: "You can submit a review request if you believe there is an error in the assessment", 
+  fr: "Vous pouvez soumettre une demande de révision si vous pensez qu'il y a une erreur dans l'évaluation" 
+},
+
+//? AbsenceManager ::
+totalRequests: { ar: "إجمالي الطلبات", en: "Total Requests", fr: "Nombre total de demandes" },
+noLeaveRequests: { ar: "لا توجد طلبات غياب", en: "No leave requests", fr: "Aucune demande d'absence" },
+noLeaveJustificationRequests: { ar: "لم تقم بتقديم أي طلبات تبرير غياب بعد", en: "You haven't submitted any leave justification requests yet", fr: "Vous n'avez encore soumis aucune demande de justification d'absence" },
+submitNewRequest: { ar: "تقديم طلب جديد", en: "Submit New Request", fr: "Soumettre une nouvelle demande" },
+supportingDocuments: { ar: "مستندات داعمة", en: "Supporting Documents", fr: "Documents justificatifs" },
+reviewDate: { ar: "تاريخ المراجعة", en: "Review Date", fr: "Date de révision" },
+adminComment: { ar: "تعليق الإدارة", en: "Admin Comment", fr: "Commentaire de l'administration" },
+requestUnderReview: { ar: "الطلب قيد المراجعة من قبل الإدارة", en: "Request under review by administration", fr: "Demande en cours de révision par l'administration" },
+excellentBehavior: { ar: "سلوك ممتاز", en: "Excellent Behavior", fr: "Comportement Excellent" },
+goodBehavior: { ar: "سلوك جيد", en: "Good Behavior", fr: "Bon Comportement" },
+noBehaviorReports: { ar: "لا توجد تقارير سلوك", en: "No Behavior Reports", fr: "Aucun rapport de comportement" },
+noBehaviorReportsForChild: { ar: "لا توجد تقارير سلوك متاحة لهذا الطفل حالياً", en: "No behavior reports available for this child currently", fr: "Aucun rapport de comportement disponible pour cet enfant actuellement" },
+reportDate: { ar: "تاريخ التقرير", en: "Report Date", fr: "Date du Rapport" },
+classParticipation: { ar: "المشاركة الصفية", en: "Class Participation", fr: "Participation en Classe" },
 
 };
 

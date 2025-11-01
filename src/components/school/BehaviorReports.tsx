@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { BehaviorReportsProps } from "../../types";
 import { BehaviourReport } from "../../models/BehaviorReport";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 // interface BehaviorReport {
 //   id: string;
@@ -35,6 +37,9 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
       actionTaken: "شهادة تقدير",
     },
 */
+  //! Translation : 
+  const {language}=useLanguage()
+
   const [reports, setReports] = useState<BehaviourReport[]>(
     behaviour_reports_list
   );
@@ -145,7 +150,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          تقارير السلوك
+          {getTranslation('BehaviorReports',language)}
         </h2>
 
         <div className="flex space-x-2 rtl:space-x-reverse">
@@ -154,16 +159,16 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">الكل</option>
-            <option value="good">سلوك إيجابي</option>
-            <option value="bad">سلوك سلبي</option>
+            <option value="all">{getTranslation('all',language)}</option>
+            <option value="good">{getTranslation('PositiveBehavior',language)}</option>
+            <option value="bad">{getTranslation('NegativeBehavior',language)}</option>
           </select>
           <button
             onClick={() => setViewSummary(!viewSummary)}
             className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <BarChart2 className="h-5 w-5" />
-            <span>{viewSummary ? "عرض قائمة" : "عرض ملخص"}</span>
+            <span>{viewSummary ? getTranslation('ViewList',language) : getTranslation('ViewSummary',language)}</span>
           </button>
 
           {/* For now : adding is only possible by the teacher not school */}
@@ -185,7 +190,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث عن الطالب أو الوصف أو الإجراء..."
+                placeholder={getTranslation('searchStudentOrDescriptionOrAction',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -200,19 +205,19 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
         {viewSummary ? (
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              ملخص تقارير السلوك
+              {getTranslation('behaviorReportsSummary',language)}
             </h3>
             <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  إجمالي التقارير: {reports.length}
+                  {getTranslation('totalReports',language)}: {reports.length}
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  سلوك إيجابي:{" "}
+                 {getTranslation('PositiveBehavior',language)}:{" "}
                   {reports.filter((r) => isPositive(r.type)).length}
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                  سلوك سلبي: {reports.filter((r) => isNegative(r.type)).length}
+                  {getTranslation('NegativeBehavior',language)}: {reports.filter((r) => isNegative(r.type)).length}
                 </p>
               </div>
               {filteredReports.map((report) => (
@@ -229,7 +234,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                     </p>
                   </div>
                   <span className="text-sm text-blue-600 dark:text-blue-400">
-                    {isNegative(report.type) ? "سلوك سلبي" : " سلوك إيجابي"}
+                    {isNegative(report.type) ? getTranslation('NegativeBehavior',language) :getTranslation('PositiveBehavior',language)}
                   </span>
                 </div>
               ))}
@@ -241,19 +246,19 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    اسم الطالب
+                    {getTranslation('studentName',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    التاريخ
+                    {getTranslation('Date',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الفئة
+                    {getTranslation('category',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الوصف
+                    {getTranslation('description',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الإجراء
+                    {getTranslation('action',language)}
                   </th>
                   {/* For now : actions disallowed for from school for now */}
                   {/* <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">

@@ -34,9 +34,14 @@ import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups.ts";
 import { chat_http_client } from "../../services/chat/chat_http_client.ts";
 import { Teacher } from "../../models/Teacher.ts";
 import { User } from "../../contexts/AuthContext.tsx";
+import { getTranslation } from "../../utils/translations.ts";
+import { useLanguage } from "../../contexts/LanguageContext.tsx";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
+
+  //! Translation :
+  const {language} = useLanguage()
 
   // ! Fetching the parent's id (which is the user id)
   const lc_user: User = JSON.parse(
@@ -188,25 +193,25 @@ const ParentDashboard: React.FC = () => {
   };
   const stats = [
     {
-      title: "أطفالي",
+      title: getTranslation('myChildren',language),
       value: students.length || "0",
       icon: UserIcon,
       color: "bg-blue-500",
     },
     {
-      title: "إجمالي عدد الغيابات",
+      title: getTranslation('totalAbsences',language),
       value: total_absences() || "0",
       icon: Calendar,
       color: "bg-green-500",
     },
     {
-      title: "رسائل جديدة",
+      title: getTranslation('newMessages',language),
       value: "3",
       icon: MessageCircle,
       color: "bg-purple-500",
     },
     {
-      title: "إشعارات",
+      title: getTranslation('notifications',language),
       value: "5",
       icon: AlertTriangle,
       color: "bg-orange-500",
@@ -214,16 +219,16 @@ const ParentDashboard: React.FC = () => {
   ];
 
   const tabs = [
-    { id: "overview", label: "نظرة عامة", icon: TrendingUp },
-    { id: "children", label: "أطفالي", icon: UserIcon },
-    { id: "grades", label: "المعدل", icon: FileText },
-    { id: "absences", label: "تقارير وغيابات", icon: Calendar },
-    { id: "chat", label: "دردشة", icon: MessageCircle },
-    { id: "announcements", label: "إشعارات وتنبيهات", icon: AlertTriangle },
-    { id: "timetable", label: "جدول التوقيت", icon: LayoutGrid },
-    { id: "homework", label: "الواجبات", icon: BookOpen },
-    { id: "calendar", label: "مكتبة رقمية", icon: Calendar },
-    { id: "events", label: "فعاليات", icon: Star },
+    { id: "overview", label:getTranslation('overview',language), icon: TrendingUp },
+    { id: "children", label: getTranslation('myChildren',language), icon: UserIcon },
+    { id: "grades", label: getTranslation('grade',language), icon: FileText },
+    { id: "absences", label:getTranslation('absencesAndReports',language), icon: Calendar },
+    { id: "chat", label: getTranslation('chat',language), icon: MessageCircle },
+    { id: "announcements", label: getTranslation('notificationsAndAlarms',language), icon: AlertTriangle },
+    { id: "timetable", label: getTranslation('timetable',language), icon: LayoutGrid },
+    { id: "homework", label: getTranslation('homeworks',language), icon: BookOpen },
+    { id: "calendar", label: getTranslation('digitalLibrary',language), icon: Calendar },
+    { id: "events", label: getTranslation('events',language), icon: Star },
   ];
 
   const renderContent = () => {
@@ -339,7 +344,7 @@ const ParentDashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 bg-green-50 dark:bg-green-900 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        المعدل العام
+                        {getTranslation('overallGrade',language)}
                       </p>
                       <p className="text-xl font-bold text-green-600">
                         {child.trimester_grade}
@@ -347,7 +352,7 @@ const ParentDashboard: React.FC = () => {
                     </div>
                     <div className="text-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        الغيابات
+                        {getTranslation('absences',language)}
                       </p>
                       <p className="text-xl font-bold text-blue-600">
                         {one_student_absences(child) || "0"}
@@ -357,7 +362,7 @@ const ParentDashboard: React.FC = () => {
 
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      الحالة الأكاديمية
+                      {getTranslation('academicStatus',language)}
                     </span>
                     <span
                       className={
@@ -370,10 +375,10 @@ const ParentDashboard: React.FC = () => {
                       }
                     >
                       {child.academic_state == "excellent"
-                        ? "ممتاز"
+                        ? getTranslation('excellent',language)
                         : child.academic_state == "very_good"
-                        ? "جيد جدا"
-                        : "اداء ضعيف"}
+                        ? getTranslation('veryGood',language)
+                        : getTranslation('poorPerformance',language)}
                     </span>
                   </div>
                 </div>
@@ -384,7 +389,7 @@ const ParentDashboard: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  آخر التحديثات
+                 {getTranslation('latestUpdates',language)}
                 </h3>
                 <div className="space-y-4">
                   {[
@@ -448,7 +453,7 @@ const ParentDashboard: React.FC = () => {
 
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  المهام المطلوبة
+                  {getTranslation('requiredTasks',language)}
                 </h3>
                 <div className="space-y-3">
                   {[
@@ -504,8 +509,8 @@ const ParentDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="لوحة تحكم ولي الأمر"
-      subtitle="مرحباً بك، هنا يمكنك متابعة تقدم أطفالك الأكاديمي"
+      title={getTranslation('parentDashboard',language)}
+      subtitle={getTranslation('welcomeMessage',language)}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}

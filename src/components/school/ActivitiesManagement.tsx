@@ -8,6 +8,8 @@ import {
 } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 interface Activity {
   event_id: string;
@@ -25,6 +27,8 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   RefetchEvents,
 }) => {
   //  mock data event shape : { id: 'a1', title: 'يوم رياضي', date: '2025-06-25', time: '09:00', category: 'رياضية', description: 'مسابقات رياضية للطلاب', location: 'ملعب المدرسة' },
+  //! translation : 
+  const {language}=useLanguage()
 
   const [activities, setActivities] = useState<Event[]>(events_list);
   const [newActivity, setNewActivity] = useState({
@@ -270,7 +274,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          إدارة الفعاليات
+          {getTranslation('eventManagement',language)}
         </h2>
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
@@ -278,24 +282,24 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">الكل</option>
-            <option value="رياضية">رياضية</option>
-            <option value="علمية">علمية</option>
-            <option value="ثقافية">ثقافية</option>
+            <option value="all">{getTranslation('all',language)}</option>
+            <option value="رياضية">{getTranslation('sports',language)}</option>
+            <option value="علمية">{getTranslation('science',language)}</option>
+            <option value="ثقافية">{getTranslation('cultural',language)}</option>
           </select>
           <button
             onClick={() => setViewCalendar(!viewCalendar)}
             className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Calendar className="h-5 w-5" />
-            <span>{viewCalendar ? "عرض جدول" : "عرض تقويم"}</span>
+            <span>{viewCalendar ? getTranslation('ViewSchedule',language) : getTranslation('viewCalendar',language)}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
-            <span>إضافة فعالية</span>
+            <span>{getTranslation('addActivity',language)}</span>
           </button>
         </div>
       </div>
@@ -308,7 +312,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث عن العنوان أو الوصف أو الموقع..."
+                placeholder={getTranslation('searchActivity',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -323,7 +327,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
         {viewCalendar ? (
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              تقويم الفعاليات
+              {getTranslation('eventsCalendar',language)}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredActivities.map((activity) => (
@@ -352,22 +356,22 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    العنوان
+                    {getTranslation('titleColumn',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الفئة
+                    {getTranslation('categoryColumn',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    التاريخ
+                    {getTranslation('dateColumn',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الوقت
+                    {getTranslation('timeColumn',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الموقع
+                    {getTranslation('locationColumn',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الإجراءات
+                    {getTranslation('actionsColumn',language)}
                   </th>
                 </tr>
               </thead>

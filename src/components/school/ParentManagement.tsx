@@ -9,6 +9,8 @@ import {
 } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { ParentManagementProps } from "../../types";
+import { getTranslation } from "../../utils/translations";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const ParentManagement: React.FC<ParentManagementProps> = ({
   parentsList,
@@ -21,6 +23,8 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
   const [selectedClass, setSelectedClass] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
   const [errorAddParent, setErrorAddParent] = useState("");
+
+  const {language}=useLanguage()
 
   // fake parent list :
   // const parents = [
@@ -220,14 +224,14 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          إدارة أولياء الأمور
+          {getTranslation('parentManagement',language)}
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
-          <span>إضافة ولي أمر</span>
+          <span> {getTranslation('addParent',language)}</span>
         </button>
       </div>
 
@@ -239,7 +243,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث عن أولياء الأمور أو الطلاب أو البريد الإلكتروني..."
+                placeholder={getTranslation('searchParentsStudentsOrEmail',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -271,20 +275,20 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  ولي الأمر
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('parent',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  البريد الإلكتروني
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('email',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  رقم الهاتف
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('phoneNumber',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الأبناء
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('children',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الإجراءات
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('actions',language)}
                 </th>
               </tr>
             </thead>

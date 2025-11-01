@@ -11,6 +11,8 @@ import {
 import { GradeReportsProps } from "../../types";
 import { Student } from "../../models/Student";
 import { Mark } from "../../models/StudentPerformance";
+import { getTranslation } from "../../utils/translations";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 // locally needed types
 interface Subject {
@@ -181,15 +183,18 @@ const GradeReports: React.FC<GradeReportsProps> = ({
     name: s.full_name,
   }));
 
+  //! Translation : 
+  const {language} = useLanguage()
+
   const [selectedChild, setSelectedChild] = useState(children[0]?.id || "");
   const [selectedPeriod, setSelectedPeriod] = useState("current");
   const [selectedSubject, setSelectedSubject] = useState("all");
 
   const periods = [
-    { id: "current", label: "الفصل الحالي" },
-    { id: "semester1", label: "الفصل الأول" },
-    { id: "semester2", label: "الفصل الثاني" },
-    { id: "year", label: "السنة الدراسية" },
+    { id: "current", label: getTranslation('currentSemester',language) },
+    { id: "semester1", label: getTranslation('firstSemester',language) },
+    { id: "semester2", label: getTranslation('secondSemester',language) },
+    { id: "year", label: getTranslation('academicYear',language) },
   ];
 
   // const gradeData: Record<string, ChildPerformance> = students.reduce(
@@ -347,11 +352,11 @@ const GradeReports: React.FC<GradeReportsProps> = ({
       {/* Header and Filters */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          تقارير الدرجات
+         {getTranslation('gradeReports',language)}
         </h2>
         <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
           <Download className="h-4 w-4" />
-          <span>تصدير التقرير</span>
+          <span>{getTranslation('exportReport',language)}</span>
         </button>
       </div>
 
@@ -360,7 +365,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
         <div className="grid md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              الطفل
+              {getTranslation('child',language)}
             </label>
             <select
               value={selectedChild}
@@ -377,7 +382,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              الفترة
+              {getTranslation('Filtering',language)}
             </label>
             <select
               value={selectedPeriod}
@@ -394,14 +399,14 @@ const GradeReports: React.FC<GradeReportsProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              المادة
+              {getTranslation('Subject',language)}
             </label>
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value="all">جميع المواد</option>
+              <option value="all">{getTranslation('allSubjects',language)}</option>
               {currentData?.subjects.map((subject: Subject) => (
                 <option key={subject.name} value={subject.name}>
                   {subject.name}
@@ -413,7 +418,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-end">
             <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Filter className="h-4 w-4" />
-              <span>تطبيق</span>
+              <span>{getTranslation('apply',language)}</span>
             </button>
           </div>
         </div>
@@ -425,7 +430,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                المعدل العام
+                {getTranslation('overallGrade',language)}
               </p>
               <p className="text-2xl font-bold text-green-600">
                 {currentData?.overall ?? "0"}/20
@@ -445,7 +450,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                الترتيب
+                {getTranslation('rank',language)}
               </p>
               <p className="text-2xl font-bold text-blue-600">
                 {currentData?.position}
@@ -456,7 +461,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            من أصل {currentData?.totalStudents} طالب
+            {getTranslation('outOf',language)} {currentData?.totalStudents} {getTranslation('student',language)}
           </p>
         </div>
 
@@ -464,7 +469,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                عدد المواد
+                {getTranslation('numberOfSubjects',language)}
               </p>
               <p className="text-2xl font-bold text-purple-600">
                 {currentData?.subjects?.length}
@@ -475,7 +480,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            مواد دراسية
+            {getTranslation('subjects',language)}
           </p>
         </div>
 
@@ -483,7 +488,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                أعلى درجة
+                {getTranslation('highestScore',language)}
               </p>
               <p className="text-2xl font-bold text-green-600">{currentData?.overall ?? 0}/20</p>
             </div>
@@ -492,7 +497,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            في {maxSubject}
+            {getTranslation('in',language)} {maxSubject}
           </p>
         </div>
       </div>
@@ -500,7 +505,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
       {/* Subject Performance */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          أداء المواد
+          {getTranslation('subjectPerformance',language)}
         </h3>
         <div className="space-y-4">
           {filteredSubjects?.map((subject: Subject, index: number) => (
@@ -525,7 +530,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                       {subject.current}/20
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      الدرجة الحالية
+                      {getTranslation('currentGrade',language)}
                     </div>
                   </div>
                   <div className="text-center">
@@ -533,7 +538,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                       {subject.average}/20
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      متوسط الصف
+                      {getTranslation('classAverage',language)}
                     </div>
                   </div>
                 </div>
@@ -579,18 +584,18 @@ const GradeReports: React.FC<GradeReportsProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            طلبات مراجعة الدرجات
+            {getTranslation('gradeReviewRequests',language)}
           </h3>
           <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-            تقديم طلب مراجعة
+            {getTranslation('submitReviewRequest',language)}
           </button>
         </div>
 
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           <Award className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-          <p>لا توجد طلبات مراجعة درجات حالياً</p>
+          <p>{getTranslation('noGradeReviewRequests',language)}</p>
           <p className="text-sm mt-1">
-            يمكنك تقديم طلب مراجعة إذا كنت تعتقد أن هناك خطأ في التقييم
+            {getTranslation('gradeReviewInstruction',language)}
           </p>
         </div>
       </div>

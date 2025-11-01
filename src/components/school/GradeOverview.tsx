@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { BarChart3, TrendingUp, Users, BookOpen, Filter } from "lucide-react";
 import { GradeOverviewProps } from "../../types";
 import { GroupsStat, SchoolStat } from "../../models/SchoolStat";
-import { useLanguage } from "../../hooks/useLanguage";
 import { getTranslation } from "../../utils/translations";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const GradeOverview: React.FC<GradeOverviewProps> = ({
   school_stat,
@@ -56,25 +56,25 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
 
   const gradeStats = [
     {
-      label: "متوسط المدرسة",
+      label: getTranslation('schoolAverage',language),
       value: `${school_stat?.school_average}/20` || "16.2/20",
       color: "bg-blue-500",
       trend: "+0.3",
     },
     {
-      label: "أعلى معدل",
+      label: getTranslation('highestGrade',language),
       value: `${school_stat?.school_max_average}/20` || "19.5/20",
       color: "bg-green-500",
       trend: "+0.5",
     },
     {
-      label: "أقل معدل",
+      label: getTranslation('lowestGrade',language),
       value: `${school_stat?.school_min_average}/20` || "12.1/20",
       color: "bg-red-500",
       trend: "-0.2",
     },
     {
-      label: "معدل النجاح",
+      label: getTranslation('passingRate',language),
       value: `${(calculateSuccessPercentage() * 100).toFixed(1)} %`,
       color: "bg-purple-500",
       trend: "+2%",
@@ -162,7 +162,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          نظرة عامة على الدرجات
+          {getTranslation('gradeOverview',language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <select
@@ -246,26 +246,26 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       {/* Class Performance */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          أداء الفصول
+          {getTranslation('classPerformance',language)}
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الفصل
+                <th className="ltr:text-left  px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('class',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  المتوسط
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('average',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  عدد الطلاب
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('numberOfStudents',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  أفضل طالب
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('topStudent',language)}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  أعلى درجة
+                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('topStudent',language)}
                 </th>
               </tr>
             </thead>
@@ -286,7 +286,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {cls.number_of_students} طالب
+                    {cls.number_of_students} {getTranslation('student',language)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {cls.top_student?.full_name}
@@ -306,7 +306,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       {/* Subject Performance */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          أداء المواد
+          {getTranslation("subjectPerformance",language)}
         </h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {FilteredSubjectPerformance?.map((subject, index) => (

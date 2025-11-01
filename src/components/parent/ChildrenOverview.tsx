@@ -12,12 +12,17 @@ import {
 import { ChildrenOverviewProps } from "../../types";
 import { Student } from "../../models/Student";
 import { getAge } from "../../lib/dateUtils";
+import { getTranslation } from "../../utils/translations";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   students,
   one_student_absences,
 }) => {
   const [selectedChild, setSelectedChild] = useState(students?.[0]?.student_id);
+  
+  //! Translations : 
+  const {language}=useLanguage()
 
   //! MOCK DATA :
   // const children = [
@@ -137,13 +142,13 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
 
   function mapBehaviour(bahaviour: string) {
     if (bahaviour == "excellent") {
-      return "ممتاز";
+      return getTranslation('excellent',language);
     }
     if (bahaviour == "very_good") {
-      return "جيد جدا";
+      return getTranslation('veryGood',language);
     }
 
-    return "اداء ضعيف";
+    return getTranslation('poorPerformance',language);
   }
   const children = students.map((student: Student) => ({
     id: student.student_id,
@@ -151,7 +156,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
     class: student.class_group?.name,
     age: getAge(new Date(student.date_of_birth ?? "2000-01-01").toString()),
     school: student.school.school_name,
-    teacher: "الأستاذة فاطمة حسن",
+    teacher: "...",
     overallGrade: student.trimester_grade || 0,
     attendance: one_student_absences(student),
     behavior: student.academic_state,
@@ -220,11 +225,11 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
       {/* Header and Child Selector */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          نظرة عامة على الأطفال
+          {getTranslation('childrenOverview',language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            اختر الطفل:
+            {getTranslation('selectChild',language)}:
           </span>
           <select
             value={selectedChild}
@@ -256,7 +261,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   {currentChild.class} - {currentChild.school}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  المعلم الرئيسي: {currentChild.teacher}
+                  {getTranslation('mainTeacher',language)} : {currentChild.teacher}
                 </p>
               </div>
               <div className="text-center">
@@ -264,7 +269,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   {currentChild.overallGrade}/20
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  المعدل العام
+                  {getTranslation('overallGrade',language)}
                 </div>
               </div>
             </div>
@@ -276,7 +281,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    عدد الغيابات
+                    {getTranslation('TotalAbsences',language)}
                   </p>
                   <p className="text-2xl font-bold text-blue-600">
                     {currentChild.attendance}
@@ -292,7 +297,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    السلوك
+                    {getTranslation('behavior',language)}
                   </p>
 
                   {currentChild.behavior == "excellent" ? (
@@ -332,7 +337,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    عدد المواد
+                    {getTranslation('numberOfSubjects',language)}
                   </p>
                   <p className="text-2xl font-bold text-purple-600">
                     {currentChild.subjects?.length}
@@ -350,7 +355,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
             {/* Subjects Performance */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                أداء المواد
+                {getTranslation('subjectPerformance',language)}
               </h3>
               <div className="space-y-4">
                 {currentChild.subjects?.map((subject, index) => (
@@ -386,7 +391,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
             {/* Recent Activities */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                النشاطات الأخيرة
+                {getTranslation('recentActivities',language)}
               </h3>
               <div className="space-y-4">
                 {currentChild.recentActivities.map((activity, index) => (
@@ -422,24 +427,24 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
           {/* Quick Actions */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              إجراءات سريعة
+              {getTranslation('quickActions',language)}
             </h3>
             <div className="grid md:grid-cols-4 gap-4">
               <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
                 <BookOpen className="h-5 w-5" />
-                <span className="text-sm font-medium">عرض الدرجات</span>
+                <span className="text-sm font-medium">{getTranslation('viewGrades',language)}</span>
               </button>
               <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
                 <Calendar className="h-5 w-5" />
-                <span className="text-sm font-medium">سجل الحضور</span>
+                <span className="text-sm font-medium">{getTranslation('attendanceRecord',language)}</span>
               </button>
               <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
                 <AlertTriangle className="h-5 w-5" />
-                <span className="text-sm font-medium">تبرير غياب</span>
+                <span className="text-sm font-medium">{getTranslation('justifyAbsence',language)}</span>
               </button>
               <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors">
                 <User className="h-5 w-5" />
-                <span className="text-sm font-medium">تواصل مع المعلم</span>
+                <span className="text-sm font-medium">{getTranslation("contactTeacher",language)}</span>
               </button>
             </div>
           </div>

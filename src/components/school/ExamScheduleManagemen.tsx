@@ -4,6 +4,8 @@ import { ExamScheduleManagementProps } from "../../types";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { PostExamSchedule } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 interface Exam {
   id: string;
@@ -108,6 +110,8 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewTimeline, setViewTimeline] = useState(false);
   const [selectedClass, setSelectedClass] = useState("all");
+
+  const {language}=useLanguage()
 
   // const handleAddExam = () => {
   //   if (
@@ -235,7 +239,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          رزنامة الامتحانات
+          {getTranslation('examCalendar',language)}
         </h2>
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
@@ -243,7 +247,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
             onChange={(e) => setSelectedClass(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">الكل</option>
+            <option value="all">{getTranslation('all',language)}</option>
             {[...new Set(exams.map((ex) => ex.className))].map((cls) => (
               <option key={cls} value={cls}>
                 {cls}
@@ -255,14 +259,14 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
             className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Clock className="h-5 w-5" />
-            <span>{viewTimeline ? "عرض جدول" : "عرض زمني"}</span>
+            <span>{viewTimeline ? getTranslation('ViewSchedule',language) : getTranslation('TimeView',language)}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
-            <span>إضافة امتحان</span>
+            <span>{getTranslation('AddExam',language)}</span>
           </button>
         </div>
       </div>
@@ -274,7 +278,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="البحث عن المادة أو الصف أو القاعة..."
+                placeholder={getTranslation('SearchSubjectClassOrRoom',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -288,7 +292,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
         {viewTimeline ? (
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              عرض زمني للامتحانات
+              {getTranslation('ExamTimeline',language)}
             </h3>
             <div className="space-y-4">
               {filteredExams.map((exam) => (
@@ -329,25 +333,25 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    المادة
+                   {getTranslation('Subject',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الصف
+                    {getTranslation('class',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    التاريخ
+                    {getTranslation('Date',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الوقت
+                    {getTranslation('Time',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    المدة (دقيقة)
+                    {getTranslation('DurationMinutes',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    القاعة
+                    {getTranslation('Room',language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    الإجراءات
+                    {getTranslation('actions',language)}
                   </th>
                 </tr>
               </thead>

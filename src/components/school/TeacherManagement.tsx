@@ -21,6 +21,8 @@ import {
   SignupPayload,
 } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Teacher } from "../../models/Teacher";
+import { getTranslation } from "../../utils/translations";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
@@ -42,6 +44,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   });
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const {language}=useLanguage()
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -357,14 +361,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          إدارة المعلمين
+          {getTranslation('teacherManagement',language)}
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
-          <span>إضافة معلم</span>
+          <span>{getTranslation('addTeacher',language)}</span>
         </button>
       </div>
 
@@ -374,7 +378,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
             type="text"
-            placeholder="البحث عن المعلمين..."
+            placeholder={getTranslation('searchTeachers',language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -421,15 +425,15 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 }`}
               >
                 {teacher.status === "نشط" || teacher.status === "active"
-                  ? "نشط"
-                  : "معطل"}
+                  ? getTranslation('active',language)
+                  : getTranslation('inactive',language)}
               </span>
             </div>
 
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  الفصول:
+                  {getTranslation('classCount',language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   <ul className="flex flex-col items-end">
@@ -444,7 +448,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  الخبرة:
+                  {getTranslation('experience',language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {teacher.years_of_experience}
@@ -452,7 +456,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  الهاتف:
+                  {getTranslation('phoneNumber',language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {teacher.phone_number}
@@ -460,7 +464,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  البريد:
+                  {getTranslation('email',language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white text-left">
                   {teacher.user.email}
@@ -499,14 +503,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                       : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
                   }`}
                 >
-                  {teacher.status === "نشط" ? "تعليق" : "تفعيل"}
+                  {teacher.status === "نشط" ? getTranslation('suspend',language): getTranslation('activate',language)}
                 </button>
 
                 <button
                   onClick={() => handleActivateTeacher(teacher.user.id, false)}
                   className={`px-3 mx-1 py-1 text-xs font-medium rounded-lg transition-colors ${"bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"}`}
                 >
-                  {"تعليق"}
+                  {getTranslation('suspend',language)}
                 </button>
               </div>
             </div>

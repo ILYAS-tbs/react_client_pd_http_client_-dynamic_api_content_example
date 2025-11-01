@@ -15,6 +15,8 @@ import { AbsenceReport } from "../../models/AbsenceReports";
 import { PostAbsenceReportPayload } from "../../services/http_api/payloads_types/parent_client_payload_types";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { parent_dashboard_client } from "../../services/http_api/parent-dashboard/parent_dashboard_client";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   students,
@@ -23,6 +25,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   behaviour_reports,
   setBehabiourReports,
 }) => {
+
+  //! Translation :
+  const {language}=useLanguage()
+
   const [selectedChild, setSelectedChild] = useState("all");
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [activeTab, setActiveTab] = useState("absences");
@@ -162,16 +168,16 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const mapBehaviourRating = (rating: string) => {
     switch (rating) {
       case "excellent":
-        return "ممتاز";
+        return getTranslation('excellent',language);
 
       case "very good":
-        return "جيد جداً";
+        return getTranslation('veryGood',language);
 
       case "good":
-        return "جيد";
+        return getTranslation('good',language);
 
       default:
-        return "ضعيف";
+        return getTranslation('poorPerformance',language);
     }
   };
   const attitudeReports = behaviour_reports.map((report) => ({
@@ -211,11 +217,11 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "approved":
-        return "مقبول";
+        return getTranslation('Accepted',language);
       case "rejected":
-        return "مرفوض";
+        return getTranslation('Rejected',language);
       default:
-        return "قيد المراجعة";
+        return getTranslation('UnderReview',language);
     }
   };
 
@@ -360,25 +366,25 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           {
-            label: "إجمالي الطلبات",
+            label: getTranslation('totalRequests',language),
             value: stats.total,
             color: "bg-blue-500",
             icon: FileText,
           },
           {
-            label: "قيد المراجعة",
+            label: getTranslation('UnderReview',language),
             value: stats.pending,
             color: "bg-yellow-500",
             icon: Clock,
           },
           {
-            label: "مقبول",
+            label: getTranslation('Accepted',language),
             value: stats.approved,
             color: "bg-green-500",
             icon: CheckCircle,
           },
           {
-            label: "مرفوض",
+            label: getTranslation('Rejected',language),
             value: stats.rejected,
             color: "bg-red-500",
             icon: XCircle,
@@ -411,16 +417,16 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
             <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              لا توجد طلبات غياب
+             {getTranslation('noLeaveRequests',language)}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              لم تقم بتقديم أي طلبات تبرير غياب بعد
+              getTranslation('noLeaveJustificationRequests',language)
             </p>
             <button
               onClick={() => setShowRequestModal(true)}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              تقديم طلب جديد
+              {getTranslation('submitNewRequest',language)}
             </button>
           </div>
         ) : (
@@ -439,10 +445,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       {request.childName}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ الغياب: {request.date.toLocaleDateString()}
+                      {getTranslation('AbsenceDate',language)}: {request.date.toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ التقديم:{" "}
+                      {getTranslation('SubmissionDate',language)}:{" "}
                       {request.submittedDate.toLocaleDateString()}
                     </p>
                   </div>
@@ -461,7 +467,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  سبب الغياب:
+                  {getTranslation('AbsenceReason',language)}:
                 </h4>
                 <p className="text-gray-900 dark:text-white">
                   {request.reason}
@@ -471,7 +477,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    مستندات داعمة:
+                    {getTranslation('supportingDocuments',language)}:
                   </span>
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -480,12 +486,12 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                         : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                     }`}
                   >
-                    {request.documents ? "متوفرة" : "غير متوفرة"}
+                    {request.documents ? getTranslation('Available',language) : getTranslation('NotAvailable',language)}
                   </span>
                 </div>
                 {request.reviewDate && (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    تاريخ المراجعة: {request.reviewDate.toLocaleString()}
+                    {getTranslation('reviewDate',language)}: {request.reviewDate.toLocaleString()}
                   </span>
                 )}
               </div>
@@ -493,7 +499,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               {request.adminComment && (
                 <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    تعليق الإدارة:
+                    {getTranslation('adminComment',language)}:
                   </h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {request.adminComment}
@@ -504,7 +510,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               {request.status === "pending" && (
                 <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse text-sm text-yellow-600 dark:text-yellow-400">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>الطلب قيد المراجعة من قبل الإدارة</span>
+                  <span>{getTranslation('requestUnderReview',language)}</span>
                 </div>
               )}
             </div>
@@ -520,19 +526,19 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           {
-            label: "إجمالي التقارير",
+            label: getTranslation('totalReports',language),
             value: attitudeStats.total,
             color: "bg-blue-500",
             icon: FileText,
           },
           {
-            label: "سلوك ممتاز",
+            label: getTranslation('excellentBehavior',language),
             value: attitudeStats.excellent,
             color: "bg-green-500",
             icon: CheckCircle,
           },
           {
-            label: "سلوك جيد",
+            label: getTranslation('goodBehavior',language),
             value: attitudeStats.good + attitudeStats.veryGood,
             color: "bg-yellow-500",
             icon: TrendingUp,
@@ -565,10 +571,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
             <TrendingUp className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              لا توجد تقارير سلوك
+              {getTranslation('noBehaviorReports',language)}
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              لا توجد تقارير سلوك متاحة لهذا الطفل حالياً
+              {getTranslation('noBehaviorReportsForChild',language)}
             </p>
           </div>
         ) : (
@@ -587,10 +593,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       {report.childName}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ التقرير: {report.date.toLocaleDateString()}
+                      {getTranslation('reportDate',language)}: {report.date.toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ التقديم: {report.submittedDate.toLocaleDateString()}
+                      {getTranslation('SubmissionDate',language)}: {report.submittedDate.toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -607,7 +613,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  المشاركة الصفية:
+                  {getTranslation('classParticipation',language)}:
                 </h4>
                 <p className="text-gray-900 dark:text-white">
                   {report.participation}
