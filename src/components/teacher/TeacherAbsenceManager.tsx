@@ -18,6 +18,8 @@ import { PostBehaviourReportPayload } from "../../services/http_api/payloads_typ
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { BehaviourReport } from "../../models/BehaviorReport";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
   absences,
@@ -27,6 +29,9 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
   behaviour_reports,
   setBehaviourReports,
 }) => {
+  //! Translations:
+  const { language } = useLanguage();
+
   const [selectedChild, setSelectedChild] = useState("all");
   const [showBehaviourReportModel, setShowBehaviourReportModel] =
     useState(false);
@@ -126,11 +131,11 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "approved":
-        return "مقبول";
+        return getTranslation("Accepted", language);
       case "rejected":
-        return "مرفوض";
+        return getTranslation("Rejected", language);
       default:
-        return "قيد المراجعة";
+        return getTranslation("UnderReview", language);
     }
   };
 
@@ -260,7 +265,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           {
-            label: "إجمالي الغيابات",
+            label: getTranslation("TotalAbsences", language),
             value: absences.length,
             color: "bg-blue-500",
             icon: FileText,
@@ -311,16 +316,16 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
             <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              لا توجد طلبات غياب
+              {getTranslation("noAbsenceRequests", language)}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              لم تقم بتقديم أي طلبات تبرير غياب بعد
+              {getTranslation("noJustificationRequests", language)}
             </p>
             <button
               onClick={() => setShowBehaviourReportModel(true)}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              تقديم طلب جديد
+              {getTranslation("submitNewRequest", language)}
             </button>
           </div>
         ) : (
@@ -393,7 +398,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
               {request.adminComment && (
                 <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    تعليق الإدارة:
+                    {getTranslation("adminComment", language)} :
                   </h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {request.adminComment}
@@ -404,7 +409,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
               {request.status === "pending" && (
                 <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse text-sm text-yellow-600 dark:text-yellow-400">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>الطلب قيد المراجعة من قبل الإدارة</span>
+                  <span>{getTranslation("requestUnderReview", language)}</span>
                 </div>
               )}
             </div>
@@ -420,19 +425,19 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           {
-            label: "إجمالي التقارير",
+            label: getTranslation("totalReports", language),
             value: attitudeStats.total,
             color: "bg-blue-500",
             icon: FileText,
           },
           {
-            label: "سلوك ممتاز",
+            label: getTranslation("excellentBehavior", language),
             value: attitudeStats.excellent,
             color: "bg-green-500",
             icon: CheckCircle,
           },
           {
-            label: "سلوك جيد",
+            label: getTranslation("goodBehavior", language),
             value: attitudeStats.good + attitudeStats.veryGood,
             color: "bg-yellow-500",
             icon: TrendingUp,
@@ -465,10 +470,10 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
             <TrendingUp className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              لا توجد تقارير سلوك
+              {getTranslation("noBehaviorReports", language)}
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              لا توجد تقارير سلوك متاحة لهذا الطفل حالياً
+              {getTranslation("noBehaviorReportsForChild", language)}
             </p>
           </div>
         ) : (
@@ -487,7 +492,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                       {report.childName}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      تاريخ التقديم:{" "}
+                      {getTranslation("SubmissionDate", language)}:{" "}
                       {new Date(report.date).toLocaleDateString("ar")}
                     </p>
                     {/* <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -509,7 +514,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  المشاركة الصفية:
+                  {getTranslation("classParticipation", language)}:
                 </h4>
                 <p className="text-gray-900 dark:text-white">
                   {report.participation}
@@ -518,7 +523,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تعليق المعلم:
+                  {getTranslation("teacherComment", language)}:
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400">
                   {report.teacherComment}
@@ -528,7 +533,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    مقدم من:
+                    {getTranslation("submittedBy", language)} :
                   </span>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">
                     {report.submittedBy}
@@ -547,7 +552,9 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {activeTab === "absences" ? "إدارة الغياب" : "تقارير السلوك"}
+          {activeTab === "absences"
+            ? getTranslation("absenceManagement", language)
+            : getTranslation("behaviorReports", language)}
         </h2>
 
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
@@ -570,7 +577,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
               className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Plus className="h-4 w-4" />
-              <span>إضافة تقرير سلوك</span>
+              <span>{getTranslation("addBehaviorReport", language)}</span>
             </button>
           )}
         </div>
@@ -586,7 +593,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            إدارة الغياب
+            {getTranslation("absenceManagement", language)}
           </button>
           <button
             onClick={() => setActiveTab("attitude")}
@@ -596,7 +603,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            تقارير السلوك
+            {getTranslation("BehaviorReports", language)}
           </button>
         </div>
       </div>
@@ -610,13 +617,13 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              إضافة تقرير سلوك
+              {getTranslation("addBehaviorReport", language)}
             </h3>
 
             <form onSubmit={handleSubmitRequest} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  اختر الطفل
+                  {getTranslation("selectChild", language)}
                 </label>
                 <select
                   name="student_id"
@@ -628,7 +635,10 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">اختر الطفل</option>
+                  <option value="">
+                    {" "}
+                    {getTranslation("selectChild", language)}
+                  </option>
                   {children.map((child) => (
                     <option key={child.id} value={child.id}>
                       {child.name}
@@ -639,7 +649,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تاريخ التقرير
+                  {getTranslation('reportDate',language)}
                 </label>
                 <input
                   name="date"
@@ -656,7 +666,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  نوع السلوك
+                  {getTranslation('behaviorType',language)}
                 </label>
                 <select
                   name="type"
@@ -668,16 +678,16 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">اختر نوع السلوك</option>
-                  <option value="excellent">ممتاز</option>
-                  <option value="good">جيد</option>
-                  <option value="bad">سيئ</option>
+                  <option value="">{getTranslation('selectBehaviorType',language)}</option>
+                  <option value="excellent">{getTranslation('excellent',language)}</option>
+                  <option value="good">{getTranslation('good',language)}</option>
+                  <option value="bad">{getTranslation('poorPerformance',language)}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  المشاركة الصفية
+                  {getTranslation('classParticipation',language)}
                 </label>
                 <textarea
                   rows={4}
@@ -688,13 +698,13 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                     handleBehaviourModelFormChange(e);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="اكتب تفاصيل إضافية عن حالة المشاركة الصفية للطالب..."
+                  placeholder={getTranslation('writeAdditionalDetails',language)}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تعليق المعلم
+                  {getTranslation('teacherComment',language)}
                 </label>
                 <textarea
                   rows={4}
@@ -705,7 +715,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                     handleBehaviourModelFormChange(e);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="أضف ملاحظاتك حول الطالب هنا..."
+                  placeholder={getTranslation('addStudentNotes',language)}
                 />
               </div>
 
@@ -723,7 +733,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   htmlFor="urgent"
                   className="text-sm text-gray-700 dark:text-gray-300"
                 >
-                  طلب عاجل (يتطلب مراجعة فورية)
+                  {getTranslation('urgentRequest',language)}
                 </label>
               </div>
 
@@ -743,13 +753,13 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {getTranslation('cancel',language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  تقديم التقرير
+                  {getTranslation('submitReport',language)}
                 </button>
               </div>
             </form>

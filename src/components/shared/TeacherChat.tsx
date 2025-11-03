@@ -32,6 +32,8 @@ import Picker from "@emoji-mart/react";
 import { useTheme } from "../../hooks/useTheme";
 import { EmojiComponent } from "./emoji_component";
 import { ParentChat } from "../../models/chat_system/ParentChat";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 interface TeacherChatProps {
   userType: "parent" | "teacher";
@@ -44,6 +46,10 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
   parents_list,
   teacher_id,
 }) => {
+
+  //! Translation :: 
+  const {language}=useLanguage()
+
   const [selectedChat, setSelectedChat] = useState<string | number>();
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -388,13 +394,13 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-            {userType === "parent" ? "المعلمون" : "أولياء الأمور"}
+            {userType === "parent" ? getTranslation('teachers',language) : getTranslation('parents',language)}
           </h3>
           <div className="relative">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="البحث..."
+              placeholder={getTranslation('search',language)}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pr-9 pl-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -499,7 +505,7 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
                     </p>
                   )}
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {currentChat?.online ? "متصل الآن" : "آخر ظهور منذ ساعة"}
+                    {currentChat?.online ? getTranslation('onlineNow',language) : getTranslation('lastSeenAnHourAgo',language)}
                   </p>
                 </div>
               </div>
@@ -642,7 +648,7 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
             <div className="text-center">
               <User className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                اختر محادثة للبدء
+               {getTranslation('selectConversationToStart',language)}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 اختر {userType === "parent" ? "معلماً" : "ولي أمر"} من القائمة

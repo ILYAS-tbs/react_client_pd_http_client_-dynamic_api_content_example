@@ -1586,6 +1586,19 @@ shortMaterialDescription: { ar: "وصف مختصر للمادة التعليمي
 uploadFile: { ar: "رفع الملف", en: "Upload file", fr: "Téléverser le fichier" },
 dragOrClickToSelect: { ar: "اسحب الملف هنا أو انقر للاختيار", en: "Drag the file here or click to select", fr: "Glissez le fichier ici ou cliquez pour sélectionner" },
 
+//? TeacherChat.tsx :
+onlineNow: { ar: "متصل الآن", en: "Online now", fr: "En ligne maintenant" },
+lastSeenAnHourAgo: { ar: "آخر ظهور منذ ساعة", en: "Last seen an hour ago", fr: "Dernière connexion il y a une heure" },
+selectConversationToStart: { ar: "اختر محادثة للبدء", en: "Select a conversation to start", fr: "Sélectionnez une conversation pour commencer" },
+noAbsenceRequests: { ar: "لا توجد طلبات غياب", en: "No absence requests", fr: "Aucune demande d'absence" },
+noJustificationRequests: { ar: "لم تقم بتقديم أي طلبات تبرير غياب بعد", en: "You haven't submitted any absence justification requests yet", fr: "Vous n'avez encore soumis aucune demande de justification d'absence" },
+addBehaviorReport: { ar: "إضافة تقرير سلوك", en: "Add behavior report", fr: "Ajouter un rapport de comportement" },
+behaviorType: { ar: "نوع السلوك", en: "Behavior type", fr: "Type de comportement" },
+selectBehaviorType: { ar: "اختر نوع السلوك", en: "Select behavior type", fr: "Choisir le type de comportement" },
+writeAdditionalDetails: { ar: "اكتب تفاصيل إضافية عن حالة المشاركة الصفية للطالب...", en: "Write additional details about the student's class participation...", fr: "Écrivez des détails supplémentaires sur la participation en classe de l'élève..." },
+addStudentNotes: { ar: "أضف ملاحظاتك حول الطالب هنا...", en: "Add your notes about the student here...", fr: "Ajoutez vos notes sur l'élève ici..." },
+submitReport: { ar: "تقديم التقرير", en: "Submit report", fr: "Soumettre le rapport" },
+
 };
 
 export function getTranslation(key: string, language: string): string {
