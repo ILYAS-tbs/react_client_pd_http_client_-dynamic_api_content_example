@@ -1183,8 +1183,8 @@ AbsenceReason: {
 },
 Documents: {
   ar: "مستندات:",
-  en: "Documents:",
-  fr: "Documents :"
+  en: "Documents",
+  fr: "Documents"
 },
 Available: {
   ar: "متوفرة",
@@ -1430,6 +1430,161 @@ noBehaviorReports: { ar: "لا توجد تقارير سلوك", en: "No Behavior
 noBehaviorReportsForChild: { ar: "لا توجد تقارير سلوك متاحة لهذا الطفل حالياً", en: "No behavior reports available for this child currently", fr: "Aucun rapport de comportement disponible pour cet enfant actuellement" },
 reportDate: { ar: "تاريخ التقرير", en: "Report Date", fr: "Date du Rapport" },
 classParticipation: { ar: "المشاركة الصفية", en: "Class Participation", fr: "Participation en Classe" },
+teacherComment: { ar: "تعليق المعلم", en: "Teacher Comment", fr: "Commentaire de l'Enseignant" },
+submittedBy: { ar: "مقدم من", en: "Submitted By", fr: "Soumis Par" },
+leaveRequest: { ar: "طلب تبرير غياب", en: "Leave Request", fr: "Demande de Congé" },
+absenceManagement: { ar: "إدارة الغياب", en: "Absence Management", fr: "Gestion des Absences" },
+absenceReasonPlaceholder: { ar: "اختر السبب", en: "Select Reason", fr: "Choisir la raison" },
+illness: { ar: "مرض", en: "Illness", fr: "Maladie" },
+medicalAppointment: { ar: "موعد طبي", en: "Medical Appointment", fr: "Rendez-vous médical" },
+familyCircumstances: { ar: "ظروف عائلية", en: "Family Circumstances", fr: "Circonstances familiales" },
+emergency: { ar: "طوارئ", en: "Emergency", fr: "Urgence" },
+travel: { ar: "سفر", en: "Travel", fr: "Voyage" },
+other: { ar: "أخرى", en: "Other", fr: "Autre" },
+
+additionalDetails: { ar: "تفاصيل إضافية", en: "Additional Details", fr: "Détails supplémentaires" },
+additionalDetailsPlaceholder: { ar: "اكتب تفاصيل إضافية عن سبب الغياب...", en: "Write additional details about the absence reason...", fr: "Écrivez des détails supplémentaires sur la raison de l'absence..." },
+uploadSupportingDocuments: { ar: "رفع مستندات داعمة (اختياري)", en: "Upload supporting documents (optional)", fr: "Télécharger des documents justificatifs (optionnel)" },
+clickToSelect: { ar: "انقر للاختيار", en: "Click to select", fr: "Cliquez pour sélectionner" },
+selectedFiles: { ar: "ملفات مختارة", en: "Selected files", fr: "Fichiers sélectionnés" },
+urgentRequest: { ar: "طلب عاجل (يتطلب مراجعة فورية)", en: "Urgent request (requires immediate review)", fr: "Demande urgente (nécessite un examen immédiat)" },
+submitRequest: { ar: "تقديم الطلب", en: "Submit Request", fr: "Soumettre la demande" },
+
+//? ParentChat.tsx ::
+parents: { ar: "أولياء الأمور", en: "Parents", fr: "Parents" },
+search: { ar: "البحث...", en: "Search...", fr: "Recherche..." },
+selectChatToStart: { ar: "اختر محادثة للبدء", en: "Select a chat to start", fr: "Sélectionnez une conversation pour commencer" },
+
+//? SchoolAnnouncements.tsx : 
+holiday: { ar: "إجازة", en: "Holiday", fr: "Vacances" },
+meeting: { ar: "اجتماع", en: "Meeting", fr: "Réunion" },
+activity: { ar: "نشاط", en: "Activity", fr: "Activité" },
+unreadAnnouncement: { ar: "إعلان غير مقروء", en: "Unread announcement", fr: "Annonce non lue" },
+youHave: { ar: "لديك", en: "You have", fr: "Vous avez" },
+enableNotifications: { ar: "تفعيل الإشعارات", en: "Enable notifications", fr: "Activer les notifications" },
+searchAnnouncements: { ar: "البحث في الإعلانات...", en: "Search announcements...", fr: "Rechercher dans les annonces..." },
+schoolAnnouncements: { ar: "إعلانات المدرسة", en: "School Announcements", fr: "Annonces de l'école" },
+totalAnnouncements: { ar: "إجمالي الإعلانات", en: "Total Announcements", fr: "Total des annonces" },
+unread: { ar: "غير مقروء", en: "Unread", fr: "Non lu" },
+pinned: { ar: "مثبت", en: "Pinned", fr: "Épinglé" },
+highPriority: { ar: "عالي الأولوية", en: "High Priority", fr: "Haute priorité" },
+pinnedAnnouncements: { ar: "الإعلانات المثبتة", en: "Pinned Announcements", fr: "Annonces épinglées" },
+attachmentsCount: { ar: "مرفق", en: "attachment", fr: "pièce jointe" },
+allAnnouncements: { ar: "جميع الإعلانات", en: "All Announcements", fr: "Toutes les annonces" },
+noAnnouncements: { ar: "لا توجد إعلانات", en: "No Announcements", fr: "Aucune annonce" },
+noAnnouncementsMatch: { ar: "لا توجد إعلانات تطابق معايير البحث المحددة", en: "No announcements match the specified search criteria", fr: "Aucune annonce ne correspond aux critères de recherche spécifiés" },
+
+//? ScheduleManagement ::
+searchChildOrClass: { ar: "البحث عن الطفل أو الفصل...", en: "Search for child or class...", fr: "Rechercher un enfant ou une classe..." },
+childrenTimetables: { ar: "جداول الأطفال", en: "Children’s Timetables", fr: "Emplois du temps des enfants" },
+noTimetablesAvailable: { ar: "لا توجد جداول متاحة. يرجى إضافة جدول جديد.", en: "No timetables available. Please add a new one.", fr: "Aucun emploi du temps disponible. Veuillez en ajouter un nouveau." },
+childName: { ar: "اسم الطفل", en: "Child Name", fr: "Nom de l’enfant" },
+
+//? HomeWorkManagement.tsx ::
+noTimetables: { ar: "لا توجد جداول متاحة.", en: "No timetables available.", fr: "Aucun emploi du temps disponible." },
+homework: { ar: "واجب منزلي", en: "Homework", fr: "Devoir à la maison" },
+exam: { ar: "اختبار", en: "Exam", fr: "Examen" },
+homeworkAndExamsSchedule: { ar: "جدول الواجبات والاختبارات", en: "Homework and Exams Schedule", fr: "Emploi du temps des devoirs et examens" },
+childrenSchedules: { ar: "جداول الأطفال", en: "Children’s Schedules", fr: "Emplois du temps des enfants" },
+type: { ar: "النوع", en: "Type", fr: "Type" },
+
+subject: { ar: "المادة", en: "Subject", fr: "Matière" },
+dueDate: { ar: "تاريخ التسليم", en: "Due Date", fr: "Date de remise" },
+download: { ar: "تحميل", en: "Download", fr: "Télécharger" },
+
+//? ResourceLibrary.tsx 
+documents: { ar: "مستندات", en: "Documents", fr: "Documents" },
+videoCourses: { ar: "دورات فيديو", en: "Video Courses", fr: "Cours vidéo" },
+books: { ar: "كتب", en: "Books", fr: "Livres" },
+educationalLibrary: { ar: "المكتبة التعليمية", en: "Educational Library", fr: "Bibliothèque éducative" },
+searchTitleDescriptionClass: { ar: "البحث عن عنوان، وصف، أو فصل...", en: "Search by title, description, or class...", fr: "Rechercher par titre, description ou classe..." },
+noEducationalMaterials: { ar: "لا توجد مواد تعليمية", en: "No educational materials", fr: "Aucun matériel éducatif" },
+noMaterialsMatch: { ar: "لم يتم العثور على مواد تطابق معايير البحث", en: "No materials found matching the search criteria", fr: "Aucun matériel ne correspond aux critères de recherche" },
+price: { ar: "السعر", en: "Price", fr: "Prix" },
+free: { ar: "مجاني", en: "Free", fr: "Gratuit" },
+dzd: { ar: "دج", en: "DZD", fr: "DZD" },
+materialDetails: { ar: "تفاصيل المادة", en: "Material Details", fr: "Détails du matériel" },
+title: { ar: "العنوان", en: "Title", fr: "Titre" },
+format: { ar: "الصيغة", en: "Format", fr: "Format" },
+size: { ar: "الحجم", en: "Size", fr: "Taille" },
+close: { ar: "إغلاق", en: "Close", fr: "Fermer" },
+purchase: { ar: "شراء", en: "Purchase", fr: "Acheter" },
+
+
+//? ActivitiesManagement.tsx
+schoolEvents: { ar: "الفعاليات المدرسية", en: "School Events", fr: "Événements scolaires" },
+searchPlaceholder: { ar: "البحث عن العنوان أو الوصف أو الموقع...", en: "Search by title, description, or location...", fr: "Rechercher par titre, description ou lieu..." },
+noEventsAvailable: { ar: "لا توجد فعاليات متاحة حالياً.", en: "No events available currently.", fr: "Aucun événement disponible pour le moment." },
+school: { ar: "المدرسة", en: "School", fr: "École" },
+location: { ar: "الموقع", en: "Location", fr: "Emplacement" },
+eventDetails: { ar: "تفاصيل الفعالية", en: "Event Details", fr: "Détails de l'événement" },
+
+//! Teacher Dashboard :
+teacherDashboardTitle: { ar: "لوحة تحكم المعلم", en: "Teacher Dashboard", fr: "Tableau de bord de l'enseignant" },
+teacherDashboardSubtitle: { ar: "مرحباً أستاذ أحمد، إليك ملخص أنشطتك اليومية", en: "Hello Mr. Ahmed, here’s a summary of your daily activities", fr: "Bonjour M. Ahmed, voici un résumé de vos activités quotidiennes" },
+myStudents: { ar: "طلابي", en: "My Students", fr: "Mes élèves" },
+uploadedMaterials: { ar: "المواد المرفوعة", en: "Uploaded Materials", fr: "Matériaux téléchargés" },
+myClasses: { ar: "فصولي", en: "My Classes", fr: "Mes classes" },
+marks: { ar: "الدرجات", en: "Marks", fr: "Notes" },
+educationalMaterials: { ar: "المواد التعليمية", en: "Educational Materials", fr: "Matériaux éducatifs" },
+communication_teacher: { ar: "التواصل", en: "Communication", fr: "Communication" },
+unexcusedAbsencesAndBehaviorReports: { ar: "الغيابات غير المبررة وتقارير السلوك", en: "Unjustified absences and behavior reports", fr: "Absences non justifiées et rapports de comportement" },
+students: { ar: "طلاب", en: "Students", fr: "Élèves" },
+
+//? default :
+enterNewGrades: { ar: "إدخال درجات جديدة", en: "Enter New Grades", fr: "Saisir de nouvelles notes" },
+uploadEducationalMaterial: { ar: "رفع مادة تعليمية", en: "Upload Educational Material", fr: "Téléverser du matériel pédagogique" },
+sendNotificationToParents: { ar: "إرسال إشعار للأولياء", en: "Send Notification to Parents", fr: "Envoyer une notification aux parents" },
+averageGrades: { ar: 'متوسط الدرجات:', en: 'Average Grades:', fr: 'Moyenne des notes:' },
+weeklySchedule: { ar: "الجدول الأسبوعي", en: "Weekly Schedule", fr: "Emploi du temps hebdomadaire" },
+addGrade: { ar: "إضافة درجة", en: "Add Grade", fr: "Ajouter une note" },
+recordAttendance: { ar: "تسجيل الغيابات", en: "Record Attendance", fr: "Enregistrer les absences" },
+viewReports: { ar: "عرض التقارير", en: "View Reports", fr: "Afficher les rapports" },
+lastGrade: { ar: "آخر درجة", en: "Last Grade", fr: "Dernière note" },
+status: { ar: "الحالة", en: "Status", fr: "Statut" },
+recordAbsences: { ar: "تسجيل الغيابات", en: "Record Absences", fr: "Enregistrer les absences" },
+searchStudents: { ar: "البحث عن الطلاب...", en: "Search for students...", fr: "Rechercher des élèves..." },
+absent: { ar: "غائب", en: "Absent", fr: "Absent" },
+present: { ar: "حاضر", en: "Present", fr: "Présent" },
+
+//? GradeManger :
+gradesManagement: { ar: "إدارة الدرجات", en: "Grades Management", fr: "Gestion des notes" },
+export: { ar: "تصدير", en: "Export", fr: "Exporter" },
+
+firstSemesterAssessment: { ar: "تقويم الفصل الأول", en: "First Semester Assessment", fr: "Évaluation du premier semestre" },
+firstSemesterExam1: { ar: "فرض الفصل الأول 1", en: "First Semester Exam 1", fr: "Examen du premier semestre 1" },
+firstSemesterExam2: { ar: "فرض الفصل الأول 2", en: "First Semester Exam 2", fr: "Examen du premier semestre 2" },
+firstSemesterHomework: { ar: "واجبات الفصل الأول", en: "First Semester Homework", fr: "Devoirs du premier semestre" },
+firstSemesterTest: { ar: "امتحان الفصل الأول", en: "First Semester Test", fr: "Test du premier semestre" },
+firstSemesterAverage: { ar: "معدل الفصل الأول", en: "First Semester Average", fr: "Moyenne du premier semestre" },
+secondSemesterAssessment: { ar: "تقويم الفصل الثاني", en: "Second Semester Assessment", fr: "Évaluation du deuxième semestre" },
+secondSemesterExam1: { ar: "فرض الفصل الثاني 1", en: "Second Semester Exam 1", fr: "Examen du deuxième semestre 1" },
+secondSemesterExam2: { ar: "فرض الفصل الثاني 2", en: "Second Semester Exam 2", fr: "Examen du deuxième semestre 2" },
+secondSemesterHomework: { ar: "واجبات الفصل الثاني", en: "Second Semester Homework", fr: "Devoirs du deuxième semestre" },
+secondSemesterTest: { ar: "امتحان الفصل الثاني", en: "Second Semester Test", fr: "Test du deuxième semestre" },
+secondSemesterAverage: { ar: "معدل الفصل الثاني", en: "Second Semester Average", fr: "Moyenne du deuxième semestre" },
+
+addNewGrade: { ar: "إضافة درجة جديدة", en: "Add New Grade", fr: "Ajouter une nouvelle note" },
+selectStudent: { ar: "اختر الطالب", en: "Select Student", fr: "Choisir un élève" },
+selectSubject: { ar: "اختر المادة", en: "Select Subject", fr: "Choisir une matière" },
+save: { ar: "حفظ", en: "Save", fr: "Enregistrer" },
+semester: { ar: "الفصل", en: "Semester", fr: "Semestre" },
+
+//? ResourceManager.tsx : 
+videos: { ar: "فيديوهات", en: "Videos", fr: "Vidéos" },
+uploadNewMaterial: { ar: "رفع مادة جديدة", en: "Upload New Material", fr: "Ajouter un nouveau cours" },
+downloads: { ar: "التحميلات", en: "Downloads", fr: "Téléchargements" },
+materialTitle: { ar: "عنوان المادة", en: "Material title", fr: "Titre du matériel" },
+educationalMaterialTitle: { ar: "عنوان المادة التعليمية", en: "Educational material title", fr: "Titre du matériel pédagogique" },
+materialType: { ar: "نوع المادة", en: "Material type", fr: "Type de matériel" },
+document: { ar: "مستند", en: "Document", fr: "Document" },
+video: { ar: "فيديو", en: "Video", fr: "Vidéo" },
+book: { ar: "كتاب", en: "Book", fr: "Livre" },
+targetedClasses: { ar: "الفصول المستهدفة", en: "Targeted classes", fr: "Classes ciblées" },
+materialDescription: { ar: "وصف المادة", en: "Material description", fr: "Description du matériel" },
+shortMaterialDescription: { ar: "وصف مختصر للمادة التعليمية...", en: "Short description of the educational material...", fr: "Brève description du matériel pédagogique..." },
+uploadFile: { ar: "رفع الملف", en: "Upload file", fr: "Téléverser le fichier" },
+dragOrClickToSelect: { ar: "اسحب الملف هنا أو انقر للاختيار", en: "Drag the file here or click to select", fr: "Glissez le fichier ici ou cliquez pour sélectionner" },
 
 };
 

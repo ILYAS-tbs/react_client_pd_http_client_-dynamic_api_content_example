@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Edit, X, Filter, Download } from "lucide-react";
+import { Plus, Edit, X, Filter, Download, LayoutGrid } from "lucide-react";
 import { GradeManagerProps } from "../../types";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
 // import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
@@ -11,6 +11,8 @@ import {
 } from "../../services/http_api/payloads_types/teacher_client_payload_types";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 const GradeManager: React.FC<GradeManagerProps> = ({
   students,
@@ -21,6 +23,9 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   setStudentsGrades,
   RefetchGrades,
 }) => {
+  //! Translations :
+  const {language}=useLanguage()
+
   const [selectedClass, setSelectedClass] = useState(
     modules_class_groups?.[0]?.class_group.class_group_id
   );
@@ -595,19 +600,19 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          إدارة الدرجات
+          {getTranslation('gradesManagement',language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Download className="h-4 w-4" />
-            <span>تصدير</span>
+            <span>{getTranslation('export',language)}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
-            <span>إضافة درجة</span>
+            <span>{getTranslation('addGrade',language)}</span>
           </button>
         </div>
       </div>
@@ -617,7 +622,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
         <div className="grid md:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              الفصل
+              {getTranslation('class',language)}
             </label>
             <select
               value={selectedClass}
@@ -638,7 +643,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              المادة
+              {getTranslation('Subject',language)}
             </label>
             <select
               value={selectedModule}
@@ -697,7 +702,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            درجات{" "}
+            {getTranslation('marks',language)}{" "}
             {modules_class_groups.find(
               (module_class_group) =>
                 module_class_group.class_group.class_group_id == selectedClass
@@ -713,47 +718,47 @@ const GradeManager: React.FC<GradeManagerProps> = ({
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الطالب
+                  {getTranslation('student',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  تقويم الفصل الأول
+                  {getTranslation('firstSemesterAssessment',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  فرض الفصل الأول 1
+                  {getTranslation('firstSemesterExam1',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  فرض الفصل الأول 2
+                  {getTranslation('firstSemesterExam2',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  واجبات الفصل الأول
+                  {getTranslation('firstSemesterHomework',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  امتحان الفصل الأول
+                  {getTranslation('firstSemesterTest',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  معدل الفصل الأول
+                  {getTranslation('firstSemesterAverage',language)}
                 </th>
                 {/* Second semester  */}
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  تقويم الفصل الثاني
+                 {getTranslation('secondSemesterAssessment',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  فرض الفصل الثاني 1
+                  {getTranslation('secondSemesterExam1',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  فرض الفصل الثاني 2
+                  {getTranslation('secondSemesterExam2',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  واجبات الفصل الثاني
+                  {getTranslation('secondSemesterHomework',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  امتحان الفصل الثاني
+                  {getTranslation('secondSemesterTest',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  معدل الفصل الثاني
+                  {getTranslation('secondSemesterAverage',language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  الإجراءات
+                  {getTranslation('actions',language)}
                 </th>
               </tr>
             </thead>
@@ -852,12 +857,12 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           <div className="h-5/6 overflow-y-auto  bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <form onSubmit={handlePostStudentGrade}>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                إضافة درجة جديدة
+                {getTranslation('addNewGrade',language)}
               </h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    الطالب
+                    {getTranslation('student',language)}
                   </label>
                   <select
                     name="student_id"
@@ -868,7 +873,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     }}
                     className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">اختر الطالب</option>
+                    <option value="">{getTranslation('selectStudent',language)}</option>
                     {students.map((s) => (
                       <option key={s.student_id} value={s.student_id}>
                         {s.full_name}
@@ -881,7 +886,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    المادة
+                    {getTranslation('Subject',language)}
                   </label>
                   <select
                     name="module_id"
@@ -892,7 +897,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     }}
                     className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">اختر المادة</option>
+                    <option value="">{getTranslation('selectSubject',language)}</option>
                     {unique_modules.map((module_id) => (
                       <option key={module_id} value={module_id}>
                         {modules.find((m) => m.module.module_id == module_id)
@@ -905,7 +910,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الفصل
+                  {getTranslation('class',language)}
                 </label>
                 <select
                   name="semester"
@@ -917,10 +922,10 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option key={"s1"} value={"s1"}>
-                    الفصل الاول
+                    {getTranslation('firstSemester',language)}
                   </option>
                   <option key={"s2"} value={"s2"}>
-                    الفصل الثاني
+                    {getTranslation('secondSemester',language)}
                   </option>
                 </select>
               </div>
@@ -929,7 +934,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 <div>
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      تقويم الفصل الأول
+                      {getTranslation('firstSemesterAssessment',language)}
                     </label>
                     <input
                       name="s1_evaluation"
@@ -945,7 +950,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الأول 1
+                     {getTranslation('firstSemesterExam1',language)}
                     </label>
                     <input
                       name="s1_devoir_1"
@@ -961,7 +966,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الأول 2
+                      {getTranslation('firstSemesterExam2',language)}
                     </label>
                     <input
                       name="s1_devoir_2"
@@ -977,7 +982,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      واجبات الفصل الأول
+                      {getTranslation('firstSemesterHomework',language)}
                     </label>
                     <input
                       name="s1_homeworks"
@@ -993,7 +998,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      امتحان الفصل الأول
+                     {getTranslation('firstSemesterTest',language)}
                     </label>
                     <input
                       name="s1_exam"
@@ -1009,7 +1014,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      معدل الفصل الأول
+                      {getTranslation('firstSemesterAverage',language)}
                     </label>
                     <input
                       name="s1_average"
@@ -1027,7 +1032,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 <div>
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      تقويم الفصل الثاني
+                      {getTranslation('secondSemesterAssessment',language)}
                     </label>
                     <input
                       name="s2_evaluation"
@@ -1043,7 +1048,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الثاني 1
+                    {getTranslation('secondSemesterExam1',language)}
                     </label>
                     <input
                       name="s2_devoir_1"
@@ -1059,7 +1064,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الثاني 2
+                      {getTranslation('secondSemesterExam2',language)}
                     </label>
                     <input
                       name="s1_devoir_2"
@@ -1075,7 +1080,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      واجبات الفصل الثاني
+                      {getTranslation('secondSemesterHomework',language)}
                     </label>
                     <input
                       name="s2_homeworks"
@@ -1091,7 +1096,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      امتحان الفصل الثاني
+                      {getTranslation('secondSemesterTest',language)}
                     </label>
                     <input
                       name="s2_exam"
@@ -1107,7 +1112,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      معدل الفصل الثاني
+                      {getTranslation('secondSemesterAverage',language)}
                     </label>
                     <input
                       name="s2_average"
@@ -1138,14 +1143,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {getTranslation('cancel',language)}
                 </button>
                 <button
                   type="submit"
                   // onClick={handleAddGrade} // formNotConnectedError
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  حفظ
+                  {getTranslation('save',language)}
                 </button>
               </div>
             </form>
@@ -1159,12 +1164,12 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           <div className="h-5/6 overflow-y-auto  bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <form onSubmit={handlePatchStudentGrade}>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                إضافة درجة جديدة
+                {getTranslation('addNewGrade',language)}
               </h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    الطالب
+                    {getTranslation('student',language)}
                   </label>
                   <select
                     name="student_id"
@@ -1187,7 +1192,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    المادة
+                    {getTranslation('subject',language)}
                   </label>
                   <select
                     name="module_id"
@@ -1211,7 +1216,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الفصل
+                  {getTranslation('semester',language)}
                 </label>
                 <select
                   name="semester"
@@ -1223,10 +1228,10 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option key={"s1"} value={"s1"}>
-                    الفصل الاول
+                   {getTranslation('firstSemester',language)}
                   </option>
                   <option key={"s2"} value={"s2"}>
-                    الفصل الثاني
+                    {getTranslation('secondSemester',language)}
                   </option>
                 </select>
               </div>
@@ -1235,7 +1240,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 <div>
                   <div className="mt-4">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        تقويم الفصل الأول
+                       {getTranslation('firstSemesterAssessment',language)}
                       </label>
                       <input
                         name="s1_evaluation"
@@ -1251,7 +1256,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الأول 1
+                      {getTranslation('firstSemesterExam1',language)}
                     </label>
                     <input
                       name="s1_devoir_1"
@@ -1267,7 +1272,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الأول 2
+                      {getTranslation('firstSemesterExam2',language)}
                     </label>
                     <input
                       name="s1_devoir_2"
@@ -1283,7 +1288,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      واجبات الفصل الأول
+                    {getTranslation('firstSemesterHomework',language)}
                     </label>
                     <input
                       name="s1_homeworks"
@@ -1299,7 +1304,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      امتحان الفصل الأول
+                      {getTranslation('firstSemesterTest',language)}
                     </label>
                     <input
                       name="s1_exam"
@@ -1315,7 +1320,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      معدل الفصل الأول
+                      {getTranslation('firstSemesterAverage',language)}
                     </label>
                     <input
                       name="s1_average"
@@ -1333,7 +1338,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 <div>
                     <div className="mt-4">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        تقويم الفصل الثاني
+                        {getTranslation('secondSemesterAssessment',language)}
                       </label>
                       <input
                         name="s2_evaluation"
@@ -1349,7 +1354,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الثاني 1
+                      {getTranslation('secondSemesterExam1',language)}
                     </label>
                     <input
                       name="s2_devoir_1"
@@ -1365,7 +1370,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      فرض الفصل الثاني 2
+                     {getTranslation('secondSemesterExam2',language)}
                     </label>
                     <input
                       name="s2_devoir_2"
@@ -1381,7 +1386,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      واجبات الفصل الثاني
+                      {getTranslation('secondSemesterHomework',language)}
                     </label>
                     <input
                       name="s2_homeworks"
@@ -1397,7 +1402,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      امتحان الفصل الثاني
+                     {getTranslation('secondSemesterTest',language)}
                     </label>
                     <input
                       name="s2_exam"
@@ -1413,7 +1418,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      معدل الفصل الثاني
+                     {getTranslation('secondSemesterAverage',language)}
                     </label>
                     <input
                       name="s2_average"
@@ -1445,14 +1450,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {getTranslation('cancel',language)}
                 </button>
                 <button
                   type="submit"
                   // onClick={handleAddGrade} // formNotConnectedError
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  حفظ
+                  {getTranslation('save',language)}
                 </button>
               </div>
             </form>

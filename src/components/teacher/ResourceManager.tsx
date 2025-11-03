@@ -16,20 +16,26 @@ import { teacher_dashboard_client } from "../../services/http_api/teacher-dashbo
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { handleDownload } from "../../lib/download_script";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 const ResourceManager: React.FC<ResourceManagerProps> = ({
   modules_class_groups,
   teacher_uploads,
   setTeacherUploads,
 }) => {
+
+  //! Translations :
+  const {language} = useLanguage()
+
   const [selectedType, setSelectedType] = useState("all");
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const resourceTypes = [
-    { value: "all", label: "الكل", icon: FileText },
-    { value: "document", label: "مستندات", icon: FileText },
-    { value: "video", label: "فيديوهات", icon: Video },
-    { value: "book", label: "كتب", icon: BookOpen },
+    { value: "all", label: getTranslation('all',language), icon: FileText },
+    { value: "document", label: getTranslation('Documents',language), icon: FileText },
+    { value: "video", label: getTranslation('videos',language), icon: Video },
+    { value: "book", label: getTranslation('books',language), icon: BookOpen },
   ];
 
   //? Mock Respousrce data
@@ -255,14 +261,14 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          المواد التعليمية
+          {getTranslation('educationalMaterials',language)}
         </h2>
         <button
           onClick={() => setShowUploadModal(true)}
           className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           <Upload className="h-4 w-4" />
-          <span>رفع مادة جديدة</span>
+          <span>{getTranslation('uploadNewMaterial',language)}</span>
         </button>
       </div>
 
@@ -320,7 +326,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
-                    تاريخ الرفع:
+                    {getTranslation('uploadDate',language)} :
                   </span>
                   <span className="text-gray-900 dark:text-white">
                     {resource.uploadDate.toLocaleDateString("ar")}
@@ -328,7 +334,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
-                    التحميلات:
+                    {getTranslation('downloads',language)}:
                   </span>
                   <span className="text-gray-900 dark:text-white">
                     {resource.downloads}
@@ -336,7 +342,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
-                    الفصول:
+                    {getTranslation('Classes',language)} :
                   </span>
                   <span className="text-gray-900 dark:text-white">
                     {resource.classes.join(", ")}
@@ -382,31 +388,31 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              رفع مادة تعليمية جديدة
+              {getTranslation('uploadNewMaterial',language)}
             </h3>
 
             <form className="space-y-4" onSubmit={handleUploadSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  عنوان المادة
+                  {getTranslation('materialTitle',language)}
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="عنوان المادة التعليمية"
+                  placeholder={getTranslation('educationalMaterialTitle',language)}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  نوع المادة
+                  {getTranslation('materialType',language)}
                 </label>
                 <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="document">مستند</option>
-                  <option value="video">فيديو</option>
-                  <option value="book">كتاب</option>
+                  <option value="document">{getTranslation('document',language)}</option>
+                  <option value="video">{getTranslation('video',language)}</option>
+                  <option value="book">{getTranslation('book',language)}</option>
                 </select>
               </div>
 
@@ -415,7 +421,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   htmlFor="class_groups"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  الفصول المستهدفة
+                  {getTranslation('targetedClasses',language)}
                 </label>
 
                 <select
@@ -447,14 +453,14 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  وصف المادة
+                 {getTranslation('materialDescription',language)}
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="وصف مختصر للمادة التعليمية..."
+                  placeholder={getTranslation('shortMaterialDescription',language)}
                 />
               </div>
 
@@ -464,14 +470,14 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   htmlFor="upload_file"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  رفع الملف
+                 {getTranslation('uploadFile',language)}
                 </label>
 
                 {/* Clickable upload area */}
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer relative">
                   <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    اسحب الملف هنا أو انقر للاختيار
+                   {getTranslation('dragOrClickToSelect',language)}
                   </p>
 
                   {/* Invisible file input overlay */}
@@ -497,13 +503,13 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   onClick={() => setShowUploadModal(false)}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {getTranslation('cancel',language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  رفع
+                  {getTranslation('save',language)}
                 </button>
               </div>
             </form>

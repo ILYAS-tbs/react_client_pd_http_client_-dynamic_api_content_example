@@ -33,9 +33,14 @@ import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
 import { Parent } from "../../models/Parent";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { getTranslation } from "../../utils/translations";
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
+
+  //! Translation 
+  const {language}=useLanguage()
 
   // ! Storing the teacher's id (which is the user id)
   const lc_user: User = JSON.parse(
@@ -147,25 +152,25 @@ const TeacherDashboard: React.FC = () => {
 
   const stats = [
     {
-      title: "طلابي",
+      title: getTranslation('myStudents',language),
       value: students.length || "0",
       icon: Users,
       color: "bg-blue-500",
     },
     {
-      title: "الفصول",
+      title: getTranslation('Classes',language),
       value: modules_class_groups.length || "0",
       icon: BookOpen,
       color: "bg-green-500",
     },
     {
-      title: "الرسائل الجديدة",
+      title: getTranslation('newMessages',language),
       value: "7",
       icon: MessageCircle,
       color: "bg-purple-500",
     },
     {
-      title: "المواد المرفوعة",
+      title: getTranslation('uploadedMaterials',language),
       value: teacher_uploads.length ?? "0",
       icon: Upload,
       color: "bg-orange-500",
@@ -173,15 +178,15 @@ const TeacherDashboard: React.FC = () => {
   ];
 
   const tabs = [
-    { id: "overview", label: "نظرة عامة", icon: TrendingUp },
-    { id: "classes", label: "فصولي", icon: Users },
-    { id: "grades", label: "الدرجات", icon: FileText },
-    { id: "resources", label: "المواد التعليمية", icon: BookOpen },
-    { id: "chat", label: "التواصل", icon: MessageCircle },
+    { id: "overview", label: getTranslation('overview',language), icon: TrendingUp },
+    { id: "classes", label: getTranslation('myClasses',language), icon: Users },
+    { id: "grades", label: getTranslation('marks',language), icon: FileText },
+    { id: "resources", label: getTranslation('educationalMaterials',language), icon: BookOpen },
+    { id: "chat", label: getTranslation('communication_teacher',language), icon: MessageCircle },
     // { id: "schedule", label: "الجدول", icon: Calendar },
     {
       id: "absences",
-      label: "الغيابات غير المبررة وتقارير السلوك",
+      label: getTranslation('unexcusedAbsencesAndBehaviorReports',language),
       icon: FileX2,
     },
   ];
@@ -419,27 +424,27 @@ const TeacherDashboard: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  إجراءات سريعة
+                  {getTranslation('quickActions',language)}
                 </h3>
                 <div className="space-y-3">
                   <button className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
                     <Edit className="h-5 w-5" />
-                    <span>إدخال درجات جديدة</span>
+                    <span>{getTranslation('enterNewGrades',language)}</span>
                   </button>
                   <button className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
                     <Upload className="h-5 w-5" />
-                    <span>رفع مادة تعليمية</span>
+                    <span>{getTranslation('uploadEducationalMaterial',language)}</span>
                   </button>
                   <button className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
                     <MessageCircle className="h-5 w-5" />
-                    <span>إرسال إشعار للأولياء</span>
+                    <span>{getTranslation('sendNotificationToParents',language)}</span>
                   </button>
                 </div>
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  رسائل جديدة
+                 {getTranslation('newMessages',language)}
                 </h3>
                 <div className="space-y-3">
                   {[
@@ -486,8 +491,8 @@ const TeacherDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title="لوحة تحكم المعلم"
-      subtitle="مرحباً أستاذ أحمد، إليك ملخص أنشطتك اليومية"
+      title={getTranslation('teacherDashboardTitle',language)}
+      subtitle={getTranslation('teacherDashboardSubtitle',language)}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}

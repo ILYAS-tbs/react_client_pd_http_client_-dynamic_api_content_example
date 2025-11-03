@@ -467,7 +467,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('AbsenceReason',language)}:
+                  {getTranslation('AbsenceReason',language)}
                 </h4>
                 <p className="text-gray-900 dark:text-white">
                   {request.reason}
@@ -477,7 +477,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {getTranslation('supportingDocuments',language)}:
+                    {getTranslation('supportingDocuments',language)}
                   </span>
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -499,7 +499,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               {request.adminComment && (
                 <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('adminComment',language)}:
+                    {getTranslation('adminComment',language)}
                   </h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {request.adminComment}
@@ -622,7 +622,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تعليق المعلم:
+                  {getTranslation('teacherComment',language)}:
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400">
                   {report.teacherComment}
@@ -632,7 +632,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    مقدم من:
+                    {getTranslation('submittedBy',language)}
                   </span>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">
                     {report.submittedBy}
@@ -672,7 +672,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Plus className="h-4 w-4" />
-              <span>طلب تبرير غياب</span>
+              <span>{getTranslation("leaveRequest",language)}</span>
             </button>
           )}
         </div>
@@ -689,7 +689,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            إدارة الغياب
+            {getTranslation('absenceManagement',language)}
           </button>
           <button
             onClick={() => setActiveTab("attitude")}
@@ -699,7 +699,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            تقارير السلوك
+            {getTranslation('behaviorReports',language)}
           </button>
         </div>
       </div>
@@ -714,13 +714,13 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              طلب تبرير غياب
+              {getTranslation('leaveRequest',language)}
             </h3>
 
             <form onSubmit={handleSubmitRequest} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  اختر الطفل
+                  {getTranslation('selectChild',language)}
                 </label>
                 <select
                   value={student_id}
@@ -731,7 +731,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">اختر الطفل</option>
+                  <option value="">{getTranslation('selectChild',language)}</option>
                   {children.map((child) => (
                     <option key={child.id} value={child.id}>
                       {child.name}
@@ -742,7 +742,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تاريخ الغياب
+                  {getTranslation('AbsenceDate',language)}
                 </label>
                 <input
                   type="date"
@@ -758,7 +758,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  سبب الغياب
+                  {getTranslation('AbsenceReason',language)}
                 </label>
                 <select
                   value={absence_reason}
@@ -769,19 +769,19 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">اختر السبب</option>
-                  <option value="مرض">مرض</option>
-                  <option value="موعد طبي">موعد طبي</option>
-                  <option value="ظروف عائلية">ظروف عائلية</option>
-                  <option value="طوارئ">طوارئ</option>
-                  <option value="سفر">سفر</option>
-                  <option value="أخرى">أخرى</option>
+                  <option value="">{getTranslation('absenceReasonPlaceholder',language)}</option>
+                  <option value="مرض">{getTranslation('illness',language)}</option>
+                  <option value="موعد طبي">{getTranslation('medicalAppointment',language)}</option>
+                  <option value="ظروف عائلية">{getTranslation('familyCircumstances',language)}</option>
+                  <option value="طوارئ">{getTranslation('emergency',language)}</option>
+                  <option value="سفر">{getTranslation('travel',language)}</option>
+                  <option value="أخرى">{getTranslation('other',language)}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تفاصيل إضافية
+                 {getTranslation('additionalDetails',language)}
                 </label>
                 <textarea
                   rows={4}
@@ -790,19 +790,19 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                     setMoreDetails(e.target.value);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="اكتب تفاصيل إضافية عن سبب الغياب..."
+                  placeholder={getTranslation('additionalDetailsPlaceholder',language)}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  رفع مستندات داعمة (اختياري)
+                  {getTranslation('uploadSupportingDocuments',language)}
                 </label>
                 <label htmlFor="proof_doc_input">
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
                     <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      انقر للاختيار
+                      {getTranslation('clickToSelect',language)}
                     </p>
                     <input
                       id="proof_doc_input"
@@ -827,7 +827,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                 </label>
                 {newRequest.documents && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                    {newRequest.documents.length} ملفات مختارة
+                    {newRequest.documents.length} {getTranslation('selectedFiles',language)}
                   </p>
                 )}
               </div>
@@ -847,7 +847,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   htmlFor="urgent"
                   className="text-sm text-gray-700 dark:text-gray-300"
                 >
-                  طلب عاجل (يتطلب مراجعة فورية)
+                  {getTranslation('urgentRequest',language)}
                 </label>
               </div>
 
@@ -872,13 +872,13 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  إلغاء
+                  {getTranslation('cancel',language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  تقديم الطلب
+                 {getTranslation('submitRequest',language)}
                 </button>
               </div>
             </form>
