@@ -28,6 +28,8 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
   //! Translations :
   const {language} = useLanguage()
 
+  
+
   const [selectedType, setSelectedType] = useState("all");
   const [showUploadModal, setShowUploadModal] = useState(false);
 
@@ -168,6 +170,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [upload_file, setUploadFile] = useState<File | null>(null);
+
   const [uploadError, setUploadError] = useState("");
 
   const [selectedClassGroups, setSelectedClassGroups] = useState<string[]>([]);
@@ -226,6 +229,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       );
 
     if (!post_upload_res.ok) {
+      showError(post_upload_res?.error)
       return;
     }
     setShowUploadModal(false);
