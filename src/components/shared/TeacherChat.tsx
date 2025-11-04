@@ -189,7 +189,7 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
   function mapAPIMessagesToFrontMessage(messages_list: Message[]) {
     return messages_list.map((message: Message) => ({
       id: message.message_id,
-      sender: message.from_user?.id === teacher_id ? "teacher" : "parent",
+      sender: String(message.from_user?.id) === String(teacher_id) ? "teacher" : "parent",
       content: message.content ?? "",
       timestamp: message.timestamp ? new Date(message.timestamp) : null,
       date: "اليوم",
