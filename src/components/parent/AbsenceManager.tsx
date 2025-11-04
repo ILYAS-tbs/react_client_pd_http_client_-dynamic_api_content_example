@@ -23,7 +23,6 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   absence_reports,
   setAbsenceReports,
   behaviour_reports,
-  setBehabiourReports,
 }) => {
   //! Translation :
   const { language } = useLanguage();
@@ -36,6 +35,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
     date: "",
     reason: "",
     details: "",
+    status:"",
     urgent: false,
     documents: null as File[] | null,
   });
@@ -194,6 +194,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
+      case "accepted":
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
       case "rejected":
         return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
@@ -216,6 +217,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "approved":
+      case "accepted":
         return getTranslation("Accepted", language);
       case "rejected":
         return getTranslation("Rejected", language);
@@ -251,7 +253,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const stats = {
     total: filteredRequests.length,
     pending: filteredRequests.filter((r) => r.status === "pending").length,
-    approved: filteredRequests.filter((r) => r.status === "approved").length,
+    approved: filteredRequests.filter((r) => r.status === "accepted").length,
     rejected: filteredRequests.filter((r) => r.status === "rejected").length,
   };
 
@@ -308,6 +310,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       date: "",
       reason: "",
       details: "",
+      status:"",
       urgent: false,
       documents: null,
     });
@@ -842,7 +845,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                         });
 
                         setProofDocument(
-                          e.target.files ? e.target.files[0] : null
+                          e.target.files ? e.target.files[0] : null 
                         );
                       }}
                       className="hidden"
@@ -892,6 +895,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       reason: "",
                       details: "",
                       urgent: false,
+                      status:"",
                       documents: null,
                     });
                   }}
