@@ -13,7 +13,7 @@ interface Notification {
   id: string;
   title: string;
   message: string;
-  type: "info" | "success" | "warning" | "error";
+  type:string;
   timestamp: string;
   read: boolean;
   pinned?:boolean;
@@ -120,7 +120,7 @@ const addNotification = (notification: Notification) => {
           id:String(not.id),
           title: not.title,
           message: not.message,
-          type: not?.type as "info" | "success" | "warning" | "error" ,
+          type: not?.type  ,
           timestamp:not.created_at.toString(),
           read:not.is_read
         });

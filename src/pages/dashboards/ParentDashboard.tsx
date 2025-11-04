@@ -36,6 +36,8 @@ import { Teacher } from "../../models/Teacher.ts";
 import { User } from "../../contexts/AuthContext.tsx";
 import { getTranslation } from "../../utils/translations.ts";
 import { useLanguage } from "../../contexts/LanguageContext.tsx";
+import { useNotifications } from "../../contexts/NotificationContext.tsx";
+import { timeAgoArabic } from "../../lib/timeAgoArabic.ts";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -157,6 +159,9 @@ const ParentDashboard: React.FC = () => {
       setTeachersList(new_teachers_list);
     }
   };
+
+  //? Notifications :
+  const {notifications}=useNotifications()
 
   useEffect(() => {
     get_current_parent_students();
@@ -391,27 +396,13 @@ const ParentDashboard: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                  {getTranslation('latestUpdates',language)}
                 </h3>
-                <div className="space-y-4">
-                  {[
-                    {
-                      type: "grade",
-                      message: "درجة جديدة في الرياضيات - أحمد",
-                      time: "منذ ساعة",
-                      child: "أحمد",
-                    },
-                    {
-                      type: "message",
-                      message: "رسالة من الأستاذة سارة",
-                      time: "منذ 2 ساعة",
-                      child: "فاطمة",
-                    },
-                    {
-                      type: "announcement",
-                      message: "إعلان: موعد الامتحانات",
-                      time: "منذ يوم",
-                      child: "عام",
-                    },
-                  ].map((update, index) => (
+                <div className="h-64 overflow-y-scroll space-y-4">
+                  {notifications.map((not)=>( {
+                      type: not.type,
+                      message: not.title,
+                      time:timeAgoArabic(not.timestamp),
+                      child: "..",
+                    })).map((update, index) => (
                     <div
                       key={index}
                       className="flex items-start space-x-3 rtl:space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"

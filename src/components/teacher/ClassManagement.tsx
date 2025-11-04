@@ -32,6 +32,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
   modules_class_groups,
   setAbsences,
   teacher_id,
+  setActiveTab
 }) => {
 
   //! Translations :: 
@@ -300,7 +301,9 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
               </h3>
             </div>
             <div className="space-y-2">
-              <button className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+              <button 
+              onClick={()=>setActiveTab('grades')}
+              className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
                 <Plus className="h-4 w-4" />
                 <span>{getTranslation('addGrade',language)}</span>
               </button>
@@ -311,7 +314,9 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 <Edit className="h-4 w-4" />
                 <span>{getTranslation('recordAttendance',language)}</span>
               </button>
-              <button className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
+              <button 
+              onClick={()=>setActiveTab('absences')}
+              className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
                 <Eye className="h-4 w-4" />
                 <span>{getTranslation('viewReports',language)}</span>
               </button>

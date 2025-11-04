@@ -25,9 +25,8 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   behaviour_reports,
   setBehabiourReports,
 }) => {
-
   //! Translation :
-  const {language}=useLanguage()
+  const { language } = useLanguage();
 
   const [selectedChild, setSelectedChild] = useState("all");
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -168,16 +167,16 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const mapBehaviourRating = (rating: string) => {
     switch (rating) {
       case "excellent":
-        return getTranslation('excellent',language);
+        return getTranslation("excellent", language);
 
       case "very good":
-        return getTranslation('veryGood',language);
+        return getTranslation("veryGood", language);
 
       case "good":
-        return getTranslation('good',language);
+        return getTranslation("good", language);
 
       default:
-        return getTranslation('poorPerformance',language);
+        return getTranslation("poorPerformance", language);
     }
   };
   const attitudeReports = behaviour_reports.map((report) => ({
@@ -217,11 +216,11 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "approved":
-        return getTranslation('Accepted',language);
+        return getTranslation("Accepted", language);
       case "rejected":
-        return getTranslation('Rejected',language);
+        return getTranslation("Rejected", language);
       default:
-        return getTranslation('UnderReview',language);
+        return getTranslation("UnderReview", language);
     }
   };
 
@@ -366,25 +365,25 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           {
-            label: getTranslation('totalRequests',language),
+            label: getTranslation("totalRequests", language),
             value: stats.total,
             color: "bg-blue-500",
             icon: FileText,
           },
           {
-            label: getTranslation('UnderReview',language),
+            label: getTranslation("UnderReview", language),
             value: stats.pending,
             color: "bg-yellow-500",
             icon: Clock,
           },
           {
-            label: getTranslation('Accepted',language),
+            label: getTranslation("Accepted", language),
             value: stats.approved,
             color: "bg-green-500",
             icon: CheckCircle,
           },
           {
-            label: getTranslation('Rejected',language),
+            label: getTranslation("Rejected", language),
             value: stats.rejected,
             color: "bg-red-500",
             icon: XCircle,
@@ -417,16 +416,16 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
             <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-             {getTranslation('noLeaveRequests',language)}
+              {getTranslation("noLeaveRequests", language)}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              getTranslation('noLeaveJustificationRequests',language)
+              {getTranslation("noLeaveJustificationRequests", language)}{" "}
             </p>
             <button
               onClick={() => setShowRequestModal(true)}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              {getTranslation('submitNewRequest',language)}
+              {getTranslation("submitNewRequest", language)}
             </button>
           </div>
         ) : (
@@ -445,10 +444,11 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       {request.childName}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation('AbsenceDate',language)}: {request.date.toLocaleDateString()}
+                      {getTranslation("AbsenceDate", language)}:{" "}
+                      {request.date.toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation('SubmissionDate',language)}:{" "}
+                      {getTranslation("SubmissionDate", language)}:{" "}
                       {request.submittedDate.toLocaleDateString()}
                     </p>
                   </div>
@@ -467,7 +467,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('AbsenceReason',language)}
+                  {getTranslation("AbsenceReason", language)}
                 </h4>
                 <p className="text-gray-900 dark:text-white">
                   {request.reason}
@@ -477,7 +477,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {getTranslation('supportingDocuments',language)}
+                    {getTranslation("supportingDocuments", language)}
                   </span>
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -486,12 +486,15 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                         : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                     }`}
                   >
-                    {request.documents ? getTranslation('Available',language) : getTranslation('NotAvailable',language)}
+                    {request.documents
+                      ? getTranslation("Available", language)
+                      : getTranslation("NotAvailable", language)}
                   </span>
                 </div>
                 {request.reviewDate && (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {getTranslation('reviewDate',language)}: {request.reviewDate.toLocaleString()}
+                    {getTranslation("reviewDate", language)}:{" "}
+                    {request.reviewDate.toLocaleString()}
                   </span>
                 )}
               </div>
@@ -499,7 +502,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               {request.adminComment && (
                 <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('adminComment',language)}
+                    {getTranslation("adminComment", language)}
                   </h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {request.adminComment}
@@ -510,7 +513,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               {request.status === "pending" && (
                 <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse text-sm text-yellow-600 dark:text-yellow-400">
                   <AlertTriangle className="h-4 w-4" />
-                  <span>{getTranslation('requestUnderReview',language)}</span>
+                  <span>{getTranslation("requestUnderReview", language)}</span>
                 </div>
               )}
             </div>
@@ -526,19 +529,19 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           {
-            label: getTranslation('totalReports',language),
+            label: getTranslation("totalReports", language),
             value: attitudeStats.total,
             color: "bg-blue-500",
             icon: FileText,
           },
           {
-            label: getTranslation('excellentBehavior',language),
+            label: getTranslation("excellentBehavior", language),
             value: attitudeStats.excellent,
             color: "bg-green-500",
             icon: CheckCircle,
           },
           {
-            label: getTranslation('goodBehavior',language),
+            label: getTranslation("goodBehavior", language),
             value: attitudeStats.good + attitudeStats.veryGood,
             color: "bg-yellow-500",
             icon: TrendingUp,
@@ -571,10 +574,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
             <TrendingUp className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              {getTranslation('noBehaviorReports',language)}
+              {getTranslation("noBehaviorReports", language)}
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {getTranslation('noBehaviorReportsForChild',language)}
+              {getTranslation("noBehaviorReportsForChild", language)}
             </p>
           </div>
         ) : (
@@ -593,10 +596,12 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       {report.childName}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation('reportDate',language)}: {report.date.toLocaleDateString()}
+                      {getTranslation("reportDate", language)}:{" "}
+                      {report.date.toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation('SubmissionDate',language)}: {report.submittedDate.toLocaleDateString()}
+                      {getTranslation("SubmissionDate", language)}:{" "}
+                      {report.submittedDate.toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -613,7 +618,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('classParticipation',language)}:
+                  {getTranslation("classParticipation", language)}:
                 </h4>
                 <p className="text-gray-900 dark:text-white">
                   {report.participation}
@@ -622,7 +627,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('teacherComment',language)}:
+                  {getTranslation("teacherComment", language)}:
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400">
                   {report.teacherComment}
@@ -632,7 +637,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {getTranslation('submittedBy',language)}
+                    {getTranslation("submittedBy", language)}
                   </span>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">
                     {report.submittedBy}
@@ -672,7 +677,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Plus className="h-4 w-4" />
-              <span>{getTranslation("leaveRequest",language)}</span>
+              <span>{getTranslation("leaveRequest", language)}</span>
             </button>
           )}
         </div>
@@ -689,7 +694,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            {getTranslation('absenceManagement',language)}
+            {getTranslation("absenceManagement", language)}
           </button>
           <button
             onClick={() => setActiveTab("attitude")}
@@ -699,7 +704,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            {getTranslation('behaviorReports',language)}
+            {getTranslation("behaviorReports", language)}
           </button>
         </div>
       </div>
@@ -714,13 +719,13 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('leaveRequest',language)}
+              {getTranslation("leaveRequest", language)}
             </h3>
 
             <form onSubmit={handleSubmitRequest} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('selectChild',language)}
+                  {getTranslation("selectChild", language)}
                 </label>
                 <select
                   value={student_id}
@@ -731,7 +736,9 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">{getTranslation('selectChild',language)}</option>
+                  <option value="">
+                    {getTranslation("selectChild", language)}
+                  </option>
                   {children.map((child) => (
                     <option key={child.id} value={child.id}>
                       {child.name}
@@ -742,7 +749,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('AbsenceDate',language)}
+                  {getTranslation("AbsenceDate", language)}
                 </label>
                 <input
                   type="date"
@@ -758,7 +765,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('AbsenceReason',language)}
+                  {getTranslation("AbsenceReason", language)}
                 </label>
                 <select
                   value={absence_reason}
@@ -769,19 +776,33 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">{getTranslation('absenceReasonPlaceholder',language)}</option>
-                  <option value="مرض">{getTranslation('illness',language)}</option>
-                  <option value="موعد طبي">{getTranslation('medicalAppointment',language)}</option>
-                  <option value="ظروف عائلية">{getTranslation('familyCircumstances',language)}</option>
-                  <option value="طوارئ">{getTranslation('emergency',language)}</option>
-                  <option value="سفر">{getTranslation('travel',language)}</option>
-                  <option value="أخرى">{getTranslation('other',language)}</option>
+                  <option value="">
+                    {getTranslation("absenceReasonPlaceholder", language)}
+                  </option>
+                  <option value="مرض">
+                    {getTranslation("illness", language)}
+                  </option>
+                  <option value="موعد طبي">
+                    {getTranslation("medicalAppointment", language)}
+                  </option>
+                  <option value="ظروف عائلية">
+                    {getTranslation("familyCircumstances", language)}
+                  </option>
+                  <option value="طوارئ">
+                    {getTranslation("emergency", language)}
+                  </option>
+                  <option value="سفر">
+                    {getTranslation("travel", language)}
+                  </option>
+                  <option value="أخرى">
+                    {getTranslation("other", language)}
+                  </option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                 {getTranslation('additionalDetails',language)}
+                  {getTranslation("additionalDetails", language)}
                 </label>
                 <textarea
                   rows={4}
@@ -790,19 +811,22 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                     setMoreDetails(e.target.value);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={getTranslation('additionalDetailsPlaceholder',language)}
+                  placeholder={getTranslation(
+                    "additionalDetailsPlaceholder",
+                    language
+                  )}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('uploadSupportingDocuments',language)}
+                  {getTranslation("uploadSupportingDocuments", language)}
                 </label>
                 <label htmlFor="proof_doc_input">
                   <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
                     <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation('clickToSelect',language)}
+                      {getTranslation("clickToSelect", language)}
                     </p>
                     <input
                       id="proof_doc_input"
@@ -827,7 +851,8 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                 </label>
                 {newRequest.documents && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                    {newRequest.documents.length} {getTranslation('selectedFiles',language)}
+                    {newRequest.documents.length}{" "}
+                    {getTranslation("selectedFiles", language)}
                   </p>
                 )}
               </div>
@@ -847,7 +872,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   htmlFor="urgent"
                   className="text-sm text-gray-700 dark:text-gray-300"
                 >
-                  {getTranslation('urgentRequest',language)}
+                  {getTranslation("urgentRequest", language)}
                 </label>
               </div>
 
@@ -872,13 +897,13 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  {getTranslation('cancel',language)}
+                  {getTranslation("cancel", language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                 {getTranslation('submitRequest',language)}
+                  {getTranslation("submitRequest", language)}
                 </button>
               </div>
             </form>

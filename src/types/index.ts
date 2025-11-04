@@ -149,6 +149,7 @@ export interface ClassManagementProps {
   modules_class_groups: TeacherModuleClassGroup[];
   setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
   teacher_id: number;
+  setActiveTab:React.Dispatch<React.SetStateAction<string>>
 }
 
 export interface TeacherAbsenceManagerProps {

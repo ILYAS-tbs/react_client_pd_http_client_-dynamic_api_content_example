@@ -15,6 +15,8 @@ const URLS = {
   get_current_parent_teachers_chats: `${SERVER_BASE_URL}/chat/get_current_parent_teachers_chats/`,
 
   upload_chat_file: `${SERVER_BASE_URL}/chat/upload-chat-file/`,
+
+  get_latest_five_messages:`${SERVER_BASE_URL}/chat/get_latest_five_messages/`
 };
 //! used by the parent dashboard/chat
 async function get_current_parent_schools_teachers() {
@@ -120,6 +122,21 @@ async function get_current_parent_teachers_chats() {
   }
 }
 
+//! get_latest_five_messages for parent or Teacher
+async function get_latest_five_messages() {
+  try {
+    const response = await fetch(URLS.get_latest_five_messages, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json(); // Automatically parse the response data
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 //! FILE UPLOADS to the chat
 async function upload_chat_file(formData: FormData, csrfToken: string) {
   /*
@@ -154,4 +171,6 @@ export const chat_http_client = {
   get_current_parent_teachers_chats: get_current_parent_teachers_chats,
 
   upload_chat_file: upload_chat_file,
+
+  get_latest_five_messages:get_latest_five_messages,
 };

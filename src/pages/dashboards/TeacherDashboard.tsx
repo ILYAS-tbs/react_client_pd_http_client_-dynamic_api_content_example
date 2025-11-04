@@ -35,6 +35,8 @@ import TeacherChat from "../../components/shared/TeacherChat";
 import { Parent } from "../../models/Parent";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { Message } from "../../models/chat_system/Message";
+import { timeAgoArabic } from "../../lib/timeAgoArabic";
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -53,6 +55,28 @@ const TeacherDashboard: React.FC = () => {
   const teacher_id: number = JSON.parse(lc_user.id);
   console.log("teacher's id : ", teacher_id);
 
+  //*: New Messages Frontend shape ::
+  /*
+  [
+                    {
+                      from: "أم أحمد",
+                      message: "استفسار عن درجات الرياضيات",
+                      time: "منذ ساعة",
+                    },
+                    {
+                      from: "أبو فاطمة",
+                      message: "طلب موعد لقاء",
+                      time: "منذ 2 ساعة",
+                    },
+                    {
+                      from: "أم محمد",
+                      message: "شكر على المجهود",
+                      time: "منذ 3 ساعات",
+                    },
+                  ]
+  */
+ 
+
   //! Fetching Data From The Server
   const [students, setStudents] = useState<Student[]>([]);
   const [modules_class_groups, setModulesClassGroups] = useState<
@@ -65,6 +89,8 @@ const TeacherDashboard: React.FC = () => {
   );
   const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
+
+  const [newMessages,setNewMessages]=useState<Message[]>([]);
 
   const get_current_teacher_students = async () => {
     const res = await teacher_dashboard_client.get_current_teacher_students();
@@ -120,6 +146,14 @@ const TeacherDashboard: React.FC = () => {
     }
   };
 
+  const get_latest_five_messages = async ()=>{
+    const res = await chat_http_client.get_latest_five_messages()
+    if(res.ok){
+      const new_messages_list :Message[]= res.data 
+      setNewMessages(new_messages_list)
+    }
+  }
+
   //? Chat system :
   //? list for all the parents this teacher can chat with
   const [parents_list, setParentsList] = useState<Parent[]>([]);
@@ -140,6 +174,7 @@ const TeacherDashboard: React.FC = () => {
     get_current_teacher_behaviour_reports();
     current_teacher_school_modules();
     current_teacher_students_grades();
+    get_latest_five_messages()
 
     //? chat system :
     get_current_teacher_school_parents();
@@ -217,6 +252,7 @@ const TeacherDashboard: React.FC = () => {
             modules_class_groups={modules_class_groups}
             setAbsences={setAbsences}
             teacher_id={teacher_id}
+            setActiveTab={setActiveTab}
           />
         );
       case "grades":
@@ -427,15 +463,21 @@ const TeacherDashboard: React.FC = () => {
                   {getTranslation('quickActions',language)}
                 </h3>
                 <div className="space-y-3">
-                  <button className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+                  <button 
+                  onClick={()=>setActiveTab('grades')}
+                  className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
                     <Edit className="h-5 w-5" />
                     <span>{getTranslation('enterNewGrades',language)}</span>
                   </button>
-                  <button className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
+                  <button
+                  onClick={()=>setActiveTab('resources')}
+                  className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
                     <Upload className="h-5 w-5" />
                     <span>{getTranslation('uploadEducationalMaterial',language)}</span>
                   </button>
-                  <button className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
+                  <button 
+                  onClick={()=>setActiveTab('chat')}
+                  className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
                     <MessageCircle className="h-5 w-5" />
                     <span>{getTranslation('sendNotificationToParents',language)}</span>
                   </button>
@@ -447,23 +489,11 @@ const TeacherDashboard: React.FC = () => {
                  {getTranslation('newMessages',language)}
                 </h3>
                 <div className="space-y-3">
-                  {[
-                    {
-                      from: "أم أحمد",
-                      message: "استفسار عن درجات الرياضيات",
-                      time: "منذ ساعة",
-                    },
-                    {
-                      from: "أبو فاطمة",
-                      message: "طلب موعد لقاء",
-                      time: "منذ 2 ساعة",
-                    },
-                    {
-                      from: "أم محمد",
-                      message: "شكر على المجهود",
-                      time: "منذ 3 ساعات",
-                    },
-                  ].map((msg, index) => (
+                  {newMessages.map((msg)=>({
+                      from: msg.from_user?.username,
+                      message: msg.content ?? "set a file",
+                      time: timeAgoArabic(msg.timestamp),
+                    })).map((msg, index) => (
                     <div
                       key={index}
                       className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
@@ -484,6 +514,9 @@ const TeacherDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
+
+
+            
           </div>
         );
     }

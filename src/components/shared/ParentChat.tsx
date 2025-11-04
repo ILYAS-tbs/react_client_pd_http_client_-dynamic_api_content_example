@@ -183,7 +183,7 @@ const ParentChat: React.FC<ParentChatProps> = ({
   function mapAPIMessagesToFrontMessage(messages_list: Message[]) {
     return messages_list.map((message: Message) => ({
       id: message.message_id,
-      sender: message.from_user === parent_id ? "parent" : "teacher",
+      sender: message.from_user?.id === parent_id ? "parent" : "teacher",
       content: message.content ?? "",
       timestamp: message.timestamp ? new Date(message.timestamp) : null,
       date: "اليوم",
