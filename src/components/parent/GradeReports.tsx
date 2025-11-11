@@ -183,18 +183,18 @@ const GradeReports: React.FC<GradeReportsProps> = ({
     name: s.full_name,
   }));
 
-  //! Translation : 
-  const {language} = useLanguage()
+  //! Translation :
+  const { language } = useLanguage();
 
   const [selectedChild, setSelectedChild] = useState(children[0]?.id || "");
   const [selectedPeriod, setSelectedPeriod] = useState("current");
   const [selectedSubject, setSelectedSubject] = useState("all");
 
   const periods = [
-    { id: "current", label: getTranslation('currentSemester',language) },
-    { id: "semester1", label: getTranslation('firstSemester',language) },
-    { id: "semester2", label: getTranslation('secondSemester',language) },
-    { id: "year", label: getTranslation('academicYear',language) },
+    { id: "current", label: getTranslation("currentSemester", language) },
+    { id: "semester1", label: getTranslation("firstSemester", language) },
+    { id: "semester2", label: getTranslation("secondSemester", language) },
+    { id: "year", label: getTranslation("academicYear", language) },
   ];
 
   // const gradeData: Record<string, ChildPerformance> = students.reduce(
@@ -250,65 +250,66 @@ const GradeReports: React.FC<GradeReportsProps> = ({
   // );
 
   const gradeData: Record<string, ChildPerformance> = students.reduce(
-  (acc, student, index) => {
-    const perf = studentPerformances[index];
-    if (!perf) return acc;
+    (acc, student, index) => {
+      const perf = studentPerformances[index];
+      if (!perf) return acc;
 
-    const mapped_subjects: Subject[] = perf.modules_stats.map((module_stat) => {
-      // For each module, pick the first ModuleMark entry (each subject has one per student)
-      const moduleMark = module_stat.module_marks[0];
-      if (!moduleMark) return null;
+      const mapped_subjects: Subject[] = perf.modules_stats
+        .map((module_stat) => {
+          // For each module, pick the first ModuleMark entry (each subject has one per student)
+          const moduleMark = module_stat.module_marks[0];
+          if (!moduleMark) return null;
 
-      // Determine which semester is selected
-      const prefix = selectedPeriod === "semester2" ? "s2_" : "s1_";
+          // Determine which semester is selected
+          const prefix = selectedPeriod === "semester2" ? "s2_" : "s1_";
 
-      // Dynamically extract marks for the selected semester
-      const fields = Object.entries(moduleMark)
-        .filter(([key]) => key.startsWith(prefix))
-        .map(([key, value]) => ({ key, value }));
+          // Dynamically extract marks for the selected semester
+          const fields = Object.entries(moduleMark)
+            .filter(([key]) => key.startsWith(prefix))
+            .map(([key, value]) => ({ key, value }));
 
-      const assessments: Assessment[] = fields
-        .filter(
-          (f) =>
-            !f.key.endsWith("average") &&
-            typeof f.value === "number" &&
-            f.value !== null
-        )
-        .map((f) => ({
-          name: translateMarkType(f.key.replace(prefix, "")),
-          grade: f.value as number,
-          max: 20,
-          date: new Date(), // Backend doesn't provide dates anymore
-          weight: 0, // You can set weights later if needed
-        }));
+          const assessments: Assessment[] = fields
+            .filter(
+              (f) =>
+                !f.key.endsWith("average") &&
+                typeof f.value === "number" &&
+                f.value !== null
+            )
+            .map((f) => ({
+              name: translateMarkType(f.key.replace(prefix, "")),
+              grade: f.value as number,
+              max: 20,
+              date: new Date(), // Backend doesn't provide dates anymore
+              weight: 0, // You can set weights later if needed
+            }));
 
-      // Extract averages
-      const currentAverage =
-        (moduleMark as any)[`${prefix}average`] ?? 0;
+          // Extract averages
+          const currentAverage = (moduleMark as any)[`${prefix}average`] ?? 0;
 
-      const subject: Subject = {
-        name: module_stat.module_name,
-        current: currentAverage,
-        previous: 0, // you can later compare s1 vs s2
-        average: module_stat.class_average,
-        assessments,
+          const subject: Subject = {
+            name: module_stat.module_name,
+            current: currentAverage,
+            previous: 0, // you can later compare s1 vs s2
+            average: module_stat.class_average,
+            assessments,
+          };
+
+          return subject;
+        })
+        .filter(Boolean) as Subject[];
+
+      acc[student.student_id] = {
+        overall: perf.student_overall_avg,
+        trend: "+0.8",
+        position: perf.student_rank,
+        totalStudents: perf.class_group_students_number,
+        subjects: mapped_subjects,
       };
 
-      return subject;
-    }).filter(Boolean) as Subject[];
-
-    acc[student.student_id] = {
-      overall: perf.student_overall_avg,
-      trend: "+0.8",
-      position: perf.student_rank,
-      totalStudents: perf.class_group_students_number,
-      subjects: mapped_subjects,
-    };
-
-    return acc;
-  },
-  {} as Record<string, ChildPerformance>
-);
+      return acc;
+    },
+    {} as Record<string, ChildPerformance>
+  );
 
   const currentData: ChildPerformance | undefined = gradeData[selectedChild];
   const filteredSubjects =
@@ -352,11 +353,11 @@ const GradeReports: React.FC<GradeReportsProps> = ({
       {/* Header and Filters */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-         {getTranslation('gradeReports',language)}
+          {getTranslation("gradeReports", language)}
         </h2>
         <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
           <Download className="h-4 w-4" />
-          <span>{getTranslation('exportReport',language)}</span>
+          <span>{getTranslation("exportReport", language)}</span>
         </button>
       </div>
 
@@ -365,7 +366,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
         <div className="grid md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation('child',language)}
+              {getTranslation("child", language)}
             </label>
             <select
               value={selectedChild}
@@ -382,7 +383,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation('Filtering',language)}
+              {getTranslation("Filtering", language)}
             </label>
             <select
               value={selectedPeriod}
@@ -399,14 +400,16 @@ const GradeReports: React.FC<GradeReportsProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation('Subject',language)}
+              {getTranslation("Subject", language)}
             </label>
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value="all">{getTranslation('allSubjects',language)}</option>
+              <option value="all">
+                {getTranslation("allSubjects", language)}
+              </option>
               {currentData?.subjects.map((subject: Subject) => (
                 <option key={subject.name} value={subject.name}>
                   {subject.name}
@@ -418,7 +421,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-end">
             <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Filter className="h-4 w-4" />
-              <span>{getTranslation('apply',language)}</span>
+              <span>{getTranslation("apply", language)}</span>
             </button>
           </div>
         </div>
@@ -430,7 +433,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {getTranslation('overallGrade',language)}
+                {getTranslation("overallGrade", language)}
               </p>
               <p className="text-2xl font-bold text-green-600">
                 {currentData?.overall ?? "0"}/20
@@ -450,7 +453,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {getTranslation('rank',language)}
+                {getTranslation("rank", language)}
               </p>
               <p className="text-2xl font-bold text-blue-600">
                 {currentData?.position}
@@ -461,7 +464,8 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation('outOf',language)} {currentData?.totalStudents} {getTranslation('student',language)}
+            {getTranslation("outOf", language)} {currentData?.totalStudents}{" "}
+            {getTranslation("student", language)}
           </p>
         </div>
 
@@ -469,7 +473,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {getTranslation('numberOfSubjects',language)}
+                {getTranslation("numberOfSubjects", language)}
               </p>
               <p className="text-2xl font-bold text-purple-600">
                 {currentData?.subjects?.length}
@@ -480,7 +484,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation('subjects',language)}
+            {getTranslation("subjects", language)}
           </p>
         </div>
 
@@ -488,24 +492,26 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {getTranslation('highestScore',language)}
+                {getTranslation("highestScore", language)}
               </p>
-              <p className="text-2xl font-bold text-green-600">{currentData?.overall ?? 0}/20</p>
+              <p className="text-2xl font-bold text-green-600">
+                {currentData?.overall ?? 0}/20
+              </p>
             </div>
             <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
               <TrendingUp className="h-6 w-6 text-green-600" />
             </div>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation('in',language)} {maxSubject}
+            {getTranslation("in", language)} {maxSubject}
           </p>
         </div>
       </div>
 
       {/* Subject Performance */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div className="min-h-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {getTranslation('subjectPerformance',language)}
+          {getTranslation("subjectPerformance", language)}
         </h3>
         <div className="space-y-4">
           {filteredSubjects?.map((subject: Subject, index: number) => (
@@ -530,7 +536,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                       {subject.current}/20
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {getTranslation('currentGrade',language)}
+                      {getTranslation("currentGrade", language)}
                     </div>
                   </div>
                   <div className="text-center">
@@ -538,7 +544,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
                       {subject.average}/20
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {getTranslation('classAverage',language)}
+                      {getTranslation("classAverage", language)}
                     </div>
                   </div>
                 </div>
@@ -580,8 +586,9 @@ const GradeReports: React.FC<GradeReportsProps> = ({
         </div>
       </div>
 
+      {/* commented for now - doesnt exist on the backend */}
       {/* Grade Appeals */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {getTranslation('gradeReviewRequests',language)}
@@ -598,7 +605,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             {getTranslation('gradeReviewInstruction',language)}
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

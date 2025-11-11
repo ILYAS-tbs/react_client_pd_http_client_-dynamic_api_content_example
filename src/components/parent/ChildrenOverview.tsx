@@ -18,11 +18,12 @@ import { useLanguage } from "../../contexts/LanguageContext";
 const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   students,
   one_student_absences,
+  setActiveTab,
 }) => {
   const [selectedChild, setSelectedChild] = useState(students?.[0]?.student_id);
-  
-  //! Translations : 
-  const {language}=useLanguage()
+
+  //! Translations :
+  const { language } = useLanguage();
 
   //! MOCK DATA :
   // const children = [
@@ -142,13 +143,13 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
 
   function mapBehaviour(bahaviour: string) {
     if (bahaviour == "excellent") {
-      return getTranslation('excellent',language);
+      return getTranslation("excellent", language);
     }
     if (bahaviour == "very_good") {
-      return getTranslation('veryGood',language);
+      return getTranslation("veryGood", language);
     }
 
-    return getTranslation('poorPerformance',language);
+    return getTranslation("poorPerformance", language);
   }
   const children = students.map((student: Student) => ({
     id: student.student_id,
@@ -225,11 +226,11 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
       {/* Header and Child Selector */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('childrenOverview',language)}
+          {getTranslation("childrenOverview", language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {getTranslation('selectChild',language)}:
+            {getTranslation("selectChild", language)}:
           </span>
           <select
             value={selectedChild}
@@ -261,7 +262,8 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   {currentChild.class} - {currentChild.school}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {getTranslation('mainTeacher',language)} : {currentChild.teacher}
+                  {getTranslation("mainTeacher", language)} :{" "}
+                  {currentChild.teacher}
                 </p>
               </div>
               <div className="text-center">
@@ -269,7 +271,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   {currentChild.overallGrade}/20
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('overallGrade',language)}
+                  {getTranslation("overallGrade", language)}
                 </div>
               </div>
             </div>
@@ -281,7 +283,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {getTranslation('TotalAbsences',language)}
+                    {getTranslation("TotalAbsences", language)}
                   </p>
                   <p className="text-2xl font-bold text-blue-600">
                     {currentChild.attendance}
@@ -297,7 +299,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {getTranslation('behavior',language)}
+                    {getTranslation("behavior", language)}
                   </p>
 
                   {currentChild.behavior == "excellent" ? (
@@ -337,7 +339,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {getTranslation('numberOfSubjects',language)}
+                    {getTranslation("numberOfSubjects", language)}
                   </p>
                   <p className="text-2xl font-bold text-purple-600">
                     {currentChild.subjects?.length}
@@ -351,11 +353,11 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
           </div>
 
           {/* Subjects and Recent Activities */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="min-h-80 grid md:grid-cols-2 gap-6">
             {/* Subjects Performance */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation('subjectPerformance',language)}
+                {getTranslation("subjectPerformance", language)}
               </h3>
               <div className="space-y-4">
                 {currentChild.subjects?.map((subject, index) => (
@@ -389,9 +391,9 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
             </div>
 
             {/* Recent Activities */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation('recentActivities',language)}
+                {getTranslation("recentActivities", language)}
               </h3>
               <div className="space-y-4">
                 {currentChild.recentActivities.map((activity, index) => (
@@ -421,30 +423,40 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Actions */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('quickActions',language)}
+              {getTranslation("quickActions", language)}
             </h3>
             <div className="grid md:grid-cols-4 gap-4">
-              <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
+              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
                 <BookOpen className="h-5 w-5" />
                 <span className="text-sm font-medium">{getTranslation('viewGrades',language)}</span>
-              </button>
-              <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+              </button> */}
+              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
                 <Calendar className="h-5 w-5" />
                 <span className="text-sm font-medium">{getTranslation('attendanceRecord',language)}</span>
-              </button>
-              <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
+              </button> */}
+              <button
+                onClick={() => setActiveTab("absences")}
+                className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors"
+              >
                 <AlertTriangle className="h-5 w-5" />
-                <span className="text-sm font-medium">{getTranslation('justifyAbsence',language)}</span>
+                <span className="text-sm font-medium">
+                  {getTranslation("justifyAbsence", language)}
+                </span>
               </button>
-              <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors">
+              <button
+                onClick={() => setActiveTab("chat")}
+                className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors"
+              >
                 <User className="h-5 w-5" />
-                <span className="text-sm font-medium">{getTranslation("contactTeacher",language)}</span>
+                <span className="text-sm font-medium">
+                  {getTranslation("contactTeacher", language)}
+                </span>
               </button>
             </div>
           </div>

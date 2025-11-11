@@ -32,11 +32,10 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
   modules_class_groups,
   setAbsences,
   teacher_id,
-  setActiveTab
+  setActiveTab,
 }) => {
-
-  //! Translations :: 
-  const {language}=useLanguage()
+  //! Translations ::
+  const { language } = useLanguage();
 
   const default_first_class =
     modules_class_groups?.[0]?.class_group.class_group_id;
@@ -203,7 +202,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('classManagement',language)}
+          {getTranslation("classManagement", language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <select
@@ -240,7 +239,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('studentsCount',language)} :
+                  {getTranslation("studentsCount", language)} :
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {currentClass.students}
@@ -248,7 +247,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('averageGrades',language)} :
+                  {getTranslation("averageGrades", language)} :
                 </span>
                 <span className="text-sm font-medium text-green-600">
                   {currentClass.averageGrade}
@@ -256,7 +255,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('AttendanceRate',language)} :
+                  {getTranslation("AttendanceRate", language)} :
                 </span>
                 <span className="text-sm font-medium text-blue-600">
                   {currentClass.attendance}
@@ -271,7 +270,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 <Calendar className="h-6 w-6 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {getTranslation('weeklySchedule',language)}
+                {getTranslation("weeklySchedule", language)}
               </h3>
             </div>
             <div className="h-64 overflow-y-auto space-y-2">
@@ -297,28 +296,30 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 <BookOpen className="h-6 w-6 text-purple-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {getTranslation('quickActions',language)}
+                {getTranslation("quickActions", language)}
               </h3>
             </div>
             <div className="space-y-2">
-              <button 
-              onClick={()=>setActiveTab('grades')}
-              className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+              <button
+                onClick={() => setActiveTab("grades")}
+                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
+              >
                 <Plus className="h-4 w-4" />
-                <span>{getTranslation('addGrade',language)}</span>
+                <span>{getTranslation("addGrade", language)}</span>
               </button>
               <button
                 onClick={() => setShowAbsenseTakingModal(true)}
                 className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
               >
                 <Edit className="h-4 w-4" />
-                <span>{getTranslation('recordAttendance',language)}</span>
+                <span>{getTranslation("recordAttendance", language)}</span>
               </button>
-              <button 
-              onClick={()=>setActiveTab('absences')}
-              className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
+              <button
+                onClick={() => setActiveTab("absences")}
+                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors"
+              >
                 <Eye className="h-4 w-4" />
-                <span>{getTranslation('viewReports',language)}</span>
+                <span>{getTranslation("viewReports", language)}</span>
               </button>
             </div>
           </div>
@@ -329,7 +330,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
       <div className="h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation('students',language)} {currentClass?.name}
+            {getTranslation("students", language)} {currentClass?.name}
           </h3>
         </div>
         <div className="overflow-x-auto">
@@ -337,19 +338,19 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('student',language)}
+                  {getTranslation("student", language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('lastGrade',language)}
+                  {getTranslation("lastGrade", language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('attendance',language)}
+                  {getTranslation("attendance", language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('status',language)}
+                  {getTranslation("status", language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('actions',language)}
+                  {getTranslation("actions", language)}
                 </th>
               </tr>
             </thead>
@@ -366,7 +367,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                      {student.lastGrade}
+                      {student.trimester_grade ?? 0}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -411,14 +412,14 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
         <div className=" fixed inset-0 !mt-0  bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('recordAbsences',language)}
+              {getTranslation("recordAbsences", language)}
             </h3>
 
             <div className="relative">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchStudents',language)}
+                placeholder={getTranslation("searchStudents", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -443,7 +444,9 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                         : "text-green-600 dark:text-green-400"
                     }`}
                   >
-                    {s.is_absent ? getTranslation('absent',language) : getTranslation('present',language)}
+                    {s.is_absent
+                      ? getTranslation("absent", language)
+                      : getTranslation("present", language)}
                   </span>
 
                   {/* actions */}
@@ -454,7 +457,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                     bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 
                     hover:bg-rose-300 dark:hover:bg-rose-800`}
                     >
-                      {getTranslation('recordAbsences',language)}
+                      {getTranslation("recordAbsences", language)}
                     </button>
                   </div>
                 </div>
@@ -465,7 +468,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 onClick={() => setShowAbsenseTakingModal(false)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                {getTranslation('close',language)}
+                {getTranslation("close", language)}
               </button>
 
               {/* Confirmation for this will be unused for now, since we have to make a copy first then make the call */}

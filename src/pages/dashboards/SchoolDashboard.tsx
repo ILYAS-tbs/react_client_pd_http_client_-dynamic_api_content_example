@@ -282,7 +282,7 @@ console.log('📊 SchoolDashboard rendering with language:', language);
 const stats =  [
     { title:getTranslation("TotalStudents",language), value: students.length || "0", icon: Users, color: "bg-blue-500" },
     { title: getTranslation("Teachers",language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
-    { title: getTranslation("ClassGroups",language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
+    { title: getTranslation("Classes",language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
     { title: getTranslation("TotalAbsences",language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
    ]
 

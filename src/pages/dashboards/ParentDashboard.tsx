@@ -43,7 +43,7 @@ const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   //! Translation :
-  const {language} = useLanguage()
+  const { language } = useLanguage();
 
   // ! Fetching the parent's id (which is the user id)
   const lc_user: User = JSON.parse(
@@ -161,7 +161,7 @@ const ParentDashboard: React.FC = () => {
   };
 
   //? Notifications :
-  const {notifications}=useNotifications()
+  const { notifications } = useNotifications();
 
   useEffect(() => {
     get_current_parent_students();
@@ -198,25 +198,25 @@ const ParentDashboard: React.FC = () => {
   };
   const stats = [
     {
-      title: getTranslation('myChildren',language),
+      title: getTranslation("myChildren", language),
       value: students.length || "0",
       icon: UserIcon,
       color: "bg-blue-500",
     },
     {
-      title: getTranslation('totalAbsences',language),
+      title: getTranslation("totalAbsences", language),
       value: total_absences() || "0",
       icon: Calendar,
       color: "bg-green-500",
     },
     {
-      title: getTranslation('newMessages',language),
+      title: getTranslation("newMessages", language),
       value: "3",
       icon: MessageCircle,
       color: "bg-purple-500",
     },
     {
-      title: getTranslation('notifications',language),
+      title: getTranslation("notifications", language),
       value: "5",
       icon: AlertTriangle,
       color: "bg-orange-500",
@@ -224,16 +224,48 @@ const ParentDashboard: React.FC = () => {
   ];
 
   const tabs = [
-    { id: "overview", label:getTranslation('overview',language), icon: TrendingUp },
-    { id: "children", label: getTranslation('myChildren',language), icon: UserIcon },
-    { id: "grades", label: getTranslation('grade',language), icon: FileText },
-    { id: "absences", label:getTranslation('absencesAndReports',language), icon: Calendar },
-    { id: "chat", label: getTranslation('chat',language), icon: MessageCircle },
-    { id: "announcements", label: getTranslation('notificationsAndAlarms',language), icon: AlertTriangle },
-    { id: "timetable", label: getTranslation('timetable',language), icon: LayoutGrid },
-    { id: "homework", label: getTranslation('homeworks',language), icon: BookOpen },
-    { id: "calendar", label: getTranslation('digitalLibrary',language), icon: Calendar },
-    { id: "events", label: getTranslation('events',language), icon: Star },
+    {
+      id: "overview",
+      label: getTranslation("overview", language),
+      icon: TrendingUp,
+    },
+    {
+      id: "children",
+      label: getTranslation("myChildren", language),
+      icon: UserIcon,
+    },
+    { id: "grades", label: getTranslation("grade", language), icon: FileText },
+    {
+      id: "absences",
+      label: getTranslation("absencesAndReports", language),
+      icon: Calendar,
+    },
+    {
+      id: "chat",
+      label: getTranslation("chat", language),
+      icon: MessageCircle,
+    },
+    // {
+    //   id: "announcements",
+    //   label: getTranslation("notificationsAndAlarms", language),
+    //   icon: AlertTriangle,
+    // },
+    {
+      id: "timetable",
+      label: getTranslation("timetable", language),
+      icon: LayoutGrid,
+    },
+    // {
+    //   id: "homework",
+    //   label: getTranslation("homeworks", language),
+    //   icon: BookOpen,
+    // },
+    {
+      id: "calendar",
+      label: getTranslation("digitalLibrary", language),
+      icon: Calendar,
+    },
+    { id: "events", label: getTranslation("events", language), icon: Star },
   ];
 
   const renderContent = () => {
@@ -243,6 +275,7 @@ const ParentDashboard: React.FC = () => {
           <ChildrenOverview
             students={students ?? []}
             one_student_absences={one_student_absences}
+            setActiveTab={setActiveTab}
           />
         );
       case "grades":
@@ -349,7 +382,7 @@ const ParentDashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 bg-green-50 dark:bg-green-900 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {getTranslation('overallGrade',language)}
+                        {getTranslation("overallGrade", language)}
                       </p>
                       <p className="text-xl font-bold text-green-600">
                         {child.trimester_grade}
@@ -357,7 +390,7 @@ const ParentDashboard: React.FC = () => {
                     </div>
                     <div className="text-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {getTranslation('absences',language)}
+                        {getTranslation("absences", language)}
                       </p>
                       <p className="text-xl font-bold text-blue-600">
                         {one_student_absences(child) || "0"}
@@ -367,7 +400,7 @@ const ParentDashboard: React.FC = () => {
 
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation('academicStatus',language)}
+                      {getTranslation("academicStatus", language)}
                     </span>
                     <span
                       className={
@@ -380,10 +413,10 @@ const ParentDashboard: React.FC = () => {
                       }
                     >
                       {child.academic_state == "excellent"
-                        ? getTranslation('excellent',language)
+                        ? getTranslation("excellent", language)
                         : child.academic_state == "very_good"
-                        ? getTranslation('veryGood',language)
-                        : getTranslation('poorPerformance',language)}
+                        ? getTranslation("veryGood", language)
+                        : getTranslation("poorPerformance", language)}
                     </span>
                   </div>
                 </div>
@@ -394,55 +427,58 @@ const ParentDashboard: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                 {getTranslation('latestUpdates',language)}
+                  {getTranslation("latestUpdates", language)}
                 </h3>
                 <div className="h-64 overflow-y-scroll space-y-4">
-                  {notifications.map((not)=>( {
+                  {notifications
+                    .map((not) => ({
                       type: not.type,
                       message: not.title,
-                      time:timeAgoArabic(not.timestamp),
+                      time: timeAgoArabic(not.timestamp),
                       child: "..",
-                    })).map((update, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start space-x-3 rtl:space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                    >
+                    }))
+                    .map((update, index) => (
                       <div
-                        className={`p-2 rounded-lg ${
-                          update.type === "grade"
-                            ? "bg-green-100 dark:bg-green-900"
-                            : update.type === "message"
-                            ? "bg-blue-100 dark:bg-blue-900"
-                            : "bg-orange-100 dark:bg-orange-900"
-                        }`}
+                        key={index}
+                        className="flex items-start space-x-3 rtl:space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                       >
-                        {update.type === "grade" ? (
-                          <FileText className="h-4 w-4 text-green-600" />
-                        ) : update.type === "message" ? (
-                          <MessageCircle className="h-4 w-4 text-blue-600" />
-                        ) : (
-                          <GraduationCap className="h-4 w-4 text-orange-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {update.message}
-                        </p>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
-                            {update.child}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {update.time}
-                          </span>
+                        <div
+                          className={`p-2 rounded-lg ${
+                            update.type === "grade"
+                              ? "bg-green-100 dark:bg-green-900"
+                              : update.type === "message"
+                              ? "bg-blue-100 dark:bg-blue-900"
+                              : "bg-orange-100 dark:bg-orange-900"
+                          }`}
+                        >
+                          {update.type === "grade" ? (
+                            <FileText className="h-4 w-4 text-green-600" />
+                          ) : update.type === "message" ? (
+                            <MessageCircle className="h-4 w-4 text-blue-600" />
+                          ) : (
+                            <GraduationCap className="h-4 w-4 text-orange-600" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            {update.message}
+                          </p>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              {update.child}
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {update.time}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+              {/* Commented For Now - Doesn't Exist on the Backend */}
+              {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   {getTranslation('requiredTasks',language)}
                 </h3>
@@ -491,7 +527,7 @@ const ParentDashboard: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         );
@@ -500,8 +536,8 @@ const ParentDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title={getTranslation('parentDashboard',language)}
-      subtitle={getTranslation('welcomeMessage',language)}
+      title={getTranslation("parentDashboard", language)}
+      subtitle={getTranslation("welcomeMessage", language)}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
