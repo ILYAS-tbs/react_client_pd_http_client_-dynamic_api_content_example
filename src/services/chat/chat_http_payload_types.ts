@@ -12,4 +12,7 @@ export interface GetConversationIDResponse {
 export interface GetConvesationMessagesPayload {
   conversation_id: string;
 }
+export interface MarkChatMessagedAsRead {
+  conversation_id: string;
+}
 

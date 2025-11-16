@@ -19,6 +19,7 @@ import { getCSRFToken } from "../../lib/get_CSRFToken";
 import {
   GetConversationIDResponse,
   GetConvesationMessagesPayload,
+  MarkChatMessagedAsRead,
   PrivateConversationIDPayload,
 } from "../../services/chat/chat_http_payload_types";
 import { BounceLoader, MoonLoader, SyncLoader } from "react-spinners";
@@ -48,7 +49,7 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
 }) => {
 
   //! Translation :: 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   const [selectedChat, setSelectedChat] = useState<string | number>();
   const [message, setMessage] = useState("");
@@ -239,6 +240,21 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
     //! Fetch the messages for that conversation
     FetchMessages(latest_conv_id);
 
+    //! Mark All Messages as read in the backned:
+    const read_msgs_payload: MarkChatMessagedAsRead = {
+      conversation_id: latest_conv_id
+    }
+    latest_csrf = getCSRFToken()!
+    const read_msgs_res = chat_http_client.mark_conv_messaged_as_read(read_msgs_payload, latest_csrf)
+    //! Optimistic update in the frontend :
+    // ✅ Optimistic update: reset unread count locally
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === user_id
+          ? { ...chat, unread: 0 } // set unread to 0 immediately
+          : chat
+      )
+    );
     setIsChatLoading(false);
   };
 
@@ -394,13 +410,13 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-            {userType === "parent" ? getTranslation('teachers',language) : getTranslation('parents',language)}
+            {userType === "parent" ? getTranslation('teachers', language) : getTranslation('parents', language)}
           </h3>
           <div className="relative">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder={getTranslation('search',language)}
+              placeholder={getTranslation('search', language)}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pr-9 pl-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -416,13 +432,12 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
               onClick={() => {
                 setSelectedChat(chat.id);
                 handleSelectingAChat(chat.id);
-                
+
               }}
-              className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                selectedChat === chat.id
-                  ? "bg-green-50 dark:bg-green-900 border-r-2 border-green-500"
-                  : ""
-              }`}
+              className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${selectedChat === chat.id
+                ? "bg-green-50 dark:bg-green-900 border-r-2 border-green-500"
+                : ""
+                }`}
             >
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <div className="relative">
@@ -506,7 +521,7 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
                     </p>
                   )}
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {currentChat?.online ? getTranslation('onlineNow',language) : getTranslation('lastSeenAnHourAgo',language)}
+                    {currentChat?.online ? getTranslation('onlineNow', language) : getTranslation('lastSeenAnHourAgo', language)}
                   </p>
                 </div>
               </div>
@@ -533,21 +548,19 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex ${
-                      msg.sender ===
+                    className={`flex ${msg.sender ===
                       (userType === "parent" ? "parent" : "teacher")
-                        ? "justify-start"
-                        : "justify-end"
-                    }`}
+                      ? "justify-start"
+                      : "justify-end"
+                      }`}
                   >
                     {msg.type === "text" ? (
                       <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          msg.sender ===
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${msg.sender ===
                           (userType === "parent" ? "parent" : "teacher")
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
-                        }`}
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                          }`}
                       >
                         <p className="text-sm">{msg?.content ?? ""}</p>
                         <div className="flex items-center justify-end mt-1 space-x-1 rtl:space-x-reverse">
@@ -649,7 +662,7 @@ const TeacherChat: React.FC<TeacherChatProps> = ({
             <div className="text-center">
               <User className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-               {getTranslation('selectConversationToStart',language)}
+                {getTranslation('selectConversationToStart', language)}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 اختر {userType === "parent" ? "معلماً" : "ولي أمر"} من القائمة
