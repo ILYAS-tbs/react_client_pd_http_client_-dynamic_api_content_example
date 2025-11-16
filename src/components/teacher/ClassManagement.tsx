@@ -33,6 +33,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
   setAbsences,
   teacher_id,
   setActiveTab,
+  teacher
 }) => {
   //! Translations ::
   const { language } = useLanguage();
@@ -273,7 +274,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 {getTranslation("weeklySchedule", language)}
               </h3>
             </div>
-            <div className="h-64 overflow-y-auto space-y-2">
+            {/* changed to new pdf overview from table-to-pdf */}
+            {/* <div className="h-64 overflow-y-auto space-y-2">
               {currentClass.schedule.map((session, index) => (
                 <div
                   key={index}
@@ -287,6 +289,41 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   </span>
                 </div>
               ))}
+            </div> */}
+            {/* PDF Preview */}
+            <div className="h-96 rounded-lg overflow-hidden border dark:border-gray-600">
+              {/* <iframe
+                src={teacher?.weekly_schedule ?? undefined}
+                className="w-full h-full"
+                title="Weekly Schedule PDF"
+              ></iframe> */}
+              {/* <a
+                href={teacher?.weekly_schedule ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                View Weekly Schedule (PDF)
+              </a> */}
+
+              {/* MUST THE FILE SERVERD EXTERNALLY TO WORK - NO LOCAL HOST */}
+              {/* <iframe
+                src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(teacher?.weekly_schedule ?? "")}`}
+                className="w-full h-96"
+              ></iframe> */}
+              {teacher?.weekly_schedule ? (
+                <iframe
+                  src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+                    teacher.weekly_schedule
+                  )}`}
+                  className="w-full h-96"
+                ></iframe>
+              ) : (
+                <p>No schedule available.</p>
+              )}
+
+
+
             </div>
           </div>
 
@@ -377,15 +414,14 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        student.status === "ممتاز"
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : student.status === "جيد جداً"
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${student.status === "ممتاز"
+                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                        : student.status === "جيد جداً"
                           ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
                           : student.status === "جيد"
-                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                          : "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
-                      }`}
+                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                            : "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                        }`}
                     >
                       {student.status}
                     </span>
@@ -438,11 +474,10 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
 
                   {/* status */}
                   <span
-                    className={`text-sm font-semibold ${
-                      s.is_absent
-                        ? "text-red-600 dark:text-red-400"
-                        : "text-green-600 dark:text-green-400"
-                    }`}
+                    className={`text-sm font-semibold ${s.is_absent
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-green-600 dark:text-green-400"
+                      }`}
                   >
                     {s.is_absent
                       ? getTranslation("absent", language)

@@ -237,7 +237,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [phone_number_update, set_phone_number_update] = useState("");
   const [years_of_experience_update, set_years_of_experience_update] =
     useState("0");
-
+  const [weekly_schedule , setWeeklySchedue]=useState<File|null>(null)
   const [modules_id, setModuleID] = useState<string>("");
   const [class_group_id, setClassGrpID] = useState<string>("");
   const [editModalError, setEditModalError] = useState("");
@@ -267,6 +267,11 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     if (profile_pic_update) {
       formData.append("profile_picture", profile_pic_update);
     }
+
+    if(weekly_schedule){
+      formData.append('weekly_schedule',weekly_schedule)
+    }
+    
     if (years_of_experience_update !== "0") {
       formData.append("years_of_experience", years_of_experience_update);
     }
@@ -704,6 +709,31 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   onChange={(e) => set_full_name_update(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="الاسم الكامل"
+                />
+              </div>
+
+              {/* Weekly Schedule */}
+              <div className="profile-picture-container">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                 الجدول الأسبوعي
+                </label>
+                <label
+                  htmlFor="weekly-schedule-file"
+                  className="flex text-gray-300 bg-brand-blue w-1/4 p-2 mt-2 rounded cursor-pointer "
+                >
+                  <FileUp />
+                  <div className="text">تحميل</div>
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const uploaded_file = e.target.files
+                      ? e.target.files?.[0]
+                      : null;
+                    setWeeklySchedue(uploaded_file ?? null);
+                  }}
+                  id="weekly-schedule-file"
+                  style={{ display: "none" }}
                 />
               </div>
 

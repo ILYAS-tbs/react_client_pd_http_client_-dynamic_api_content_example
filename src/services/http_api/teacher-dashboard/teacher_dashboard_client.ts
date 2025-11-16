@@ -9,6 +9,7 @@ import { SERVER_BASE_URL } from "../server_constants";
 
 const BASE_URL = SERVER_BASE_URL;
 const URLS = {
+  get_teacher_by_id:`${BASE_URL}/teacher/teachers/`,
   get_current_teacher_students: `${BASE_URL}/teacher/teachers/get_current_teacher_students/`,
   get_current_teacher_modules_and_class_groups: `${BASE_URL}/teacher/teachers/get_current_teacher_modules_and_class_groups/`,
   get_current_teacher_uploads: `${BASE_URL}/teacher/teachers/get_current_teacher_uploads/`,
@@ -28,6 +29,23 @@ const URLS = {
   create_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/create_teacher_upload/`,
   delete_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/`,
 };
+
+async function get_teacher_by_id(id:number) {
+  const GET_TEACHER_URL = URLS.get_teacher_by_id + id + '/'
+  try {
+    const response = await fetch(GET_TEACHER_URL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 
 async function get_current_teacher_students() {
   try {
@@ -289,6 +307,7 @@ async function delete_teacher_upload(id: number, csrfToken: string) {
   }
 }
 export const teacher_dashboard_client = {
+  get_teacher_by_id:get_teacher_by_id,
   get_current_teacher_students: get_current_teacher_students,
   get_current_teacher_modules_and_class_groups:
     get_current_teacher_modules_and_class_groups,

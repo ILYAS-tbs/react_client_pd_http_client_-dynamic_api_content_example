@@ -15,6 +15,7 @@ export interface Teacher {
   specialization: string;
   qualifications: string;
   years_of_experience: number;
+  weekly_schedule: string | null ;
   status: string;
   modulesAndClassGroups?: ModulesAndClassGroup[];
 }

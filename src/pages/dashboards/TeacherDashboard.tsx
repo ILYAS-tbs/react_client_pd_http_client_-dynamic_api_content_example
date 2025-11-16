@@ -37,6 +37,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 import { Message } from "../../models/chat_system/Message";
 import { timeAgoArabic } from "../../lib/timeAgoArabic";
+import { Teacher } from "../../models/Teacher";
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -78,6 +79,7 @@ const TeacherDashboard: React.FC = () => {
  
 
   //! Fetching Data From The Server
+  const [teacher,setTeacher]=useState<Teacher | null>(null)
   const [students, setStudents] = useState<Student[]>([]);
   const [modules_class_groups, setModulesClassGroups] = useState<
     TeacherModuleClassGroup[]
@@ -91,7 +93,14 @@ const TeacherDashboard: React.FC = () => {
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
 
   const [newMessages,setNewMessages]=useState<Message[]>([]);
-
+  
+  const get_teacher_by_id = async () => {
+    const res = await teacher_dashboard_client.get_teacher_by_id(teacher_id);
+    if (res.ok) {
+      const new_teacher: Teacher = res.data;
+      setTeacher(new_teacher);
+    }
+  };
   const get_current_teacher_students = async () => {
     const res = await teacher_dashboard_client.get_current_teacher_students();
     if (res.ok) {
@@ -167,6 +176,7 @@ const TeacherDashboard: React.FC = () => {
     }
   };
   useEffect(() => {
+    get_teacher_by_id();
     get_current_teacher_students();
     get_current_teacher_modules_and_class_groups();
     get_current_teacher_uploads();
@@ -253,6 +263,7 @@ const TeacherDashboard: React.FC = () => {
             setAbsences={setAbsences}
             teacher_id={teacher_id}
             setActiveTab={setActiveTab}
+            teacher={teacher}
           />
         );
       case "grades":

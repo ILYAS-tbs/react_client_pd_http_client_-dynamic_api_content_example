@@ -150,6 +150,7 @@ export interface ClassManagementProps {
   setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
   teacher_id: number;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+  teacher : Teacher | null
 }
 
 export interface TeacherAbsenceManagerProps {
