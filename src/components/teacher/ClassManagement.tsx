@@ -316,23 +316,30 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 const ext = url.split('.').pop()?.toLowerCase();
 
                 if (ext === 'pdf') {
-                  // PDF preview using Google Docs Viewer
+                  // PDF preview in iframe
                   return (
                     <iframe
                       src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`}
-                      className="w-full h-96"
+                      className="w-full h-96 border rounded-lg"
                     ></iframe>
                   );
                 } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
-                  // Image preview
-                  return <img src={url} alt="Schedule" className="w-full h-96 object-contain" />;
+                  // Image preview clickable to open full screen
+                  return (
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      <img
+                        src={url}
+                        alt="Schedule"
+                        className="w-full h-96 object-contain cursor-pointer border rounded-lg"
+                      />
+                    </a>
+                  );
                 } else {
                   return <p>Unsupported file type.</p>;
                 }
               })() : (
                 <p>No schedule available.</p>
               )}
-
 
 
             </div>
