@@ -24,7 +24,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   RefetchGrades,
 }) => {
   //! Translations :
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   const [selectedClass, setSelectedClass] = useState(
     modules_class_groups?.[0]?.class_group.class_group_id
@@ -144,7 +144,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           module: "",
         },
         "فرض الفصل الأول 2": {
-          score: grade.s1_devoir_2, // typo fixed here (was s1_devoi2)
+          score: grade.s1_devoir_2,
           max: 20,
           date: "",
           note: "",
@@ -188,7 +188,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           module: "",
         },
         "فرض الفصل الثاني 2": {
-          score: grade.s2_devoir_2, // typo fixed here (was s2_devoi2)
+          score: grade.s2_devoir_2,
           max: 20,
           date: "",
           note: "",
@@ -215,6 +215,50 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           note: "",
           module: "",
         },
+
+        // -------- الفصل الثالث --------
+        "تقويم الفصل الثالث": {
+          score: grade.s3_evaluation,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
+        "فرض الفصل الثالث 1": {
+          score: grade.s3_devoir_1,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
+        "فرض الفصل الثالث 2": {
+          score: grade.s3_devoir_2,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
+        "واجبات الفصل الثالث": {
+          score: grade.s3_homeworks,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
+        "امتحان الفصل الثالث": {
+          score: grade.s3_exam,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
+        "معدل الفصل الثالث": {
+          score: grade.s3_average,
+          max: 20,
+          date: "",
+          note: "",
+          module: "",
+        },
       },
       average: Number(grade.s1_average) || 0,
     };
@@ -231,6 +275,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   }, [students_grades]);
 
   const gradeKeys = [
+    // -------- Semester 1 --------
     "تقويم الفصل الأول",
     "فرض الفصل الأول 1",
     "فرض الفصل الأول 2",
@@ -238,13 +283,23 @@ const GradeManager: React.FC<GradeManagerProps> = ({
     "امتحان الفصل الأول",
     "معدل الفصل الأول",
 
+    // -------- Semester 2 --------
     "تقويم الفصل الثاني",
     "فرض الفصل الثاني 1",
     "فرض الفصل الثاني 2",
     "واجبات الفصل الثاني",
     "امتحان الفصل الثاني",
     "معدل الفصل الثاني",
+
+    // -------- Semester 3 --------
+    "تقويم الفصل الثالث",
+    "فرض الفصل الثالث 1",
+    "فرض الفصل الثالث 2",
+    "واجبات الفصل الثالث",
+    "امتحان الفصل الثالث",
+    "معدل الفصل الثالث",
   ] as const;
+
   // apply the filter ; class and module
   // useEffect(() => {
   //   const updatedGrades = students_grades
@@ -425,15 +480,16 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       module_id: "",
       class_group_id: "",
 
+      // -------- Semester 1 --------
       s1_devoir_1: 0,
       s1_devoir_2: 0,
       s1_tests: 0,
       s1_homeworks: 0,
       s1_evaluation: 0,
-
       s1_exam: 0,
       s1_average: 0,
 
+      // -------- Semester 2 --------
       s2_devoir_1: 0,
       s2_devoir_2: 0,
       s2_tests: 0,
@@ -441,8 +497,16 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       s2_evaluation: 0,
       s2_exam: 0,
       s2_average: 0,
-    });
 
+      // -------- Semester 3 --------
+      s3_devoir_1: 0,
+      s3_devoir_2: 0,
+      s3_tests: 0,
+      s3_homeworks: 0,
+      s3_evaluation: 0,
+      s3_exam: 0,
+      s3_average: 0,
+    });
   const handleStudentGradeFormChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -468,25 +532,34 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       teacher_id: postStudentGradeForm.teacher_id ?? 0,
       class_group_id: selectedClass ?? "",
 
-      // Semester 1
+      // -------- Semester 1 --------
       s1_devoir_1: postStudentGradeForm.s1_devoir_1 ?? null,
       s1_devoir_2: postStudentGradeForm.s1_devoir_2 ?? null,
       s1_tests: postStudentGradeForm.s1_tests ?? null,
       s1_homeworks: postStudentGradeForm.s1_homeworks ?? null,
-      s1_evaluation:postStudentGradeForm.s1_evaluation ?? null,
+      s1_evaluation: postStudentGradeForm.s1_evaluation ?? null,
       s1_exam: postStudentGradeForm.s1_exam ?? null,
       s1_average: postStudentGradeForm.s1_average ?? null,
 
-      // Semester 2
+      // -------- Semester 2 --------
       s2_devoir_1: postStudentGradeForm.s2_devoir_1 ?? null,
       s2_devoir_2: postStudentGradeForm.s2_devoir_2 ?? null,
       s2_tests: postStudentGradeForm.s2_tests ?? null,
       s2_homeworks: postStudentGradeForm.s2_homeworks ?? null,
-      s2_evaluation:postStudentGradeForm.s2_evaluation ?? null,
-
+      s2_evaluation: postStudentGradeForm.s2_evaluation ?? null,
       s2_exam: postStudentGradeForm.s2_exam ?? null,
       s2_average: postStudentGradeForm.s2_average ?? null,
+
+      // -------- Semester 3 --------
+      s3_devoir_1: postStudentGradeForm.s3_devoir_1 ?? null,
+      s3_devoir_2: postStudentGradeForm.s3_devoir_2 ?? null,
+      s3_tests: postStudentGradeForm.s3_tests ?? null,
+      s3_homeworks: postStudentGradeForm.s3_homeworks ?? null,
+      s3_evaluation: postStudentGradeForm.s3_evaluation ?? null,
+      s3_exam: postStudentGradeForm.s3_exam ?? null,
+      s3_average: postStudentGradeForm.s3_average ?? null,
     };
+
 
     const post_studentGrade_res = await teacher_dashboard_client.post_grades(
       post_studentGrade_payload,
@@ -504,21 +577,32 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   const [last_selected_student, setLastSelectedStudent] = useState("");
   const [patchStudentGradeForm, setPatchStudentGradeForm] =
     useState<PatchStudentGradesPayload>({
+      // -------- Semester 1 --------
       s1_devoir_1: undefined,
       s1_devoir_2: undefined,
       s1_tests: undefined,
       s1_homeworks: undefined,
-      s1_evaluation : undefined,
+      s1_evaluation: undefined,
       s1_exam: undefined,
       s1_average: undefined,
 
+      // -------- Semester 2 --------
       s2_devoir_1: undefined,
       s2_devoir_2: undefined,
       s2_tests: undefined,
       s2_homeworks: undefined,
-      s2_evaluation : undefined,
+      s2_evaluation: undefined,
       s2_exam: undefined,
       s2_average: undefined,
+
+      // -------- Semester 3 --------
+      s3_devoir_1: undefined,
+      s3_devoir_2: undefined,
+      s3_tests: undefined,
+      s3_homeworks: undefined,
+      s3_evaluation: undefined,
+      s3_exam: undefined,
+      s3_average: undefined,
     });
   function resetPatchStudentGradeForm() {
     setPatchStudentGradeForm({
@@ -563,25 +647,34 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       )?.id ?? -1;
 
     const patch_grade_payload: PatchStudentGradesPayload = {
-      // Semester 1
+      // -------- Semester 1 --------
       s1_devoir_1: patchStudentGradeForm.s1_devoir_1,
       s1_devoir_2: patchStudentGradeForm.s1_devoir_2,
       s1_tests: patchStudentGradeForm.s1_tests,
       s1_homeworks: patchStudentGradeForm.s1_homeworks,
-      s1_evaluation:patchStudentGradeForm.s1_evaluation,
+      s1_evaluation: patchStudentGradeForm.s1_evaluation,
       s1_exam: patchStudentGradeForm.s1_exam,
       s1_average: patchStudentGradeForm.s1_average,
 
-      // Semester 2
+      // -------- Semester 2 --------
       s2_devoir_1: patchStudentGradeForm.s2_devoir_1,
       s2_devoir_2: patchStudentGradeForm.s2_devoir_2,
       s2_tests: patchStudentGradeForm.s2_tests,
       s2_homeworks: patchStudentGradeForm.s2_homeworks,
-      s2_evaluation:patchStudentGradeForm.s2_evaluation,
-
+      s2_evaluation: patchStudentGradeForm.s2_evaluation,
       s2_exam: patchStudentGradeForm.s2_exam,
       s2_average: patchStudentGradeForm.s2_average,
+
+      // -------- Semester 3 --------
+      s3_devoir_1: patchStudentGradeForm.s3_devoir_1,
+      s3_devoir_2: patchStudentGradeForm.s3_devoir_2,
+      s3_tests: patchStudentGradeForm.s3_tests,
+      s3_homeworks: patchStudentGradeForm.s3_homeworks,
+      s3_evaluation: patchStudentGradeForm.s3_evaluation,
+      s3_exam: patchStudentGradeForm.s3_exam,
+      s3_average: patchStudentGradeForm.s3_average,
     };
+
 
     const patch_grades_res = await teacher_dashboard_client.patch_grades(
       last_selected_student_grades_id,
@@ -600,19 +693,19 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('gradesManagement',language)}
+          {getTranslation('gradesManagement', language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Download className="h-4 w-4" />
-            <span>{getTranslation('export',language)}</span>
+            <span>{getTranslation('export', language)}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
-            <span>{getTranslation('addGrade',language)}</span>
+            <span>{getTranslation('addGrade', language)}</span>
           </button>
         </div>
       </div>
@@ -622,7 +715,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
         <div className="grid md:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation('class',language)}
+              {getTranslation('class', language)}
             </label>
             <select
               value={selectedClass}
@@ -643,7 +736,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation('Subject',language)}
+              {getTranslation('Subject', language)}
             </label>
             <select
               value={selectedModule}
@@ -702,7 +795,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation('marks',language)}{" "}
+            {getTranslation('marks', language)}{" "}
             {modules_class_groups.find(
               (module_class_group) =>
                 module_class_group.class_group.class_group_id == selectedClass
@@ -718,50 +811,76 @@ const GradeManager: React.FC<GradeManagerProps> = ({
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('student',language)}
+                  {getTranslation('student', language)}
+                </th>
+
+                {/* First semester */}
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('firstSemesterAssessment', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('firstSemesterAssessment',language)}
+                  {getTranslation('firstSemesterExam1', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('firstSemesterExam1',language)}
+                  {getTranslation('firstSemesterExam2', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('firstSemesterExam2',language)}
+                  {getTranslation('firstSemesterHomework', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('firstSemesterHomework',language)}
+                  {getTranslation('firstSemesterTest', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('firstSemesterTest',language)}
+                  {getTranslation('firstSemesterAverage', language)}
+                </th>
+
+                {/* Second semester */}
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('secondSemesterAssessment', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('firstSemesterAverage',language)}
-                </th>
-                {/* Second semester  */}
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                 {getTranslation('secondSemesterAssessment',language)}
+                  {getTranslation('secondSemesterExam1', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('secondSemesterExam1',language)}
+                  {getTranslation('secondSemesterExam2', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('secondSemesterExam2',language)}
+                  {getTranslation('secondSemesterHomework', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('secondSemesterHomework',language)}
+                  {getTranslation('secondSemesterTest', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('secondSemesterTest',language)}
+                  {getTranslation('secondSemesterAverage', language)}
+                </th>
+
+                {/* Third semester */}
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('thirdSemesterAssessment', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('secondSemesterAverage',language)}
+                  {getTranslation('thirdSemesterExam1', language)}
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('actions',language)}
+                  {getTranslation('thirdSemesterExam2', language)}
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('thirdSemesterHomework', language)}
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('thirdSemesterTest', language)}
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('thirdSemesterAverage', language)}
+                </th>
+
+                {/* Actions */}
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {getTranslation('actions', language)}
                 </th>
               </tr>
             </thead>
+
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredGrades.map((student) => (
                 <tr
@@ -776,21 +895,20 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   {/* Loop through fixed order of grade keys */}
                   {gradeKeys.map((key) =>
                     key === "معدل الفصل الأول" ||
-                    key === "معدل الفصل الثاني" ? (
+                      key === "معدل الفصل الثاني" || key === "معدل الفصل الثالث" ? (
                       <td
                         key={key}
                         className="px-6 py-4 whitespace-nowrap text-center"
                       >
                         <span
-                          className={`text-sm font-bold ${
-                            (student.grades[key]!.score ?? 0) >= 16
-                              ? "text-green-600"
-                              : (student.grades[key]!.score ?? 0) >= 12
+                          className={`text-sm font-bold ${(student.grades[key]!.score ?? 0) >= 16
+                            ? "text-green-600"
+                            : (student.grades[key]!.score ?? 0) >= 12
                               ? "text-blue-600"
                               : (student.grades[key]!.score ?? 0) >= 10
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                          }`}
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                            }`}
                         >
                           {student.grades[key]!.score ?? "-"}/{gradeSystem}
                         </span>
@@ -807,11 +925,10 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                         {/* Remark/note for later */}
                         <div className="text-xs text-gray-600 dark:text-gray-400">
                           {student.grades[key]?.note
-                            ? `${student.grades[key]!.note.substring(0, 20)}${
-                                student.grades[key]!.note.length > 20
-                                  ? "..."
-                                  : ""
-                              }`
+                            ? `${student.grades[key]!.note.substring(0, 20)}${student.grades[key]!.note.length > 20
+                              ? "..."
+                              : ""
+                            }`
                             : "-"}
                           {student.grades[key]?.module
                             ? ` (${student.grades[key]!.module})`
@@ -857,12 +974,12 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           <div className="h-5/6 overflow-y-auto  bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <form onSubmit={handlePostStudentGrade}>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation('addNewGrade',language)}
+                {getTranslation('addNewGrade', language)}
               </h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('student',language)}
+                    {getTranslation('student', language)}
                   </label>
                   <select
                     name="student_id"
@@ -873,7 +990,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     }}
                     className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">{getTranslation('selectStudent',language)}</option>
+                    <option value="">{getTranslation('selectStudent', language)}</option>
                     {students.map((s) => (
                       <option key={s.student_id} value={s.student_id}>
                         {s.full_name}
@@ -886,7 +1003,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('Subject',language)}
+                    {getTranslation('Subject', language)}
                   </label>
                   <select
                     name="module_id"
@@ -897,7 +1014,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     }}
                     className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">{getTranslation('selectSubject',language)}</option>
+                    <option value="">{getTranslation('selectSubject', language)}</option>
                     {unique_modules.map((module_id) => (
                       <option key={module_id} value={module_id}>
                         {modules.find((m) => m.module.module_id == module_id)
@@ -910,7 +1027,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('class',language)}
+                  {getTranslation('class', language)}
                 </label>
                 <select
                   name="semester"
@@ -922,10 +1039,13 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option key={"s1"} value={"s1"}>
-                    {getTranslation('firstSemester',language)}
+                    {getTranslation('firstSemester', language)}
                   </option>
                   <option key={"s2"} value={"s2"}>
-                    {getTranslation('secondSemester',language)}
+                    {getTranslation('secondSemester', language)}
+                  </option>
+                  <option key={"s3"} value={"s3"}>
+                    {getTranslation('thirdSemester', language)}
                   </option>
                 </select>
               </div>
@@ -934,14 +1054,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 <div>
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterAssessment',language)}
+                      {getTranslation('firstSemesterAssessment', language)}
                     </label>
                     <input
                       name="s1_evaluation"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_evaluation ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -951,14 +1071,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {getTranslation('firstSemesterExam1',language)}
+                      {getTranslation('firstSemesterExam1', language)}
                     </label>
                     <input
                       name="s1_devoir_1"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_devoir_1 ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -968,14 +1088,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterExam2',language)}
+                      {getTranslation('firstSemesterExam2', language)}
                     </label>
                     <input
                       name="s1_devoir_2"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_devoir_2 ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -985,14 +1105,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterHomework',language)}
+                      {getTranslation('firstSemesterHomework', language)}
                     </label>
                     <input
                       name="s1_homeworks"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_homeworks ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1002,14 +1122,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {getTranslation('firstSemesterTest',language)}
+                      {getTranslation('firstSemesterTest', language)}
                     </label>
                     <input
                       name="s1_exam"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_exam ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1019,14 +1139,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterAverage',language)}
+                      {getTranslation('firstSemesterAverage', language)}
                     </label>
                     <input
                       name="s1_average"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_average ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1034,18 +1154,18 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     />
                   </div>
                 </div>
-              ) : (
+              ) : gradeSemester === 's2' ? ((
                 <div>
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterAssessment',language)}
+                      {getTranslation('secondSemesterAssessment', language)}
                     </label>
                     <input
                       name="s2_evaluation"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s2_evaluation ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1055,14 +1175,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('secondSemesterExam1',language)}
+                      {getTranslation('secondSemesterExam1', language)}
                     </label>
                     <input
                       name="s2_devoir_1"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s2_devoir_1 ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1072,14 +1192,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterExam2',language)}
+                      {getTranslation('secondSemesterExam2', language)}
                     </label>
                     <input
                       name="s1_devoir_2"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s1_devoir_2 ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1089,14 +1209,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterHomework',language)}
+                      {getTranslation('secondSemesterHomework', language)}
                     </label>
                     <input
                       name="s2_homeworks"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s2_homeworks ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1106,14 +1226,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterTest',language)}
+                      {getTranslation('secondSemesterTest', language)}
                     </label>
                     <input
                       name="s2_exam"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s2_exam ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1123,14 +1243,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterAverage',language)}
+                      {getTranslation('secondSemesterAverage', language)}
                     </label>
                     <input
                       name="s2_average"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={postStudentGradeForm.s2_average ?? 0}
                       onChange={handleStudentGradeFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1138,7 +1258,112 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     />
                   </div>
                 </div>
-              )}
+              )) : ((
+                <div>
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('thirdSemesterAssessment', language)}
+                    </label>
+                    <input
+                      name="s3_evaluation"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={postStudentGradeForm.s3_evaluation ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('thirdSemesterExam1', language)}
+                    </label>
+                    <input
+                      name="s3_devoir_1"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={postStudentGradeForm.s3_devoir_1 ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('thirdSemesterExam2', language)}
+                    </label>
+                    <input
+                      name="s3_devoir_2"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={postStudentGradeForm.s3_devoir_2 ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('thirdSemesterHomework', language)}
+                    </label>
+                    <input
+                      name="s3_homeworks"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={postStudentGradeForm.s3_homeworks ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('thirdSemesterTest', language)}
+                    </label>
+                    <input
+                      name="s3_exam"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={postStudentGradeForm.s3_exam ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('thirdSemesterAverage', language)}
+                    </label>
+                    <input
+                      name="s3_average"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={postStudentGradeForm.s3_average ?? 0}
+                      onChange={handleStudentGradeFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+              ))}
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
@@ -1155,14 +1380,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  {getTranslation('cancel',language)}
+                  {getTranslation('cancel', language)}
                 </button>
                 <button
                   type="submit"
                   // onClick={handleAddGrade} // formNotConnectedError
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {getTranslation('save',language)}
+                  {getTranslation('save', language)}
                 </button>
               </div>
             </form>
@@ -1176,17 +1401,17 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           <div className="h-5/6 overflow-y-auto  bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <form onSubmit={handlePatchStudentGrade}>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation('addNewGrade',language)}
+                {getTranslation('addNewGrade', language)}
               </h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('student',language)}
+                    {getTranslation('student', language)}
                   </label>
                   <select
                     name="student_id"
                     value={last_selected_student}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option
@@ -1204,12 +1429,12 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('subject',language)}
+                    {getTranslation('subject', language)}
                   </label>
                   <select
                     name="module_id"
                     value={patchStudentGradeForm.module_id}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option
@@ -1228,7 +1453,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('semester',language)}
+                  {getTranslation('semester', language)}
                 </label>
                 <select
                   name="semester"
@@ -1240,10 +1465,13 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option key={"s1"} value={"s1"}>
-                   {getTranslation('firstSemester',language)}
+                    {getTranslation('firstSemester', language)}
                   </option>
                   <option key={"s2"} value={"s2"}>
-                    {getTranslation('secondSemester',language)}
+                    {getTranslation('secondSemester', language)}
+                  </option>
+                  <option key={"s3"} value={"s3"}>
+                    {getTranslation('thirdSemester', language)}
                   </option>
                 </select>
               </div>
@@ -1251,32 +1479,32 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               {gradeSemester === "s1" ? (
                 <div>
                   <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                       {getTranslation('firstSemesterAssessment',language)}
-                      </label>
-                      <input
-                        name="s1_evaluation"
-                        type="number"
-                        min="0"
-                        max={gradeSystem}
-                        step="0.01" 
-                        value={patchStudentGradeForm.s1_evaluation ?? 0}
-                        onChange={handleStudentGradePatchFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="0"
-                      />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {getTranslation('firstSemesterAssessment', language)}
+                    </label>
+                    <input
+                      name="s1_evaluation"
+                      type="number"
+                      min="0"
+                      max={gradeSystem}
+                      step="0.01"
+                      value={patchStudentGradeForm.s1_evaluation ?? 0}
+                      onChange={handleStudentGradePatchFormChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="0"
+                    />
                   </div>
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterExam1',language)}
+                      {getTranslation('firstSemesterExam1', language)}
                     </label>
                     <input
                       name="s1_devoir_1"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={patchStudentGradeForm.s1_devoir_1 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1286,14 +1514,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterExam2',language)}
+                      {getTranslation('firstSemesterExam2', language)}
                     </label>
                     <input
                       name="s1_devoir_2"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={patchStudentGradeForm.s1_devoir_2 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1303,14 +1531,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation('firstSemesterHomework',language)}
+                      {getTranslation('firstSemesterHomework', language)}
                     </label>
                     <input
                       name="s1_homeworks"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={patchStudentGradeForm.s1_homeworks ?? 0}
                       onChange={handleStudentGradePatchFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1320,14 +1548,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterTest',language)}
+                      {getTranslation('firstSemesterTest', language)}
                     </label>
                     <input
                       name="s1_exam"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={patchStudentGradeForm.s1_exam ?? 0}
                       onChange={handleStudentGradePatchFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1337,14 +1565,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
 
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('firstSemesterAverage',language)}
+                      {getTranslation('firstSemesterAverage', language)}
                     </label>
                     <input
                       name="s1_average"
                       type="number"
                       min="0"
                       max={gradeSystem}
-                      step="0.01" 
+                      step="0.01"
                       value={patchStudentGradeForm.s1_average ?? 0}
                       onChange={handleStudentGradePatchFormChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1352,111 +1580,213 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     />
                   </div>
                 </div>
-              ) : (
-                <div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {getTranslation('secondSemesterAssessment',language)}
-                      </label>
-                      <input
-                        name="s2_evaluation"
-                        type="number"
-                        min="0"
-                        max={gradeSystem}
-                        step="0.01" 
-                        value={patchStudentGradeForm.s2_evaluation ?? 0}
-                        onChange={handleStudentGradePatchFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="0"
-                      />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterExam1',language)}
-                    </label>
-                    <input
-                      name="s2_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01" 
-                      value={patchStudentGradeForm.s2_devoir_1 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {getTranslation('secondSemesterExam2',language)}
-                    </label>
-                    <input
-                      name="s2_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01" 
-                      value={patchStudentGradeForm.s2_devoir_2 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation('secondSemesterHomework',language)}
-                    </label>
-                    <input
-                      name="s2_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01" 
-                      value={patchStudentGradeForm.s2_homeworks ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {getTranslation('secondSemesterTest',language)}
-                    </label>
-                    <input
-                      name="s2_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01" 
-                      value={patchStudentGradeForm.s2_exam ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                     {getTranslation('secondSemesterAverage',language)}
-                    </label>
-                    <input
-                      name="s2_average"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01" 
-                      value={patchStudentGradeForm.s2_average ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="0"
-                    />
-                  </div>
+              ) : (gradeSemester === "s2" ? (<div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('secondSemesterAssessment', language)}
+                  </label>
+                  <input
+                    name="s2_evaluation"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s2_evaluation ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
                 </div>
-              )}
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('secondSemesterExam1', language)}
+                  </label>
+                  <input
+                    name="s2_devoir_1"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s2_devoir_1 ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('secondSemesterExam2', language)}
+                  </label>
+                  <input
+                    name="s2_devoir_2"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s2_devoir_2 ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('secondSemesterHomework', language)}
+                  </label>
+                  <input
+                    name="s2_homeworks"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s2_homeworks ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('secondSemesterTest', language)}
+                  </label>
+                  <input
+                    name="s2_exam"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s2_exam ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('secondSemesterAverage', language)}
+                  </label>
+                  <input
+                    name="s2_average"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s2_average ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              ) : (<div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('thirdSemesterAssessment', language)}
+                  </label>
+                  <input
+                    name="s3_evaluation"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s3_evaluation ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('thirdSemesterExam1', language)}
+                  </label>
+                  <input
+                    name="s3_devoir_1"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s3_devoir_1 ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('thirdSemesterExam2', language)}
+                  </label>
+                  <input
+                    name="s3_devoir_2"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s3_devoir_2 ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('thirdSemesterHomework', language)}
+                  </label>
+                  <input
+                    name="s3_homeworks"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s3_homeworks ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('thirdSemesterTest', language)}
+                  </label>
+                  <input
+                    name="s3_exam"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s3_exam ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation('thirdSemesterAverage', language)}
+                  </label>
+                  <input
+                    name="s3_average"
+                    type="number"
+                    min="0"
+                    max={gradeSystem}
+                    step="0.01"
+                    value={patchStudentGradeForm.s3_average ?? 0}
+                    onChange={handleStudentGradePatchFormChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              ))}
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
@@ -1474,14 +1804,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  {getTranslation('cancel',language)}
+                  {getTranslation('cancel', language)}
                 </button>
                 <button
                   type="submit"
                   // onClick={handleAddGrade} // formNotConnectedError
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {getTranslation('save',language)}
+                  {getTranslation('save', language)}
                 </button>
               </div>
             </form>

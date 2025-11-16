@@ -23,6 +23,16 @@ export interface StudentGrade {
   s2_evaluation: number | null;
   s2_exam: number | null;
   s2_average: number | null;
+
+  // -------- Semester 3 --------
+  s3_devoir_1: number | null;
+  s3_devoir_2: number | null;
+  s3_tests: number | null;
+  s3_homeworks: number | null;
+  s3_evaluation: number | null;
+  s3_exam: number | null;
+  s3_average: number | null;
+  
   year: number | null;
   teacher: number | null;
   module: string;

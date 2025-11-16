@@ -41,14 +41,16 @@ export interface PostStudentGradesPayload {
   teacher_id: number;
   class_group_id: string;
 
+  // -------- Semester 1 --------
   s1_devoir_1?: number | null;
   s1_devoir_2?: number | null;
   s1_tests?: number | null;
   s1_homeworks?: number | null;
   s1_evaluation?: number | null;
   s1_exam?: number | null;
-
   s1_average?: number | null;
+
+  // -------- Semester 2 --------
   s2_devoir_1?: number | null;
   s2_devoir_2?: number | null;
   s2_tests?: number | null;
@@ -56,31 +58,51 @@ export interface PostStudentGradesPayload {
   s2_evaluation?: number | null;
   s2_exam?: number | null;
   s2_average?: number | null;
+
+  // -------- Semester 3 --------
+  s3_devoir_1?: number | null;
+  s3_devoir_2?: number | null;
+  s3_tests?: number | null;
+  s3_homeworks?: number | null;
+  s3_evaluation?: number | null;
+  s3_exam?: number | null;
+  s3_average?: number | null;
 }
+
 export interface PatchStudentGradesPayload {
   student_id?: string;
   module_id?: string;
   teacher_id?: number;
   class_group_id?: string;
 
+  // -------- Semester 1 --------
   s1_devoir_1?: number | null;
   s1_devoir_2?: number | null;
   s1_tests?: number | null;
   s1_homeworks?: number | null;
   s1_evaluation?: number | null;
-
   s1_exam?: number | null;
-
   s1_average?: number | null;
+
+  // -------- Semester 2 --------
   s2_devoir_1?: number | null;
   s2_devoir_2?: number | null;
   s2_tests?: number | null;
   s2_homeworks?: number | null;
   s2_evaluation?: number | null;
-
   s2_exam?: number | null;
   s2_average?: number | null;
+
+  // -------- Semester 3 --------
+  s3_devoir_1?: number | null;
+  s3_devoir_2?: number | null;
+  s3_tests?: number | null;
+  s3_homeworks?: number | null;
+  s3_evaluation?: number | null;
+  s3_exam?: number | null;
+  s3_average?: number | null;
 }
+
 // Will be "FormData"
 // export interface PostTeacherUploadPayload {
 //   title: string;

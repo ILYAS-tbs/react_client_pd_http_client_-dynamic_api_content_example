@@ -145,8 +145,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
   const students = students_list.map((student: Student) => ({
     id: student.student_id,
     name: student.full_name,
-    lastGrade: "14/20",
-    attendance: "89%",
+    trimester_grade: student.trimester_grade,
+    is_absent: student.is_absent,
     status: "مقبول",
   }));
 
@@ -311,14 +311,25 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(teacher?.weekly_schedule ?? "")}`}
                 className="w-full h-96"
               ></iframe> */}
-              {teacher?.weekly_schedule ? (
-                <iframe
-                  src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
-                    teacher.weekly_schedule
-                  )}`}
-                  className="w-full h-96"
-                ></iframe>
-              ) : (
+              {teacher?.weekly_schedule ? (() => {
+                const url = teacher.weekly_schedule;
+                const ext = url.split('.').pop()?.toLowerCase();
+
+                if (ext === 'pdf') {
+                  // PDF preview using Google Docs Viewer
+                  return (
+                    <iframe
+                      src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`}
+                      className="w-full h-96"
+                    ></iframe>
+                  );
+                } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
+                  // Image preview
+                  return <img src={url} alt="Schedule" className="w-full h-96 object-contain" />;
+                } else {
+                  return <p>Unsupported file type.</p>;
+                }
+              })() : (
                 <p>No schedule available.</p>
               )}
 
@@ -381,13 +392,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   {getTranslation("lastGrade", language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("attendance", language)}
-                </th>
-                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("status", language)}
-                </th>
-                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("actions", language)}
+                  {getTranslation("attendanceStatus", language)}
                 </th>
               </tr>
             </thead>
@@ -409,10 +414,10 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      {student.attendance}
+                      {student.is_absent ? getTranslation('absent', language) : getTranslation('present', language)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${student.status === "ممتاز"
                         ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
@@ -425,8 +430,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                     >
                       {student.status}
                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  </td> */}
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                         <Eye className="h-4 w-4" />
@@ -435,7 +440,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                         <Edit className="h-4 w-4" />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

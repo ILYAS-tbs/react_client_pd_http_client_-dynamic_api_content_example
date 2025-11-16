@@ -336,14 +336,15 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                     {resource.uploadDate.toLocaleDateString("ar")}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
+                {/* hide downloads for now */}
+                {/* <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
                     {getTranslation('downloads',language)}:
                   </span>
                   <span className="text-gray-900 dark:text-white">
                     {resource.downloads}
                   </span>
-                </div>
+                </div> */}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
                     {getTranslation('Classes',language)} :
@@ -356,9 +357,10 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
               <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1">
+                 {/* No use for the eye button for now */}
+                  {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1">
                     <Eye className="h-4 w-4" />
-                  </button>
+                  </button> */}
 
                   <button
                     onClick={() => handleDownload(resource)}

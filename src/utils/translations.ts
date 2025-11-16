@@ -1033,6 +1033,11 @@ export const translations: Translations = {
     en: "Class Management",
     fr: "Gestion des classes",
   },
+  attendanceStatus: {
+    ar: "حالة الحضور",
+    en: "Attendance Status",
+    fr: "Statut de présence",
+  },
   addClass: {
     ar: "إضافة صف",
     en: "Add Class",
@@ -1513,6 +1518,12 @@ export const translations: Translations = {
     en: "Second Semester",
     fr: "2ème Semestre",
   },
+  thirdSemester: {
+  ar: "الفصل الثالث",
+  en: "Third Semester",
+  fr: "3ème Semestre",
+},
+
   academicYear: {
     ar: "السنة الدراسية",
     en: "Academic Year",
@@ -2034,7 +2045,37 @@ export const translations: Translations = {
     en: "Second Semester Average",
     fr: "Moyenne du deuxième semestre",
   },
-
+  // Third semester translations
+  thirdSemesterAssessment: {
+    ar: "تقويم الفصل الثالث",
+    en: "Third Semester Assessment",
+    fr: "Évaluation du troisième semestre",
+  },
+  thirdSemesterExam1: {
+    ar: "فرض الفصل الثالث 1",
+    en: "Third Semester Exam 1",
+    fr: "Examen du troisième semestre 1",
+  },
+  thirdSemesterExam2: {
+    ar: "فرض الفصل الثالث 2",
+    en: "Third Semester Exam 2",
+    fr: "Examen du troisième semestre 2",
+  },
+  thirdSemesterHomework: {
+    ar: "واجبات الفصل الثالث",
+    en: "Third Semester Homework",
+    fr: "Devoirs du troisième semestre",
+  },
+  thirdSemesterTest: {
+    ar: "امتحان الفصل الثالث",
+    en: "Third Semester Test",
+    fr: "Test du troisième semestre",
+  },
+  thirdSemesterAverage: {
+    ar: "معدل الفصل الثالث",
+    en: "Third Semester Average",
+    fr: "Moyenne du troisième semestre",
+  },
   addNewGrade: {
     ar: "إضافة درجة جديدة",
     en: "Add New Grade",
