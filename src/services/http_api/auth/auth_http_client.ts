@@ -13,7 +13,7 @@ const URLS = {
   ROLE: `${SERVER_BASE_URL}/user-auth/get_role`,
   SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
   VERIFY_EMAIL:`${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/email/verify`,
-  
+  VERIFY_EMAIL_RESEND:`${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/email/verify/resend`,
   TEACHER_SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/app/v1/auth/signup`,
   LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
   LOGOUT: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
@@ -81,6 +81,28 @@ async function verify_email(payload:VefiryEmailPayload,csrfToken:string){
       },
       credentials:"include",
       body:JSON.stringify(payload)
+    })
+
+    const data = await response.json()
+    return {ok:response.ok,status:response.status,data:data}
+
+  } catch (error) {
+    return {ok:false , error:error}
+  }
+}
+async function verify_email_resend(csrfToken:string){
+  if(!csrfToken){
+    throw new Error("Error No Csrf Token Passed")
+  }
+
+  try {
+    const response = await fetch(URLS.VERIFY_EMAIL_RESEND,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-CSRFToken":csrfToken
+      },
+      credentials:"include",
     })
 
     const data = await response.json()
@@ -237,6 +259,7 @@ async function register_Teacher(
 export const auth_http_client = {
   signup: signup,
   verify_email:verify_email,
+  verify_email_resend:verify_email_resend,
   teacher_signup: teacher_signup,
   login: login,
   logout: logout,

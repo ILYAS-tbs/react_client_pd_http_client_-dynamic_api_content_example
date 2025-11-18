@@ -41,6 +41,7 @@ interface LoginResponse {
   ok: boolean;
   status: number | undefined;
   user?: User;
+  error?:any
 }
 
 interface AuthContextType {
@@ -49,7 +50,7 @@ interface AuthContextType {
   login: (
     email: string,
     password: string,
-    role: string
+    role: string,
   ) => Promise<LoginResponse>;
   register: (userData: any, isCreatingSchool: boolean) => Promise<boolean>;
   logout: () => void;
@@ -107,9 +108,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
     const result = await auth_http_client.login(login_payload, latest_csrf);
 
+
     if (!result.ok) {
       console.log("RESPONSE NOT OK");
-      return { ok: false, status: result.status };
+      return { ok: false, status: result.status , error:result.error};
     }
     console.log("Login Succeful");
     console.log(result.data);

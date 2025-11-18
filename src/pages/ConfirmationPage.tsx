@@ -19,7 +19,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
   const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(10); // 10 seconds
   const [canResend, setCanResend] = useState(false);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -174,6 +174,12 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
   const handleResendCode = async () => {
     if (!canResend || isResending) return;
 
+    //! API CALL (Resend code):
+    const latest_csrf = getCSRFToken()!
+    const res = auth_http_client.verify_email_resend(latest_csrf);
+
+    setTimeLeft(10);
+    
     setIsResending(true);
     setError('');
     setSuccess('');

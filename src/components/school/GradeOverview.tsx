@@ -11,7 +11,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
   class_groups,
 }) => {
 
-  const {language} = useLanguage()
+  const { language } = useLanguage()
 
   const [selectedClass, setSelectedClass] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
@@ -35,7 +35,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       )
     ),
   ];
-  const semesters = ["all", "s1", "s2"];
+  const semesters = ["all", "s1", "s2", "s3"];
 
   function calculateSuccessPercentage() {
     let percentage = 0;
@@ -56,25 +56,25 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
 
   const gradeStats = [
     {
-      label: getTranslation('schoolAverage',language),
+      label: getTranslation('schoolAverage', language),
       value: `${school_stat?.school_average}/20` || "16.2/20",
       color: "bg-blue-500",
       trend: "+0.3",
     },
     {
-      label: getTranslation('highestGrade',language),
+      label: getTranslation('highestGrade', language),
       value: `${school_stat?.school_max_average}/20` || "19.5/20",
       color: "bg-green-500",
       trend: "+0.5",
     },
     {
-      label: getTranslation('lowestGrade',language),
+      label: getTranslation('lowestGrade', language),
       value: `${school_stat?.school_min_average}/20` || "12.1/20",
       color: "bg-red-500",
       trend: "-0.2",
     },
     {
-      label: getTranslation('passingRate',language),
+      label: getTranslation('passingRate', language),
       value: `${(calculateSuccessPercentage() * 100).toFixed(1)} %`,
       color: "bg-purple-500",
       trend: "+2%",
@@ -128,12 +128,12 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
   //! Map to mock data above
   const determineModuleDifficulty = (module_average: number) => {
     if (module_average <= 10) {
-      return getTranslation("Difficult",language);
+      return getTranslation("Difficult", language);
     }
     if (module_average <= 15) {
-      return getTranslation("Medium",language);
+      return getTranslation("Medium", language);
     }
-    return getTranslation("Easy",language)
+    return getTranslation("Easy", language)
   };
   const subjectPerformance = school_stat?.semesters_stats.map(
     (module_stat) => ({
@@ -162,7 +162,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('gradeOverview',language)}
+          {getTranslation('gradeOverview', language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
           <select
@@ -207,11 +207,14 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
                 {semester === "all"
                   ? "الكل"
                   : semester === "s1"
-                  ? "الفصل الاول"
-                  : "الفصل الثاني"}
+                    ? "الفصل الاول"
+                    : semester === "s2"
+                      ? "الفصل الثاني"
+                      : "الفصل الثالث"} {/* s3 label */}
               </option>
             ))}
           </select>
+
         </div>
       </div>
 
@@ -246,26 +249,26 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       {/* Class Performance */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {getTranslation('classPerformance',language)}
+          {getTranslation('classPerformance', language)}
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="ltr:text-left  px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('class',language)}
+                  {getTranslation('class', language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('average',language)}
+                  {getTranslation('average', language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('numberOfStudents',language)}
+                  {getTranslation('numberOfStudents', language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('topStudent',language)}
+                  {getTranslation('topStudent', language)}
                 </th>
                 <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation('topStudent',language)}
+                  {getTranslation('topStudent', language)}
                 </th>
               </tr>
             </thead>
@@ -286,7 +289,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {cls.number_of_students} {getTranslation('student',language)}
+                    {cls.number_of_students} {getTranslation('student', language)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {cls.top_student?.full_name}
@@ -306,7 +309,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
       {/* Subject Performance */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {getTranslation("subjectPerformance",language)}
+          {getTranslation("subjectPerformance", language)}
         </h3>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {FilteredSubjectPerformance?.map((subject, index) => (
@@ -319,13 +322,12 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
                   {subject.subject}
                 </h4>
                 <span
-                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    subject.difficulty === "صعب"
+                  className={`px-2 py-1 text-xs font-semibold rounded-full ${subject.difficulty === "صعب"
                       ? "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                       : subject.difficulty === "متوسط"
-                      ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                      : "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                  }`}
+                        ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                        : "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                    }`}
                 >
                   {subject.difficulty}
                 </span>
