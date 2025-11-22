@@ -47,6 +47,7 @@ interface LoginResponse {
 interface AuthContextType {
   user: User | null;
   userData : UserData | null ;
+  setUserData:React.Dispatch<React.SetStateAction<UserData | null>>,
   login: (
     email: string,
     password: string,
@@ -285,7 +286,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user,userData, login, register, logout, isLoading, change_role }}
+      value={{ user,userData,setUserData, login, register, logout, isLoading, change_role }}
     >
       {children}
     </AuthContext.Provider>

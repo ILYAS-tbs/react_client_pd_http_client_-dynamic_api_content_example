@@ -21,10 +21,14 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
   const [success, setSuccess] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState(10); // 10 seconds
   const [canResend, setCanResend] = useState(false);
-  
+
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
   const { t, language, isRTL } = useLanguage();
+
+  //! For Login here : 
+  const { login, change_role, logout } = useAuth();
+
 
   // Timer for resend functionality
   useEffect(() => {
@@ -92,11 +96,19 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
     }
   };
 
-  const {userData} = useAuth()
+  const { userData } = useAuth()
+
+  function showError(duration: number, error: string) {
+    setError(error)
+
+    setTimeout(() => {
+      setError("")
+    }, duration);
+  }
 
   const handleSubmit = async (codeToSubmit?: string) => {
     const finalCode = codeToSubmit || code.join('');
-    
+
     if (finalCode.length !== 6) {
       setError(t('incompleteCode') || 'يرجى إدخال الرمز المكون من 6 أرقام كاملاً');
       return;
@@ -104,61 +116,84 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
 
     setIsLoading(true);
     //! API CALL : Verify Email
-    const csrfToken= getCSRFToken()!
-    const verify_payload:VefiryEmailPayload={
-      key:finalCode
-    }  
-    const res = await auth_http_client.verify_email(verify_payload,csrfToken)
+    const csrfToken = getCSRFToken()!
+    const verify_payload: VefiryEmailPayload = {
+      key: finalCode
+    }
+    const res = await auth_http_client.verify_email(verify_payload, csrfToken)
 
     setError('');
     setSuccess('');
-   
+
+
     try {
       const role = localStorage.getItem("role")
-      
+
+      const isCreatingSchool = role === "school"
+
+      if (isCreatingSchool) {
+        //* 1.Creatin a School
+        const school_payload: RegisterSchoolPayload = {
+          school_name: userData?.name ?? "",
+          email: userData?.email ?? "",
+          phone_number: userData?.phone ?? "",
+          school_level: userData?.school_level ?? "",
+          website: "",
+          address: "",
+          wilaya: "",
+          commun: "",
+          school_type: "",
+          established_year: 0,
+          description: "",
+        };
+
+        const latest_csrf = getCSRFToken()!
+
+        const school_result = await auth_http_client.register_school(
+          school_payload,
+          latest_csrf
+        );
+      } else {
+        //* 2.Creating A parent
+        const parent_payload: RegisterParentPayload = {
+          full_name: userData?.email ?? "",
+          phone_number: userData?.phone ?? "",
+          address: "",
+          relationship_to_student: "",
+        };
+        const latest_csrf = getCSRFToken()!
+        const parent_result = await auth_http_client.register_parent(
+          parent_payload,
+          latest_csrf
+        );
+      }
+      //! Navigate to the correct Dashboard
       if (res.ok) {
         //? Case Of Valid Key-Code 
         setSuccess(t('emailConfirmed') || 'تم تأكيد البريد الإلكتروني بنجاح!');
-        setTimeout(() => {
-          navigate(`/login`);
-        }, 1500);
+
+        //! Login FLOW (repeated) from (login.tsx)
+        //* Call 00 : logout first - removing the session_id if it was there from signup
+        const logout_res = logout()
+
+        //* call 01 - authenticate user
+        const success_result = await login(userData?.email ?? "", userData?.password ?? "", role ?? "");
+        const user_role = success_result?.user?.role ?? role;
+
+        if (!success_result.ok) {
+          showError(5000, "البريد الإلكتروني أو كلمة المرور غير صحيحة")
+        }
+        if (success_result) {
+          if (user_role) {
+            setTimeout(() => {
+              navigate(`/${user_role}-dashboard`);
+              onClose?.();
+            }, 1500);
+          }
+        }
+
+
       }
-      const isCreatingSchool = role ==="school"
-
-      if (isCreatingSchool) {
-      const school_payload: RegisterSchoolPayload = {
-        school_name: userData?.name ?? "",
-        email: userData?.email ??"",
-        phone_number: userData?.phone ??"",
-        school_level: userData?.school_level ??"",
-        website: "",
-        address: "",
-        wilaya: "",
-        commun: "",
-        school_type: "",
-        established_year: 0,
-        description: "",
-      };
-
-      const latest_csrf = getCSRFToken()!
-
-      const school_result = await auth_http_client.register_school(
-        school_payload,
-        latest_csrf
-      );
-    } else {
-      const parent_payload: RegisterParentPayload = {
-        full_name: userData?.email ??"",
-        phone_number: userData?.phone ??"",
-        address: "",
-        relationship_to_student: "",
-      };
-      const latest_csrf = getCSRFToken()!
-      const parent_result = await auth_http_client.register_parent(
-        parent_payload,
-        latest_csrf
-      );
-    }
 
     } catch (error) {
       console.error('Confirmation failed:', error);
@@ -179,7 +214,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
     const res = auth_http_client.verify_email_resend(latest_csrf);
 
     setTimeLeft(10);
-    
+
     setIsResending(true);
     setError('');
     setSuccess('');
@@ -303,8 +338,8 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
               >
                 <RefreshCw className={`w-4 h-4 ${isResending ? 'animate-spin' : ''}`} />
                 <span>
-                  {isResending 
-                    ? (t('resending') || 'جاري الإرسال...') 
+                  {isResending
+                    ? (t('resending') || 'جاري الإرسال...')
                     : (t('resendCode') || 'إعادة إرسال الرمز')
                   }
                 </span>

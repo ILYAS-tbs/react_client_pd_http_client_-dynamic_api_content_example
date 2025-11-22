@@ -318,7 +318,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               {getTranslation("noAbsenceRequests", language)}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {/* <p className="text-gray-600 dark:text-gray-400 mb-4">
               {getTranslation("noJustificationRequests", language)}
             </p>
             <button
@@ -326,7 +326,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               {getTranslation("submitNewRequest", language)}
-            </button>
+            </button> */}
           </div>
         ) : (
           filteredRequests.map((request) => (

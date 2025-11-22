@@ -16,7 +16,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
   const [role, setRole] = useState("parent");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string>("error");
+  const [error, setError] = useState<string>("");
   const { login, change_role, logout } = useAuth();
   const { t, language, isRTL } = useLanguage();
   const navigate = useNavigate();

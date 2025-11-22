@@ -28,8 +28,35 @@ interface RegisterProps {
   onClose?: () => void;
 }
 
+interface Wilaya {
+  name: string;
+  communes: string[];
+}
+
+interface School {
+  name: string;
+  level: string;
+  wilaya_name: string;
+  commune_name: string;
+}
+
+interface Child {
+  fullName: string;
+  dateOfBirth: string;
+  schoolName: string;
+  grade: string;
+}
+
+interface RegisterProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
 const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
   const navigate = useNavigate();
+
+  //! set global state for passing to the confirmation page :: 
+  const { setUserData } = useAuth()
 
   const [formData, setFormData] = useState({
     name: "",
@@ -190,8 +217,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
     return "";
   };
 
-  const {  logout } = useAuth();
-  
+  const { logout } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -218,9 +245,24 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
         formData.role === "school"
       );
       //?: LocalStorage:: Account Role Global
-      localStorage.setItem("role",formData.role)
+      localStorage.setItem("role", formData.role)
 
       if (success) {
+        //! Set Global state for the confirmation page :: 
+        setUserData({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          commune: formData.commune,
+          wilaya: formData.wilaya,
+          role: formData.role as "parent" |"teacher" | "school",
+          phone: formData.phone,
+          numberOfChildren: formData.numberOfChildren,
+          children: formData.children,
+          schoolType: formData.schoolType,
+          school_level: formData.school_level,
+        });
+
         setSuccess(t("registrationSuccess") || "Successfully signed up!");
         navigate("/confirmation-code");
 
@@ -304,9 +346,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Role Selection */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("selectRole") || "Select Role"}
             </label>
@@ -331,11 +372,10 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                     onClick={() =>
                       setFormData({ ...formData, role: option.value })
                     }
-                    className={`flex items-center space-x-3 rtl:space-x-reverse p-3 border-2 rounded-lg transition-all ${
-                      formData.role === option.value
+                    className={`flex items-center space-x-3 rtl:space-x-reverse p-3 border-2 rounded-lg transition-all ${formData.role === option.value
                         ? "border-[#39789b] bg-[#39789b]/5"
                         : "border-gray-200 dark:border-gray-700 hover:border-[#39789b]/50"
-                    } ${isRTL ? "text-right" : "text-left"}`}
+                      } ${isRTL ? "text-right" : "text-left"}`}
                   >
                     <Icon className="w-5 h-5 text-[#39789b]" />
                     <span className="font-medium text-gray-900 dark:text-white">
@@ -350,9 +390,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Name */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {formData.role === "school"
                 ? t("schoolName") || "School Name"
@@ -363,9 +402,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                }`}
               placeholder={
                 formData.role === "school"
                   ? t("schoolNamePlaceholder") || "Al Amal Primary School"
@@ -378,9 +416,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Email */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("email") || "Email"}
             </label>
@@ -389,9 +426,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                }`}
               placeholder={t("emailPlaceholder") || "example@email.dz"}
               required
             />
@@ -400,9 +436,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Phone */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("phoneNumber") || "Phone Number"}
             </label>
@@ -411,9 +446,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                }`}
               placeholder="+213 551 123 456"
               required
             />
@@ -422,9 +456,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Wilaya */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("wilaya") || "Wilaya"}
             </label>
@@ -440,9 +473,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                   commune: "",
                 });
               }}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                }`}
               required
             >
               <option value="">{t("selectWilaya") || "Select Wilaya"}</option>
@@ -457,9 +489,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Commune */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("commune") || "Commune"}
             </label>
@@ -470,9 +501,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 setSelectedCommune(e.target.value);
                 setFormData({ ...formData, commune: e.target.value });
               }}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                }`}
               required
               disabled={!selectedWilaya}
             >
@@ -492,9 +522,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {formData.role === "school" && (
             <div>
               <label
-                className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                  }`}
               >
                 {t("schoolType") || "School Type"}
               </label>
@@ -502,9 +531,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 name="schoolType"
                 value={formData.schoolType}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                  }`}
                 required
               >
                 <option value="public">{t("publicSchool") || "Public"}</option>
@@ -519,9 +547,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {formData.role === "school" && (
             <div>
               <label
-                className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                  }`}
               >
                 {t("schoolLevel") || "School Level"}
               </label>
@@ -529,9 +556,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 name="school_level"
                 value={formData.school_level}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                  }`}
                 required
               >
                 <option value="primary">
@@ -717,9 +743,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Password */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("password") || "Password"}
             </label>
@@ -729,9 +754,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                  }`}
                 placeholder={t("password") || "Password"}
                 required
               />
@@ -752,9 +776,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           {/* Confirm Password */}
           <div>
             <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${
-                isRTL ? "text-right" : "text-left"
-              }`}
+              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 ${isRTL ? "text-right" : "text-left"
+                }`}
             >
               {t("confirmPassword") || "Confirm Password"}
             </label>
@@ -764,9 +787,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                  }`}
                 placeholder={t("confirmPassword") || "Confirm Password"}
                 required
               />
@@ -788,9 +810,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 bg-[#39789b] text-white rounded-lg hover:bg-[#2f6a85] transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
-              isRTL ? "text-right" : "text-left"
-            }`}
+            className={`w-full py-3 px-4 bg-[#39789b] text-white rounded-lg hover:bg-[#2f6a85] transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? "text-right" : "text-left"
+              }`}
           >
             {isLoading
               ? t("loading") || "Loading..."
@@ -799,9 +820,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
 
           {/* Login Link */}
           <div
-            className={`text-center text-sm text-gray-600 dark:text-gray-400 ${
-              isRTL ? "text-right" : "text-left"
-            }`}
+            className={`text-center text-sm text-gray-600 dark:text-gray-400 ${isRTL ? "text-right" : "text-left"
+              }`}
           >
             {t("alreadyHaveAccount") || "Already have an account?"}{" "}
             <Link to="/login" className="text-[#39789b] hover:underline">
@@ -809,9 +829,8 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
             </Link>
           </div>
           <div
-            className={`text-center text-sm text-gray-600 dark:text-gray-400 ${
-              isRTL ? "text-right" : "text-left"
-            }`}
+            className={`text-center text-sm text-gray-600 dark:text-gray-400 ${isRTL ? "text-right" : "text-left"
+              }`}
           >
             <Link to="/" className="text-[#39789b] hover:underline">
               {t("cancel") || "Go Back"}
@@ -824,3 +843,4 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true, onClose }) => {
 };
 
 export default Register;
+
