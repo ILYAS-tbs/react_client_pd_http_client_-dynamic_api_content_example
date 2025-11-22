@@ -56,7 +56,8 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
 };
 
   const {user} = useAuth()
-  const role = localStorage.getItem('role')
+  const schoolParentOrTeacherManagementUser = JSON.parse(localStorage.getItem('schoolParentOrTeacherManagementUser' )??"")
+  const role = localStorage.getItem('role') || schoolParentOrTeacherManagementUser?.role 
 
   
 
