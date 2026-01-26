@@ -80,11 +80,11 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="w-16 h-16 flex items-center justify-center">
+            <div className="w-32 h-32 flex items-center justify-center">
               <img
                 src="/assets/pedaconnect-removebg.png"
                 alt="PedaConnect Logo"
-                className="w-16 h-16 object-contain"
+                className="w-32 h-32 object-contain"
               />
             </div>
             <div>

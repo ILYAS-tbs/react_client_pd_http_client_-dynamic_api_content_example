@@ -61,7 +61,6 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={["teacher"]}>
                         <TeacherDashboard />
-                        //{" "}
                       </ProtectedRoute>
                     }
                   />
@@ -70,7 +69,6 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={["parent"]}>
                         <ParentDashboard />
-                        //{" "}
                       </ProtectedRoute>
                     }
                   />

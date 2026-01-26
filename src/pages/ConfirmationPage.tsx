@@ -244,9 +244,9 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
             <img
-              src="/assets/logo.jpg"
+              src="/assets/pedaconnect-removebg.png"
               alt="Platform Logo"
-              className="w-10 h-10 object-contain rounded-lg"
+              className="w-20 h-20 object-contain rounded-lg"
             />
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">

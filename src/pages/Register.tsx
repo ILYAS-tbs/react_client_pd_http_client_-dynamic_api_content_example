@@ -190,7 +190,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
             <img
               src="/assets/pedaconnect-removebg.png"
               alt="PedaConnect Logo"
-              className="w-48 h-48 object-contain"
+              className="w-96 h-96 object-contain"
             />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">

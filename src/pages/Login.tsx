@@ -76,7 +76,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
             <img
               src="/assets/pedaconnect-removebg.png"
               alt="PedaConnect Logo"
-              className="w-24 h-24 object-contain"
+              className="w-48 h-48 object-contain"
             />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">

@@ -127,17 +127,17 @@ export function About() {
         </div>
 
         {/* Stats Section with Academic Success Image */}
-        <div className="relative rounded-3xl overflow-hidden w-full aspect-[21/9] max-h-[500px]">
+        <div className="relative rounded-3xl overflow-hidden w-full min-h-[400px] flex items-center">
           <div className="absolute inset-0">
             <img
               src="https://images.pexels.com/photos/5212329/pexels-photo-5212329.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Students celebrating academic success"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover grayscale brightness-75 contrast-125"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-600/90 to-primary-700/90"></div>
+            <div className="absolute inset-0 bg-black/30"></div>
           </div>
-          <div className="relative p-8 md:p-12">
+          <div className="relative w-full p-8 md:p-16 lg:p-20">
             <div className="text-center mb-8">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 {language === 'ar' ? 'إنجازاتنا في أرقام' : language === 'fr' ? 'Nos Réalisations en Chiffres' : 'Our Achievements in Numbers'}

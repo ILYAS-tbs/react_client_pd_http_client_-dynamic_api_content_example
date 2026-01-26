@@ -34,7 +34,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
 }) => {
   const { user, logout } = useAuth();
-  const { notifications,notifications_data, unreadCount } = useNotifications();
+  const { notifications, notifications_data, unreadCount } = useNotifications();
   const { isDark, toggleTheme } = useTheme();
   const { language, isRTL, setLanguage } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,7 +53,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [isNotifOpen, setIsNotifOpen] = useState(false);
 
 
-   const handleLanguageChange = (newLang: 'ar' | 'en' | 'fr') => {
+  const handleLanguageChange = (newLang: 'ar' | 'en' | 'fr') => {
     console.log('🌍 Changing language to:', newLang);
     setLanguage(newLang);
     // localStorage.setItem('language', newLang); // ✅ Save to localStorage
@@ -68,13 +68,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="flex justify-between items-center min-h-16 max-h-32 ">
-            <div>
-              <h1 className="text-sm sm:text-xl font-semibold text-gray-900 dark:text-white">
-                {title}
-              </h1>
-              <p className="truncate text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                {subtitle}
-              </p>
+            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+              <img
+                src="/assets/pedaconnect-removebg.png"
+                alt="Logo"
+                className="w-16 h-16 object-contain"
+              />
+              <div>
+                <h1 className="text-sm sm:text-xl font-semibold text-gray-900 dark:text-white">
+                  {title}
+                </h1>
+                <p className="truncate text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  {subtitle}
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4 rtl:space-x-reverse">
@@ -124,14 +131,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 <div className="flex items-center space-x-2 sm:space-x-3 rtl:space-x-reverse">
                   <div className="text-right rtl:text-left">
                     <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                      {getTranslation('accountStatus',language)}
+                      {getTranslation('accountStatus', language)}
                     </p>
                     <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-                      {getTranslation('accountActive',language)}
+                      {getTranslation('accountActive', language)}
                     </p>
                   </div>
                   <button
-                    onClick={() => {}}
+                    onClick={() => { }}
                     className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     title={isRTL ? "الاشتراك" : "subscribe"}
                   >
@@ -156,13 +163,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       ? user?.role === "school"
                         ? "إدارة المدرسة"
                         : user?.role === "teacher"
-                        ? "معلم"
-                        : "ولي أمر"
+                          ? "معلم"
+                          : "ولي أمر"
                       : user?.role === "school"
-                      ? "School Admin"
-                      : user?.role === "teacher"
-                      ? "Teacher"
-                      : "Parent"}
+                        ? "School Admin"
+                        : user?.role === "teacher"
+                          ? "Teacher"
+                          : "Parent"}
                   </p>
                 </div>
                 <button
@@ -187,11 +194,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`flex items-center space-x-1 sm:space-x-2 rtl:space-x-reverse py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
+                className={`flex items-center space-x-1 sm:space-x-2 rtl:space-x-reverse py-3 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                     ? "border-green-500 text-green-600 dark:text-green-400"
                     : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 <tab.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>{tab.label}</span>
@@ -226,11 +232,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     onTabChange(tab.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`flex items-center w-full space-x-2 rtl:space-x-reverse py-3 px-4 text-sm font-medium transition-colors ${
-                    activeTab === tab.id
+                  className={`flex items-center w-full space-x-2 rtl:space-x-reverse py-3 px-4 text-sm font-medium transition-colors ${activeTab === tab.id
                       ? "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
                       : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
+                    }`}
                 >
                   <tab.icon className="h-5 w-5" />
                   <span>{tab.label}</span>

@@ -55,11 +55,11 @@ export function Footer() {
           {/* Brand Section */}
           <div className={`lg:col-span-1 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="flex items-center space-x-3 rtl:space-x-reverse mb-6">
-              <div className="w-16 h-16 flex items-center justify-center">
+              <div className="w-32 h-32 flex items-center justify-center">
                 <img
                   src="/assets/pedaconnect-removebg.png"
                   alt="PedaConnect Logo"
-                  className="w-16 h-16 object-contain"
+                  className="w-32 h-32 object-contain"
                 />
               </div>
               <div>
