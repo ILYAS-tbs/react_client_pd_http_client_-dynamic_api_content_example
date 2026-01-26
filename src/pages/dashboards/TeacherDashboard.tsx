@@ -43,7 +43,7 @@ const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   //! Translation 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   // ! Storing the teacher's id (which is the user id)
   const lc_user: User = JSON.parse(
@@ -76,10 +76,10 @@ const TeacherDashboard: React.FC = () => {
                     },
                   ]
   */
- 
+
 
   //! Fetching Data From The Server
-  const [teacher,setTeacher]=useState<Teacher | null>(null)
+  const [teacher, setTeacher] = useState<Teacher | null>(null)
   const [students, setStudents] = useState<Student[]>([]);
   const [modules_class_groups, setModulesClassGroups] = useState<
     TeacherModuleClassGroup[]
@@ -92,8 +92,8 @@ const TeacherDashboard: React.FC = () => {
   const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
 
-  const [newMessages,setNewMessages]=useState<Message[]>([]);
-  
+  const [newMessages, setNewMessages] = useState<Message[]>([]);
+
   const get_teacher_by_id = async () => {
     const res = await teacher_dashboard_client.get_teacher_by_id(teacher_id);
     if (res.ok) {
@@ -155,10 +155,10 @@ const TeacherDashboard: React.FC = () => {
     }
   };
 
-  const get_latest_five_messages = async ()=>{
+  const get_latest_five_messages = async () => {
     const res = await chat_http_client.get_latest_five_messages()
-    if(res.ok){
-      const new_messages_list :Message[]= res.data 
+    if (res.ok) {
+      const new_messages_list: Message[] = res.data
       setNewMessages(new_messages_list)
     }
   }
@@ -197,25 +197,25 @@ const TeacherDashboard: React.FC = () => {
 
   const stats = [
     {
-      title: getTranslation('myStudents',language),
+      title: getTranslation('myStudents', language),
       value: students.length || "0",
       icon: Users,
-      color: "bg-blue-500",
+      color: "bg-primary-600",
     },
     {
-      title: getTranslation('Classes',language),
+      title: getTranslation('Classes', language),
       value: modules_class_groups.length || "0",
       icon: BookOpen,
       color: "bg-green-500",
     },
     {
-      title: getTranslation('newMessages',language),
+      title: getTranslation('newMessages', language),
       value: "7",
       icon: MessageCircle,
       color: "bg-purple-500",
     },
     {
-      title: getTranslation('uploadedMaterials',language),
+      title: getTranslation('uploadedMaterials', language),
       value: teacher_uploads.length ?? "0",
       icon: Upload,
       color: "bg-orange-500",
@@ -223,15 +223,15 @@ const TeacherDashboard: React.FC = () => {
   ];
 
   const tabs = [
-    { id: "overview", label: getTranslation('overview',language), icon: TrendingUp },
-    { id: "classes", label: getTranslation('myClasses',language), icon: Users },
-    { id: "grades", label: getTranslation('marks',language), icon: FileText },
-    { id: "resources", label: getTranslation('educationalMaterials',language), icon: BookOpen },
-    { id: "chat", label: getTranslation('communication_teacher',language), icon: MessageCircle },
+    { id: "overview", label: getTranslation('overview', language), icon: TrendingUp },
+    { id: "classes", label: getTranslation('myClasses', language), icon: Users },
+    { id: "grades", label: getTranslation('marks', language), icon: FileText },
+    { id: "resources", label: getTranslation('educationalMaterials', language), icon: BookOpen },
+    { id: "chat", label: getTranslation('communication_teacher', language), icon: MessageCircle },
     // { id: "schedule", label: "الجدول", icon: Calendar },
     {
       id: "absences",
-      label: getTranslation('unexcusedAbsencesAndBehaviorReports',language),
+      label: getTranslation('unexcusedAbsencesAndBehaviorReports', language),
       icon: FileX2,
     },
   ];
@@ -447,8 +447,8 @@ const TeacherDashboard: React.FC = () => {
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                   >
                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                      <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg">
-                        <BookOpen className="h-5 w-5 text-blue-600" />
+                      <div className="bg-primary-100 dark:bg-primary-900/20 p-2 rounded-lg">
+                        <BookOpen className="h-5 w-5 text-primary-600" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">
@@ -471,40 +471,40 @@ const TeacherDashboard: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  {getTranslation('quickActions',language)}
+                  {getTranslation('quickActions', language)}
                 </h3>
                 <div className="space-y-3">
-                  <button 
-                  onClick={()=>setActiveTab('grades')}
-                  className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+                  <button
+                    onClick={() => setActiveTab('grades')}
+                    className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
                     <Edit className="h-5 w-5" />
-                    <span>{getTranslation('enterNewGrades',language)}</span>
+                    <span>{getTranslation('enterNewGrades', language)}</span>
                   </button>
                   <button
-                  onClick={()=>setActiveTab('resources')}
-                  className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
+                    onClick={() => setActiveTab('resources')}
+                    className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors">
                     <Upload className="h-5 w-5" />
-                    <span>{getTranslation('uploadEducationalMaterial',language)}</span>
+                    <span>{getTranslation('uploadEducationalMaterial', language)}</span>
                   </button>
-                  <button 
-                  onClick={()=>setActiveTab('chat')}
-                  className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
+                  <button
+                    onClick={() => setActiveTab('chat')}
+                    className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors">
                     <MessageCircle className="h-5 w-5" />
-                    <span>{getTranslation('sendNotificationToParents',language)}</span>
+                    <span>{getTranslation('sendNotificationToParents', language)}</span>
                   </button>
                 </div>
               </div>
 
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                 {getTranslation('newMessages',language)}
+                  {getTranslation('newMessages', language)}
                 </h3>
                 <div className="space-y-3">
-                  {newMessages.map((msg)=>({
-                      from: msg.from_user?.username,
-                      message: msg.content ?? "set a file",
-                      time: timeAgoArabic(msg.timestamp),
-                    })).map((msg, index) => (
+                  {newMessages.map((msg) => ({
+                    from: msg.from_user?.username,
+                    message: msg.content ?? "set a file",
+                    time: timeAgoArabic(msg.timestamp),
+                  })).map((msg, index) => (
                     <div
                       key={index}
                       className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
@@ -527,7 +527,7 @@ const TeacherDashboard: React.FC = () => {
             </div>
 
 
-            
+
           </div>
         );
     }
@@ -535,8 +535,8 @@ const TeacherDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title={getTranslation('teacherDashboardTitle',language)}
-      subtitle={getTranslation('teacherDashboardSubtitle',language)}
+      title={getTranslation('teacherDashboardTitle', language)}
+      subtitle={getTranslation('teacherDashboardSubtitle', language)}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Target, Eye, Award, Users, BookOpen, MessageCircle, BarChart3, TrendingUp } from 'lucide-react';
+
+import { Target, Eye, Award, Users, BookOpen, BarChart3 } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
 
@@ -34,7 +34,7 @@ export function About() {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white dark:bg-gray-900">
+    <section id="about" className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-gray-900 border-t-4 border-primary-600/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className={`text-center mb-16 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -48,9 +48,9 @@ export function About() {
 
         {/* Mission & Vision with Dashboard Images */}
         <div className="grid md:grid-cols-2 gap-12 mb-20">
-          <div className={`bg-gradient-to-br from-[#39789b]/5 to-[#bcc6d2]/10 rounded-2xl p-8 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className={`bg-gradient-to-br from-primary-600/5 to-[#bcc6d2]/10 rounded-2xl p-8 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-[#39789b] rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
+              <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
                 <Target className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -58,8 +58,8 @@ export function About() {
               </h3>
             </div>
             <div className="mb-6 relative rounded-xl overflow-hidden w-full aspect-[16/9]">
-              <img 
-                src="https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg?auto=compress&cs=tinysrgb&w=600" 
+              <img
+                src="https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg?auto=compress&cs=tinysrgb&w=600"
                 alt="Student progress tracking dashboard"
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -70,9 +70,9 @@ export function About() {
             </p>
           </div>
 
-          <div className={`bg-gradient-to-br from-[#bcc6d2]/5 to-[#39789b]/10 rounded-2xl p-8 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className={`bg-gradient-to-br from-[#bcc6d2]/5 to-primary-600/10 rounded-2xl p-8 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-[#39789b] rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
+              <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
                 <Eye className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -80,8 +80,8 @@ export function About() {
               </h3>
             </div>
             <div className="mb-6 relative rounded-xl overflow-hidden w-full aspect-[16/9]">
-              <img 
-                src="https://images.pexels.com/photos/5428010/pexels-photo-5428010.jpeg?auto=compress&cs=tinysrgb&w=600" 
+              <img
+                src="https://images.pexels.com/photos/5428010/pexels-photo-5428010.jpeg?auto=compress&cs=tinysrgb&w=600"
                 alt="Digital education analytics"
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -101,16 +101,16 @@ export function About() {
               className={`group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}
             >
               <div className="relative w-full aspect-[16/9] overflow-hidden">
-                <img 
-                  src={feature.image} 
+                <img
+                  src={feature.image}
                   alt={feature.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#39789b]/30 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-600/30 to-transparent"></div>
                 <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
                   <div className="w-8 h-8 bg-white/90 rounded-lg flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-[#39789b]" />
+                    <feature.icon className="w-5 h-5 text-primary-600" />
                   </div>
                 </div>
               </div>
@@ -129,45 +129,45 @@ export function About() {
         {/* Stats Section with Academic Success Image */}
         <div className="relative rounded-3xl overflow-hidden w-full aspect-[21/9] max-h-[500px]">
           <div className="absolute inset-0">
-            <img 
-              src="https://images.pexels.com/photos/5212329/pexels-photo-5212329.jpeg?auto=compress&cs=tinysrgb&w=1200" 
+            <img
+              src="https://images.pexels.com/photos/5212329/pexels-photo-5212329.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Students celebrating academic success"
               className="w-full h-full object-cover"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#39789b]/90 to-[#2d5f7d]/90"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-600/90 to-primary-700/90"></div>
           </div>
           <div className="relative p-8 md:p-12">
             <div className="text-center mb-8">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 {language === 'ar' ? 'إنجازاتنا في أرقام' : language === 'fr' ? 'Nos Réalisations en Chiffres' : 'Our Achievements in Numbers'}
               </h3>
-              <p className="text-blue-100 text-lg">
+              <p className="text-primary-100 text-lg">
                 {language === 'ar' ? 'نتائج حقيقية تؤكد نجاح منصتنا' : language === 'fr' ? 'Résultats réels confirmant le succès de notre plateforme' : 'Real results confirming our platform\'s success'}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                 <div className="text-3xl md:text-4xl font-bold text-white mb-2">500+</div>
-                <div className="text-blue-100 text-sm">
+                <div className="text-primary-100 text-sm">
                   {language === 'ar' ? 'مدرسة مسجلة' : language === 'fr' ? 'Écoles Inscrites' : 'Registered Schools'}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                 <div className="text-3xl md:text-4xl font-bold text-white mb-2">10K+</div>
-                <div className="text-blue-100 text-sm">
+                <div className="text-primary-100 text-sm">
                   {language === 'ar' ? 'ولي أمر نشط' : language === 'fr' ? 'Parents Actifs' : 'Active Parents'}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                 <div className="text-3xl md:text-4xl font-bold text-white mb-2">2K+</div>
-                <div className="text-blue-100 text-sm">
+                <div className="text-primary-100 text-sm">
                   {language === 'ar' ? 'معلم متصل' : language === 'fr' ? 'Enseignants Connectés' : 'Connected Teachers'}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                 <div className="text-3xl md:text-4xl font-bold text-white mb-2">98%</div>
-                <div className="text-blue-100 text-sm">
+                <div className="text-primary-100 text-sm">
                   {language === 'ar' ? 'رضا المستخدمين' : language === 'fr' ? 'Satisfaction Utilisateurs' : 'User Satisfaction'}
                 </div>
               </div>

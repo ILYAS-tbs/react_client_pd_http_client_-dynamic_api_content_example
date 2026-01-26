@@ -6,16 +6,16 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: "#f0f9ff",
-          100: "#e0f2fe",
-          200: "#bae6fd",
-          300: "#7dd3fc",
-          400: "#39789b",
-          500: "#39789b",
-          600: "#2d5f7d",
-          700: "#0c4a6e",
-          800: "#075985",
-          900: "#0c4a6e",
+          50: "#eef7ff",
+          100: "#d9edff",
+          200: "#bce0ff",
+          300: "#8ecaff",
+          400: "#59aaff",
+          500: "#2d89fa",
+          600: "#1877f2", // Main Brand Color
+          700: "#0c56c2",
+          800: "#0e459d",
+          900: "#133a7c",
         },
         secondary: {
           50: "#edeff3",
@@ -30,7 +30,7 @@ export default {
           900: "#0f172a",
         },
         // ! My Custom colors :
-        "brand-blue": "#39789B",
+        "brand-blue": "#1877F2",
       },
       fontFamily: {
         arabic: ["Cairo", "Tajawal", "Noto Sans Arabic", "sans-serif"],

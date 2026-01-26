@@ -51,11 +51,11 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 
 const SchoolDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
-  
+
   const { language } = useLanguage();
-    
-  
-  
+
+
+
   //! Getting the schools's id (which is the user id)
   const lc_user: User = JSON.parse(
     localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
@@ -165,7 +165,7 @@ const SchoolDashboard: React.FC = () => {
     }
   };
 
-  
+
 
   useEffect(() => {
     //! fetching :
@@ -179,7 +179,7 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_exam_schedules();
     get_current_school_stats();
     get_modules();
-   
+
   }, []);
 
   const total_num_of_absences = () => {
@@ -226,8 +226,8 @@ const SchoolDashboard: React.FC = () => {
                   ].map
   */
 
-  const {notifications_data}=useNotifications()
-  
+  const { notifications_data } = useNotifications()
+
   const [actions, setActions] = useState(
     notifications_data?.map((not) => ({
       action: not.title,
@@ -275,32 +275,32 @@ const SchoolDashboard: React.FC = () => {
   // ];
 
   //? Cached Array (no rerender)
-  
-  
-console.log('📊 SchoolDashboard rendering with language:', language);
 
-const stats =  [
-    { title:getTranslation("TotalStudents",language), value: students.length || "0", icon: Users, color: "bg-blue-500" },
-    { title: getTranslation("Teachers",language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
-    { title: getTranslation("Classes",language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
-    { title: getTranslation("TotalAbsences",language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
-   ]
+
+  console.log('📊 SchoolDashboard rendering with language:', language);
+
+  const stats = [
+    { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-600" },
+    { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
+    { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
+    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
+  ]
 
 
   const tabs = [
-    { id: "home", label: getTranslation("home",language), icon: Home },
-    { id: "users", label: getTranslation("UserManagement",language), icon: Users },
-    { id: "levels", label: getTranslation("ClassManagement",language), icon: Layers },
-    { id: "schedules", label: getTranslation("ScheduleManagement",language), icon: Calendar },
-    { id: "exams", label: getTranslation('ExamSchedule',language), icon: FileText },
-    { id: "reports", label: getTranslation('Reports',language), icon: BarChart2 },
-    { id: "grades", label: getTranslation("GradeOverview",language), icon: FileText },
-    { id: "activities", label: getTranslation('Activities',language), icon: Star },
+    { id: "home", label: getTranslation("home", language), icon: Home },
+    { id: "users", label: getTranslation("UserManagement", language), icon: Users },
+    { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
+    { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
+    { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
+    { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },
+    { id: "grades", label: getTranslation("GradeOverview", language), icon: FileText },
+    { id: "activities", label: getTranslation('Activities', language), icon: Star },
   ];
 
   const renderContent = () => {
 
-   
+
 
     switch (activeTab) {
       case "home":
@@ -319,7 +319,7 @@ const stats =  [
                         {stat.title}
                       </p>
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {getTranslation(String(stat.value),language)}
+                        {getTranslation(String(stat.value), language)}
                       </p>
                     </div>
                     <div className={`${stat.color} p-3 rounded-lg`}>
@@ -334,7 +334,7 @@ const stats =  [
             <div className="grid md:grid-cols-2 gap-6">
               <div className=" h-64 overflow-y-scroll bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                 {getTranslation("recentActivity",language)}
+                  {getTranslation("recentActivity", language)}
                 </h3>
                 <div className="space-y-4">
                   {actions?.map((activity, index) => (
@@ -360,7 +360,7 @@ const stats =  [
 
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                 {getTranslation('monthlyStats',language)}
+                  {getTranslation('monthlyStats', language)}
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -375,7 +375,7 @@ const stats =  [
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       معدل الحضور
                     </span>
-                    <span className="text-sm font-semibold text-blue-600">
+                    <span className="text-sm font-semibold text-primary-600">
                       94.2%
                     </span>
                   </div>
@@ -485,10 +485,10 @@ const stats =  [
   };
 
   return (
-    
+
     <DashboardLayout
-      title={getTranslation("SchoolDashboard",language)}
-      subtitle={getTranslation("WelcomeSubtitle",language)}
+      title={getTranslation("SchoolDashboard", language)}
+      subtitle={getTranslation("WelcomeSubtitle", language)}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}

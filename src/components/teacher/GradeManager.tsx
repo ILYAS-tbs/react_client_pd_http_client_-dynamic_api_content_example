@@ -696,7 +696,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           {getTranslation('gradesManagement', language)}
         </h2>
         <div className="flex items-center space-x-4 rtl:space-x-reverse">
-          <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
             <Download className="h-4 w-4" />
             <span>{getTranslation('export', language)}</span>
           </button>
@@ -904,7 +904,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                           className={`text-sm font-bold ${(student.grades[key]!.score ?? 0) >= 16
                             ? "text-green-600"
                             : (student.grades[key]!.score ?? 0) >= 12
-                              ? "text-blue-600"
+                              ? "text-primary-600"
                               : (student.grades[key]!.score ?? 0) >= 10
                                 ? "text-yellow-600"
                                 : "text-red-600"

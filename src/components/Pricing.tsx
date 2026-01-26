@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Check, Star, Zap } from "lucide-react";
 import { useLanguage } from "../hooks/useLanguage";
 import { getTranslation } from "../utils/translations";
@@ -38,41 +38,41 @@ export function Pricing() {
         language === "ar"
           ? "للتجربة والاستخدام المحدود"
           : language === "fr"
-          ? "Pour essai et usage limité"
-          : "For trial and limited usage",
+            ? "Pour essai et usage limité"
+            : "For trial and limited usage",
       features: [
         language === "ar"
           ? "طفل واحد"
           : language === "fr"
-          ? "Un enfant"
-          : "One child",
+            ? "Un enfant"
+            : "One child",
         language === "ar"
           ? "عرض الدرجات"
           : language === "fr"
-          ? "Consultation des notes"
-          : "View grades",
+            ? "Consultation des notes"
+            : "View grades",
         language === "ar"
           ? "الجدول الزمني"
           : language === "fr"
-          ? "Emploi du temps"
-          : "Schedule view",
+            ? "Emploi du temps"
+            : "Schedule view",
         language === "ar"
           ? "دعم أساسي"
           : language === "fr"
-          ? "Support de base"
-          : "Basic support",
+            ? "Support de base"
+            : "Basic support",
       ],
       limitations: [
         language === "ar"
           ? "رسائل محدودة"
           : language === "fr"
-          ? "Messages limités"
-          : "Limited messages",
+            ? "Messages limités"
+            : "Limited messages",
         language === "ar"
           ? "بدون إشعارات"
           : language === "fr"
-          ? "Pas de notifications"
-          : "No notifications",
+            ? "Pas de notifications"
+            : "No notifications",
       ],
       buttonText: getTranslation("choosePlan", language),
       popular: false,
@@ -85,50 +85,50 @@ export function Pricing() {
         language === "ar"
           ? "شهرياً"
           : language === "fr"
-          ? "par mois"
-          : "per month",
+            ? "par mois"
+            : "per month",
       description:
         language === "ar"
           ? "للعائلات النشطة"
           : language === "fr"
-          ? "Pour familles actives"
-          : "For active families",
+            ? "Pour familles actives"
+            : "For active families",
       features: [
         language === "ar"
           ? "حتى 5 أطفال"
           : language === "fr"
-          ? "Jusqu'à 5 enfants"
-          : "Up to 5 children",
+            ? "Jusqu'à 5 enfants"
+            : "Up to 5 children",
         language === "ar"
           ? "متابعة شاملة"
           : language === "fr"
-          ? "Suivi complet"
-          : "Complete tracking",
+            ? "Suivi complet"
+            : "Complete tracking",
         language === "ar"
           ? "رسائل غير محدودة"
           : language === "fr"
-          ? "Messages illimités"
-          : "Unlimited messages",
+            ? "Messages illimités"
+            : "Unlimited messages",
         language === "ar"
           ? "إشعارات فورية"
           : language === "fr"
-          ? "Notifications instantanées"
-          : "Instant notifications",
+            ? "Notifications instantanées"
+            : "Instant notifications",
         language === "ar"
           ? "تبرير الغياب"
           : language === "fr"
-          ? "Justification absence"
-          : "Absence justification",
+            ? "Justification absence"
+            : "Absence justification",
         language === "ar"
           ? "الاستعلام عن الدرجات"
           : language === "fr"
-          ? "Demandes révision notes"
-          : "Grade appeals",
+            ? "Demandes révision notes"
+            : "Grade appeals",
         language === "ar"
           ? "دعم ذات أولوية"
           : language === "fr"
-          ? "Support prioritaire"
-          : "Priority support",
+            ? "Support prioritaire"
+            : "Priority support",
       ],
       buttonText: getTranslation("choosePlan", language),
       popular: true,
@@ -142,45 +142,45 @@ export function Pricing() {
         language === "ar"
           ? "كل 3 أشهر"
           : language === "fr"
-          ? "tous les 3 mois"
-          : "every 3 months",
+            ? "tous les 3 mois"
+            : "every 3 months",
       description:
         language === "ar"
           ? "توفير 17% - الأفضل قيمة"
           : language === "fr"
-          ? "Économie 17% - Meilleure valeur"
-          : "Save 17% - Best value",
+            ? "Économie 17% - Meilleure valeur"
+            : "Save 17% - Best value",
       features: [
         language === "ar"
           ? "حتى 5 أطفال"
           : language === "fr"
-          ? "Jusqu'à 5 enfants"
-          : "Up to 5 children",
+            ? "Jusqu'à 5 enfants"
+            : "Up to 5 children",
         language === "ar"
           ? "جميع ميزات الخطة الشهرية"
           : language === "fr"
-          ? "Toutes les fonctionnalités mensuelles"
-          : "All monthly features",
+            ? "Toutes les fonctionnalités mensuelles"
+            : "All monthly features",
         language === "ar"
           ? "تقارير تفصيلية"
           : language === "fr"
-          ? "Rapports détaillés"
-          : "Detailed reports",
+            ? "Rapports détaillés"
+            : "Detailed reports",
         language === "ar"
           ? "تحليلات الأداء"
           : language === "fr"
-          ? "Analyses performance"
-          : "Performance analytics",
+            ? "Analyses performance"
+            : "Performance analytics",
         language === "ar"
           ? "وصول مبكر للميزات"
           : language === "fr"
-          ? "Accès anticipé aux fonctionnalités"
-          : "Early access to features",
+            ? "Accès anticipé aux fonctionnalités"
+            : "Early access to features",
         language === "ar"
           ? "دعم متقدم 24/7"
           : language === "fr"
-          ? "Support avancé 24/7"
-          : "Advanced 24/7 support",
+            ? "Support avancé 24/7"
+            : "Advanced 24/7 support",
       ],
       buttonText: getTranslation("choosePlan", language),
       popular: false,
@@ -207,25 +207,24 @@ export function Pricing() {
               {language === "ar"
                 ? "أسعار بالدينار الجزائري (DZD)"
                 : language === "fr"
-                ? "Prix en Dinar Algérien (DZD)"
-                : "Prices in Algerian Dinar (DZD)"}
+                  ? "Prix en Dinar Algérien (DZD)"
+                  : "Prices in Algerian Dinar (DZD)"}
             </span>
           </div>
         </div>
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {plans.map((plan, index) => (
+          {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${
-                plan.popular ? "ring-2 ring-[#39789b] scale-105" : ""
-              } ${isRTL ? "text-right" : "text-left"}`}
+              className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${plan.popular ? "ring-2 ring-primary-600 scale-105" : ""
+                } ${isRTL ? "text-right" : "text-left"}`}
             >
               {/* Popular Badge */}
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-[#39789b] text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-1 rtl:space-x-reverse shadow-lg">
+                  <div className="bg-primary-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-1 rtl:space-x-reverse shadow-lg">
                     <Star className="w-4 h-4" />
                     <span>{getTranslation("popular", language)}</span>
                   </div>
@@ -253,7 +252,7 @@ export function Pricing() {
                   </p>
 
                   <div className="flex items-baseline space-x-2 rtl:space-x-reverse">
-                    <span className="text-4xl font-bold text-[#39789b] dark:text-blue-300">
+                    <span className="text-4xl font-bold text-primary-600 dark:text-primary-300">
                       {plan.price}
                     </span>
                     <span className="text-lg text-gray-600 dark:text-gray-400">
@@ -301,11 +300,10 @@ export function Pricing() {
                 {/* CTA Button */}
                 <button
                   onClick={() => pay_func(1000)}
-                  className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 ${
-                    plan.popular
-                      ? "bg-[#39789b] hover:bg-[#2d5f7d] text-white shadow-lg hover:shadow-xl"
-                      : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
-                  }`}
+                  className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 ${plan.popular
+                    ? "bg-primary-600 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl"
+                    : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
+                    }`}
                 >
                   {plan.buttonText}
                 </button>
@@ -319,62 +317,62 @@ export function Pricing() {
           <div className="bg-[#edeff3] dark:bg-gray-800 rounded-2xl p-8 max-w-4xl mx-auto">
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="w-12 h-12 bg-[#39789b] rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Check className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">
                   {language === "ar"
                     ? "بدون رسوم خفية"
                     : language === "fr"
-                    ? "Aucun frais caché"
-                    : "No Hidden Fees"}
+                      ? "Aucun frais caché"
+                      : "No Hidden Fees"}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {language === "ar"
                     ? "ما تراه هو ما تدفعه"
                     : language === "fr"
-                    ? "Ce que vous voyez est ce que vous payez"
-                    : "What you see is what you pay"}
+                      ? "Ce que vous voyez est ce que vous payez"
+                      : "What you see is what you pay"}
                 </p>
               </div>
 
               <div>
-                <div className="w-12 h-12 bg-[#39789b] rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Star className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">
                   {language === "ar"
                     ? "ضمان الجودة"
                     : language === "fr"
-                    ? "Garantie qualité"
-                    : "Quality Guarantee"}
+                      ? "Garantie qualité"
+                      : "Quality Guarantee"}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {language === "ar"
                     ? "30 يوماً ضمان استرداد المال"
                     : language === "fr"
-                    ? "30 jours de garantie de remboursement"
-                    : "30-day money-back guarantee"}
+                      ? "30 jours de garantie de remboursement"
+                      : "30-day money-back guarantee"}
                 </p>
               </div>
 
               <div>
-                <div className="w-12 h-12 bg-[#39789b] rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">
                   {language === "ar"
                     ? "سهولة الإلغاء"
                     : language === "fr"
-                    ? "Annulation facile"
-                    : "Easy Cancellation"}
+                      ? "Annulation facile"
+                      : "Easy Cancellation"}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   {language === "ar"
                     ? "يمكنك الإلغاء في أي وقت"
                     : language === "fr"
-                    ? "Annulez à tout moment"
-                    : "Cancel anytime"}
+                      ? "Annulez à tout moment"
+                      : "Cancel anytime"}
                 </p>
               </div>
             </div>

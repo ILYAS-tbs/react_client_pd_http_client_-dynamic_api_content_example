@@ -27,27 +27,33 @@ export interface User {
 export interface UserData {
   commune?: string;
   confirmPassword?: string;
-  email:string;
+  email: string;
   name: string;
   numberOfChildren?: number;
   password: string;
   phone?: string;
-  role?:"school" | "teacher" | "parent";
+  role?: "school" | "teacher" | "parent";
   schoolType?: string;
   school_level?: string;
   wilaya?: string;
+  children?: Array<{
+    fullName: string;
+    dateOfBirth: string;
+    schoolName: string;
+    grade: string;
+  }>;
 }
 interface LoginResponse {
   ok: boolean;
   status: number | undefined;
   user?: User;
-  error?:any
+  error?: any
 }
 
 interface AuthContextType {
   user: User | null;
-  userData : UserData | null ;
-  setUserData:React.Dispatch<React.SetStateAction<UserData | null>>,
+  userData: UserData | null;
+  setUserData: React.Dispatch<React.SetStateAction<UserData | null>>,
   login: (
     email: string,
     password: string,
@@ -76,7 +82,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   //! USERDATA USED with Registrations
-  const [ userData,setUserData] = useState<UserData|null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -112,7 +118,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     if (!result.ok) {
       console.log("RESPONSE NOT OK");
-      return { ok: false, status: result.status , error:result.error};
+      return { ok: false, status: result.status, error: result.error };
     }
     console.log("Login Succeful");
     console.log(result.data);
@@ -160,8 +166,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         role === "school"
           ? "École Primaire El-Hikmah"
           : role === "teacher"
-          ? "Ahmed Benaissa"
-          : "Fatima Bourahla",
+            ? "Ahmed Benaissa"
+            : "Fatima Bourahla",
       email: user.email || "NO EMAIL!",
       role: role as "school" | "teacher" | "parent",
       schoolId: role !== "school" ? "school-1" : undefined,
@@ -175,16 +181,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     );
   }
 
-    const get_session = async()=>{
-    const response=  await fetch(
-        `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = await response.json()
-      return data
+  const get_session = async () => {
+    const response = await fetch(
+      `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+    const data = await response.json()
+    return data
   }
   const register = async (
     userData: UserData,
@@ -195,7 +201,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     // Mock registration
     // await new Promise((resolve) => setTimeout(resolve, 1000));
 
- 
+
 
     // Real registry :
     const user_payload: SignupPayload = {
@@ -209,7 +215,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     // CSRF token
     let latest_csrf = getCSRFToken()!;
     const result = await auth_http_client.signup(user_payload, latest_csrf);
-    
+
     //? call02 School or parent linking with him
     // CSRF token
     latest_csrf = getCSRFToken()!;
@@ -251,7 +257,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     //   );
     // }
 
-        
+
     //! BETTER TO TAKE THE USER TO LOGIN AFTER THE REGISTER 
     //! AND NOT DIRECTLY TO THE DASHBOARD
     //?: CAll03 : getting the use data (ID from the backend)
@@ -286,7 +292,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user,userData,setUserData, login, register, logout, isLoading, change_role }}
+      value={{ user, userData, setUserData, login, register, logout, isLoading, change_role }}
     >
       {children}
     </AuthContext.Provider>

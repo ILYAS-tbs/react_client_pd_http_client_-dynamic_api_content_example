@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { ClassManagementProps } from "../../types";
 import {
-  Schedule,
   TeacherModuleClassGroup,
 } from "../../models/TeacherModuleClassGroup";
 import { Student } from "../../models/Student";
@@ -20,7 +19,7 @@ import {
   PostAbsencePayload,
 } from "../../services/http_api/payloads_types/teacher_client_payload_types";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
-import { User } from "../../contexts/AuthContext";
+
 import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
 import { TeacherAbsence } from "../../models/TeacherAbsence";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -225,8 +224,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
+              <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-lg">
+                <Users className="h-6 w-6 text-primary-600" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -258,7 +257,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation("AttendanceRate", language)} :
                 </span>
-                <span className="text-sm font-medium text-blue-600">
+                <span className="text-sm font-medium text-primary-600">
                   {currentClass.attendance}
                 </span>
               </div>
@@ -364,7 +363,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
               </button>
               <button
                 onClick={() => setShowAbsenseTakingModal(true)}
-                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors"
               >
                 <Edit className="h-4 w-4" />
                 <span>{getTranslation("recordAttendance", language)}</span>
@@ -420,7 +419,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
                       {student.is_absent ? getTranslation('absent', language) : getTranslation('present', language)}
                     </span>
                   </td>

@@ -8,7 +8,7 @@ const SchoolAnnouncements: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   //! Translations :
-  const {language} = useLanguage()
+  const { language } = useLanguage()
 
   const announcements = [
     {
@@ -78,12 +78,12 @@ const SchoolAnnouncements: React.FC = () => {
     }
   ];
 
-  const announcementTypes = [getTranslation('all',language), getTranslation('exams',language), getTranslation('holiday',language),getTranslation('meeting',language),getTranslation('activity',language), getTranslation('update',language)];
+  const announcementTypes = [getTranslation('all', language), getTranslation('exams', language), getTranslation('holiday', language), getTranslation('meeting', language), getTranslation('activity', language), getTranslation('update', language)];
 
   const filteredAnnouncements = announcements.filter(announcement => {
     const matchesFilter = filter === 'all' || filter === 'الكل' || announcement.type === filter;
     const matchesSearch = announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         announcement.content.toLowerCase().includes(searchTerm.toLowerCase());
+      announcement.content.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -108,7 +108,7 @@ const SchoolAnnouncements: React.FC = () => {
       case 'إجازة':
         return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
       case 'اجتماع':
-        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+        return 'bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200';
       case 'نشاط':
         return 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200';
       default:
@@ -123,17 +123,17 @@ const SchoolAnnouncements: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{getTranslation('schoolAnnouncements',language)}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{getTranslation('schoolAnnouncements', language)}</h2>
           {unreadCount > 0 && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {getTranslation('youHave',language)} {unreadCount} {getTranslation('unreadAnnouncement',language)}
+              {getTranslation('youHave', language)} {unreadCount} {getTranslation('unreadAnnouncement', language)}
             </p>
           )}
         </div>
         <div className="flex items-center space-x-2 rtl:space-x-reverse">
-          <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
             <Bell className="h-4 w-4" />
-            <span>{getTranslation('enableNotifications',language)}</span>
+            <span>{getTranslation('enableNotifications', language)}</span>
           </button>
         </div>
       </div>
@@ -146,7 +146,7 @@ const SchoolAnnouncements: React.FC = () => {
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchAnnouncements',language)}
+                placeholder={getTranslation('searchAnnouncements', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -172,10 +172,10 @@ const SchoolAnnouncements: React.FC = () => {
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: getTranslation('totalAnnouncements',language), value: announcements.length, color: 'bg-blue-500' },
-          { label: getTranslation('unread',language), value: unreadCount, color: 'bg-red-500' },
-          { label: getTranslation('pinned',language), value: announcements.filter(a => a.pinned).length, color: 'bg-yellow-500' },
-          { label: getTranslation('highPriority',language), value: announcements.filter(a => a.priority === 'عالي').length, color: 'bg-purple-500' }
+          { label: getTranslation('totalAnnouncements', language), value: announcements.length, color: 'bg-blue-500' },
+          { label: getTranslation('unread', language), value: unreadCount, color: 'bg-red-500' },
+          { label: getTranslation('pinned', language), value: announcements.filter(a => a.pinned).length, color: 'bg-yellow-500' },
+          { label: getTranslation('highPriority', language), value: announcements.filter(a => a.priority === 'عالي').length, color: 'bg-purple-500' }
         ].map((stat, index) => (
           <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ const SchoolAnnouncements: React.FC = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2 rtl:space-x-reverse">
             <Pin className="h-5 w-5 text-yellow-600" />
-            <span>{getTranslation('pinnedAnnouncements',language)}</span>
+            <span>{getTranslation('pinnedAnnouncements', language)}</span>
           </h3>
           <div className="space-y-4">
             {pinnedAnnouncements.map((announcement) => (
@@ -221,14 +221,14 @@ const SchoolAnnouncements: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <Pin className="h-4 w-4 text-yellow-600" />
-                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                    <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                       <Eye className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
-                
+
                 <p className="text-gray-600 dark:text-gray-300 mb-4">{announcement.content}</p>
-                
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4 rtl:space-x-reverse text-sm text-gray-500 dark:text-gray-400">
                     <div className="flex items-center space-x-1 rtl:space-x-reverse">
@@ -244,7 +244,7 @@ const SchoolAnnouncements: React.FC = () => {
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       <Download className="h-4 w-4 text-gray-400" />
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {announcement.attachments.length} {getTranslation('attachmentsCount',language)}
+                        {announcement.attachments.length} {getTranslation('attachmentsCount', language)}
                       </span>
                     </div>
                   )}
@@ -257,7 +257,7 @@ const SchoolAnnouncements: React.FC = () => {
 
       {/* Regular Announcements */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{getTranslation('allAnnouncements',language)}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{getTranslation('allAnnouncements', language)}</h3>
         <div className="space-y-4">
           {regularAnnouncements.map((announcement) => (
             <div key={announcement.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -279,13 +279,13 @@ const SchoolAnnouncements: React.FC = () => {
                     <span className="text-xs text-gray-500 dark:text-gray-400">{announcement.targetAudience}</span>
                   </div>
                 </div>
-                <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                   <Eye className="h-4 w-4" />
                 </button>
               </div>
-              
+
               <p className="text-gray-600 dark:text-gray-300 mb-4">{announcement.content}</p>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center space-x-1 rtl:space-x-reverse">
@@ -301,7 +301,7 @@ const SchoolAnnouncements: React.FC = () => {
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <Download className="h-4 w-4 text-gray-400" />
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {announcement.attachments.length} {getTranslation('attachmentsCount',language)}
+                      {announcement.attachments.length} {getTranslation('attachmentsCount', language)}
                     </span>
                   </div>
                 )}
@@ -314,8 +314,8 @@ const SchoolAnnouncements: React.FC = () => {
       {filteredAnnouncements.length === 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
           <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{getTranslation('noAnnouncements',language)}</h3>
-          <p className="text-gray-600 dark:text-gray-400">{getTranslation('noAnnouncementsMatch',language)}</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{getTranslation('noAnnouncements', language)}</h3>
+          <p className="text-gray-600 dark:text-gray-400">{getTranslation('noAnnouncementsMatch', language)}</p>
         </div>
       )}
     </div>

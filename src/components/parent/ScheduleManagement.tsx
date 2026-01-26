@@ -34,7 +34,7 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
 }) => {
 
   //! Translations ::
-  const {language} = useLanguage()
+  const { language } = useLanguage()
 
   function mapClassGroupToSchedule(
     class_groups_list: ClassGroup[]
@@ -169,7 +169,7 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-         {getTranslation('timetable',language)}
+          {getTranslation('timetable', language)}
         </h2>
       </div>
 
@@ -181,7 +181,7 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchChildOrClass',language)}
+                placeholder={getTranslation('searchChildOrClass', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -195,31 +195,31 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="p-6">
           <h3 className="ltr:text-left text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            {getTranslation('childrenTimetables',language)}
+            {getTranslation('childrenTimetables', language)}
           </h3>
           {filteredSchedules.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-              <p>{getTranslation('noTimetablesAvailable',language)}</p>
+              <p>{getTranslation('noTimetablesAvailable', language)}</p>
             </div>
           ) : (
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-700">
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('childName',language)}
+                    {getTranslation('childName', language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('class',language)}
+                    {getTranslation('class', language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                   {getTranslation('uploadStatus',language)}
+                    {getTranslation('uploadStatus', language)}
                   </th>
                   {/* <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
                     تاريخ الرفع
                   </th> */}
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('actions',language)}
+                    {getTranslation('actions', language)}
                   </th>
                 </tr>
               </thead>
@@ -237,9 +237,9 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
                       {schedule.pdfUrl ? (
-                        <span className="text-green-600">{getTranslation('uploaded',language)}</span>
+                        <span className="text-green-600">{getTranslation('uploaded', language)}</span>
                       ) : (
-                        <span className="text-red-600">{getTranslation('notUploaded',language)}</span>
+                        <span className="text-red-600">{getTranslation('notUploaded', language)}</span>
                       )}
                     </td>
                     {/* <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
@@ -254,7 +254,7 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
                       <div className="flex space-x-2 rtl:space-x-reverse">
                         {/* <button
                           onClick={() => handleViewSchedule(schedule.pdfUrl)}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                           disabled={!schedule.pdfUrl}
                         >
                           <Eye className="h-5 w-5" />

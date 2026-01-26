@@ -36,13 +36,13 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
     null
   );
 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   const resourceTypes = [
-    { value: "all", label: getTranslation('all',language), icon: FileText },
-    { value: "document", label: getTranslation('documents',language), icon: FileText },
-    { value: "video", label: getTranslation('videoCourses',language), icon: Video },
-    { value: "book", label: getTranslation('books',language), icon: BookOpen },
+    { value: "all", label: getTranslation('all', language), icon: FileText },
+    { value: "document", label: getTranslation('documents', language), icon: FileText },
+    { value: "video", label: getTranslation('videoCourses', language), icon: Video },
+    { value: "book", label: getTranslation('books', language), icon: BookOpen },
   ];
   //! Mock data to map the API to
   // const resources: Resource[] = [
@@ -136,7 +136,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
       upload_file: upload.upload_file,
       format: fileInfo.format,
       size: `${Number(upload.size).toFixed(1)} - ${upload.size_unit}`,
-      uploadDate: new Date(upload.created_at.toString().split("T")[0]),
+      uploadDate: upload.created_at ? new Date(upload.created_at) : new Date(),
       downloads: 23,
       classes: upload.class_groups.map((cls) => cls.name),
       description: upload.description,
@@ -198,7 +198,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-         {getTranslation('educationalLibrary',language)}
+          {getTranslation('educationalLibrary', language)}
         </h2>
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
@@ -221,7 +221,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
             type="text"
-            placeholder={getTranslation('searchTitleDescriptionClass',language)}
+            placeholder={getTranslation('searchTitleDescriptionClass', language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -234,10 +234,10 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
           <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            {getTranslation('noEducationalMaterials',language)}
+            {getTranslation('noEducationalMaterials', language)}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {getTranslation('noMaterialsMatch',language)}
+            {getTranslation('noMaterialsMatch', language)}
           </p>
         </div>
       ) : (
@@ -276,7 +276,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      {getTranslation('uploadDate',language)}:
+                      {getTranslation('uploadDate', language)}:
                     </span>
                     <span className="text-gray-900 dark:text-white">
                       {resource.uploadDate.toLocaleDateString()}
@@ -284,7 +284,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      {getTranslation('Classes',language)}:
+                      {getTranslation('Classes', language)}:
                     </span>
                     <span className="text-gray-900 dark:text-white">
                       {resource.classes.join(", ")}
@@ -292,19 +292,19 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      {getTranslation('price',language)}:
+                      {getTranslation('price', language)}:
                     </span>
                     <span className="text-gray-900 dark:text-white flex items-center">
                       {resource.price === null ? (
-                        getTranslation('free',language)
+                        getTranslation('free', language)
                       ) : (
                         <>
                           {resource.originalPrice && (
                             <span className="text-red-600 line-through ml-2">
-                              {resource.originalPrice} {getTranslation('dzd',language)}
+                              {resource.originalPrice} {getTranslation('dzd', language)}
                             </span>
                           )}
-                          {resource.price} {getTranslation('dzd',language)}
+                          {resource.price} {getTranslation('dzd', language)}
                         </>
                       )}
                     </span>
@@ -315,7 +315,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <button
                       onClick={() => setSelectedResource(resource)}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1"
+                      className="text-blue-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-1"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
@@ -348,12 +348,12 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('materialDetails',language)}
+              {getTranslation('materialDetails', language)}
             </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('title',language)}
+                  {getTranslation('title', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedResource.title}
@@ -361,7 +361,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('type',language)}
+                  {getTranslation('type', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {
@@ -372,7 +372,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('format',language)}
+                  {getTranslation('format', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedResource.format}
@@ -380,7 +380,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('size',language)}
+                  {getTranslation('size', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedResource.size}
@@ -388,7 +388,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('classes',language)}
+                  {getTranslation('classes', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedResource.classes.join(", ")}
@@ -396,19 +396,19 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('price',language)}
+                  {getTranslation('price', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white flex items-center">
                   {selectedResource.price === null ? (
-                    getTranslation('free',language)
+                    getTranslation('free', language)
                   ) : (
                     <>
                       {selectedResource.originalPrice && (
                         <span className="text-red-600 line-through ml-2">
-                          {selectedResource.originalPrice} {getTranslation('dzd',language)}
+                          {selectedResource.originalPrice} {getTranslation('dzd', language)}
                         </span>
                       )}
-                      {selectedResource.price} {getTranslation('dzd',language)}
+                      {selectedResource.price} {getTranslation('dzd', language)}
                     </>
                   )}
                   {selectedResource.originalPrice && (
@@ -418,7 +418,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('description',language)}
+                  {getTranslation('description', language)}
                 </label>
                 <p className="text-gray-600 dark:text-gray-400">
                   {selectedResource.description}
@@ -430,7 +430,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                 onClick={() => setSelectedResource(null)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                {getTranslation('close',language)}
+                {getTranslation('close', language)}
               </button>
               <button
                 onClick={() => {
@@ -439,7 +439,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                 }}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
-                {selectedResource.price === null ? getTranslation('download',language) : getTranslation('purchase',language)}
+                {selectedResource.price === null ? getTranslation('download', language) : getTranslation('purchase', language)}
               </button>
             </div>
           </div>

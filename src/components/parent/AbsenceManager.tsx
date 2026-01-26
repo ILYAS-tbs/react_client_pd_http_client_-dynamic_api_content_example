@@ -35,7 +35,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
     date: "",
     reason: "",
     details: "",
-    status:"",
+    status: "",
     urgent: false,
     documents: null as File[] | null,
   });
@@ -233,7 +233,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
       case "جيد جداً":
       case "very good":
-        return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
+        return "bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200";
       case "جيد":
       case "good":
         return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
@@ -310,7 +310,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       date: "",
       reason: "",
       details: "",
-      status:"",
+      status: "",
       urgent: false,
       documents: null,
     });
@@ -370,7 +370,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           {
             label: getTranslation("totalRequests", language),
             value: stats.total,
-            color: "bg-blue-500",
+            color: "bg-primary-600",
             icon: FileText,
           },
           {
@@ -439,8 +439,8 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                  <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                    <Calendar className="h-6 w-6 text-blue-600" />
+                  <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
+                    <Calendar className="h-6 w-6 text-primary-600" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -483,11 +483,10 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                     {getTranslation("supportingDocuments", language)}
                   </span>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      request.documents
-                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                    }`}
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ${request.documents
+                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                      : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                      }`}
                   >
                     {request.documents
                       ? getTranslation("Available", language)
@@ -534,7 +533,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           {
             label: getTranslation("totalReports", language),
             value: attitudeStats.total,
-            color: "bg-blue-500",
+            color: "bg-primary-600",
             icon: FileText,
           },
           {
@@ -691,21 +690,19 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
         <div className="flex space-x-4 rtl:space-x-reverse">
           <button
             onClick={() => setActiveTab("absences")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === "absences"
-                ? "bg-green-600 text-white"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "absences"
+              ? "bg-green-600 text-white"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
           >
             {getTranslation("absenceManagement", language)}
           </button>
           <button
             onClick={() => setActiveTab("attitude")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === "attitude"
-                ? "bg-green-600 text-white"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "attitude"
+              ? "bg-green-600 text-white"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
           >
             {getTranslation("behaviorReports", language)}
           </button>
@@ -845,7 +842,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                         });
 
                         setProofDocument(
-                          e.target.files ? e.target.files[0] : null 
+                          e.target.files ? e.target.files[0] : null
                         );
                       }}
                       className="hidden"
@@ -895,7 +892,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                       reason: "",
                       details: "",
                       urgent: false,
-                      status:"",
+                      status: "",
                       documents: null,
                     });
                   }}

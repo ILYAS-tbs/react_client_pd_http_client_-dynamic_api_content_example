@@ -38,7 +38,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
     },
 */
   //! Translation : 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   const [reports, setReports] = useState<BehaviourReport[]>(
     behaviour_reports_list
@@ -150,7 +150,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('BehaviorReports',language)}
+          {getTranslation('BehaviorReports', language)}
         </h2>
 
         <div className="flex space-x-2 rtl:space-x-reverse">
@@ -159,16 +159,16 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">{getTranslation('all',language)}</option>
-            <option value="good">{getTranslation('PositiveBehavior',language)}</option>
-            <option value="bad">{getTranslation('NegativeBehavior',language)}</option>
+            <option value="all">{getTranslation('all', language)}</option>
+            <option value="good">{getTranslation('PositiveBehavior', language)}</option>
+            <option value="bad">{getTranslation('NegativeBehavior', language)}</option>
           </select>
           <button
             onClick={() => setViewSummary(!viewSummary)}
-            className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <BarChart2 className="h-5 w-5" />
-            <span>{viewSummary ? getTranslation('ViewList',language) : getTranslation('ViewSummary',language)}</span>
+            <span>{viewSummary ? getTranslation('ViewList', language) : getTranslation('ViewSummary', language)}</span>
           </button>
 
           {/* For now : adding is only possible by the teacher not school */}
@@ -190,7 +190,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchStudentOrDescriptionOrAction',language)}
+                placeholder={getTranslation('searchStudentOrDescriptionOrAction', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -205,19 +205,19 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
         {viewSummary ? (
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              {getTranslation('behaviorReportsSummary',language)}
+              {getTranslation('behaviorReportsSummary', language)}
             </h3>
             <div className="space-y-4">
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {getTranslation('totalReports',language)}: {reports.length}
+                  {getTranslation('totalReports', language)}: {reports.length}
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                 {getTranslation('PositiveBehavior',language)}:{" "}
+                  {getTranslation('PositiveBehavior', language)}:{" "}
                   {reports.filter((r) => isPositive(r.type)).length}
                 </p>
                 <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                  {getTranslation('NegativeBehavior',language)}: {reports.filter((r) => isNegative(r.type)).length}
+                  {getTranslation('NegativeBehavior', language)}: {reports.filter((r) => isNegative(r.type)).length}
                 </p>
               </div>
               {filteredReports.map((report) => (
@@ -233,8 +233,8 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                       {new Date(report.date).toDateString()}
                     </p>
                   </div>
-                  <span className="text-sm text-blue-600 dark:text-blue-400">
-                    {isNegative(report.type) ? getTranslation('NegativeBehavior',language) :getTranslation('PositiveBehavior',language)}
+                  <span className="text-sm text-primary-600 dark:text-blue-400">
+                    {isNegative(report.type) ? getTranslation('NegativeBehavior', language) : getTranslation('PositiveBehavior', language)}
                   </span>
                 </div>
               ))}
@@ -246,19 +246,19 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('studentName',language)}
+                    {getTranslation('studentName', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('Date',language)}
+                    {getTranslation('Date', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('category',language)}
+                    {getTranslation('category', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('description',language)}
+                    {getTranslation('description', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('action',language)}
+                    {getTranslation('action', language)}
                   </th>
                   {/* For now : actions disallowed for from school for now */}
                   {/* <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -315,7 +315,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                        <button className="text-primary-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                           <Eye className="h-4 w-4" />
                         </button>
                       </div>

@@ -5,16 +5,14 @@ import {
   Video,
   BookOpen,
   Download,
-  Eye,
   Trash2,
-  Plus,
 } from "lucide-react";
 import { ResourceManagerProps } from "../../types";
 import { TeacherUpload } from "../../models/TeacherUpload";
-import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
+
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
-import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
+
 import { handleDownload } from "../../lib/download_script";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
@@ -26,18 +24,18 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 }) => {
 
   //! Translations :
-  const {language} = useLanguage()
+  const { language } = useLanguage()
 
-  
+
 
   const [selectedType, setSelectedType] = useState("all");
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const resourceTypes = [
-    { value: "all", label: getTranslation('all',language), icon: FileText },
-    { value: "document", label: getTranslation('Documents',language), icon: FileText },
-    { value: "video", label: getTranslation('videos',language), icon: Video },
-    { value: "book", label: getTranslation('books',language), icon: BookOpen },
+    { value: "all", label: getTranslation('all', language), icon: FileText },
+    { value: "document", label: getTranslation('Documents', language), icon: FileText },
+    { value: "video", label: getTranslation('videos', language), icon: Video },
+    { value: "book", label: getTranslation('books', language), icon: BookOpen },
   ];
 
   //? Mock Respousrce data
@@ -123,7 +121,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       upload_file: upload.upload_file,
       format: fileInfo.format,
       size: `${Number(upload.size).toFixed(1)} - ${upload.size_unit}`,
-      uploadDate: new Date(upload.created_at.toString().split("T")[0]),
+      uploadDate: upload.created_at ? new Date(upload.created_at) : new Date(),
       downloads: 23,
       classes: upload.class_groups.map((cls) => cls.name),
       description: upload.description,
@@ -150,7 +148,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       case "video":
         return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
       case "book":
-        return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
+        return "bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200";
       default:
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
     }
@@ -229,7 +227,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       );
 
     if (!post_upload_res.ok) {
-      showError(post_upload_res?.error)
+      showError(String(post_upload_res?.error || "Unknown error"))
       return;
     }
     setShowUploadModal(false);
@@ -246,7 +244,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
   //! Delete Teacher upload
   const handleDeleteUpload = async (id: number) => {
     const latest_csrf = getCSRFToken()!;
-    const delete_res = await teacher_dashboard_client.delete_teacher_upload(
+    await teacher_dashboard_client.delete_teacher_upload(
       id,
       latest_csrf
     );
@@ -265,14 +263,14 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('educationalMaterials',language)}
+          {getTranslation('educationalMaterials', language)}
         </h2>
         <button
           onClick={() => setShowUploadModal(true)}
           className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           <Upload className="h-4 w-4" />
-          <span>{getTranslation('uploadNewMaterial',language)}</span>
+          <span>{getTranslation('uploadNewMaterial', language)}</span>
         </button>
       </div>
 
@@ -283,11 +281,10 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
             <button
               key={type.value}
               onClick={() => setSelectedType(type.value)}
-              className={`flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg transition-colors ${
-                selectedType === type.value
-                  ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border-2 border-green-500"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-              }`}
+              className={`flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg transition-colors ${selectedType === type.value
+                ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border-2 border-green-500"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                }`}
             >
               <type.icon className="h-4 w-4" />
               <span>{type.label}</span>
@@ -330,7 +327,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {getTranslation('uploadDate',language)} :
+                    {getTranslation('uploadDate', language)} :
                   </span>
                   <span className="text-gray-900 dark:text-white">
                     {resource.uploadDate.toLocaleDateString("ar")}
@@ -347,7 +344,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                 </div> */}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {getTranslation('Classes',language)} :
+                    {getTranslation('Classes', language)} :
                   </span>
                   <span className="text-gray-900 dark:text-white">
                     {resource.classes.join(", ")}
@@ -357,8 +354,8 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
               <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                 {/* No use for the eye button for now */}
-                  {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1">
+                  {/* No use for the eye button for now */}
+                  {/* <button className="text-primary-600 hover:text-blue-900 dark:text-primary-400 dark:hover:text-blue-300 p-1">
                     <Eye className="h-4 w-4" />
                   </button> */}
 
@@ -394,31 +391,31 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('uploadNewMaterial',language)}
+              {getTranslation('uploadNewMaterial', language)}
             </h3>
 
             <form className="space-y-4" onSubmit={handleUploadSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('materialTitle',language)}
+                  {getTranslation('materialTitle', language)}
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={getTranslation('educationalMaterialTitle',language)}
+                  placeholder={getTranslation('educationalMaterialTitle', language)}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('materialType',language)}
+                  {getTranslation('materialType', language)}
                 </label>
                 <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                  <option value="document">{getTranslation('document',language)}</option>
-                  <option value="video">{getTranslation('video',language)}</option>
-                  <option value="book">{getTranslation('book',language)}</option>
+                  <option value="document">{getTranslation('document', language)}</option>
+                  <option value="video">{getTranslation('video', language)}</option>
+                  <option value="book">{getTranslation('book', language)}</option>
                 </select>
               </div>
 
@@ -427,7 +424,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   htmlFor="class_groups"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  {getTranslation('targetedClasses',language)}
+                  {getTranslation('targetedClasses', language)}
                 </label>
 
                 <select
@@ -459,14 +456,14 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                 {getTranslation('materialDescription',language)}
+                  {getTranslation('materialDescription', language)}
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={getTranslation('shortMaterialDescription',language)}
+                  placeholder={getTranslation('shortMaterialDescription', language)}
                 />
               </div>
 
@@ -476,21 +473,21 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   htmlFor="upload_file"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                 {getTranslation('uploadFile',language)}
+                  {getTranslation('uploadFile', language)}
                 </label>
 
                 {/* Clickable upload area */}
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer relative">
                   <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                   {getTranslation('dragOrClickToSelect',language)}
+                    {getTranslation('dragOrClickToSelect', language)}
                   </p>
 
                   {/* Invisible file input overlay */}
                   <input
                     type="file"
                     onChange={(e) =>
-                      setUploadFile(e.target.files ? e.target.files[0] : null)
+                      setUploadFile(e.target.files?.[0] || null)
                     }
                     name="upload_file"
                     id="upload_file"
@@ -509,13 +506,13 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   onClick={() => setShowUploadModal(false)}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  {getTranslation('cancel',language)}
+                  {getTranslation('cancel', language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {getTranslation('save',language)}
+                  {getTranslation('save', language)}
                 </button>
               </div>
             </form>

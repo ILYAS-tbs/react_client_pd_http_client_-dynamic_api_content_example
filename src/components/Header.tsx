@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Moon, Sun, Globe, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { getTranslation } from '../utils/translations';
-import { auth_http_client } from '../services/http_api/auth/auth_http_client';
+
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -20,7 +20,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
 
 
   // ✅ FIXED: Use setLanguage instead of changeLanguage
-  const { language, setLanguage, isRTL } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
 
   const navigationItems = [
@@ -80,15 +80,15 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="w-12 h-12 flex items-center justify-center">
+            <div className="w-16 h-16 flex items-center justify-center">
               <img
-                src="assets/logo.jpg"
+                src="/assets/pedaconnect-removebg.png"
                 alt="PedaConnect Logo"
-                className="w-12 h-12 object-contain"
+                className="w-16 h-16 object-contain"
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[#39789b] dark:text-blue-300">PedaConnect</h1>
+              <h1 className="text-xl font-bold text-primary-600 dark:text-primary-300">PedaConnect</h1>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 {getTranslation('heroSlogan', language)}
               </p>
@@ -102,8 +102,8 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeSection === item.id
-                    ? 'bg-[#39789b] text-white shadow-lg'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-[#edeff3] dark:hover:bg-gray-700 hover:text-[#39789b] dark:hover:text-blue-300'
+                  ? 'bg-primary-600 text-white shadow-lg'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-secondary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-300'
                   }`}
               >
                 {item.label}
@@ -117,7 +117,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             <div className="relative">
               <button
                 onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-                className="flex items-center space-x-2 rtl:space-x-reverse px-3 py-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center space-x-2 rtl:space-x-reverse px-3 py-2 rounded-lg hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <Globe className="w-4 h-4" />
                 <span className="text-sm m-4">{languages.find(lang => lang.code === language)?.flag}</span>
@@ -131,7 +131,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                       onClick={() => {
                         handleLanguageChange(lang.code as any)
                       }}
-                      className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors flex items-center space-x-3 rtl:space-x-reverse ${language === lang.code ? 'bg-[#edeff3] dark:bg-gray-700 text-[#39789b] dark:text-blue-300' : ''
+                      className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-3 rtl:space-x-reverse ${language === lang.code ? 'bg-secondary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-300' : ''
                         } first:rounded-t-lg last:rounded-b-lg`}
                     >
                       <span>{lang.flag}</span>
@@ -145,7 +145,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors"
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -154,7 +154,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             {user ?
               <button
                 onClick={() => handleLogoutAndNavigate(`/${role}-dashboard`)}
-                className="px-6 py-2 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 py-2 bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {/* {getTranslation('register', language)} */}
                 لوحة البيانات
@@ -163,13 +163,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               : <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <button
                   onClick={() => handleLogoutAndNavigate("/login")}
-                  className="px-4 py-2 text-sm font-medium text-sky-500 hover:text-[#2d5f7d] transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
                 >
                   {getTranslation('login', language)}
                 </button>
                 <button
                   onClick={() => handleLogoutAndNavigate('/register')}
-                  className="px-6 py-2 bg-sky-600 hover:bg-[#2d5f7d] text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {getTranslation('register', language)}
                 </button>
@@ -180,7 +180,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-[#edeff3] dark:text-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-secondary-50 dark:text-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -196,8 +196,8 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 key={item.id}
                 onClick={() => { scrollToSection(item.id) }}
                 className={`block w-full px-4 py-3 rounded-lg text-left rtl:text-right font-medium transition-all duration-200 ${activeSection === item.id
-                    ? 'bg-[#39789b] text-white'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-[#edeff3] dark:hover:bg-gray-700'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-secondary-50 dark:hover:bg-gray-700'
                   }`}
               >
                 {item.label}
@@ -208,7 +208,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center dark:text-gray-200 space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg hover:bg-[#edeff3] dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center dark:text-gray-200 space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                   <span className="text-sm">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
@@ -218,13 +218,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               <div className="space-y-2">
                 <button
                   onClick={() => navigate('/login')}
-                  className="block w-full px-4 py-3 text-center font-medium text-[#39789b] hover:bg-[#edeff3] dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="block w-full px-4 py-3 text-center font-medium text-primary-600 hover:bg-secondary-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   {getTranslation('login', language)}
                 </button>
                 <button
                   onClick={() => navigate('/register')}
-                  className="block w-full px-4 py-3 bg-[#39789b] hover:bg-[#2d5f7d] text-white text-center font-medium rounded-lg transition-colors"
+                  className="block w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white text-center font-medium rounded-lg transition-colors"
                 >
                   {getTranslation('register', language)}
                 </button>

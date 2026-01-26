@@ -18,11 +18,11 @@ export function Services({ onGetStarted }: HeroProps) {
       image: 'https://images.pexels.com/photos/5428010/pexels-photo-5428010.jpeg?auto=compress&cs=tinysrgb&w=600',
       features: [
         language === 'ar' ? 'إدارة الطلاب والمعلمين' : language === 'fr' ? 'Gestion des élèves et enseignants' : 'Student and teacher management',
-        language === 'ar' ? 'نظام الدرجات المرن' : language === 'fr' ? 'Système de notation flexible' : 'Flexible grading system', 
+        language === 'ar' ? 'نظام الدرجات المرن' : language === 'fr' ? 'Système de notation flexible' : 'Flexible grading system',
         language === 'ar' ? 'تتبع الحضور' : language === 'fr' ? 'Suivi de présence' : 'Attendance tracking',
         language === 'ar' ? 'التقارير التفصيلية' : language === 'fr' ? 'Rapports détaillés' : 'Detailed reports'
       ],
-      color: 'from-blue-500 to-blue-600'
+      color: 'from-primary-500 to-primary-600'
     },
     {
       icon: Users,
@@ -93,7 +93,7 @@ export function Services({ onGetStarted }: HeroProps) {
   ];
 
   return (
-    <section id="services" className="py-20 bg-[#edeff3] dark:bg-gray-800">
+    <section id="services" className="py-16 sm:py-20 lg:py-24 bg-secondary-50 dark:bg-gray-800 border-t-4 border-primary-600/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className={`text-center mb-16 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -101,9 +101,9 @@ export function Services({ onGetStarted }: HeroProps) {
             {getTranslation('servicesTitle', language)}
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            {language === 'ar' ? 'نقدم مجموعة شاملة من الخدمات المتطورة لتلبية احتياجات جميع أطراف العملية التعليمية' : 
-             language === 'fr' ? 'Nous offrons une gamme complète de services avancés pour répondre aux besoins de tous les acteurs du processus éducatif' :
-             'We offer a comprehensive range of advanced services to meet the needs of all educational stakeholders'}
+            {language === 'ar' ? 'نقدم مجموعة شاملة من الخدمات المتطورة لتلبية احتياجات جميع أطراف العملية التعليمية' :
+              language === 'fr' ? 'Nous offrons une gamme complète de services avancés pour répondre aux besoins de tous les acteurs du processus éducatif' :
+                'We offer a comprehensive range of advanced services to meet the needs of all educational stakeholders'}
           </p>
         </div>
 
@@ -115,8 +115,8 @@ export function Services({ onGetStarted }: HeroProps) {
               className={`group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${isRTL ? 'text-right' : 'text-left'}`}
             >
               <div className="relative w-full aspect-[16/9] overflow-hidden">
-                <img 
-                  src={service.image} 
+                <img
+                  src={service.image}
                   alt={service.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
@@ -133,7 +133,7 @@ export function Services({ onGetStarted }: HeroProps) {
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-8">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                   {service.title}
@@ -141,11 +141,11 @@ export function Services({ onGetStarted }: HeroProps) {
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                   {service.description}
                 </p>
-                
+
                 <div className="space-y-3">
                   {service.features.map((feature, featureIndex) => (
                     <div key={featureIndex} className="flex items-center space-x-3 rtl:space-x-reverse">
-                      <div className="w-2 h-2 bg-[#39789b] rounded-full"></div>
+                      <div className="w-2 h-2 bg-[primary-600] rounded-full"></div>
                       <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </div>
                   ))}
@@ -163,16 +163,16 @@ export function Services({ onGetStarted }: HeroProps) {
               className={`bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${isRTL ? 'text-right' : 'text-left'}`}
             >
               <div className="relative w-full aspect-[16/9] overflow-hidden">
-                <img 
-                  src={feature.image} 
+                <img
+                  src={feature.image}
                   alt={feature.title}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#39789b]/30 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[primary-600]/30 to-transparent"></div>
                 <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
                   <div className="w-8 h-8 bg-white/90 rounded-lg flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-[#39789b]" />
+                    <feature.icon className="w-5 h-5 text-[primary-600]" />
                   </div>
                 </div>
               </div>
@@ -192,26 +192,26 @@ export function Services({ onGetStarted }: HeroProps) {
         <div className="text-center">
           <div className="relative rounded-2xl overflow-hidden w-full aspect-[21/9] max-h-[500px]">
             <div className="absolute inset-0">
-              <img 
-                src="https://images.pexels.com/photos/5212329/pexels-photo-5212329.jpeg?auto=compress&cs=tinysrgb&w=1200" 
+              <img
+                src="https://images.pexels.com/photos/5212329/pexels-photo-5212329.jpeg?auto=compress&cs=tinysrgb&w=1200"
                 alt="Students achieving academic success"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#39789b]/90 to-[#2d5f7d]/90"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[primary-600]/90 to-[primary-700]/90"></div>
             </div>
             <div className="relative p-8 md:p-12">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 {language === 'ar' ? 'جاهز للبدء؟' : language === 'fr' ? 'Prêt à Commencer?' : 'Ready to Get Started?'}
               </h3>
-              <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-                {language === 'ar' ? 'انضم إلى آلاف المدارس وأولياء الأمور الذين يثقون في بيداكونيكت لتحقيق النجاح المؤكد' : 
-                 language === 'fr' ? 'Rejoignez des milliers d\'écoles et de parents qui font confiance à PedaConnect pour un succès assuré' :
-                 'Join thousands of schools and parents who trust PedaConnect for assured success'}
+              <p className="text-primary-100 text-lg mb-8 max-w-2xl mx-auto">
+                {language === 'ar' ? 'انضم إلى آلاف المدارس وأولياء الأمور الذين يثقون في بيداكونيكت لتحقيق النجاح المؤكد' :
+                  language === 'fr' ? 'Rejoignez des milliers d\'écoles et de parents qui font confiance à PedaConnect pour un succès assuré' :
+                    'Join thousands of schools and parents who trust PedaConnect for assured success'}
               </p>
-              <button 
-              onClick={onGetStarted}
-              className="bg-white text-[#39789b] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg">
+              <button
+                onClick={onGetStarted}
+                className="bg-white text-[primary-600] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg">
                 {getTranslation('getStarted', language)}
               </button>
             </div>

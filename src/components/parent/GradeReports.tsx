@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  BarChart3,
   TrendingUp,
   TrendingDown,
   Download,
   Filter,
-  Calendar,
-  Award,
 } from "lucide-react";
 import { GradeReportsProps } from "../../types";
 import { Student } from "../../models/Student";
-import { Mark } from "../../models/StudentPerformance";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
 
@@ -38,13 +34,14 @@ interface ChildPerformance {
   subjects: Subject[];
 }
 
-const translateMarkType = (type: string): string => {
+const translateMarkType = (type: string | undefined): string => {
+  if (!type) return "غير محدد";
   type = type.replace(/^s\d_/, "").trim().toLowerCase();
   const match = type.match(/([a-zA-Z]+)_?(\d*)/);
-  if (!match) return type || "غير محدد";
+  if (!match) return type ?? "غير محدد";
 
   const base = match[1];
-  const num = parseInt(match[2]) || 0;
+  const num = parseInt(match[2] ?? "0") || 0;
 
   let baseAr: string;
   switch (base) {
@@ -158,18 +155,18 @@ const GradeReports: React.FC<GradeReportsProps> = ({
   const filteredSubjects =
     selectedSubject === "all"
       ? currentData?.subjects
-      : currentData?.subjects.filter((s: Subject) => s.name === selectedSubject);
+      : currentData?.subjects?.filter((s: Subject) => s.name === selectedSubject);
 
   const getGradeColor = (grade: number) => {
     if (grade >= 16) return "text-green-600";
-    if (grade >= 12) return "text-blue-600";
+    if (grade >= 12) return "text-primary-600";
     if (grade >= 10) return "text-yellow-600";
     return "text-red-600";
   };
 
   const getGradeBgColor = (grade: number) => {
     if (grade >= 16) return "bg-green-100 dark:bg-green-900";
-    if (grade >= 12) return "bg-blue-100 dark:bg-blue-900";
+    if (grade >= 12) return "bg-primary-100 dark:bg-primary-900/20";
     if (grade >= 10) return "bg-yellow-100 dark:bg-yellow-900";
     return "bg-red-100 dark:bg-red-900";
   };
@@ -182,11 +179,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
     return <div className="h-4 w-4"></div>;
   };
 
-  const maxGrade = Math.max(
-    ...(currentData?.subjects?.map((s: Subject) => s.current) ?? [])
-  );
-  const maxSubject =
-    currentData?.subjects?.find((s: Subject) => s.current === maxGrade)?.name || "";
+
 
   return (
     <div className="space-y-6">
@@ -248,7 +241,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="all">{getTranslation("allSubjects", language)}</option>
-              {currentData?.subjects.map((subject: Subject) => (
+              {currentData?.subjects?.map((subject: Subject) => (
                 <option key={subject.name} value={subject.name}>
                   {subject.name}
                 </option>
@@ -257,7 +250,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           </div>
 
           <div className="flex items-end">
-            <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               <Filter className="h-4 w-4" />
               <span>{getTranslation("apply", language)}</span>
             </button>

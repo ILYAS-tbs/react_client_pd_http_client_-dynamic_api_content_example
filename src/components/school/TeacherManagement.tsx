@@ -45,7 +45,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -237,7 +237,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [phone_number_update, set_phone_number_update] = useState("");
   const [years_of_experience_update, set_years_of_experience_update] =
     useState("0");
-  const [weekly_schedule , setWeeklySchedue]=useState<File|null>(null)
+  const [weekly_schedule, setWeeklySchedue] = useState<File | null>(null)
   const [modules_id, setModuleID] = useState<string>("");
   const [class_group_id, setClassGrpID] = useState<string>("");
   const [editModalError, setEditModalError] = useState("");
@@ -268,10 +268,10 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       formData.append("profile_picture", profile_pic_update);
     }
 
-    if(weekly_schedule){
-      formData.append('weekly_schedule',weekly_schedule)
+    if (weekly_schedule) {
+      formData.append('weekly_schedule', weekly_schedule)
     }
-    
+
     if (years_of_experience_update !== "0") {
       formData.append("years_of_experience", years_of_experience_update);
     }
@@ -366,14 +366,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('teacherManagement',language)}
+          {getTranslation('teacherManagement', language)}
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
-          <span>{getTranslation('addTeacher',language)}</span>
+          <span>{getTranslation('addTeacher', language)}</span>
         </button>
       </div>
 
@@ -383,7 +383,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
             type="text"
-            placeholder={getTranslation('searchTeachers',language)}
+            placeholder={getTranslation('searchTeachers', language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -408,8 +408,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     className="rounded-full bg-cover w-[64px] h-[64px]"
                   />
                 ) : (
-                  <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                    <UserCheck className="h-6 w-6 text-blue-600" />
+                  <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
+                    <UserCheck className="h-6 w-6 text-primary-600" />
                   </div>
                 )}
 
@@ -423,27 +423,26 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </div>
               </div>
               <span
-                className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  teacher.status === "نشط" || teacher.status === "active"
-                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                    : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                }`}
+                className={`px-2 py-1 text-xs font-semibold rounded-full ${teacher.status === "نشط" || teacher.status === "active"
+                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                  : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                  }`}
               >
                 {teacher.status === "نشط" || teacher.status === "active"
-                  ? getTranslation('active',language)
-                  : getTranslation('inactive',language)}
+                  ? getTranslation('active', language)
+                  : getTranslation('inactive', language)}
               </span>
             </div>
 
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('classCount',language)}:
+                  {getTranslation('classCount', language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   <ul className="flex flex-col items-end">
                     {teacher.modulesAndClassGroups?.map((x) => (
-                    <li key={`${x.module.module_id}-${x.class_group.class_group_id}`}>
+                      <li key={`${x.module.module_id}-${x.class_group.class_group_id}`}>
                         {x.module.module_name} - {x.class_group.name}
                       </li>
                     ))}
@@ -453,7 +452,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('experience',language)}:
+                  {getTranslation('experience', language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {teacher.years_of_experience}
@@ -461,7 +460,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('phoneNumber',language)}:
+                  {getTranslation('phoneNumber', language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                   {teacher.phone_number}
@@ -469,7 +468,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('email',language)}:
+                  {getTranslation('email', language)}:
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white text-left">
                   {teacher.user.email}
@@ -480,7 +479,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
             <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
                 {/* hide teacher removed for now  */}
-                {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                {/* <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                   <Eye className="h-4 w-4" />
                 </button> */}
 
@@ -502,20 +501,19 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               <div className="activation-buttons">
                 <button
                   onClick={() => handleActivateTeacher(teacher.user.id, true)}
-                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
-                    teacher.status === "نشط"
-                      ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
-                      : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
-                  }`}
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${teacher.status === "نشط"
+                    ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
+                    : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
+                    }`}
                 >
-                  {teacher.status === "نشط" ? getTranslation('suspend',language): getTranslation('activate',language)}
+                  {teacher.status === "نشط" ? getTranslation('suspend', language) : getTranslation('activate', language)}
                 </button>
 
                 <button
                   onClick={() => handleActivateTeacher(teacher.user.id, false)}
                   className={`px-3 mx-1 py-1 text-xs font-medium rounded-lg transition-colors ${"bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"}`}
                 >
-                  {getTranslation('suspend',language)}
+                  {getTranslation('suspend', language)}
                 </button>
               </div>
             </div>
@@ -715,7 +713,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               {/* Weekly Schedule */}
               <div className="profile-picture-container">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                 الجدول الأسبوعي
+                  الجدول الأسبوعي
                 </label>
                 <label
                   htmlFor="weekly-schedule-file"

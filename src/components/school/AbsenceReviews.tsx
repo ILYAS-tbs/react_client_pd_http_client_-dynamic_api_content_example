@@ -15,7 +15,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
   const [filter, setFilter] = useState("pending");
 
   //! Translation :: 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
   // mock data :
   // const absenceRequests = [
   //   {
@@ -93,11 +93,11 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
   const getStatusText = (status: string) => {
     switch (status) {
       case "accepted":
-        return getTranslation('Accepted',language);
+        return getTranslation('Accepted', language);
       case "rejected":
-        return getTranslation('Rejected',language);
+        return getTranslation('Rejected', language);
       default:
-        return getTranslation('UnderReview',language);
+        return getTranslation('UnderReview', language);
     }
   };
 
@@ -123,21 +123,21 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-         {getTranslation('ReviewAbsenceRequests',language)}
+          {getTranslation('ReviewAbsenceRequests', language)}
         </h2>
         <div className="flex items-center space-x-2 rtl:space-x-reverse">
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {getTranslation('Filtering',language)}:
+            {getTranslation('Filtering', language)}:
           </span>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">{getTranslation('all',language)}</option>
-            <option value="pending">{getTranslation('UnderReview',language)}</option>
-            <option value="accepted">{getTranslation('Accepted',language)}</option>
-            <option value="rejected">{getTranslation('Rejected',language)}</option>
+            <option value="all">{getTranslation('all', language)}</option>
+            <option value="pending">{getTranslation('UnderReview', language)}</option>
+            <option value="accepted">{getTranslation('Accepted', language)}</option>
+            <option value="rejected">{getTranslation('Rejected', language)}</option>
           </select>
         </div>
       </div>
@@ -146,23 +146,23 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
           {
-            label: getTranslation('TotalRequests',language),
+            label: getTranslation('TotalRequests', language),
             value: absenceRequests.length,
-            color: "bg-blue-500",
+            color: "bg-primary-600",
           },
           {
-            label: getTranslation('UnderReview',language),
+            label: getTranslation('UnderReview', language),
             value: absenceRequests.filter((r) => r.status === "pending").length,
             color: "bg-yellow-500",
           },
           {
-            label: getTranslation('Accepted',language),
+            label: getTranslation('Accepted', language),
             value: absenceRequests.filter((r) => r.status === "accepted")
               .length,
             color: "bg-green-500",
           },
           {
-            label:getTranslation('Rejected',language),
+            label: getTranslation('Rejected', language),
             value: absenceRequests.filter((r) => r.status === "rejected")
               .length,
             color: "bg-red-500",
@@ -198,15 +198,15 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                  <User className="h-6 w-6 text-blue-600" />
+                <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
+                  <User className="h-6 w-6 text-primary-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {request.student.full_name}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {getTranslation('class',language)} {request?.student?.class_group?.name} - {getTranslation('parent',language)}: {" "}
+                    {getTranslation('class', language)} {request?.student?.class_group?.name} - {getTranslation('parent', language)}: {" "}
                     {request.parent.full_name}
                   </p>
                 </div>
@@ -223,7 +223,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
             <div className="grid md:grid-cols-2 gap-4 mb-4">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  {getTranslation('AbsenceDate',language)}:
+                  {getTranslation('AbsenceDate', language)}:
                 </p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {new Date(request.submit_date).toDateString()}
@@ -231,7 +231,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  {getTranslation('SubmissionDate',language)}:
+                  {getTranslation('SubmissionDate', language)}:
                 </p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {new Date(request.submit_date).toDateString()}
@@ -241,7 +241,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
 
             <div className="mb-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                {getTranslation('AbsenceReason',language)}:
+                {getTranslation('AbsenceReason', language)}:
               </p>
               <p className="text-gray-900 dark:text-white">
                 {request.absence_reason}
@@ -252,16 +252,15 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
               <div className="flex items-center space-x-4 rtl:space-x-reverse">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                   {getTranslation('Documents',language)}:
+                    {getTranslation('Documents', language)}:
                   </span>
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      request.proof_document
+                    className={`px-2 py-1 text-xs font-semibold rounded-full ${request.proof_document
                         ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                         : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                    }`}
+                      }`}
                   >
-                    {request.proof_document ? getTranslation('Available',language):getTranslation('NotAvailable',language)}
+                    {request.proof_document ? getTranslation('Available', language) : getTranslation('NotAvailable', language)}
                   </span>
                 </div>
 
@@ -282,7 +281,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                     className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     <Check className="h-4 w-4" />
-                    <span>{getTranslation('Accept',language)}</span>
+                    <span>{getTranslation('Accept', language)}</span>
                   </button>
 
                   <button
@@ -292,7 +291,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                     className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
                     <X className="h-4 w-4" />
-                    <span>{getTranslation('Reject',language)}</span>
+                    <span>{getTranslation('Reject', language)}</span>
                   </button>
 
                   {/* show the proof document if exist else error */}
@@ -301,14 +300,14 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                       href={SERVER_BASE_URL + request.proof_document}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       <Eye className="h-4 w-4" />
-                      <span>{getTranslation('Details',language)}</span>
+                      <span>{getTranslation('Details', language)}</span>
                     </a>
                   ) : (
                     <div className="  space-x-1 rtl:space-x-reverse px-3 py-2 text-red-600  rounded-lg hover:text-red-500 transition-colors">
-                      {getTranslation('NoDetailsOrDocuments',language)}
+                      {getTranslation('NoDetailsOrDocuments', language)}
                     </div>
                   )}
                 </div>

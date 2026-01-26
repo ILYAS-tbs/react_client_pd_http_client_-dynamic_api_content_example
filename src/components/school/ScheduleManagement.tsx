@@ -39,7 +39,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
   }
 
   //! Translation:
-  const {language}=useLanguage()
+  const { language } = useLanguage()
   // mock schedule data : { id: "s1", className: "الصف الخامس أ", pdfUrl: null, uploadedAt: "" },
 
   const [schedules, setSchedules] = useState<ScheduleItem[]>(
@@ -57,7 +57,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
 
   const [last_selected_schedule, set_last_selected_schedule] =
     useState<ScheduleItem | null>(null);
-  
+
   //? API CALL PUT class_group
   async function handleUpdateSubmit() {
     const formData_update = new FormData();
@@ -165,9 +165,9 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('schedulesManagement',language)}
+          {getTranslation('schedulesManagement', language)}
         </h2>
-        
+
         {/* Hide Creation For Now it isnt working */}
         {/* <div className="flex space-x-2 rtl:space-x-reverse">
           <button
@@ -188,7 +188,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchClass',language)}
+                placeholder={getTranslation('searchClass', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -202,23 +202,23 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="p-6">
           <h3 className="ltr:text-left text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            {getTranslation('classSchedule',language)}
+            {getTranslation('classSchedule', language)}
           </h3>
           <div className="min-w-full">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-700">
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('className',language)}
+                    {getTranslation('className', language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('uploadStatus',language)}
+                    {getTranslation('uploadStatus', language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('lessonSchedule',language)}
+                    {getTranslation('lessonSchedule', language)}
                   </th>
                   <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('actions',language)}
+                    {getTranslation('actions', language)}
                   </th>
                 </tr>
               </thead>
@@ -246,13 +246,13 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                             href={SERVER_BASE_URL + schedule.pdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300"
+                            className="text-primary-400 hover:text-primary-300"
                           >
                             {schedule.className + ".pdf"}
                           </a>
                           {/* <button
                                                 // onClick={() => handleRemovePdf(cls.id)}
-                                                className="text-blue-400 hover:text-blue-300"
+                                                className="text-primary-400 hover:text-primary-300"
                                               > */}
                           {/* <X className="h-5 w-5" /> */}
                           {/* <Download className="h-5 w-5" />
@@ -268,7 +268,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                         {/* {schedule.pdfUrl && (
                           <button
                             onClick={() => handleViewSchedule(schedule.pdfUrl)}
-                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="text-primary-600 hover:text-blue-900 dark:text-primary-400 dark:hover:text-primary-300"
                           >
                             <Eye className="h-5 w-5" />
                           </button>

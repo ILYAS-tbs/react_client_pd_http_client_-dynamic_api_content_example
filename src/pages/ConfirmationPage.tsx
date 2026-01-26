@@ -283,8 +283,8 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           {/* Email Icon and Message */}
           <div className="text-center space-y-3">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-[#39789b]/10 rounded-full flex items-center justify-center">
-                <Mail className="w-8 h-8 text-[#39789b]" />
+              <div className="w-16 h-16 bg-primary-600/10 rounded-full flex items-center justify-center">
+                <Mail className="w-8 h-8 text-primary-600" />
               </div>
             </div>
             <div className="space-y-1">
@@ -294,7 +294,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t('confirmationCodeSent') || 'لقد أرسلنا رمز تأكيد مكون من 6 أرقام إلى'}
               </p>
-              <p className="text-sm font-medium text-[#39789b]">
+              <p className="text-sm font-medium text-primary-600">
                 {email || 'عنوان بريدك الإلكتروني'}
               </p>
             </div>
@@ -317,7 +317,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={index === 0 ? handlePaste : undefined}
-                  className="w-12 h-12 text-center text-lg font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#39789b] focus:border-[#39789b] bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                  className="w-12 h-12 text-center text-lg font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-primary-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
                   disabled={isLoading}
                 />
               ))}
@@ -334,7 +334,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
               <button
                 onClick={handleResendCode}
                 disabled={isResending}
-                className="text-sm text-[#39789b] hover:underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1 rtl:space-x-reverse mx-auto"
+                className="text-sm text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1 rtl:space-x-reverse mx-auto"
               >
                 <RefreshCw className={`w-4 h-4 ${isResending ? 'animate-spin' : ''}`} />
                 <span>
@@ -351,7 +351,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           <button
             onClick={() => handleSubmit()}
             disabled={isLoading || code.some(digit => digit === '')}
-            className={`w-full py-3 px-4 bg-[#39789b] text-white rounded-lg hover:bg-[#2f6a85] transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'text-right' : 'text-left'}`}
+            className={`w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'text-right' : 'text-left'}`}
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
@@ -368,7 +368,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
             {t('wrongEmail') || 'بريد إلكتروني خاطئ؟'}{' '}
             <Link
               to="/login"
-              className="text-[#39789b] hover:underline"
+              className="text-primary-600 hover:underline"
             >
               {t('backToLogin') || 'العودة لتسجيل الدخول'}
             </Link>

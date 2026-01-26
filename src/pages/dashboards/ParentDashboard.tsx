@@ -201,7 +201,7 @@ const ParentDashboard: React.FC = () => {
       title: getTranslation("myChildren", language),
       value: students.length || "0",
       icon: UserIcon,
-      color: "bg-blue-500",
+      color: "bg-primary-600",
     },
     {
       title: getTranslation("totalAbsences", language),
@@ -366,8 +366,8 @@ const ParentDashboard: React.FC = () => {
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex items-center space-x-4 rtl:space-x-reverse mb-4">
-                    <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                      <UserIcon className="h-6 w-6 text-blue-600" />
+                    <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
+                      <UserIcon className="h-6 w-6 text-primary-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -388,11 +388,11 @@ const ParentDashboard: React.FC = () => {
                         {child.trimester_grade}
                       </p>
                     </div>
-                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                    <div className="text-center p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {getTranslation("absences", language)}
                       </p>
-                      <p className="text-xl font-bold text-blue-600">
+                      <p className="text-xl font-bold text-primary-600">
                         {one_student_absences(child) || "0"}
                       </p>
                     </div>
@@ -408,15 +408,15 @@ const ParentDashboard: React.FC = () => {
                         (child.academic_state == "excellent"
                           ? " bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 "
                           : child.academic_state == "very_good"
-                          ? " bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 "
-                          : " bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 ")
+                            ? " bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 "
+                            : " bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 ")
                       }
                     >
                       {child.academic_state == "excellent"
                         ? getTranslation("excellent", language)
                         : child.academic_state == "very_good"
-                        ? getTranslation("veryGood", language)
-                        : getTranslation("poorPerformance", language)}
+                          ? getTranslation("veryGood", language)
+                          : getTranslation("poorPerformance", language)}
                     </span>
                   </div>
                 </div>
@@ -443,18 +443,17 @@ const ParentDashboard: React.FC = () => {
                         className="flex items-start space-x-3 rtl:space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                       >
                         <div
-                          className={`p-2 rounded-lg ${
-                            update.type === "grade"
+                          className={`p-2 rounded-lg ${update.type === "grade"
                               ? "bg-green-100 dark:bg-green-900"
                               : update.type === "message"
-                              ? "bg-blue-100 dark:bg-blue-900"
-                              : "bg-orange-100 dark:bg-orange-900"
-                          }`}
+                                ? "bg-primary-100 dark:bg-primary-900/20"
+                                : "bg-orange-100 dark:bg-orange-900/20"
+                            }`}
                         >
                           {update.type === "grade" ? (
                             <FileText className="h-4 w-4 text-green-600" />
                           ) : update.type === "message" ? (
-                            <MessageCircle className="h-4 w-4 text-blue-600" />
+                            <MessageCircle className="h-4 w-4 text-primary-600" />
                           ) : (
                             <GraduationCap className="h-4 w-4 text-orange-600" />
                           )}

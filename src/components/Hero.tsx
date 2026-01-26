@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowRight, ArrowLeft, Play, BookOpen, Users, Trophy, BarChart3, GraduationCap } from 'lucide-react';
 // import { useLanguage } from '../hooks/useLanguage';
 import { getTranslation } from '../utils/translations';
@@ -11,44 +10,44 @@ interface HeroProps {
 export function Hero({ onGetStarted }: HeroProps) {
   const { language, isRTL } = useLanguage();
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
-  
+
   const scrollTo = (id: string) => {
-  const element = document.getElementById(id);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
-  }
-};
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-[#edeff3] to-[#bcc6d2] dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-[#39789b]/10 rounded-full blur-xl"></div>
+        <div className="absolute top-20 left-10 w-20 h-20 bg-primary-600/10 rounded-full blur-xl"></div>
         <div className="absolute top-40 right-20 w-32 h-32 bg-[#bcc6d2]/20 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-[#39789b]/15 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-primary-600/15 rounded-full blur-xl"></div>
         <div className="absolute bottom-40 right-10 w-16 h-16 bg-[#bcc6d2]/25 rounded-full blur-lg"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
 
           {/* Content */}
           <div className={`${isRTL ? 'lg:order-2' : 'lg:order-1'} space-y-8`}>
             <div className="space-y-6">
               {/* Badge */}
-              <div className="inline-flex items-center px-4 py-2 bg-[#39789b]/10 dark:bg-[#39789b]/20 rounded-full">
-                <Trophy className="w-4 h-4 text-[#39789b] mr-2 rtl:mr-0 rtl:ml-2" />
-                <span className="text-sm font-medium text-[#39789b] dark:text-blue-300">
+              <div className="inline-flex items-center px-4 py-2 bg-primary-600/10 dark:bg-primary-600/20 rounded-full">
+                <Trophy className="w-4 h-4 text-primary-600 mr-2 rtl:mr-0 rtl:ml-2" />
+                <span className="text-sm font-medium text-primary-600 dark:text-primary-300">
                   {getTranslation('heroSlogan', language)}
                 </span>
               </div>
-                      
+
               {/* Main Title */}
-              <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+              <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                 <span className="text-gray-900 dark:text-white">
                   PedaConnect
                 </span>
                 <br />
-                <span className="text-[#39789b] dark:text-blue-300">
+                <span className="text-primary-600 dark:text-primary-400">
                   {getTranslation('heroSlogan', language)}
                 </span>
               </h1>
@@ -61,19 +60,19 @@ export function Hero({ onGetStarted }: HeroProps) {
 
             {/* CTA Buttons */}
             <div className={`flex flex-col sm:flex-row gap-4 ${isRTL ? 'sm:justify-end' : 'sm:justify-start'}`}>
-              <button 
+              <button
                 onClick={onGetStarted}
-                className="group flex items-center justify-center px-8 py-4 bg-[#39789b] hover:bg-[#2d5f7d] text-white rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="group flex items-center justify-center px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 <span className="mr-2 rtl:mr-0 rtl:ml-2">{getTranslation('getStarted', language)}</span>
                 <ArrowIcon className="w-5 h-5 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
               </button>
-              
+
               <button
-              onClick={()=>scrollTo("about")}
-              className="group flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-[#bcc6d2] dark:border-gray-700 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
-                
-                <Play className="w-5 h-5 mr-2 rtl:mr-0 rtl:ml-2 text-[#39789b] group-hover:scale-110 transition-transform" />
+                onClick={() => scrollTo("about")}
+                className="group flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-[#bcc6d2] dark:border-gray-700 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+
+                <Play className="w-5 h-5 mr-2 rtl:mr-0 rtl:ml-2 text-primary-600 group-hover:scale-110 transition-transform" />
                 <span>{getTranslation('learnMore', language)}</span>
               </button>
             </div>
@@ -81,19 +80,19 @@ export function Hero({ onGetStarted }: HeroProps) {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200 dark:border-gray-700">
               <div className={`text-center ${isRTL ? 'text-right' : 'text-left'}`}>
-                <div className="text-2xl md:text-3xl font-bold text-[#39789b] dark:text-blue-300">500+</div>
+                <div className="text-2xl md:text-3xl font-bold text-primary-600 dark:text-primary-300">500+</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {language === 'ar' ? 'مدرسة' : language === 'fr' ? 'Écoles' : 'Schools'}
                 </div>
               </div>
               <div className={`text-center ${isRTL ? 'text-right' : 'text-left'}`}>
-                <div className="text-2xl md:text-3xl font-bold text-[#39789b] dark:text-blue-300">10K+</div>
+                <div className="text-2xl md:text-3xl font-bold text-primary-600 dark:text-primary-300">10K+</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {language === 'ar' ? 'ولي أمر' : language === 'fr' ? 'Parents' : 'Parents'}
                 </div>
               </div>
               <div className={`text-center ${isRTL ? 'text-right' : 'text-left'}`}>
-                <div className="text-2xl md:text-3xl font-bold text-[#39789b] dark:text-blue-300">2K+</div>
+                <div className="text-2xl md:text-3xl font-bold text-primary-600 dark:text-primary-300">2K+</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {language === 'ar' ? 'معلم' : language === 'fr' ? 'Enseignants' : 'Teachers'}
                 </div>
@@ -109,7 +108,7 @@ export function Hero({ onGetStarted }: HeroProps) {
                 {/* Dashboard Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <div className="w-10 h-10 bg-[#39789b] rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[primary-600] rounded-lg flex items-center justify-center">
                       <GraduationCap className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -130,7 +129,7 @@ export function Hero({ onGetStarted }: HeroProps) {
 
                 {/* Grade Cards */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl border border-green-200 dark:border-green-700">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl border border-green-200 dark:border-green-700 opacity-80 grayscale-[30%] hover:grayscale-0 hover:opacity-100 transition-all duration-300">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-green-700 dark:text-green-300">
                         {language === 'ar' ? 'الرياضيات' : language === 'fr' ? 'Mathématiques' : 'Mathematics'}
@@ -143,16 +142,16 @@ export function Hero({ onGetStarted }: HeroProps) {
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
+                  <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4 rounded-xl border border-primary-200 dark:border-primary-700 opacity-80 grayscale-[30%] hover:grayscale-0 hover:opacity-100 transition-all duration-300">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                      <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
                         {language === 'ar' ? 'العلوم' : language === 'fr' ? 'Sciences' : 'Sciences'}
                       </span>
-                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <BookOpen className="w-4 h-4 text-primary-600" />
                     </div>
-                    <div className="text-2xl font-bold text-blue-800 dark:text-blue-200">16/20</div>
-                    <div className="w-full bg-blue-200 dark:bg-blue-700 rounded-full h-2 mt-2">
-                      <div className="bg-blue-500 h-2 rounded-full" style={{ width: '80%' }}></div>
+                    <div className="text-2xl font-bold text-primary-800 dark:text-primary-200">16/20</div>
+                    <div className="w-full bg-primary-200 dark:bg-primary-700 rounded-full h-2 mt-2">
+                      <div className="bg-primary-500 h-2 rounded-full" style={{ width: '80%' }}></div>
                     </div>
                   </div>
                 </div>
@@ -161,7 +160,7 @@ export function Hero({ onGetStarted }: HeroProps) {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                      <Users className="w-5 h-5 text-[#39789b]" />
+                      <Users className="w-5 h-5 text-primary-600" />
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {language === 'ar' ? 'الحضور اليوم' : language === 'fr' ? 'Présence Aujourd\'hui' : 'Today\'s Attendance'}
                       </span>
@@ -173,12 +172,12 @@ export function Hero({ onGetStarted }: HeroProps) {
 
                   <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                      <Trophy className="w-5 h-5 text-[#39789b]" />
+                      <Trophy className="w-5 h-5 text-primary-600" />
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {language === 'ar' ? 'المعدل العام' : language === 'fr' ? 'Moyenne Générale' : 'Overall Average'}
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-[#39789b]">17.2/20</span>
+                    <span className="text-sm font-bold text-primary-600">17.2/20</span>
                   </div>
                 </div>
               </div>
@@ -190,7 +189,7 @@ export function Hero({ onGetStarted }: HeroProps) {
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">A+</span>
                 </div>
               </div>
-              
+
               <div className="absolute -bottom-4 -left-4 rtl:-left-auto rtl:-right-4 w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex items-center justify-center transform -rotate-12 hover:rotate-0 transition-transform duration-300 border border-gray-200 dark:border-gray-700">
                 <div className="text-center">
                   <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-1" />
@@ -201,7 +200,7 @@ export function Hero({ onGetStarted }: HeroProps) {
               {/* Progress Indicator */}
               <div className="absolute top-1/2 -left-8 rtl:-left-auto rtl:-right-8 transform -translate-y-1/2 bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-xl border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#39789b] to-[#2d5f7d] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[primary-600] to-[primary-700] rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-sm">95%</span>
                   </div>
                   <div>

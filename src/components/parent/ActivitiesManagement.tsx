@@ -23,7 +23,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
 }) => {
 
   //! Translations :: 
-  const {language} = useLanguage()
+  const { language } = useLanguage()
 
   //! mock data to map the api to :
   // const [activities] = useState<Activity[]>([
@@ -126,7 +126,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('schoolEvents',language)}
+          {getTranslation('schoolEvents', language)}
         </h2>
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
@@ -134,17 +134,17 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">{getTranslation('all',language)}</option>
-            <option value="رياضية">{getTranslation('sports',language)}</option>
-            <option value="علمية">{getTranslation('science',language)}</option>
-            <option value="ثقافية">{getTranslation('cultural',language)}</option>
+            <option value="all">{getTranslation('all', language)}</option>
+            <option value="رياضية">{getTranslation('sports', language)}</option>
+            <option value="علمية">{getTranslation('science', language)}</option>
+            <option value="ثقافية">{getTranslation('cultural', language)}</option>
           </select>
           <button
             onClick={() => setViewCalendar(!viewCalendar)}
-            className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Calendar className="h-5 w-5" />
-            <span>{viewCalendar ? getTranslation('ViewSchedule',language) : getTranslation('viewCalendar',language)}</span>
+            <span>{viewCalendar ? getTranslation('ViewSchedule', language) : getTranslation('viewCalendar', language)}</span>
           </button>
         </div>
       </div>
@@ -157,7 +157,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchPlaceholder',language)}
+                placeholder={getTranslation('searchPlaceholder', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -172,12 +172,12 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
         {filteredActivities.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <Star className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p>{getTranslation('noEventsAvailable',language)}</p>
+            <p>{getTranslation('noEventsAvailable', language)}</p>
           </div>
         ) : viewCalendar ? (
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-             {getTranslation('eventsCalendar',language)}
+              {getTranslation('eventsCalendar', language)}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredActivities.map((activity) => (
@@ -194,7 +194,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                       {activity.category}
                     </p>
                   </div>
-                  <div className="text-sm text-blue-600 dark:text-blue-400 mt-2">
+                  <div className="text-sm text-primary-600 dark:text-blue-400 mt-2">
                     {activity.date.toLocaleDateString()} - {activity.time} (
                     {activity.location})
                   </div>
@@ -208,28 +208,28 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('titleColumn',language)}
+                    {getTranslation('titleColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('categoryColumn',language)}
+                    {getTranslation('categoryColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('student',language)}
+                    {getTranslation('student', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('school',language)}
+                    {getTranslation('school', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('Date',language)}
+                    {getTranslation('Date', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('Time',language)}
+                    {getTranslation('Time', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('location',language)}
+                    {getTranslation('location', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('actions',language)}
+                    {getTranslation('actions', language)}
                   </th>
                 </tr>
               </thead>
@@ -277,7 +277,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => setSelectedActivity(activity)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-primary-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -295,12 +295,12 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('eventDetails',language)}
+              {getTranslation('eventDetails', language)}
             </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('titleColumn',language)}
+                  {getTranslation('titleColumn', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedActivity.title}
@@ -308,7 +308,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                   {getTranslation('categoryColumn',language)}
+                  {getTranslation('categoryColumn', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedActivity.category}
@@ -316,7 +316,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('Date',language)}
+                  {getTranslation('Date', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedActivity.date.toLocaleDateString()}
@@ -324,7 +324,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('location',language)}
+                  {getTranslation('location', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedActivity.time}
@@ -332,7 +332,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('location',language)}
+                  {getTranslation('location', language)}
                 </label>
                 <p className="text-gray-900 dark:text-white">
                   {selectedActivity.location}
@@ -340,7 +340,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('description',language)}
+                  {getTranslation('description', language)}
                 </label>
                 <p className="text-gray-600 dark:text-gray-400">
                   {selectedActivity.description}
@@ -352,7 +352,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                 onClick={() => setSelectedActivity(null)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                {getTranslation('close',language)}
+                {getTranslation('close', language)}
               </button>
             </div>
           </div>

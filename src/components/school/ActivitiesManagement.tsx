@@ -28,7 +28,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
 }) => {
   //  mock data event shape : { id: 'a1', title: 'يوم رياضي', date: '2025-06-25', time: '09:00', category: 'رياضية', description: 'مسابقات رياضية للطلاب', location: 'ملعب المدرسة' },
   //! translation : 
-  const {language}=useLanguage()
+  const { language } = useLanguage()
 
   const [activities, setActivities] = useState<Event[]>(events_list);
   const [newActivity, setNewActivity] = useState({
@@ -274,7 +274,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('eventManagement',language)}
+          {getTranslation('eventManagement', language)}
         </h2>
         <div className="flex space-x-2 rtl:space-x-reverse">
           <select
@@ -282,24 +282,24 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="all">{getTranslation('all',language)}</option>
-            <option value="رياضية">{getTranslation('sports',language)}</option>
-            <option value="علمية">{getTranslation('science',language)}</option>
-            <option value="ثقافية">{getTranslation('cultural',language)}</option>
+            <option value="all">{getTranslation('all', language)}</option>
+            <option value="رياضية">{getTranslation('sports', language)}</option>
+            <option value="علمية">{getTranslation('science', language)}</option>
+            <option value="ثقافية">{getTranslation('cultural', language)}</option>
           </select>
           <button
             onClick={() => setViewCalendar(!viewCalendar)}
-            className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Calendar className="h-5 w-5" />
-            <span>{viewCalendar ? getTranslation('ViewSchedule',language) : getTranslation('viewCalendar',language)}</span>
+            <span>{viewCalendar ? getTranslation('ViewSchedule', language) : getTranslation('viewCalendar', language)}</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
-            <span>{getTranslation('addActivity',language)}</span>
+            <span>{getTranslation('addActivity', language)}</span>
           </button>
         </div>
       </div>
@@ -312,7 +312,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder={getTranslation('searchActivity',language)}
+                placeholder={getTranslation('searchActivity', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -327,7 +327,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
         {viewCalendar ? (
           <div className="p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              {getTranslation('eventsCalendar',language)}
+              {getTranslation('eventsCalendar', language)}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredActivities.map((activity) => (
@@ -343,7 +343,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                       {activity.category}
                     </p>
                   </div>
-                  <div className="text-sm text-blue-600 dark:text-blue-400 mt-2">
+                  <div className="text-sm text-primary-600 dark:text-blue-400 mt-2">
                     {activity.date} - {activity.date} ({activity.place})
                   </div>
                 </div>
@@ -356,22 +356,22 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('titleColumn',language)}
+                    {getTranslation('titleColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('categoryColumn',language)}
+                    {getTranslation('categoryColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('dateColumn',language)}
+                    {getTranslation('dateColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('timeColumn',language)}
+                    {getTranslation('timeColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('locationColumn',language)}
+                    {getTranslation('locationColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('actionsColumn',language)}
+                    {getTranslation('actionsColumn', language)}
                   </th>
                 </tr>
               </thead>
@@ -425,7 +425,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                         </button>
 
                         {/* for now : now eye */}
-                        {/* <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                        {/* <button className="text-primary-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                           <Eye className="h-4 w-4" />
                         </button> */}
                       </div>

@@ -146,7 +146,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
       case "جيد جداً":
       case "good":
-        return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
+        return "bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200";
       case "جيد":
       case "bad":
         return "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200";
@@ -267,7 +267,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
           {
             label: getTranslation("TotalAbsences", language),
             value: absences.length,
-            color: "bg-blue-500",
+            color: "bg-primary-600",
             icon: FileText,
           },
           // {
@@ -336,8 +336,8 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                  <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                    <Calendar className="h-6 w-6 text-blue-600" />
+                  <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
+                    <Calendar className="h-6 w-6 text-primary-600" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -427,7 +427,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
           {
             label: getTranslation("totalReports", language),
             value: attitudeStats.total,
-            color: "bg-blue-500",
+            color: "bg-primary-600",
             icon: FileText,
           },
           {
@@ -587,21 +587,19 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
         <div className="flex space-x-4 rtl:space-x-reverse">
           <button
             onClick={() => setActiveTab("absences")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === "absences"
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "absences"
                 ? "bg-green-600 text-white"
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
+              }`}
           >
             {getTranslation("absenceManagement", language)}
           </button>
           <button
             onClick={() => setActiveTab("attitude")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === "attitude"
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === "attitude"
                 ? "bg-green-600 text-white"
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
+              }`}
           >
             {getTranslation("BehaviorReports", language)}
           </button>
@@ -649,7 +647,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('reportDate',language)}
+                  {getTranslation('reportDate', language)}
                 </label>
                 <input
                   name="date"
@@ -666,7 +664,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('behaviorType',language)}
+                  {getTranslation('behaviorType', language)}
                 </label>
                 <select
                   name="type"
@@ -678,16 +676,16 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 >
-                  <option value="">{getTranslation('selectBehaviorType',language)}</option>
-                  <option value="excellent">{getTranslation('excellent',language)}</option>
-                  <option value="good">{getTranslation('good',language)}</option>
-                  <option value="bad">{getTranslation('poorPerformance',language)}</option>
+                  <option value="">{getTranslation('selectBehaviorType', language)}</option>
+                  <option value="excellent">{getTranslation('excellent', language)}</option>
+                  <option value="good">{getTranslation('good', language)}</option>
+                  <option value="bad">{getTranslation('poorPerformance', language)}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('classParticipation',language)}
+                  {getTranslation('classParticipation', language)}
                 </label>
                 <textarea
                   rows={4}
@@ -698,13 +696,13 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                     handleBehaviourModelFormChange(e);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={getTranslation('writeAdditionalDetails',language)}
+                  placeholder={getTranslation('writeAdditionalDetails', language)}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('teacherComment',language)}
+                  {getTranslation('teacherComment', language)}
                 </label>
                 <textarea
                   rows={4}
@@ -715,7 +713,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                     handleBehaviourModelFormChange(e);
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={getTranslation('addStudentNotes',language)}
+                  placeholder={getTranslation('addStudentNotes', language)}
                 />
               </div>
 
@@ -733,7 +731,7 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   htmlFor="urgent"
                   className="text-sm text-gray-700 dark:text-gray-300"
                 >
-                  {getTranslation('urgentRequest',language)}
+                  {getTranslation('urgentRequest', language)}
                 </label>
               </div>
 
@@ -753,13 +751,13 @@ const TeacherAbsenceManager: React.FC<TeacherAbsenceManagerProps> = ({
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  {getTranslation('cancel',language)}
+                  {getTranslation('cancel', language)}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  {getTranslation('submitReport',language)}
+                  {getTranslation('submitReport', language)}
                 </button>
               </div>
             </form>
