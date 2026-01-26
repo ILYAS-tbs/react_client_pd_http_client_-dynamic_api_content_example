@@ -429,8 +429,8 @@ const ParentChat: React.FC<ParentChatProps> = ({
                 handleSelectingAChat(chat.id);
               }}
               className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${selectedChat === chat.id
-                  ? "bg-green-50 dark:bg-green-900 border-r-2 border-green-500"
-                  : ""
+                ? "bg-green-50 dark:bg-green-900 border-r-2 border-green-500"
+                : ""
                 }`}
             >
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -499,11 +499,11 @@ const ParentChat: React.FC<ParentChatProps> = ({
                   </h3>
 
                   {/* temporary to inspect chats */}
-                  {conv_id && (
+                  {/* {conv_id && (
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {conv_id}
                     </h3>
-                  )}
+                  )} */}
 
                   {/* <p className="text-sm text-gray-600 dark:text-gray-400">
                     {currentChat.subject}
@@ -543,17 +543,17 @@ const ParentChat: React.FC<ParentChatProps> = ({
                   <div
                     key={msg.id}
                     className={`flex ${msg.sender ===
-                        (userType === "parent" ? "parent" : "teacher")
-                        ? "justify-start"
-                        : "justify-end"
+                      (userType === "parent" ? "parent" : "teacher")
+                      ? "justify-start"
+                      : "justify-end"
                       }`}
                   >
                     {msg.type === "text" ? (
                       <div
                         className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${msg.sender ===
-                            (userType === "parent" ? "parent" : "teacher")
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                          (userType === "parent" ? "parent" : "teacher")
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                           }`}
                       >
                         <p className="text-sm">{msg?.content ?? ""}</p>
