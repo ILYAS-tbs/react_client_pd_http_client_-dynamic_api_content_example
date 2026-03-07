@@ -141,7 +141,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
           </select>
           <button
             onClick={() => setViewCalendar(!viewCalendar)}
-            className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-500 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Calendar className="h-5 w-5" />
             <span>{viewCalendar ? getTranslation('ViewSchedule', language) : getTranslation('viewCalendar', language)}</span>
@@ -194,7 +194,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                       {activity.category}
                     </p>
                   </div>
-                  <div className="text-sm text-primary-600 dark:text-blue-400 mt-2">
+                  <div className="text-sm text-primary-500 dark:text-primary-400 mt-2">
                     {activity.date.toLocaleDateString()} - {activity.time} (
                     {activity.location})
                   </div>
@@ -277,7 +277,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => setSelectedActivity(activity)}
-                        className="text-primary-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                       >
                         <Eye className="h-4 w-4" />
                       </button>

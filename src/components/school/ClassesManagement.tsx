@@ -389,13 +389,13 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                           href={SERVER_BASE_URL + cls.teacher_list}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary-400 hover:text-blue-300"
+                          className="text-primary-400 hover:text-primary-300"
                         >
                           {cls.name + ".pdf"}
                         </a>
                         {/* <button
                           // onClick={() => handleRemovePdf(cls.id)}
-                          className="text-primary-400 hover:text-blue-300"
+                          className="text-primary-400 hover:text-primary-300"
                         > */}
                         {/* <X className="h-5 w-5" /> */}
                         {/* <Download className="h-5 w-5" />
@@ -412,7 +412,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                         />
                         <label
                           htmlFor={`pdfUpload-${cls.id}`}
-                          className="flex items-center justify-center w-full p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition duration-200 text-sm"
+                          className="flex items-center justify-center w-full p-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition duration-200 text-sm"
                         >
                           <Plus className="h-4 w-4 mr-1" />
                           رفع ملف
@@ -506,7 +506,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                     />
                     <label
                       htmlFor="pdfUploadModal"
-                      className="flex items-center justify-center w-full p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition duration-200 text-sm"
+                      className="flex items-center justify-center w-full p-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition duration-200 text-sm"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       رفع ملف PDF

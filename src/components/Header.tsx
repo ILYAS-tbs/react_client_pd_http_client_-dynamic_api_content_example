@@ -78,17 +78,16 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
     <header className={`fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="w-32 h-32 flex items-center justify-center">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer" onClick={() => navigate('/')}>
+            <div className="w-12 h-12 flex items-center justify-center">
               <img
                 src="/assets/pedaconnect-removebg.png"
                 alt="PedaConnect Logo"
-                className="w-32 h-32 object-contain"
+                className="w-12 h-12 object-contain"
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-primary-600 dark:text-primary-300">PedaConnect</h1>
+              <h1 className="text-xl font-bold text-primary-500 dark:text-primary-400">PedaConnect</h1>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 {getTranslation('heroSlogan', language)}
               </p>
@@ -102,8 +101,8 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeSection === item.id
-                  ? 'bg-primary-600 text-white shadow-lg'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-secondary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-300'
+                  ? 'bg-primary-500 text-white shadow-lg'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-secondary-50 dark:hover:bg-gray-700 hover:text-primary-500 dark:hover:text-primary-300'
                   }`}
               >
                 {item.label}
@@ -131,7 +130,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                       onClick={() => {
                         handleLanguageChange(lang.code as any)
                       }}
-                      className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-3 rtl:space-x-reverse ${language === lang.code ? 'bg-secondary-50 dark:bg-gray-700 text-primary-600 dark:text-primary-300' : ''
+                      className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-3 rtl:space-x-reverse ${language === lang.code ? 'bg-secondary-50 dark:bg-gray-700 text-primary-500 dark:text-primary-300' : ''
                         } first:rounded-t-lg last:rounded-b-lg`}
                     >
                       <span>{lang.flag}</span>
@@ -154,7 +153,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             {user ?
               <button
                 onClick={() => handleLogoutAndNavigate(`/${role}-dashboard`)}
-                className="px-6 py-2 bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {/* {getTranslation('register', language)} */}
                 لوحة البيانات
@@ -163,13 +162,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               : <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <button
                   onClick={() => handleLogoutAndNavigate("/login")}
-                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:text-primary-800 transition-colors"
                 >
                   {getTranslation('login', language)}
                 </button>
                 <button
                   onClick={() => handleLogoutAndNavigate('/register')}
-                  className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-6 py-2 bg-primary-500 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {getTranslation('register', language)}
                 </button>
@@ -196,7 +195,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 key={item.id}
                 onClick={() => { scrollToSection(item.id) }}
                 className={`block w-full px-4 py-3 rounded-lg text-left rtl:text-right font-medium transition-all duration-200 ${activeSection === item.id
-                  ? 'bg-primary-600 text-white'
+                  ? 'bg-primary-500 text-white'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-secondary-50 dark:hover:bg-gray-700'
                   }`}
               >
@@ -218,13 +217,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               <div className="space-y-2">
                 <button
                   onClick={() => navigate('/login')}
-                  className="block w-full px-4 py-3 text-center font-medium text-primary-600 hover:bg-secondary-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="block w-full px-4 py-3 text-center font-medium text-primary-500 hover:bg-secondary-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   {getTranslation('login', language)}
                 </button>
                 <button
                   onClick={() => navigate('/register')}
-                  className="block w-full px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white text-center font-medium rounded-lg transition-colors"
+                  className="block w-full px-4 py-3 bg-primary-500 hover:bg-primary-700 text-white text-center font-medium rounded-lg transition-colors"
                 >
                   {getTranslation('register', language)}
                 </button>

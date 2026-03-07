@@ -385,14 +385,14 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                    <span className="text-sm font-semibold text-primary-500 dark:text-primary-400">
                       {student.attendance}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       {/* hide student : disable for now  */}
-                      {/* <button className="text-primary-600 hover:text-blue-900 dark:text-primary-400 dark:hover:text-blue-300">
+                      {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                         <Eye className="h-4 w-4" />
                       </button> */}
 

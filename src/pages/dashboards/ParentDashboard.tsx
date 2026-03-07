@@ -201,7 +201,7 @@ const ParentDashboard: React.FC = () => {
       title: getTranslation("myChildren", language),
       value: students.length || "0",
       icon: UserIcon,
-      color: "bg-primary-600",
+      color: "bg-primary-500",
     },
     {
       title: getTranslation("totalAbsences", language),
@@ -367,7 +367,7 @@ const ParentDashboard: React.FC = () => {
                 >
                   <div className="flex items-center space-x-4 rtl:space-x-reverse mb-4">
                     <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
-                      <UserIcon className="h-6 w-6 text-primary-600" />
+                      <UserIcon className="h-6 w-6 text-primary-500" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -392,7 +392,7 @@ const ParentDashboard: React.FC = () => {
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {getTranslation("absences", language)}
                       </p>
-                      <p className="text-xl font-bold text-primary-600">
+                      <p className="text-xl font-bold text-primary-500">
                         {one_student_absences(child) || "0"}
                       </p>
                     </div>
@@ -453,7 +453,7 @@ const ParentDashboard: React.FC = () => {
                           {update.type === "grade" ? (
                             <FileText className="h-4 w-4 text-green-600" />
                           ) : update.type === "message" ? (
-                            <MessageCircle className="h-4 w-4 text-primary-600" />
+                            <MessageCircle className="h-4 w-4 text-primary-500" />
                           ) : (
                             <GraduationCap className="h-4 w-4 text-orange-600" />
                           )}

@@ -355,7 +355,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
               <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   {/* No use for the eye button for now */}
-                  {/* <button className="text-primary-600 hover:text-blue-900 dark:text-primary-400 dark:hover:text-blue-300 p-1">
+                  {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-1">
                     <Eye className="h-4 w-4" />
                   </button> */}
 

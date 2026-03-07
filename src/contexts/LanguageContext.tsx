@@ -1,8 +1,7 @@
 // src/contexts/LanguageContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { translations, getTranslation } from '../utils/translations';
-
-type Language = 'ar' | 'en' | 'fr';
+import { Language } from '../types';
+import { getTranslation } from '../utils/translations';
 
 interface LanguageContextType {
   language: Language;

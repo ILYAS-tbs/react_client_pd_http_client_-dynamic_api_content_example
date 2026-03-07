@@ -173,7 +173,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
       case "video":
         return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
       case "book":
-        return "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200";
+        return "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200";
       default:
         return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
     }
@@ -315,7 +315,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <button
                       onClick={() => setSelectedResource(resource)}
-                      className="text-blue-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-1"
+                      className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-1"
                     >
                       <Eye className="h-4 w-4" />
                     </button>

@@ -165,7 +165,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
           </select>
           <button
             onClick={() => setViewSummary(!viewSummary)}
-            className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-500 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <BarChart2 className="h-5 w-5" />
             <span>{viewSummary ? getTranslation('ViewList', language) : getTranslation('ViewSummary', language)}</span>
@@ -233,7 +233,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                       {new Date(report.date).toDateString()}
                     </p>
                   </div>
-                  <span className="text-sm text-primary-600 dark:text-blue-400">
+                  <span className="text-sm text-primary-500 dark:text-primary-400">
                     {isNegative(report.type) ? getTranslation('NegativeBehavior', language) : getTranslation('PositiveBehavior', language)}
                   </span>
                 </div>
@@ -315,7 +315,7 @@ const BehaviorReports: React.FC<BehaviorReportsProps> = ({
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <button className="text-primary-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                        <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                           <Eye className="h-4 w-4" />
                         </button>
                       </div>

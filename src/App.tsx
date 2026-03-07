@@ -133,7 +133,7 @@ export default App;
 //           <div className="flex justify-between items-center h-20">
 //             {/* Logo */}
 //             <div className="flex items-center space-x-4">
-//               <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl shadow-lg">
+//               <div className="bg-gradient-to-r from-primary-500 to-purple-600 p-3 rounded-xl shadow-lg">
 //                 <img
 //                   src="/assets/logo.png"
 //                   alt="PedaConnect Logo"
@@ -155,7 +155,7 @@ export default App;
 //                   PedaConnect
 //                 </h1>
 //                 <p
-//                   className="text-sm text-blue-600 dark:text-blue-400 font-medium"
+//                   className="text-sm text-primary-500 dark:text-primary-400 font-medium"
 //                   dir="rtl"
 //                 >
 //                   تعليم متابع نجاح مؤكد
@@ -199,7 +199,7 @@ export default App;
 //                   }
 //                 }}
 //               />
-//               <GraduationCap className="h-20 w-20 text-blue-600 hidden fallback-icon" />
+//               <GraduationCap className="h-20 w-20 text-primary-500 hidden fallback-icon" />
 //             </div>
 //             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
 //               PedaConnect
@@ -243,8 +243,8 @@ export default App;
 //               </p>
 //             </div>
 //             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-700">
-//               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mb-2 mx-auto">
-//                 <span className="text-blue-600 dark:text-blue-400 text-sm">
+//               <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center mb-2 mx-auto">
+//                 <span className="text-primary-500 dark:text-primary-400 text-sm">
 //                   👨‍👩‍👧‍👦
 //                 </span>
 //               </div>

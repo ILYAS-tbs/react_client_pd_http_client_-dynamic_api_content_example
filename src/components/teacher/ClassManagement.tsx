@@ -225,7 +225,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
               <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-lg">
-                <Users className="h-6 w-6 text-primary-600" />
+                <Users className="h-6 w-6 text-primary-500" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -257,7 +257,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation("AttendanceRate", language)} :
                 </span>
-                <span className="text-sm font-medium text-primary-600">
+                <span className="text-sm font-medium text-primary-500">
                   {currentClass.attendance}
                 </span>
               </div>
@@ -300,7 +300,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 href={teacher?.weekly_schedule ?? undefined}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 underline"
+                className="text-primary-500 underline"
               >
                 View Weekly Schedule (PDF)
               </a> */}
@@ -419,7 +419,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                    <span className="text-sm font-semibold text-primary-500 dark:text-primary-400">
                       {student.is_absent ? getTranslation('absent', language) : getTranslation('present', language)}
                     </span>
                   </td>
@@ -428,7 +428,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${student.status === "ممتاز"
                         ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                         : student.status === "جيد جداً"
-                          ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                          ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
                           : student.status === "جيد"
                             ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                             : "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
@@ -439,7 +439,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   </td> */}
                   {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                         <Eye className="h-4 w-4" />
                       </button>
                       <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">

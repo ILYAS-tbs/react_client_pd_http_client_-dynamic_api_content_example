@@ -409,7 +409,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   />
                 ) : (
                   <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
-                    <UserCheck className="h-6 w-6 text-primary-600" />
+                    <UserCheck className="h-6 w-6 text-primary-500" />
                   </div>
                 )}
 
@@ -479,7 +479,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
             <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
                 {/* hide teacher removed for now  */}
-                {/* <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                   <Eye className="h-4 w-4" />
                 </button> */}
 
@@ -678,7 +678,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </label>
                 <label
                   htmlFor="img-file-update"
-                  className="flex text-gray-300 bg-brand-blue w-1/4 p-2 mt-2 rounded cursor-pointer "
+                  className="flex text-gray-300 bg-brand-primary w-1/4 p-2 mt-2 rounded cursor-pointer "
                 >
                   <FileUp />
                   <div className="text">تحميل</div>
@@ -717,7 +717,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </label>
                 <label
                   htmlFor="weekly-schedule-file"
-                  className="flex text-gray-300 bg-brand-blue w-1/4 p-2 mt-2 rounded cursor-pointer "
+                  className="flex text-gray-300 bg-brand-primary w-1/4 p-2 mt-2 rounded cursor-pointer "
                 >
                   <FileUp />
                   <div className="text">تحميل</div>

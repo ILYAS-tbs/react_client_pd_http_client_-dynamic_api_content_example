@@ -1,6 +1,6 @@
 
 import { Target, Eye, Award, Users, BookOpen, BarChart3 } from 'lucide-react';
-import { useLanguage } from '../hooks/useLanguage';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
 
 export function About() {
@@ -34,7 +34,7 @@ export function About() {
   ];
 
   return (
-    <section id="about" className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-gray-900 border-t-4 border-primary-600/10">
+    <section id="about" className="py-16 sm:py-20 lg:py-24 bg-white dark:bg-gray-900 border-t-4 border-primary-500/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className={`text-center mb-16 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -48,9 +48,9 @@ export function About() {
 
         {/* Mission & Vision with Dashboard Images */}
         <div className="grid md:grid-cols-2 gap-12 mb-20">
-          <div className={`bg-gradient-to-br from-primary-600/5 to-[#bcc6d2]/10 rounded-2xl p-8 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className={`bg-gradient-to-br from-primary-500/5 to-secondary-200/10 rounded-2xl p-8 border border-secondary-200/20 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
+              <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
                 <Target className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -70,9 +70,9 @@ export function About() {
             </p>
           </div>
 
-          <div className={`bg-gradient-to-br from-[#bcc6d2]/5 to-primary-600/10 rounded-2xl p-8 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className={`bg-gradient-to-br from-secondary-200/5 to-primary-500/10 rounded-2xl p-8 border border-secondary-200/20 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
+              <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
                 <Eye className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -98,7 +98,7 @@ export function About() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className={`group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-[#bcc6d2]/20 ${isRTL ? 'text-right' : 'text-left'}`}
+              className={`group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-secondary-200/20 ${isRTL ? 'text-right' : 'text-left'}`}
             >
               <div className="relative w-full aspect-[16/9] overflow-hidden">
                 <img
@@ -107,15 +107,15 @@ export function About() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-600/30 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-500/30 to-transparent"></div>
                 <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3">
-                  <div className="w-8 h-8 bg-white/90 rounded-lg flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-primary-600" />
+                  <div className="w-8 h-8 bg-white/90 rounded-lg flex items-center justify-center shadow-sm">
+                    <feature.icon className="w-5 h-5 text-primary-500" />
                   </div>
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary-500 transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">

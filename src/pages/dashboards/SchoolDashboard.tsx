@@ -50,7 +50,7 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 );
 
 const SchoolDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState("levels");
 
   const { language } = useLanguage();
 
@@ -252,7 +252,7 @@ const SchoolDashboard: React.FC = () => {
   //     title: "TotalStudents",
   //     value: students.length || "0",
   //     icon: Users,
-  //     color: "bg-blue-500",
+  //     color: "bg-primary-500",
   //   },
   //   {
   //     title: getTranslation("المعلمون",language),
@@ -280,7 +280,7 @@ const SchoolDashboard: React.FC = () => {
   console.log('📊 SchoolDashboard rendering with language:', language);
 
   const stats = [
-    { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-600" },
+    { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500" },
     { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
     { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
     { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
@@ -288,9 +288,9 @@ const SchoolDashboard: React.FC = () => {
 
 
   const tabs = [
+    { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "home", label: getTranslation("home", language), icon: Home },
     { id: "users", label: getTranslation("UserManagement", language), icon: Users },
-    { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
     { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },
@@ -375,7 +375,7 @@ const SchoolDashboard: React.FC = () => {
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       معدل الحضور
                     </span>
-                    <span className="text-sm font-semibold text-primary-600">
+                    <span className="text-sm font-semibold text-primary-500">
                       94.2%
                     </span>
                   </div>

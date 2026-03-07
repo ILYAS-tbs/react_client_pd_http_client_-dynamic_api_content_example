@@ -323,7 +323,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                         <Eye className="h-4 w-4" />
                       </button>
                       {/* the parent has his data - can't be edited by school for now */}

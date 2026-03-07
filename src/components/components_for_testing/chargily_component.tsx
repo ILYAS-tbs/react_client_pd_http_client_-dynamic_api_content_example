@@ -13,7 +13,7 @@ function ChargilyPayment(){
     } 
     //?: Payment Button
    return <>
-    <button className="w-10 bg-blue-800  text-white px-8 py-1
+    <button className="w-10 bg-primary-800  text-white px-8 py-1
      flex items-center justify-center rounded "
      onClick={pay_func}
      >

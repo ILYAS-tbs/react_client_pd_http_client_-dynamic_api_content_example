@@ -9,8 +9,6 @@ import { auth_http_client } from "../services/http_api/auth/auth_http_client";
 import { getCSRFToken } from "../lib/get_CSRFToken";
 import {
   LoginPayload,
-  RegisterParentPayload,
-  RegisterSchoolPayload,
   SignupPayload,
 } from "../services/http_api/payloads_types/school_client_payload_types";
 import { BackendUser } from "../models/BackendUser";
@@ -56,8 +54,7 @@ interface AuthContextType {
   setUserData: React.Dispatch<React.SetStateAction<UserData | null>>,
   login: (
     email: string,
-    password: string,
-    role: string,
+    password: string
   ) => Promise<LoginResponse>;
   register: (userData: any, isCreatingSchool: boolean) => Promise<boolean>;
   logout: () => void;
@@ -181,20 +178,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     );
   }
 
-  const get_session = async () => {
-    const response = await fetch(
-      `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    const data = await response.json()
-    return data
-  }
   const register = async (
-    userData: UserData,
-    isCreatingSchool: boolean
+    userData: UserData
   ): Promise<boolean> => {
     setIsLoading(true);
 
@@ -214,7 +199,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     //? call01 : userCreation ()
     // CSRF token
     let latest_csrf = getCSRFToken()!;
-    const result = await auth_http_client.signup(user_payload, latest_csrf);
+    await auth_http_client.signup(user_payload, latest_csrf);
 
     //? call02 School or parent linking with him
     // CSRF token

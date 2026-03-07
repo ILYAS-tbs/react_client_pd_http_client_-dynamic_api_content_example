@@ -370,7 +370,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           {
             label: getTranslation("totalRequests", language),
             value: stats.total,
-            color: "bg-primary-600",
+            color: "bg-primary-500",
             icon: FileText,
           },
           {
@@ -440,7 +440,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse">
                   <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
-                    <Calendar className="h-6 w-6 text-primary-600" />
+                    <Calendar className="h-6 w-6 text-primary-500" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -533,7 +533,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           {
             label: getTranslation("totalReports", language),
             value: attitudeStats.total,
-            color: "bg-primary-600",
+            color: "bg-primary-500",
             icon: FileText,
           },
           {

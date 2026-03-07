@@ -254,7 +254,7 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
                       <div className="flex space-x-2 rtl:space-x-reverse">
                         {/* <button
                           onClick={() => handleViewSchedule(schedule.pdfUrl)}
-                          className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
+                          className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                           disabled={!schedule.pdfUrl}
                         >
                           <Eye className="h-5 w-5" />

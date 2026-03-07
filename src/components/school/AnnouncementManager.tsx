@@ -93,7 +93,7 @@ const AnnouncementManager: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <button className="text-primary-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-2">
+                <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-2">
                   <Eye className="h-4 w-4" />
                 </button>
                 <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-2">

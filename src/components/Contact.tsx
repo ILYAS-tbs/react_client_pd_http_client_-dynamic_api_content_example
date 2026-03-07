@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Send, Clock, MessageCircle } from 'lucide-react';
-import { useLanguage } from '../hooks/useLanguage';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
 
 export function Contact() {
@@ -91,7 +91,7 @@ export function Contact() {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-[#edeff3] dark:bg-gray-800">
+    <section id="contact" className="py-20 bg-secondary-50 dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className={`text-center mb-16 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -136,7 +136,7 @@ export function Contact() {
                       value={formState.name}
                       onChange={handleInputChange}
                       required
-                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
+                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
                       placeholder={language === 'ar' ? 'أدخل اسمك الكامل' :
                         language === 'fr' ? 'Entrez votre nom complet' :
                           'Enter your full name'}
@@ -155,7 +155,7 @@ export function Contact() {
                       value={formState.email}
                       onChange={handleInputChange}
                       required
-                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
+                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
                       placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' :
                         language === 'fr' ? 'Entrez votre email' :
                           'Enter your email'}
@@ -174,7 +174,7 @@ export function Contact() {
                       name="userType"
                       value={formState.userType}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
+                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
                     >
                       <option value="parent">
                         {language === 'ar' ? 'ولي أمر' : language === 'fr' ? 'Parent' : 'Parent'}
@@ -200,7 +200,7 @@ export function Contact() {
                       value={formState.subject}
                       onChange={handleInputChange}
                       required
-                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
+                      className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}
                       placeholder={language === 'ar' ? 'موضوع رسالتك' :
                         language === 'fr' ? 'Sujet de votre message' :
                           'Subject of your message'}
@@ -220,7 +220,7 @@ export function Contact() {
                     onChange={handleInputChange}
                     required
                     rows={6}
-                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none ${isRTL ? 'text-right' : 'text-left'}`}
+                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none ${isRTL ? 'text-right' : 'text-left'}`}
                     placeholder={language === 'ar' ? 'اكتب رسالتك هنا...' :
                       language === 'fr' ? 'Écrivez votre message ici...' :
                         'Write your message here...'}
@@ -229,7 +229,7 @@ export function Contact() {
 
                 <button
                   type="submit"
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 rtl:space-x-reverse"
+                  className="w-full bg-primary-500 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 rtl:space-x-reverse"
                 >
                   <Send className="w-5 h-5" />
                   <span>
@@ -252,14 +252,14 @@ export function Contact() {
               <div className="space-y-6">
                 {contactInfo.map((info, index) => (
                   <div key={index} className={`flex items-start space-x-4 rtl:space-x-reverse ${isRTL ? 'text-right' : 'text-left'}`}>
-                    <div className="w-12 h-12 bg-primary-600/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <info.icon className="w-6 h-6 text-primary-600" />
+                    <div className="w-12 h-12 bg-primary-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <info.icon className="w-6 h-6 text-primary-500" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                         {info.title}
                       </h4>
-                      <p className="text-primary-600 font-medium">
+                      <p className="text-primary-500 font-medium">
                         {info.primary}
                       </p>
                       <p className="text-gray-600 dark:text-gray-300 text-sm">
@@ -282,7 +282,7 @@ export function Contact() {
                 {faqs.map((faq, index) => (
                   <div key={index} className={`border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0 ${isRTL ? 'text-right' : 'text-left'}`}>
                     <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-start space-x-2 rtl:space-x-reverse">
-                      <MessageCircle className="w-4 h-4 text-primary-600 mt-1 flex-shrink-0" />
+                      <MessageCircle className="w-4 h-4 text-primary-500 mt-1 flex-shrink-0" />
                       <span>{faq.question}</span>
                     </h4>
                     <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed pl-6 rtl:pl-0 rtl:pr-6">

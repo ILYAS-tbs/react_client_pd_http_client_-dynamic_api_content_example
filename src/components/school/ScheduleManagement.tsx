@@ -268,7 +268,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                         {/* {schedule.pdfUrl && (
                           <button
                             onClick={() => handleViewSchedule(schedule.pdfUrl)}
-                            className="text-primary-600 hover:text-blue-900 dark:text-primary-400 dark:hover:text-primary-300"
+                            className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
                           >
                             <Eye className="h-5 w-5" />
                           </button>

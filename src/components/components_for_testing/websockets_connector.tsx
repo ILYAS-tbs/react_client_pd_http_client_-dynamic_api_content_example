@@ -24,7 +24,7 @@ export default function WebSocketConnector() {
     console.log("WebSocket closed:", event);
   };
   return (
-    <div className="ws-conainter h-[200px] w-full bg-blue-800 flex justify-center items-center">
+    <div className="ws-conainter h-[200px] w-full bg-primary-800 flex justify-center items-center">
       <h1 className="text text-xl font-bold text-white">
         websockets connecion
       </h1>

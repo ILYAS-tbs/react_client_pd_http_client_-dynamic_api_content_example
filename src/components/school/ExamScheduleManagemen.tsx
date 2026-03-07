@@ -256,7 +256,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
           </select>
           <button
             onClick={() => setViewTimeline(!viewTimeline)}
-            className="bg-primary-600 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-500 text-white px-3 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Clock className="h-5 w-5" />
             <span>{viewTimeline ? getTranslation('ViewSchedule', language) : getTranslation('TimeView', language)}</span>
@@ -319,7 +319,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                     <span className="text-sm text-gray-700 dark:text-gray-300">
                       {exam.class_group_name} - {exam.class_group_name}
                     </span>
-                    <span className="text-sm text-primary-600 dark:text-primary-400">
+                    <span className="text-sm text-primary-500 dark:text-primary-400">
                       {exam.time} ({exam.duration} دقيقة)
                     </span>
                   </div>
@@ -418,7 +418,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                         </button>
 
                         {/* For now : no eye */}
-                        {/* <button className="text-primary-600 hover:text-blue-900 dark:text-primary-400 dark:hover:text-blue-300">
+                        {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                           <Eye className="h-4 w-4" />
                         </button> */}
                       </div>

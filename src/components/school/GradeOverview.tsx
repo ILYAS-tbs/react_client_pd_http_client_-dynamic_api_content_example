@@ -58,7 +58,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
     {
       label: getTranslation('schoolAverage', language),
       value: `${school_stat?.school_average}/20` || "16.2/20",
-      color: "bg-primary-600",
+      color: "bg-primary-500",
       trend: "+0.3",
     },
     {

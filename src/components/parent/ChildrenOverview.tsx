@@ -202,7 +202,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
       case "grade":
         return <Award className="h-4 w-4 text-green-600" />;
       case "attendance":
-        return <Calendar className="h-4 w-4 text-primary-600" />;
+        return <Calendar className="h-4 w-4 text-primary-500" />;
       case "behavior":
         return <TrendingUp className="h-4 w-4 text-purple-600" />;
       case "achievement":
@@ -216,7 +216,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
 
   const getGradeColor = (grade: number) => {
     if (grade >= 16) return "text-green-600";
-    if (grade >= 12) return "text-primary-600";
+    if (grade >= 12) return "text-primary-500";
     if (grade >= 10) return "text-yellow-600";
     return "text-red-600";
   };
@@ -252,7 +252,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-6 rtl:space-x-reverse">
               <div className="bg-primary-100 dark:bg-primary-900/20 p-4 rounded-full">
-                <User className="h-8 w-8 text-primary-600" />
+                <User className="h-8 w-8 text-primary-500" />
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -285,12 +285,12 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     {getTranslation("TotalAbsences", language)}
                   </p>
-                  <p className="text-2xl font-bold text-primary-600">
+                  <p className="text-2xl font-bold text-primary-500">
                     {currentChild.attendance}
                   </p>
                 </div>
                 <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-lg">
-                  <Calendar className="h-6 w-6 text-primary-600" />
+                  <Calendar className="h-6 w-6 text-primary-500" />
                 </div>
               </div>
             </div>

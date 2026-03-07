@@ -131,7 +131,7 @@ const SchoolAnnouncements: React.FC = () => {
           )}
         </div>
         <div className="flex items-center space-x-2 rtl:space-x-reverse">
-          <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          <button className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors">
             <Bell className="h-4 w-4" />
             <span>{getTranslation('enableNotifications', language)}</span>
           </button>
@@ -172,7 +172,7 @@ const SchoolAnnouncements: React.FC = () => {
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: getTranslation('totalAnnouncements', language), value: announcements.length, color: 'bg-blue-500' },
+          { label: getTranslation('totalAnnouncements', language), value: announcements.length, color: 'bg-primary-500' },
           { label: getTranslation('unread', language), value: unreadCount, color: 'bg-red-500' },
           { label: getTranslation('pinned', language), value: announcements.filter(a => a.pinned).length, color: 'bg-yellow-500' },
           { label: getTranslation('highPriority', language), value: announcements.filter(a => a.priority === 'عالي').length, color: 'bg-purple-500' }
@@ -221,7 +221,7 @@ const SchoolAnnouncements: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <Pin className="h-4 w-4 text-yellow-600" />
-                    <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                    <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                       <Eye className="h-4 w-4" />
                     </button>
                   </div>
@@ -279,7 +279,7 @@ const SchoolAnnouncements: React.FC = () => {
                     <span className="text-xs text-gray-500 dark:text-gray-400">{announcement.targetAudience}</span>
                   </div>
                 </div>
-                <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
                   <Eye className="h-4 w-4" />
                 </button>
               </div>

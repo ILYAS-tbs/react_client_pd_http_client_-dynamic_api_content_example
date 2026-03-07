@@ -1,6 +1,6 @@
 import React from 'react';
 import { GraduationCap, Phone, Mail, MapPin, Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
-import { useLanguage } from '../hooks/useLanguage';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
 
 export function Footer() {
@@ -55,16 +55,16 @@ export function Footer() {
           {/* Brand Section */}
           <div className={`lg:col-span-1 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="flex items-center space-x-3 rtl:space-x-reverse mb-6">
-              <div className="w-32 h-32 flex items-center justify-center">
+              <div className="w-16 h-16 flex items-center justify-center">
                 <img
                   src="/assets/pedaconnect-removebg.png"
                   alt="PedaConnect Logo"
-                  className="w-32 h-32 object-contain"
+                  className="w-16 h-16 object-contain"
                 />
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-white">PedaConnect</h3>
-                <p className="text-sm text-gray-300">تعليم متابع نجاح مؤكد</p>
+                <p className="text-sm text-primary-400">تعليم متابع نجاح مؤكد</p>
               </div>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
@@ -77,7 +77,7 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-primary-600 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                  className="w-10 h-10 bg-gray-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110"
                   aria-label={social.label}
                 >
                   <social.icon className="w-5 h-5" />
@@ -192,9 +192,9 @@ export function Footer() {
                 placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' :
                   language === 'fr' ? 'Entrez votre email' :
                     'Enter your email'}
-                className={`flex-1 px-4 py-3 bg-gray-800 text-white rounded-l-xl ${isRTL ? 'rounded-l-none rounded-r-xl' : ''} focus:outline-none focus:ring-2 focus:ring-primary-600 border border-gray-700`}
+                className={`flex-1 px-4 py-3 bg-gray-800 text-white rounded-l-xl ${isRTL ? 'rounded-l-none rounded-r-xl' : ''} focus:outline-none focus:ring-2 focus:ring-primary-500 border border-gray-700`}
               />
-              <button className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-r-xl rtl:rounded-r-none rtl:rounded-l-xl font-semibold transition-colors duration-200">
+              <button className="px-6 py-3 bg-primary-500 hover:bg-primary-700 text-white rounded-r-xl rtl:rounded-r-none rtl:rounded-l-xl font-semibold transition-colors duration-200">
                 {language === 'ar' ? 'اشتراك' : language === 'fr' ? 'S\'abonner' : 'Subscribe'}
               </button>
             </div>

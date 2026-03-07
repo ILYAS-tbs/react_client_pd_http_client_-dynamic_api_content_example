@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { X, Eye, EyeOff, Users, School, GraduationCap } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
-import { auth_http_client } from "../services/http_api/auth/auth_http_client";
 
 interface LoginProps {
   isOpen?: boolean;
@@ -13,12 +12,11 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("parent");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>("");
-  const { login, change_role, logout } = useAuth();
-  const { t, language, isRTL } = useLanguage();
+  const { login, logout } = useAuth();
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
 
   function showError(duration: number, error: string) {
@@ -35,10 +33,10 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
 
     try {
       // Call 00 : logout first - removing the session_id if it was there from signup
-      const logout_res = logout();
+      logout();
 
       // call 01 - authenticate user
-      const success_result = await login(email, password, role);
+      const success_result = await login(email, password);
       const user_role = success_result?.user?.role;
 
       if (!success_result.ok) {
@@ -58,11 +56,6 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
     }
   };
 
-  const roleIcons = {
-    parent: Users,
-    teacher: GraduationCap,
-    school: School,
-  };
 
   if (!isOpen) return null;
 
@@ -76,7 +69,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
             <img
               src="/assets/pedaconnect-removebg.png"
               alt="PedaConnect Logo"
-              className="w-48 h-48 object-contain"
+              className="w-28 h-28 object-contain"
             />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -89,52 +82,6 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
 
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-          {/* Role Selection */}
-          <div>
-            <label
-              className={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 ${isRTL ? "text-right" : "text-left"
-                }`}
-            >
-              {t("selectRole") || "Select Role"}
-            </label>
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                {
-                  value: "parent",
-                  label: t("parent") || "Parent",
-                  icon: Users,
-                },
-                {
-                  value: "teacher",
-                  label: t("teacher") || "Teacher",
-                  icon: GraduationCap,
-                },
-                {
-                  value: "school",
-                  label: t("school") || "School",
-                  icon: School,
-                },
-              ].map((option) => {
-                const Icon = roleIcons[option.value as keyof typeof roleIcons];
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setRole(option.value)}
-                    className={`flex items-center space-x-3 rtl:space-x-reverse p-3 border-2 rounded-lg transition-all ${role === option.value
-                      ? "border-primary-600 bg-primary-50"
-                      : "border-gray-200 dark:border-gray-700 hover:border-primary-200"
-                      } ${isRTL ? "text-right" : "text-left"}`}
-                  >
-                    <Icon className="w-5 h-5 text-primary-600" />
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {option.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
 
           {/* Email */}
           <div>
@@ -148,7 +95,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
                 }`}
               placeholder={t("emailPlaceholder") || "example@school.dz"}
               required
@@ -168,7 +115,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
+                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"
                   }`}
                 placeholder={t("password") || "Password"}
                 required
@@ -197,7 +144,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? "text-right" : "text-left"
+            className={`w-full py-3 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? "text-right" : "text-left"
               }`}
           >
             {isLoading ? t("loading") || "Loading..." : t("login") || "Login"}
@@ -209,7 +156,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
               }`}
           >
             {t("noAccount") || "Don’t have an account?"}{" "}
-            <Link to="/register" className="text-primary-600 hover:underline">
+            <Link to="/register" className="text-primary-500 hover:underline">
               {t("signUp") || "Sign Up"}
             </Link>
           </div>
@@ -217,7 +164,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
             className={`text-center text-sm text-gray-600 dark:text-gray-400 ${isRTL ? "text-right" : "text-left"
               }`}
           >
-            <Link to="/" className="text-primary-600 hover:underline">
+            <Link to="/" className="text-primary-500 hover:underline">
               {t("cancel") || "Go Back"}
             </Link>
           </div>

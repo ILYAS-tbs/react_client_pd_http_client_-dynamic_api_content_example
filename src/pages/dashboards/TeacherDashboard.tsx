@@ -200,7 +200,7 @@ const TeacherDashboard: React.FC = () => {
       title: getTranslation('myStudents', language),
       value: students.length || "0",
       icon: Users,
-      color: "bg-primary-600",
+      color: "bg-primary-500",
     },
     {
       title: getTranslation('Classes', language),
@@ -448,7 +448,7 @@ const TeacherDashboard: React.FC = () => {
                   >
                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                       <div className="bg-primary-100 dark:bg-primary-900/20 p-2 rounded-lg">
-                        <BookOpen className="h-5 w-5 text-primary-600" />
+                        <BookOpen className="h-5 w-5 text-primary-500" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">

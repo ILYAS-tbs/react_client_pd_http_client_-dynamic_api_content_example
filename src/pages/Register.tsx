@@ -190,7 +190,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
             <img
               src="/assets/pedaconnect-removebg.png"
               alt="PedaConnect Logo"
-              className="w-96 h-96 object-contain"
+              className="w-28 h-28 object-contain"
             />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -243,11 +243,11 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                       setFormData({ ...formData, role: option.value })
                     }
                     className={`flex items-center justify-center space-x-2 rtl:space-x-reverse p-3 border-2 rounded-lg transition-all flex-1 ${formData.role === option.value
-                      ? "border-primary-600 bg-primary-50"
+                      ? "border-primary-500 bg-primary-50"
                       : "border-gray-200 dark:border-gray-700 hover:border-primary-200"
                       } ${isRTL ? "text-right" : "text-left"}`}
                   >
-                    <Icon className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                    <Icon className="w-5 h-5 text-primary-500 flex-shrink-0" />
                     <span className="font-medium text-gray-900 dark:text-white truncate">
                       {option.label}
                     </span>
@@ -271,7 +271,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+              className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
               placeholder={
                 formData.role === "school"
                   ? t("schoolNamePlaceholder") || "Al Amal Primary School"
@@ -295,7 +295,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                 placeholder={t("emailPlaceholder") || "example@email.dz"}
                 required
               />
@@ -313,7 +313,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                 placeholder="+213 551 123 456"
                 required
               />
@@ -341,7 +341,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                     commune: "",
                   });
                 }}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                 required
               >
                 <option value="">{t("selectWilaya") || "Select Wilaya"}</option>
@@ -367,7 +367,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                   setSelectedCommune(e.target.value);
                   setFormData({ ...formData, commune: e.target.value });
                 }}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                 required
                 disabled={!selectedWilaya}
               >
@@ -398,7 +398,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                   name="schoolType"
                   value={formData.schoolType}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                   required
                 >
                   <option value="public">{t("publicSchool") || "Public"}</option>
@@ -419,7 +419,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                   name="school_level"
                   value={formData.school_level}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                   required
                 >
                   <option value="primary">
@@ -447,7 +447,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                 placeholder={t("password") || "Password"}
                 required
               />
@@ -474,7 +474,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
+                className={`w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${isRTL ? "text-right" : "text-left"}`}
                 placeholder={t("confirmPassword") || "Confirm Password"}
                 required
               />
@@ -492,7 +492,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? "text-right" : "text-left"}`}
+            className={`w-full py-3 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? "text-right" : "text-left"}`}
           >
             {isLoading ? t("loading") || "Loading..." : t("signUp") || "Sign Up"}
           </button>
@@ -502,14 +502,14 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
             className={`text-center text-sm text-gray-600 dark:text-gray-400 ${isRTL ? "text-right" : "text-left"}`}
           >
             {t("alreadyHaveAccount") || "Already have an account?"}{" "}
-            <Link to="/login" className="text-primary-600 hover:underline">
+            <Link to="/login" className="text-primary-500 hover:underline">
               {t("signIn") || "Sign In"}
             </Link>
           </div>
           <div
             className={`text-center text-sm text-gray-600 dark:text-gray-400 ${isRTL ? "text-right" : "text-left"}`}
           >
-            <Link to="/" className="text-primary-600 hover:underline">
+            <Link to="/" className="text-primary-500 hover:underline">
               {t("cancel") || "Go Back"}
             </Link>
           </div>

@@ -148,7 +148,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
           {
             label: getTranslation('TotalRequests', language),
             value: absenceRequests.length,
-            color: "bg-primary-600",
+            color: "bg-primary-500",
           },
           {
             label: getTranslation('UnderReview', language),
@@ -199,7 +199,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-4 rtl:space-x-reverse">
                 <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
-                  <User className="h-6 w-6 text-primary-600" />
+                  <User className="h-6 w-6 text-primary-500" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -300,7 +300,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                       href={SERVER_BASE_URL + request.proof_document}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                      className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       <Eye className="h-4 w-4" />
                       <span>{getTranslation('Details', language)}</span>

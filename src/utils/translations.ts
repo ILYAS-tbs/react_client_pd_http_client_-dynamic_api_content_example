@@ -647,6 +647,166 @@ export const translations: Translations = {
     fr: "Annuler",
   },
 
+  // Missing Pricing Keys
+  dzdPrices: {
+    ar: "أسعار بالدينار الجزائري (DZD)",
+    en: "Prices in Algerian Dinar (DZD)",
+    fr: "Prix en Dinar Algérien (DZD)",
+  },
+  noHiddenFees: {
+    ar: "بدون رسوم خفية",
+    en: "No Hidden Fees",
+    fr: "Aucun frais caché",
+  },
+  whatYouSee: {
+    ar: "ما تراه هو ما تدفعه",
+    en: "What you see is what you pay",
+    fr: "Ce que vous voyez est ce que vous payez",
+  },
+  qualityGuarantee: {
+    ar: "ضمان الجودة",
+    en: "Quality Guarantee",
+    fr: "Garantie qualité",
+  },
+  thirtyDayMoneyBack: {
+    ar: "30 يوماً ضمان استرداد المال",
+    en: "30-day money-back guarantee",
+    fr: "30 jours de garantie de remboursement",
+  },
+  easyCancellation: {
+    ar: "سهولة الإلغاء",
+    en: "Easy Cancellation",
+    fr: "Annulation facile",
+  },
+  cancelAnytime: {
+    ar: "يمكنك الإلغاء في أي وقت",
+    en: "Cancel anytime",
+    fr: "Annulez à tout moment",
+  },
+
+  // Missing Services Keys
+  readyToStart: {
+    ar: "جاهز للبدء؟",
+    en: "Ready to Get Started?",
+    fr: "Prêt à Commencer ?",
+  },
+  joinThousands: {
+    ar: "انضم إلى آلاف المدارس وأولياء الأمور الذين يثقون في بيداكونيكت لتحقيق النجاح المؤكد",
+    en: "Join thousands of schools and parents who trust PedaConnect for assured success",
+    fr: "Rejoignez des milliers d'écoles et de parents qui font confiance à PedaConnect pour un succès assuré",
+  },
+  achievementsInNumbers: {
+    ar: "إنجازاتنا في أرقام",
+    en: "Our Achievements in Numbers",
+    fr: "Nos Réalisations en Chiffres",
+  },
+  realResults: {
+    ar: "نتائج حقيقية تؤكد نجاح منصتنا",
+    en: "Real results confirming our platform's success",
+    fr: "Résultats réels confirmant le succès de notre plateforme",
+  },
+  registeredSchools: {
+    ar: "مدرسة مسجلة",
+    en: "Registered Schools",
+    fr: "Écoles Inscrites",
+  },
+  activeParents: {
+    ar: "ولي أمر نشط",
+    en: "Active Parents",
+    fr: "Parents Actifs",
+  },
+  connectedTeachers: {
+    ar: "معلم متصل",
+    en: "Connected Teachers",
+    fr: "Enseignants Connectés",
+  },
+  userSatisfaction: {
+    ar: "رضا المستخدمين",
+    en: "User Satisfaction",
+    fr: "Satisfaction Utilisateurs",
+  },
+  advancedAnalytics: {
+    ar: "تحليلات متقدمة",
+    en: "Advanced Analytics",
+    fr: "Analyses Avancées",
+  },
+  advancedAnalyticsDesc: {
+    ar: "تقارير شاملة وإحصائيات مفصلة لتتبع الأداء",
+    en: "Comprehensive reports and detailed statistics to track performance",
+    fr: "Rapports complets et statistiques détaillées pour suivre les performances",
+  },
+  documentManagement: {
+    ar: "إدارة الوثائق",
+    en: "Document Management",
+    fr: "Gestion des Documents",
+  },
+  documentManagementDesc: {
+    ar: "تنظيم وأرشفة جميع الوثائق الأكاديمية والإدارية",
+    en: "Organization and archiving of all academic and administrative documents",
+    fr: "Organisation et archivage de tous les documents académiques et administratifs",
+  },
+  smartScheduling: {
+    ar: "جدولة ذكية",
+    en: "Smart Scheduling",
+    fr: "Planification Intelligente",
+  },
+  smartSchedulingDesc: {
+    ar: "نظام جدولة متطور للحصص والأنشطة المدرسية",
+    en: "Advanced scheduling system for classes and school activities",
+    fr: "Système de planification avancé pour les cours et activités scolaires",
+  },
+  advancedSecurity: {
+    ar: "أمان متقدم",
+    en: "Advanced Security",
+    fr: "Sécurité Avancée",
+  },
+  advancedSecurityDesc: {
+    ar: "حماية شاملة للبيانات مع أعلى معايير الأمان",
+    en: "Comprehensive data protection with highest security standards",
+    fr: "Protection complète des données avec les plus hauts standards de sécurité",
+  },
+
+  // Missing About Keys
+  advancedEducation: {
+    ar: "تعليم متطور",
+    en: "Advanced Education",
+    fr: "Éducation Avancée",
+  },
+  advancedEducationDesc: {
+    ar: "منصة تعليمية حديثة تواكب أحدث التطورات التكنولوجية",
+    en: "Modern educational platform following the latest technological developments",
+    fr: "Plateforme éducative moderne suivant les dernières évolutions technologiques",
+  },
+  effectiveCommunication: {
+    ar: "تواصل فعال",
+    en: "Effective Communication",
+    fr: "Communication Efficace",
+  },
+  effectiveCommunicationDesc: {
+    ar: "ربط مباشر بين المدارس والمعلمين وأولياء الأمور",
+    en: "Direct connection between schools, teachers and parents",
+    fr: "Connexion directe entre écoles, enseignants et parents",
+  },
+  completeTracking: {
+    ar: "متابعة شاملة",
+    en: "Complete Tracking",
+    fr: "Suivi Complet",
+  },
+  completeTrackingDesc: {
+    ar: "متابعة شاملة ومفصلة لأداء الطلاب الأكاديمي",
+    en: "Comprehensive and detailed tracking of student academic performance",
+    fr: "Suivi complet et détaillé des performances académiques des élèves",
+  },
+  guaranteedResults: {
+    ar: "نتائج مضمونة",
+    en: "Guaranteed Results",
+    fr: "Résultats Garantis",
+  },
+  guaranteedResultsDesc: {
+    ar: "تحسين ملحوظ في الأداء الأكاديمي ومشاركة أولياء الأمور",
+    en: "Notable improvement in academic performance and parent engagement",
+    fr: "Amélioration notable des performances académiques et de l'engagement des parents",
+  },
   time: {
     ar: "الوقت",
     en: "Time",
@@ -1519,10 +1679,10 @@ export const translations: Translations = {
     fr: "2ème Semestre",
   },
   thirdSemester: {
-  ar: "الفصل الثالث",
-  en: "Third Semester",
-  fr: "3ème Semestre",
-},
+    ar: "الفصل الثالث",
+    en: "Third Semester",
+    fr: "3ème Semestre",
+  },
 
   academicYear: {
     ar: "السنة الدراسية",

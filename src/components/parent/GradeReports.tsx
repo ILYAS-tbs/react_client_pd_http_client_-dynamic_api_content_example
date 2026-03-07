@@ -159,7 +159,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
 
   const getGradeColor = (grade: number) => {
     if (grade >= 16) return "text-green-600";
-    if (grade >= 12) return "text-primary-600";
+    if (grade >= 12) return "text-primary-500";
     if (grade >= 10) return "text-yellow-600";
     return "text-red-600";
   };
@@ -250,7 +250,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
           </div>
 
           <div className="flex items-end">
-            <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors">
               <Filter className="h-4 w-4" />
               <span>{getTranslation("apply", language)}</span>
             </button>
