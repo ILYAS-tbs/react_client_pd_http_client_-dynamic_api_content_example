@@ -1,75 +1,44 @@
-## 📌 Changes Made
+# 🎓 PedaConnect - Educational Management Platform
 
-### 🔹 `src/lib`
+PedaConnect is a modern, comprehensive educational management system designed to bridge the gap between schools, teachers, and parents. It provides a centralized platform for managing students, schedules, grades, and communication in real-time.
 
-- **getCSRFToken**: Utility to fetch CSRF token.
+## 🚀 Key Features
 
-### 🔹 `src/services/http_api`
+- **🏫 School Administration Dashboard**: Manage students, teachers, classes, and school-wide announcements.
+- **👨‍🏫 Teacher Dashboard**: Handle classroom management, grade entry, and resource sharing.
+- **👪 Parent Portal**: Track child's progress, view schedules, and receive school updates.
+- **⚡ Real-time Notifications**: Stay updated with instant alerts for absences, grades, and announcements.
 
-- **auth/**: Added authentication endpoints (all `POST`).
-- **school-dashboard/**: Added `GET` request to fetch school data.
-- **http_types.ts**: Noted the need to model backend response shapes.
+## 🛠️ Technology Stack
 
-### 🔹 `types/`
+- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS
+- **Backend**: Django, REST Framework
+- **Database**: PostgreSQL
+- **Icons**: Lucide React
 
-- Modeled **Student** as it appears in the frontend  
-  (mapping `student_backend → student_frontend`).
+## 📖 Documentation
 
-### 🔹 `app.tsx`
+For more detailed information, please refer to the following documents:
 
-- Initial API call to set the **CSRF token** from the server.
+- [**About Project**](./About_project.md): Detailed project overview, tech stack, and folder structure.
+- [**Workflows**](./workflows.md): Step-by-step feature workflows for each dashboard.
 
-### 🔹 `contexts/AuthContext.tsx`
+## 🏁 Getting Started
 
-- **login**: Integrated real login call using the `http_client`.
-- **change_role(role)** : to change the auth user role depending on "get_role" endpoint , which search the role of that user who just logged in
+### Prerequisites
+- Node.js (v18+)
+- npm or yarn
 
-### 🔹 `pages/dashboard/SchoolDashboard`
+### Installation
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-- Added `GET` calls:
-  - `getStudents`
-  - `getTeachers`
-  - `getClassGroups`
-
-### 🔹 `components/StudentManagement`
-
-- Switched to **real student data** instead of mock data.
-- Example of mapping in "components/StudentManagement" :
-
-```js
-const students_real: Student[] = studentsList.map((response_student) => {
-  const student: Student = {
-    id: response_student.student_id,
-    name: response_student.full_name,
-    class: response_student.class_group?.name,
-    age: getAge(response_student.date_of_birth),
-    parent: response_student?.parent?.full_name,
-    phone: response_student?.parent?.phone_number,
-    average: response_student.trimester_grade,
-    attendance: "89%",
-  };
-  return student;
-});
-```
-
-### 🔹 `components/TeacherManagement`
-
-- added example of how to use PATCH request
-- how to use files and form data for files
-- POST , PATCH , DELETE : will have the same logic , a body , csrf_token
-
-- Switched to **real student data** instead of mock data.
-- Example of mapping in "components/StudentManagement" :
-
-- student_api_shape → student_frontend_shape
-- This mapping ensures flexibility if frontend `Student` shape differs from backend for some reason .
-
-### 🔹 `1. src/services/http_api/http_payload_types.ts`:
-
-- to model how we should say payloads in what format
-
-### 🔹 `2. src/services/http_api/http_reponse_types.ts`:
-
-- to model what the api is returning
-
-- why both 1 & 2 : for images we get a "string" for path as response , but in request we send a "FILE"
+---
+© 2025 PedaConnect Team. All rights reserved.
