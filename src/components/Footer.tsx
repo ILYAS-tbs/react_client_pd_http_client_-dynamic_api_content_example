@@ -207,13 +207,7 @@ export function Footer() {
             <p className="text-gray-400 text-sm">
               © {currentYear} PedaConnect. {getTranslation('allRightsReserved', language)}
             </p>
-            <div className="flex items-center space-x-6 rtl:space-x-reverse">
-              <span className="text-gray-400 text-sm">
-                {language === 'ar' ? 'صنع بـ ❤️ في الجزائر' :
-                  language === 'fr' ? 'Fait avec ❤️ en Algérie' :
-                    'Made with ❤️ in Algeria'}
-              </span>
-            </div>
+            
           </div>
         </div>
       </div>

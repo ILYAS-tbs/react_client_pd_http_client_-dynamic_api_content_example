@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import SchoolDashboard from "./pages/dashboards/SchoolDashboard";
 import TeacherDashboard from "./pages/dashboards/TeacherDashboard";
 import ParentDashboard from "./pages/dashboards/ParentDashboard";
+import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import ConfirmationCode from "./pages/ConfirmationPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
@@ -69,6 +70,14 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={["parent"]}>
                         <ParentDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin-dashboard"
+                    element={
+                      <ProtectedRoute allowedRoles={["super-admin"]}>
+                        <AdminDashboard />
                       </ProtectedRoute>
                     }
                   />

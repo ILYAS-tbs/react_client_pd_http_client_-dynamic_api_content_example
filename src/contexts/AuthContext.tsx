@@ -18,7 +18,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "school" | "teacher" | "parent";
+  role: "school" | "teacher" | "parent" | "super-admin";
   schoolId?: string;
   schoolType?: "public" | "private";
 }
@@ -30,7 +30,7 @@ export interface UserData {
   numberOfChildren?: number;
   password: string;
   phone?: string;
-  role?: "school" | "teacher" | "parent";
+  role?: "school" | "teacher" | "parent" | "super-admin";
   schoolType?: string;
   school_level?: string;
   wilaya?: string;
@@ -61,7 +61,7 @@ interface AuthContextType {
   isLoading: boolean;
 
   // just to change the role again after login,
-  change_role: (role: "school" | "teacher" | "parent") => void;
+  change_role: (role: "school" | "teacher" | "parent" | "super-admin") => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -133,7 +133,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       id: backend_user?.data.user.id.toString() ?? "-1",
       name: backend_user.data.user.username,
       email: backend_user.data.user.email || "NO EMAIL!",
-      role: role_from_server as "school" | "teacher" | "parent",
+      role: role_from_server as "school" | "teacher" | "parent" | "super-admin",
       // schoolId: role_from_server !== "school" ? "school-1" : undefined,
       // schoolType: role_from_server === "school" ? "private" : undefined,
     };
@@ -151,7 +151,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return { ok: result.ok, status: result.status, user: newUser };
   };
 
-  function change_role(role: "school" | "teacher" | "parent") {
+  function change_role(role: "school" | "teacher" | "parent" | "super-admin") {
     if (!user) return;
 
     console.log(`user`); // to check if it is in sync with the MockUSer
@@ -164,9 +164,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           ? "École Primaire El-Hikmah"
           : role === "teacher"
             ? "Ahmed Benaissa"
-            : "Fatima Bourahla",
+            : role === "super-admin"
+              ? "PedaConnect Admin"
+              : "Fatima Bourahla",
       email: user.email || "NO EMAIL!",
-      role: role as "school" | "teacher" | "parent",
+      role: role as "school" | "teacher" | "parent" | "super-admin",
       schoolId: role !== "school" ? "school-1" : undefined,
       schoolType: role === "school" ? "private" : undefined,
     };
