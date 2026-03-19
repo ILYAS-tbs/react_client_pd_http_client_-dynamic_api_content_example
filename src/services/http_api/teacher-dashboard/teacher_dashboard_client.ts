@@ -16,6 +16,9 @@ const URLS = {
   get_current_teacher_behaviour_reports: `${BASE_URL}/teacher/teachers/get_current_teacher_behaviour_reports/`,
   current_teacher_school_modules: `${BASE_URL}/teacher/teachers/current_teacher_school_modules/`,
   current_teacher_students_grades: `${BASE_URL}/teacher/teachers/current_teacher_students_grades/`,
+  get_grading_formula: `${BASE_URL}/teacher/grading-formulas/get_formula/`,
+  save_grading_formula: `${BASE_URL}/teacher/grading-formulas/save_formula/`,
+  recalculate_all_averages: `${BASE_URL}/teacher/grading-formulas/recalculate_all_averages/`,
   patch_student: `${BASE_URL}/student/students/`,
 
   post_absence: `${BASE_URL}/class-group/absences/`,
@@ -394,6 +397,83 @@ async function get_student_averages(
   }
 }
 
+//! Get Grading Formula for a Module/Class/Semester :
+async function get_grading_formula(
+  moduleId: string | number,
+  classGroupId: string | number,
+  semester: 's1' | 's2' | 's3'
+) {
+  let url = URLS.get_grading_formula;
+  url += `?module_id=${moduleId}&class_group_id=${classGroupId}&semester=${semester}`;
+  
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Save Grading Formula for a Module/Class/Semester :
+async function save_grading_formula(
+  payload: {
+    module_id: string | number;
+    class_group_id: string | number;
+    semester: 's1' | 's2' | 's3';
+    formula_config: Record<string, number>;
+  },
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.save_grading_formula, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Recalculate All Averages for a Module/Class/Semester :
+async function recalculate_all_averages(
+  payload: {
+    module_id: string | number;
+    class_group_id: string | number;
+    semester: 's1' | 's2' | 's3';
+  },
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.recalculate_all_averages, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 export const teacher_dashboard_client = {
   get_teacher_by_id:get_teacher_by_id,
   get_current_teacher_students: get_current_teacher_students,
@@ -416,6 +496,9 @@ export const teacher_dashboard_client = {
   calculate_average: calculate_average,
   calculate_batch_averages: calculate_batch_averages,
   get_student_averages: get_student_averages,
+  get_grading_formula: get_grading_formula,
+  save_grading_formula: save_grading_formula,
+  recalculate_all_averages: recalculate_all_averages,
 
   create_teacher_upload: create_teacher_upload,
   delete_teacher_upload: delete_teacher_upload,
