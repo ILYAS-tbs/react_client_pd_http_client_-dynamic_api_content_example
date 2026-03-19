@@ -25,6 +25,9 @@ const URLS = {
   post_mark: `${BASE_URL}/teacher/marks/`,
   post_grades: `${BASE_URL}/teacher/student-grades/`,
   patch_grades: `${BASE_URL}/teacher/student-grades/`,
+  calculate_average: `${BASE_URL}/teacher/student-grades/`,
+  calculate_batch_averages: `${BASE_URL}/teacher/student-grades/calculate_batch_averages/`,
+  get_student_averages: `${BASE_URL}/teacher/student-grades/get_student_averages/`,
 
   create_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/create_teacher_upload/`,
   delete_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/`,
@@ -306,6 +309,91 @@ async function delete_teacher_upload(id: number, csrfToken: string) {
     return { ok: false, error: error };
   }
 }
+
+//! Calculate Average for Single Student Grade Record :
+async function calculate_average(id: number, csrfToken: string) {
+  const CALCULATE_URL = URLS.calculate_average + id + "/calculate_average/";
+  try {
+    const response = await fetch(CALCULATE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Calculate Batch Averages for Multiple Records :
+async function calculate_batch_averages(
+  csrfToken: string,
+  filters?: {
+    student_id?: number;
+    module_id?: number;
+    class_group_id?: number;
+  }
+) {
+  let url = URLS.calculate_batch_averages;
+  
+  // Add query parameters if filters provided
+  if (filters) {
+    const params = new URLSearchParams();
+    if (filters.student_id) params.append("student_id", filters.student_id.toString());
+    if (filters.module_id) params.append("module_id", filters.module_id.toString());
+    if (filters.class_group_id) params.append("class_group_id", filters.class_group_id.toString());
+    
+    if (params.toString()) {
+      url += "?" + params.toString();
+    }
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Get Student Averages :
+async function get_student_averages(
+  studentId: number,
+  moduleId?: number
+) {
+  let url = URLS.get_student_averages + "?student_id=" + studentId;
+  
+  if (moduleId) {
+    url += "&module_id=" + moduleId;
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 export const teacher_dashboard_client = {
   get_teacher_by_id:get_teacher_by_id,
   get_current_teacher_students: get_current_teacher_students,
@@ -325,6 +413,9 @@ export const teacher_dashboard_client = {
   post_mark: post_mark,
   post_grades: post_grades,
   patch_grades: patch_grades,
+  calculate_average: calculate_average,
+  calculate_batch_averages: calculate_batch_averages,
+  get_student_averages: get_student_averages,
 
   create_teacher_upload: create_teacher_upload,
   delete_teacher_upload: delete_teacher_upload,
