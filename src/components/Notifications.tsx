@@ -1,13 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { notifications_client } from "../services/http_api/notifications/notifications_client";
 import { useNotifications } from "../contexts/NotificationContext";
+
+interface Notification {
+  id: string | number;
+  title: string;
+  message: string;
+  timestamp: string;
+}
+
+interface NotificationsDropdownProps {
+  notifications: Notification[];
+  unreadCount: number;
+  timeAgoArabic: (timestamp: string) => string;
+}
 
 const NotificationsDropdown = ({
   notifications,
   unreadCount,
   timeAgoArabic,
-}) => {
+}: NotificationsDropdownProps) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [alignRight, setAlignRight] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -35,7 +48,7 @@ const NotificationsDropdown = ({
     const res = await notifications_client.mark_notifs_as_read()
     if (res.ok) {
     // ✅ Update frontend state too
-    notifications.forEach((n) => markAsRead(n.id));
+    notifications.forEach((n: Notification) => markAsRead(String(n.id)));
   }
   }
 
@@ -102,7 +115,7 @@ const NotificationsDropdown = ({
           {/* Notifications */}
           {notifications?.length > 0 ? (
             <ul className="divide-y divide-gray-100 dark:divide-gray-700">
-              {notifications.map((notif) => (
+              {notifications.map((notif: Notification) => (
                 <li
                   key={notif.id}
                   className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer flex flex-col gap-1"

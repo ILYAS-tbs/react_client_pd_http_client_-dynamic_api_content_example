@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Edit, X, Filter, Download, LayoutGrid } from "lucide-react";
+import { Plus, Edit, X, Download } from "lucide-react";
 import { GradeManagerProps } from "../../types";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
 import { StudentGrade } from "../../models/StudentGrade";
@@ -22,7 +22,6 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   modules_class_groups,
   students_grades,
   teacher_id,
-  setStudentsGrades,
   RefetchGrades,
 }) => {
   //! Translations :
@@ -39,8 +38,8 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   // ✅ ADDED FORMULA STATE
   const [currentFormula, setCurrentFormula] = useState<Record<string, number> | null>(null);
   
-  const [appliedModuleFilter, setAppliedModuleFilter] = useState("");
-  const [gradeSystem, setGradeSystem] = useState("20");
+  const [gradeSystem, _setGradeSystem] = useState("20");
+  const [appliedModuleFilter, _setAppliedModuleFilter] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newGrade, setNewGrade] = useState({
     studentId: "",
@@ -230,8 +229,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
     };
   }
 
-  const initial_students_grades = students_grades.map(mapStudentGrade);
-  const [grades, setGrades] = useState(initial_students_grades);
+  const [, setGrades] = useState(students_grades.map(mapStudentGrade));
 
   //? SYNC WITH THE SERVER
   useEffect(() => {
@@ -283,14 +281,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
     )
     .map(mapStudentGrade);
 
-  const handleApplyFilter = () => {
-    setAppliedModuleFilter(selectedModule);
-  };
 
-  const handleClearFilter = () => {
-    setSelectedModule("");
-    setAppliedModuleFilter("");
-  };
 
   //! Post Mark
   const [gradeSemester, setGradeSemester] = useState("s1");
