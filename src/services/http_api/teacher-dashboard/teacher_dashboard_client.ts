@@ -16,6 +16,9 @@ const URLS = {
   get_current_teacher_behaviour_reports: `${BASE_URL}/teacher/teachers/get_current_teacher_behaviour_reports/`,
   current_teacher_school_modules: `${BASE_URL}/teacher/teachers/current_teacher_school_modules/`,
   current_teacher_students_grades: `${BASE_URL}/teacher/teachers/current_teacher_students_grades/`,
+  get_grading_formula: `${BASE_URL}/teacher/grading-formulas/get_formula/`,
+  save_grading_formula: `${BASE_URL}/teacher/grading-formulas/save_formula/`,
+  recalculate_all_averages: `${BASE_URL}/teacher/grading-formulas/recalculate_all_averages/`,
   patch_student: `${BASE_URL}/student/students/`,
 
   post_absence: `${BASE_URL}/class-group/absences/`,
@@ -25,6 +28,9 @@ const URLS = {
   post_mark: `${BASE_URL}/teacher/marks/`,
   post_grades: `${BASE_URL}/teacher/student-grades/`,
   patch_grades: `${BASE_URL}/teacher/student-grades/`,
+  calculate_average: `${BASE_URL}/teacher/student-grades/`,
+  calculate_batch_averages: `${BASE_URL}/teacher/student-grades/calculate_batch_averages/`,
+  get_student_averages: `${BASE_URL}/teacher/student-grades/get_student_averages/`,
 
   create_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/create_teacher_upload/`,
   delete_teacher_upload: `${BASE_URL}/teacher/teacher-uploads/`,
@@ -306,6 +312,168 @@ async function delete_teacher_upload(id: number, csrfToken: string) {
     return { ok: false, error: error };
   }
 }
+
+//! Calculate Average for Single Student Grade Record :
+async function calculate_average(id: number, csrfToken: string) {
+  const CALCULATE_URL = URLS.calculate_average + id + "/calculate_average/";
+  try {
+    const response = await fetch(CALCULATE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Calculate Batch Averages for Multiple Records :
+async function calculate_batch_averages(
+  csrfToken: string,
+  filters?: {
+    student_id?: number;
+    module_id?: number;
+    class_group_id?: number;
+  }
+) {
+  let url = URLS.calculate_batch_averages;
+  
+  // Add query parameters if filters provided
+  if (filters) {
+    const params = new URLSearchParams();
+    if (filters.student_id) params.append("student_id", filters.student_id.toString());
+    if (filters.module_id) params.append("module_id", filters.module_id.toString());
+    if (filters.class_group_id) params.append("class_group_id", filters.class_group_id.toString());
+    
+    if (params.toString()) {
+      url += "?" + params.toString();
+    }
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Get Student Averages :
+async function get_student_averages(
+  studentId: number,
+  moduleId?: number
+) {
+  let url = URLS.get_student_averages + "?student_id=" + studentId;
+  
+  if (moduleId) {
+    url += "&module_id=" + moduleId;
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Get Grading Formula for a Module/Class/Semester :
+async function get_grading_formula(
+  moduleId: string | number,
+  classGroupId: string | number,
+  semester: 's1' | 's2' | 's3'
+) {
+  let url = URLS.get_grading_formula;
+  url += `?module_id=${moduleId}&class_group_id=${classGroupId}&semester=${semester}`;
+  
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Save Grading Formula for a Module/Class/Semester :
+async function save_grading_formula(
+  payload: {
+    module_id: string | number;
+    class_group_id: string | number;
+    semester: 's1' | 's2' | 's3';
+    formula_config: Record<string, number>;
+  },
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.save_grading_formula, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! Recalculate All Averages for a Module/Class/Semester :
+async function recalculate_all_averages(
+  payload: {
+    module_id: string | number;
+    class_group_id: string | number;
+    semester: 's1' | 's2' | 's3';
+  },
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.recalculate_all_averages, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 export const teacher_dashboard_client = {
   get_teacher_by_id:get_teacher_by_id,
   get_current_teacher_students: get_current_teacher_students,
@@ -325,6 +493,12 @@ export const teacher_dashboard_client = {
   post_mark: post_mark,
   post_grades: post_grades,
   patch_grades: patch_grades,
+  calculate_average: calculate_average,
+  calculate_batch_averages: calculate_batch_averages,
+  get_student_averages: get_student_averages,
+  get_grading_formula: get_grading_formula,
+  save_grading_formula: save_grading_formula,
+  recalculate_all_averages: recalculate_all_averages,
 
   create_teacher_upload: create_teacher_upload,
   delete_teacher_upload: delete_teacher_upload,
