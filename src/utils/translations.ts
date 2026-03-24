@@ -2358,6 +2358,962 @@ export const translations: Translations = {
     en: "Submit report",
     fr: "Soumettre le rapport",
   },
+
+  // Admin Dashboard :: 
+  platformAdmin: {
+    ar: "مسؤول المنصة",
+    en: "Platform Admin",
+    fr: "Administrateur de Plateforme",
+  },
+  overview: {
+    ar: "نظرة عامة",
+    en: "Overview",
+    fr: "Aperçu",
+  },
+  schools: {
+    ar: "المدارس",
+    en: "Schools",
+    fr: "Écoles",
+  },
+  reports: {
+    ar: "التقارير",
+    en: "Reports",
+    fr: "Rapports",
+  },
+  announcements: {
+    ar: "الإعلانات",
+    en: "Announcements",
+    fr: "Annonces",
+  },
+  subscriptions: {
+    ar: "الاشتراكات",
+    en: "Subscriptions",
+    fr: "Abonnements",
+  },
+  totalSchools: {
+    ar: "إجمالي المدارس",
+    en: "Total Schools",
+    fr: "Nombre Total d'Écoles",
+  },
+  totalTeachers: {
+    ar: "إجمالي المعلمين",
+    en: "Total Teachers",
+    fr: "Nombre Total d'Enseignants",
+  },
+  totalParents: {
+    ar: "إجمالي أولياء الأمور",
+    en: "Total Parents",
+    fr: "Nombre Total de Parents",
+  },
+  activeSubscriptions: {
+    ar: "الاشتراكات النشطة",
+    en: "Active Subscriptions",
+    fr: "Abonnements Actifs",
+  },
+  pendingReports: {
+    ar: "التقارير المعلقة",
+    en: "Pending Reports",
+    fr: "Rapports en Attente",
+  },
+  activeAdmins: {
+    ar: "المسؤولون النشطون",
+    en: "Active Admins",
+    fr: "Administrateurs Actifs",
+  },
+  
+  // School Management
+  schoolManagement: {
+    ar: "إدارة المدارس",
+    en: "School Management",
+    fr: "Gestion des Écoles",
+  },
+  searchSchools: {
+    ar: "ابحث عن المدارس...",
+    en: "Search schools...",
+    fr: "Rechercher des écoles...",
+  },
+  schoolLevel: {
+    ar: "المستوى التعليمي",
+    en: "School Level",
+    fr: "Niveau Scolaire",
+  },
+  allLevels: {
+    ar: "جميع المستويات",
+    en: "All Levels",
+    fr: "Tous les Niveaux",
+  },
+  primary: {
+    ar: "ابتدائي",
+    en: "Primary",
+    fr: "Primaire",
+  },
+  middle: {
+    ar: "متوسط",
+    en: "Middle",
+    fr: "Moyen",
+  },
+  high: {
+    ar: "ثانوي",
+    en: "High",
+    fr: "Secondaire",
+  },
+  schoolType: {
+    ar: "نوع المدرسة",
+    en: "School Type",
+    fr: "Type d'École",
+  },
+  allTypes: {
+    ar: "جميع الأنواع",
+    en: "All Types",
+    fr: "Tous les Types",
+  },
+  public: {
+    ar: "حكومية",
+    en: "Public",
+    fr: "Public",
+  },
+  private: {
+    ar: "خاصة",
+    en: "Private",
+    fr: "Privée",
+  },
+  schoolName: {
+    ar: "اسم المدرسة",
+    en: "School Name",
+    fr: "Nom de l'École",
+  },
+  email: {
+    ar: "البريد الإلكتروني",
+    en: "Email",
+    fr: "E-mail",
+  },
+  level: {
+    ar: "المستوى",
+    en: "Level",
+    fr: "Niveau",
+  },
+  type: {
+    ar: "النوع",
+    en: "Type",
+    fr: "Type",
+  },
+  students: {
+    ar: "الطلاب",
+    en: "Students",
+    fr: "Élèves",
+  },
+  status: {
+    ar: "الحالة",
+    en: "Status",
+    fr: "Statut",
+  },
+  active: {
+    ar: "نشط",
+    en: "Active",
+    fr: "Actif",
+  },
+  suspended: {
+    ar: "موقوف",
+    en: "Suspended",
+    fr: "Suspendu",
+  },
+  actions: {
+    ar: "الإجراءات",
+    en: "Actions",
+    fr: "Actions",
+  },
+  viewDetails: {
+    ar: "عرض التفاصيل",
+    en: "View Details",
+    fr: "Voir les Détails",
+  },
+  suspend: {
+    ar: "إيقاف",
+    en: "Suspend",
+    fr: "Suspendre",
+  },
+  activate: {
+    ar: "تفعيل",
+    en: "Activate",
+    fr: "Activer",
+  },
+
+  // User Management
+  userManagement: {
+    ar: "إدارة المستخدمين",
+    en: "User Management",
+    fr: "Gestion des Utilisateurs",
+  },
+  searchUsers: {
+    ar: "ابحث عن المستخدمين...",
+    en: "Search users...",
+    fr: "Rechercher des utilisateurs...",
+  },
+  allRoles: {
+    ar: "جميع الأدوار",
+    en: "All Roles",
+    fr: "Tous les Rôles",
+  },
+  allStatus: {
+    ar: "جميع الحالات",
+    en: "All Status",
+    fr: "Tous les Statuts",
+  },
+  inactive: {
+    ar: "غير نشط",
+    en: "Inactive",
+    fr: "Inactif",
+  },
+  username: {
+    ar: "اسم المستخدم",
+    en: "Username",
+    fr: "Nom d'Utilisateur",
+  },
+  userType: {
+    ar: "نوع المستخدم",
+    en: "User Type",
+    fr: "Type d'Utilisateur",
+  },
+  joined: {
+    ar: "تاريخ الانضمام",
+    en: "Joined",
+    fr: "Date d'Adhésion",
+  },
+  deactivate: {
+    ar: "إلغاء التفعيل",
+    en: "Deactivate",
+    fr: "Désactiver",
+  },
+  reactivate: {
+    ar: "إعادة التفعيل",
+    en: "Reactivate",
+    fr: "Réactiver",
+  },
+
+  // Report Management
+  absenceReports: {
+    ar: "تقارير الغياب",
+    en: "Absence Reports",
+    fr: "Rapports d'Absence",
+  },
+  behaviourReports: {
+    ar: "تقارير السلوك",
+    en: "Behaviour Reports",
+    fr: "Rapports de Comportement",
+  },
+  searchReports: {
+    ar: "ابحث عن التقارير...",
+    en: "Search reports...",
+    fr: "Rechercher des rapports...",
+  },
+  pending: {
+    ar: "معلق",
+    en: "Pending",
+    fr: "En Attente",
+  },
+  approved: {
+    ar: "موافق عليه",
+    en: "Approved",
+    fr: "Approuvé",
+  },
+  rejected: {
+    ar: "مرفوض",
+    en: "Rejected",
+    fr: "Rejeté",
+  },
+  student: {
+    ar: "الطالب",
+    en: "Student",
+    fr: "Élève",
+  },
+  parent: {
+    ar: "ولي الأمر",
+    en: "Parent",
+    fr: "Parent",
+  },
+  teacher: {
+    ar: "المعلم",
+    en: "Teacher",
+    fr: "Enseignant",
+  },
+  absenceDate: {
+    ar: "تاريخ الغياب",
+    en: "Absence Date",
+    fr: "Date d'Absence",
+  },
+  reason: {
+    ar: "السبب",
+    en: "Reason",
+    fr: "Raison",
+  },
+  submitted: {
+    ar: "مرسل في",
+    en: "Submitted",
+    fr: "Soumis",
+  },
+  approve: {
+    ar: "الموافقة",
+    en: "Approve",
+    fr: "Approuver",
+  },
+  reject: {
+    ar: "الرفض",
+    en: "Reject",
+    fr: "Rejeter",
+  },
+  approveReport: {
+    ar: "الموافقة على التقرير",
+    en: "Approve Report",
+    fr: "Approuver le Rapport",
+  },
+  rejectReport: {
+    ar: "رفض التقرير",
+    en: "Reject Report",
+    fr: "Rejeter le Rapport",
+  },
+  comment: {
+    ar: "ملاحظة",
+    en: "Comment",
+    fr: "Commentaire",
+  },
+  rejectionReason: {
+    ar: "سبب الرفض",
+    en: "Rejection Reason",
+    fr: "Raison du Rejet",
+  },
+
+  // Announcement Management
+  announcementsManagement: {
+    ar: "إدارة الإعلانات",
+    en: "Announcements Management",
+    fr: "Gestion des Annonces",
+  },
+  searchAnnouncements: {
+    ar: "ابحث عن الإعلانات...",
+    en: "Search announcements...",
+    fr: "Rechercher des annonces...",
+  },
+  allAudiences: {
+    ar: "جميع الجماهير",
+    en: "All Audiences",
+    fr: "Tous les Publics",
+  },
+  createNew: {
+    ar: "إنشاء جديد",
+    en: "New",
+    fr: "Nouveau",
+  },
+  createAnnouncement: {
+    ar: "إنشاء إعلان جديد",
+    en: "Create New Announcement",
+    fr: "Créer une Nouvelle Annonce",
+  },
+  title: {
+    ar: "العنوان",
+    en: "Title",
+    fr: "Titre",
+  },
+  content: {
+    ar: "المحتوى",
+    en: "Content",
+    fr: "Contenu",
+  },
+  priority: {
+    ar: "الأولوية",
+    en: "Priority",
+    fr: "Priorité",
+  },
+  low: {
+    ar: "منخفضة",
+    en: "Low",
+    fr: "Basse",
+  },
+  medium: {
+    ar: "متوسطة",
+    en: "Medium",
+    fr: "Moyenne",
+  },
+  high: {
+    ar: "عالية",
+    en: "High",
+    fr: "Élevée",
+  },
+  targetGroup: {
+    ar: "المجموعة المستهدفة",
+    en: "Target Group",
+    fr: "Groupe Cible",
+  },
+  everyone: {
+    ar: "الجميع",
+    en: "Everyone",
+    fr: "Tout le Monde",
+  },
+  publish: {
+    ar: "نشر",
+    en: "Publish",
+    fr: "Publier",
+  },
+  archive: {
+    ar: "أرشيف",
+    en: "Archive",
+    fr: "Archiver",
+  },
+  pinned: {
+    ar: "مثبت",
+    en: "Pinned",
+    fr: "Épinglé",
+  },
+  published: {
+    ar: "منشور",
+    en: "Published",
+    fr: "Publié",
+  },
+  draft: {
+    ar: "مسودة",
+    en: "Draft",
+    fr: "Brouillon",
+  },
+
+  // Subscription Management
+  subscriptionManagement: {
+    ar: "إدارة الاشتراكات",
+    en: "Subscriptions Management",
+    fr: "Gestion des Abonnements",
+  },
+  searchSubscriptions: {
+    ar: "ابحث عن الاشتراكات...",
+    en: "Search subscriptions...",
+    fr: "Rechercher des abonnements...",
+  },
+  free: {
+    ar: "مجاني",
+    en: "Free",
+    fr: "Gratuit",
+  },
+  startDate: {
+    ar: "تاريخ البداية",
+    en: "Start Date",
+    fr: "Date de Début",
+  },
+  expiryDate: {
+    ar: "تاريخ الانتهاء",
+    en: "Expiry Date",
+    fr: "Date d'Expiration",
+  },
+  expiringS: {
+    ar: "ينتهي قريباً",
+    en: "Expiring Soon",
+    fr: "Expire Bientôt",
+  },
+  expired: {
+    ar: "منتهي الصلاحية",
+    en: "Expired",
+    fr: "Expiré",
+  },
+  extend: {
+    ar: "التمديد",
+    en: "Extend",
+    fr: "Prolonger",
+  },
+  extendSubscription: {
+    ar: "تمديد الاشتراك",
+    en: "Extend Subscription",
+    fr: "Prolonger l'Abonnement",
+  },
+  duration: {
+    ar: "المدة",
+    en: "Duration",
+    fr: "Durée",
+  },
+  months: {
+    ar: "شهور",
+    en: "Months",
+    fr: "Mois",
+  },
+
+  // Common Admin Actions
+  page: {
+    ar: "الصفحة",
+    en: "Page",
+    fr: "Page",
+  },
+  of: {
+    ar: "من",
+    en: "of",
+    fr: "de",
+  },
+  loading: {
+    ar: "جاري التحميل...",
+    en: "Loading...",
+    fr: "Chargement...",
+  },
+  loadingUsers: {
+    ar: "جاري تحميل المستخدمين...",
+    en: "Loading users...",
+    fr: "Chargement des utilisateurs...",
+  },
+  loadingSchools: {
+    ar: "جاري تحميل المدارس...",
+    en: "Loading schools...",
+    fr: "Chargement des écoles...",
+  },
+  loadingReports: {
+    ar: "جاري تحميل التقارير...",
+    en: "Loading reports...",
+    fr: "Chargement des rapports...",
+  },
+  loadingAnnouncements: {
+    ar: "جاري تحميل الإعلانات...",
+    en: "Loading announcements...",
+    fr: "Chargement des annonces...",
+  },
+  loadingSubscriptions: {
+    ar: "جاري تحميل الاشتراكات...",
+    en: "Loading subscriptions...",
+    fr: "Chargement des abonnements...",
+  },
+  create: {
+    ar: "إنشاء",
+    en: "Create",
+    fr: "Créer",
+  },
+  save: {
+    ar: "حفظ",
+    en: "Save",
+    fr: "Enregistrer",
+  },
+  update: {
+    ar: "تحديث",
+    en: "Update",
+    fr: "Mettre à Jour",
+  },
+  delete: {
+    ar: "حذف",
+    en: "Delete",
+    fr: "Supprimer",
+  },
+  successMessage: {
+    ar: "تمت العملية بنجاح",
+    en: "Operation successful",
+    fr: "Opération réussie",
+  },
+  errorMessage: {
+    ar: "حدث خطأ ما",
+    en: "An error occurred",
+    fr: "Une erreur s'est produite",
+  },
+  // Missing Keys for OverviewTab and other components
+  refresh: {
+    ar: "تحديث",
+    en: "Refresh",
+    fr: "Actualiser",
+  },
+  hoursAgo: {
+    ar: "منذ 2 ساعة",
+    en: "2 hours ago",
+    fr: "il y a 2 heures",
+  },
+  recentActivity: {
+    ar: "النشاط الأخير",
+    en: "Recent Activity",
+    fr: "Activité récente",
+  },
+  schoolRegistrationApproved: {
+    ar: "تم الموافقة على تسجيل المدرسة",
+    en: "School registration approved",
+    fr: "Enregistrement de l'école approuvé",
+  },
+  pendingActions: {
+    ar: "الإجراءات المعلقة",
+    en: "Pending Actions",
+    fr: "Actions en attente",
+  },
+  pendingReports: {
+    ar: "التقارير المعلقة",
+    en: "Pending Reports",
+    fr: "Rapports en attente",
+  },
+  absenceReportsAwaitingReview: {
+    ar: "تقارير الغياب بانتظار المراجعة",
+    en: "Absence reports awaiting review",
+    fr: "Rapports d'absence en attente de révision",
+  },
+  pendingSchools: {
+    ar: "المدارس المعلقة",
+    en: "Pending Schools",
+    fr: "Écoles en attente",
+  },
+  schoolsAwaitingApproval: {
+    ar: "المدارس بانتظار الموافقة",
+    en: "Schools awaiting approval",
+    fr: "Écoles en attente d'approbation",
+  },
+  expiringSoon: {
+    ar: "ينتهي قريباً",
+    en: "Expiring Soon",
+    fr: "Expire bientôt",
+  },
+  subscriptionsExpiringIn30Days: {
+    ar: "الاشتراكات التي تنتهي خلال 30 يوماً",
+    en: "Subscriptions expiring in 30 days",
+    fr: "Abonnements expirant dans 30 jours",
+  },
+  platformGrowth: {
+    ar: "نمو المنصة",
+    en: "Platform Growth",
+    fr: "Croissance de la plateforme",
+  },
+  registrations: {
+    ar: "التسجيلات",
+    en: "Registrations",
+    fr: "Inscriptions",
+  },
+  // Month names
+  jan: {
+    ar: "يناير",
+    en: "Jan",
+    fr: "Jan",
+  },
+  feb: {
+    ar: "فبراير",
+    en: "Feb",
+    fr: "Fév",
+  },
+  mar: {
+    ar: "مارس",
+    en: "Mar",
+    fr: "Mar",
+  },
+  apr: {
+    ar: "أبريل",
+    en: "Apr",
+    fr: "Avr",
+  },
+  may: {
+    ar: "مايو",
+    en: "May",
+    fr: "Mai",
+  },
+  jun: {
+    ar: "يونيو",
+    en: "Jun",
+    fr: "Juin",
+  },
+  jul: {
+    ar: "يوليو",
+    en: "Jul",
+    fr: "Juil",
+  },
+  aug: {
+    ar: "أغسطس",
+    en: "Aug",
+    fr: "Aoû",
+  },
+  sep: {
+    ar: "سبتمبر",
+    en: "Sep",
+    fr: "Sep",
+  },
+  oct: {
+    ar: "أكتوبر",
+    en: "Oct",
+    fr: "Oct",
+  },
+  nov: {
+    ar: "نوفمبر",
+    en: "Nov",
+    fr: "Nov",
+  },
+  dec: {
+    ar: "ديسمبر",
+    en: "Dec",
+    fr: "Déc",
+  },
+  // Performance metrics
+  platformHealth: {
+    ar: "صحة المنصة",
+    en: "Platform Health",
+    fr: "Santé de la plateforme",
+  },
+  avgResponseTime: {
+    ar: "متوسط وقت الاستجابة",
+    en: "Avg Response Time",
+    fr: "Temps de réponse moyen",
+  },
+  milliseconds: {
+    ar: "ميلي ثانية",
+    en: "Milliseconds",
+    fr: "Millisecondes",
+  },
+  activeUsers: {
+    ar: "المستخدمون النشطون",
+    en: "Active Users",
+    fr: "Utilisateurs actifs",
+  },
+  uptimeThisMonth: {
+    ar: "وقت التشغيل هذا الشهر",
+    en: "Uptime this month",
+    fr: "Disponibilité ce mois-ci",
+  },
+  currentlyOnline: {
+    ar: "متصل الآن",
+    en: "Currently online",
+    fr: "En ligne actuellement",
+  },
+  // Additional missing keys
+  created: {
+    ar: "تاريخ الإنشاء",
+    en: "Created",
+    fr: "Créé",
+  },
+  published: {
+    ar: "منشور",
+    en: "Published",
+    fr: "Publié",
+  },
+  draft: {
+    ar: "مسودة",
+    en: "Draft",
+    fr: "Brouillon",
+  },
+  target: {
+    ar: "الهدف",
+    en: "Target",
+    fr: "Cible",
+  },
+  publish: {
+    ar: "نشر",
+    en: "Publish",
+    fr: "Publier",
+  },
+  archive: {
+    ar: "أرشيف",
+    en: "Archive",
+    fr: "Archiver",
+  },
+  new: {
+    ar: "جديد",
+    en: "New",
+    fr: "Nouveau",
+  },
+  loadingSchools: {
+    ar: "جاري تحميل المدارس...",
+    en: "Loading schools...",
+    fr: "Chargement des écoles...",
+  },
+  loadingAnnouncements: {
+    ar: "جاري تحميل الإعلانات...",
+    en: "Loading announcements...",
+    fr: "Chargement des annonces...",
+  },
+  loadingReports: {
+    ar: "جاري تحميل التقارير...",
+    en: "Loading reports...",
+    fr: "Chargement des rapports...",
+  },
+  loadingSubscriptions: {
+    ar: "جاري تحميل الاشتراكات...",
+    en: "Loading subscriptions...",
+    fr: "Chargement des abonnements...",
+  },
+  // Announcement-specific keys
+  cancel: {
+    ar: "إلغاء",
+    en: "Cancel",
+    fr: "Annuler",
+  },
+  create: {
+    ar: "إنشاء",
+    en: "Create",
+    fr: "Créer",
+  },
+  title: {
+    ar: "العنوان",
+    en: "Title",
+    fr: "Titre",
+  },
+  content: {
+    ar: "المحتوى",
+    en: "Content",
+    fr: "Contenu",
+  },
+  priority: {
+    ar: "الأولوية",
+    en: "Priority",
+    fr: "Priorité",
+  },
+  low: {
+    ar: "منخفضة",
+    en: "Low",
+    fr: "Faible",
+  },
+  medium: {
+    ar: "متوسطة",
+    en: "Medium",
+    fr: "Moyen",
+  },
+  high: {
+    ar: "عالية",
+    en: "High",
+    fr: "Élevé",
+  },
+  targetGroup: {
+    ar: "مجموعة الهدف",
+    en: "Target Group",
+    fr: "Groupe cible",
+  },
+  category: {
+    ar: "الفئة",
+    en: "Category",
+    fr: "Catégorie",
+  },
+  announcementTitle: {
+    ar: "عنوان الإعلان",
+    en: "Announcement title",
+    fr: "Titre de l'annonce",
+  },
+  announcementContent: {
+    ar: "محتوى الإعلان",
+    en: "Announcement content",
+    fr: "Contenu de l'annonce",
+  },
+  createNewAnnouncement: {
+    ar: "إنشاء إعلان جديد",
+    en: "Create New Announcement",
+    fr: "Créer une nouvelle annonce",
+  },
+  titleAndContentRequired: {
+    ar: "العنوان والمحتوى مطلوبان",
+    en: "Title and content are required",
+    fr: "Le titre et le contenu sont requis",
+  },
+  announcementCreatedSuccessfully: {
+    ar: "تم إنشاء الإعلان بنجاح",
+    en: "Announcement created successfully",
+    fr: "Annonce créée avec succès",
+  },
+  failedCreateAnnouncement: {
+    ar: "فشل إنشاء الإعلان",
+    en: "Failed to create announcement",
+    fr: "Échec de la création de l'annonce",
+  },
+  announcementPublishedSuccessfully: {
+    ar: "تم نشر الإعلان بنجاح",
+    en: "Announcement published successfully",
+    fr: "Annonce publiée avec succès",
+  },
+  failedPublishAnnouncement: {
+    ar: "فشل نشر الإعلان",
+    en: "Failed to publish announcement",
+    fr: "Échec de la publication de l'annonce",
+  },
+  announcementArchivedSuccessfully: {
+    ar: "تم أرشفة الإعلان بنجاح",
+    en: "Announcement archived successfully",
+    fr: "Annonce archivée avec succès",
+  },
+  failedArchiveAnnouncement: {
+    ar: "فشل أرشفة الإعلان",
+    en: "Failed to archive announcement",
+    fr: "Échec de l'archivage de l'annonce",
+  },
+  // Report-specific keys
+  addCommentOptional: {
+    ar: "إضافة تعليق (اختياري)...",
+    en: "Add comment (optional)...",
+    fr: "Ajouter un commentaire (optionnel)...",
+  },
+  addRejectionReason: {
+    ar: "إضافة سبب الرفض...",
+    en: "Add rejection reason...",
+    fr: "Ajouter la raison du rejet...",
+  },
+  rejectionReasonRequired: {
+    ar: "سبب الرفض مطلوب",
+    en: "Rejection reason is required",
+    fr: "La raison du rejet est requise",
+  },
+  // Membership-specific keys
+  subscriptionsManagement: {
+    ar: "إدارة الاشتراكات",
+    en: "Subscriptions Management",
+    fr: "Gestion des abonnements",
+  },
+  searchSubscriptions: {
+    ar: "ابحث عن الاشتراكات...",
+    en: "Search subscriptions...",
+    fr: "Rechercher des abonnements...",
+  },
+  allStatus: {
+    ar: "جميع الحالات",
+    en: "All Status",
+    fr: "Tous les statuts",
+  },
+  sub200: {
+    ar: "اشتراك 200",
+    en: "Sub 200",
+    fr: "Abonnement 200",
+  },
+  sub500: {
+    ar: "اشتراك 500",
+    en: "Sub 500",
+    fr: "Abonnement 500",
+  },
+  free: {
+    ar: "مجاني",
+    en: "Free",
+    fr: "Gratuit",
+  },
+  inactive: {
+    ar: "غير نشط",
+    en: "Inactive",
+    fr: "Inactif",
+  },
+  startDate: {
+    ar: "تاريخ البداية",
+    en: "Start Date",
+    fr: "Date de début",
+  },
+  expiryDate: {
+    ar: "تاريخ الانتهاء",
+    en: "Expiry Date",
+    fr: "Date d'expiration",
+  },
+  expired: {
+    ar: "منتهي الصلاحية",
+    en: "Expired",
+    fr: "Expiré",
+  },
+  durationMonths: {
+    ar: "المدة (بالأشهر)",
+    en: "Duration (months)",
+    fr: "Durée (mois)",
+  },
+  reasonOptional: {
+    ar: "السبب (اختياري)",
+    en: "Reason (optional)",
+    fr: "Raison (optionnel)",
+  },
+  reasonForExtensionPlaceholder: {
+    ar: "سبب التمديد (مثل: دعم العملاء، عرض ترويجي)...",
+    en: "Reason for extension (e.g., customer support, promotion)...",
+    fr: "Raison de la prolongation (p. ex., support client, promotion)...",
+  },
+  extendDurationMinimum: {
+    ar: "مدة التمديد يجب أن تكون على الأقل 1 شهر",
+    en: "Extend duration must be at least 1 month",
+    fr: "La durée d'extension doit être d'au moins 1 mois",
+  },
+  membershipExtendedSuccessfully: {
+    ar: "تم تمديد الاشتراك بنجاح",
+    en: "Membership extended successfully",
+    fr: "Abonnement prolongé avec succès",
+  },
+  failedExtendMembership: {
+    ar: "فشل تمديد الاشتراك",
+    en: "Failed to extend membership",
+    fr: "Échec de la prolongation de l'abonnement",
+  },
 };
 
 export function getTranslation(key: string, language: string): string {

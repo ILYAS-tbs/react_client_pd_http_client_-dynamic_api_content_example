@@ -49,6 +49,9 @@ function App() {
                     element={<ConfirmationCode />}
                   />
 
+                    <Route path="/admin" element={<AdminDashboard />} />
+
+
                   <Route
                     path="/school-dashboard"
                     element={
