@@ -38,8 +38,8 @@ const GradeManager: React.FC<GradeManagerProps> = ({
   // ✅ ADDED FORMULA STATE
   const [currentFormula, setCurrentFormula] = useState<Record<string, number> | null>(null);
   
-  const [gradeSystem, _setGradeSystem] = useState("20");
-  const [appliedModuleFilter, _setAppliedModuleFilter] = useState("");
+  const [appliedModuleFilter, setAppliedModuleFilter] = useState("");
+  const [gradeSystem, setGradeSystem] = useState("20");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newGrade, setNewGrade] = useState({
     studentId: "",
@@ -229,7 +229,8 @@ const GradeManager: React.FC<GradeManagerProps> = ({
     };
   }
 
-  const [, setGrades] = useState(students_grades.map(mapStudentGrade));
+  const initial_students_grades = students_grades.map(mapStudentGrade);
+  const [grades, setGrades] = useState(initial_students_grades);
 
   //? SYNC WITH THE SERVER
   useEffect(() => {
@@ -281,7 +282,14 @@ const GradeManager: React.FC<GradeManagerProps> = ({
     )
     .map(mapStudentGrade);
 
+  const handleApplyFilter = () => {
+    setAppliedModuleFilter(selectedModule);
+  };
 
+  const handleClearFilter = () => {
+    setSelectedModule("");
+    setAppliedModuleFilter("");
+  };
 
   //! Post Mark
   const [gradeSemester, setGradeSemester] = useState("s1");
@@ -840,11 +848,11 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                           ) >= 16
                             ? "text-green-600"
                             : (student.grades[key]!.score ?? 0) >= 12
-                              ? "text-primary-600"
-                              : (student.grades[key]!.score ?? 0) >= 10
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                            }`}
+                            ? "text-primary-600"
+                            : (student.grades[key]!.score ?? 0) >= 10
+                            ? "text-yellow-600"
+                            : "text-red-600"
+                          }`}
                         >
                           {student.grades[key]!.score ?? "-"}/{gradeSystem}
                         </span>

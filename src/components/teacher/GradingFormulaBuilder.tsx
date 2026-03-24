@@ -227,7 +227,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
     setIsSaving(true);
     setSuccessMessage('');
     try {
-      const csrfToken = getCSRFToken() ?? '';
+      const csrfToken = getCSRFToken();
       const response = await teacher_dashboard_client.save_grading_formula(
         {
           module_id: moduleId,
@@ -270,7 +270,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
     setValidationErrors([]);
     setSuccessMessage('');
     try {
-      const csrfToken = getCSRFToken() ?? '';
+      const csrfToken = getCSRFToken();
       const response = await teacher_dashboard_client.recalculate_all_averages(
         {
           module_id: moduleId,
@@ -430,7 +430,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                       <label className="block mb-2">
                         <span className="text-2xl mr-2">{assessment.icon}</span>
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          {(assessment.label as Record<string, string>)[language] || assessment.label.en}
+                          {assessment.label[language] || assessment.label.en}
                         </span>
                       </label>
                       <div className="flex items-center gap-2 mb-3">
@@ -447,7 +447,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                       <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                         <div
                           className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
-                          style={{ width: `${Math.min(100, formula[assessment.key] ?? 0)}%` }}
+                          style={{ width: `${Math.min(100, formula[assessment.key])}%` }}
                         />
                       </div>
                     </div>
@@ -466,10 +466,10 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                       {language === 'ar' ? 'أدخل درجات العينة' : 'Sample Grades'}
                     </p>
                     <div className="space-y-2">
-                      {ASSESSMENT_TYPES.filter(a => (formula[a.key] ?? 0) > 0).map(assessment => (
+                      {ASSESSMENT_TYPES.filter(a => formula[a.key] > 0).map(assessment => (
                         <div key={assessment.key} className="flex items-center gap-2">
                           <label className="text-xs font-medium text-gray-600 dark:text-gray-400 min-w-fit">
-                            {assessment.icon} {(assessment.label as Record<string, string>)[language] || assessment.label.en}
+                            {assessment.icon} {assessment.label[language] || assessment.label.en}
                           </label>
                           <input
                             type="number"
