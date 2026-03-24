@@ -13,6 +13,8 @@ const URLS = {
   get_current_teacher_school_parents: `${SERVER_BASE_URL}/teacher/teachers/get_current_teacher_school_parents/`,
   get_current_teacher_parents_chats: `${SERVER_BASE_URL}/chat/get_current_teacher_parents_chats/`,
   get_current_parent_teachers_chats: `${SERVER_BASE_URL}/chat/get_current_parent_teachers_chats/`,
+  get_current_school_parents_chats: `${SERVER_BASE_URL}/chat/get_current_school_parents_chats/`,
+  get_current_parent_schools_chats: `${SERVER_BASE_URL}/chat/get_current_parent_schools_chats/`,
 
   mark_conv_messaged_as_read:`${SERVER_BASE_URL}/chat/mark_conv_messaged_as_read/`,
 
@@ -124,6 +126,40 @@ async function get_current_parent_teachers_chats() {
   }
 }
 
+//! CHATS from the School dashboard : getting the school's parents's chats
+async function get_current_school_parents_chats() {
+  try {
+    const response = await fetch(URLS.get_current_school_parents_chats, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+//! CHATS from the Parent dashboard : getting the parent's schools' chats
+async function get_current_parent_schools_chats() {
+  try {
+    const response = await fetch(URLS.get_current_parent_schools_chats, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 //! get_latest_five_messages for parent or Teacher
 async function get_latest_five_messages() {
   try {
@@ -192,6 +228,8 @@ export const chat_http_client = {
 
   get_current_teacher_parents_chats: get_current_teacher_parents_chats,
   get_current_parent_teachers_chats: get_current_parent_teachers_chats,
+  get_current_school_parents_chats: get_current_school_parents_chats,
+  get_current_parent_schools_chats: get_current_parent_schools_chats,
 
   upload_chat_file: upload_chat_file,
 

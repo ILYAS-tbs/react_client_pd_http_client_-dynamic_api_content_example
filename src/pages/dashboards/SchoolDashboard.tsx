@@ -7,6 +7,7 @@ import {
   FileText,
   BarChart2,
   Star,
+  MessageCircle,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import StudentManagement from "../../components/school/StudentManagement";
@@ -18,6 +19,7 @@ import ExamScheduleManagemen from "../../components/school/ExamScheduleManagemen
 import AbsenceReviews from "../../components/school/AbsenceReviews";
 import GradeOverview from "../../components/school/GradeOverview";
 import ClassesManagement from "../../components/school/ClassesManagement";
+import SchoolParentChat from "../../components/shared/SchoolParentChat";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { Student } from "../../models/Student";
@@ -291,6 +293,7 @@ const SchoolDashboard: React.FC = () => {
     { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "home", label: getTranslation("home", language), icon: Home },
     { id: "users", label: getTranslation("UserManagement", language), icon: Users },
+    { id: "chat", label: getTranslation("Chat", language), icon: MessageCircle },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
     { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },
@@ -424,6 +427,13 @@ const SchoolDashboard: React.FC = () => {
               RefetchStudents={RefetchStudents}
             />
           </div>
+        );
+      case "chat":
+        return (
+          <SchoolParentChat
+            parents_list={parents}
+            school_id={school_id}
+          />
         );
       case "levels":
         return (
