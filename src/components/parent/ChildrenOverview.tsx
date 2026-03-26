@@ -20,7 +20,9 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   setActiveTab,
   studentPerformances,
 }) => {
-  const [selectedChild, setSelectedChild] = useState(students?.[0]?.student_id);
+  const [selectedChild, setSelectedChild] = useState<string | number | undefined>(
+    students && students.length > 0 ? students[0]?.student_id : undefined
+  );
 
   //! Translations :
   const { language } = useLanguage();
@@ -156,29 +158,31 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
       (p) => String(p.student_id) === String(student.student_id)
     );
     const overallScore = perf?.s1_overall ?? perf?.s2_overall ?? perf?.s3_overall ?? null;
-    return ({
-    id: student.student_id,
-    name: student.full_name,
-    class: student.class_group?.name,
-    age: getAge(new Date(student.date_of_birth ?? "2000-01-01").toString()),
-    school: student.school.school_name,
-    teacher: "...",
-    overallGrade: overallScore ?? student.trimester_grade ?? 0,
-    attendance: one_student_absences(student),
-    behavior: student.academic_state,
-    subjects: perf?.modules_stats?.map((mod) => ({
-      name: mod.module_name,
-      grade: mod.s1_average ?? 0,
-      teacher: "",
-    })) ?? student.module_grades?.["s1"]?.map((module_grade) => {
-      const key = Object.keys(module_grade)[0]!;
-      const value = module_grade[key]!;
-      return { name: key, grade: value.average, teacher: value.teacher_name };
-    }),
-    recentActivities: [],
-  });});
+    const absences = one_student_absences(student) ?? 0;
+    return {
+      id: student.student_id,
+      name: student.full_name,
+      class: student.class_group?.name,
+      age: getAge(new Date(student.date_of_birth ?? "2000-01-01").toString()),
+      school: student.school?.school_name ?? "—",
+      teacher: "...",
+      overallGrade: overallScore ?? student.trimester_grade ?? 0,
+      attendance: absences,
+      behavior: student.academic_state,
+      subjects: perf?.modules_stats?.map((mod) => ({
+        name: mod.module_name,
+        grade: mod.s1_average ?? 0,
+        teacher: "",
+      })) ?? student.module_grades?.["s1"]?.map((module_grade) => {
+        const key = Object.keys(module_grade)[0]!;
+        const value = module_grade[key]!;
+        return { name: key, grade: value.average, teacher: value.teacher_name };
+      }),
+      recentActivities: [],
+    };
+  });
 
-  const currentChild = children.find((child) => child.id === selectedChild);
+  const currentChild = children.find((child) => child.id === selectedChild) || children[0];
 
 
   const getGradeColor = (grade: number) => {
@@ -219,7 +223,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
           {getTranslation("noStudentsFound", language)}
         </div>
-      ) : !currentChild ? null : (
+      ) : currentChild ? (
         <>
           {/* Child Profile Card */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -437,7 +441,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
             </div>
           </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 };
