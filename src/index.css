@@ -3,18 +3,18 @@
 @tailwind utilities;
 
 :root {
-  /* Primary Colors - Cyan/Azur Palette (Main Brand) */
-  --primary-50: #f0fdfa;
-  --primary-100: #ccfbf1;
-  --primary-200: #99f6e4;
-  --primary-300: #5eead4;
-  --primary-400: #2dd4bf;
-  --primary-500: #30a8aa;
-  /* Brand Cyan - Main */
-  --primary-600: #0d9488;
-  --primary-700: #0f766e;
-  --primary-800: #115e59;
-  --primary-900: #134e4a;
+  /* Primary Colors - Blue Palette (Main Brand) */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  /* Brand Blue - Main */
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
 
   /* Secondary Colors - Navy Palette (Accent) */
   --secondary-50: #f4f6f9;
@@ -31,22 +31,22 @@
 
   /* Brand Colors aliases */
   --color-brand-primary: var(--primary-500);
-  /* Cyan #30a8aa */
+  /* Blue #3b82f6 */
   --color-brand-secondary: var(--secondary-600);
   /* Bleu foncé #1f3969 */
 }
 
 .dark {
-  --primary-50: #042f2e;
-  --primary-100: #064e4b;
-  --primary-200: #0d9488;
-  --primary-300: #14b8a6;
-  --primary-400: #2dd4bf;
-  --primary-500: #30a8aa;
-  --primary-600: #5eead4;
-  --primary-700: #99f6e4;
-  --primary-800: #ccfbf1;
-  --primary-900: #f0fdfa;
+  --primary-50: #0c1844;
+  --primary-100: #0f2854;
+  --primary-200: #1e40af;
+  --primary-300: #1d4ed8;
+  --primary-400: #2563eb;
+  --primary-500: #3b82f6;
+  --primary-600: #60a5fa;
+  --primary-700: #93c5fd;
+  --primary-800: #bfdbfe;
+  --primary-900: #dbeafe;
 
   --secondary-50: #020617;
   --secondary-100: #0f172a;

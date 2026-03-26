@@ -96,7 +96,7 @@ export function Footer() {
                 <li key={index}>
                   <button
                     onClick={() => scrollToSection(link.href)}
-                    className="text-gray-300 hover:text-primary-500 transition-colors duration-200 hover:underline"
+                    className="text-gray-300 hover:bg-primary-500 transition-colors duration-200 hover:underline"
                   >
                     {link.label}
                   </button>
@@ -115,7 +115,7 @@ export function Footer() {
                 <li key={index}>
                   <a
                     href={link.href}
-                    className="text-gray-300 hover:text-primary-500 transition-colors duration-200 hover:underline"
+                    className="text-gray-300 hover:bg-primary-500 transition-colors duration-200 hover:underline"
                   >
                     {link.label}
                   </a>

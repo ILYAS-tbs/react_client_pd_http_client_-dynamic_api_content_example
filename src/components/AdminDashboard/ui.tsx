@@ -65,17 +65,17 @@ export const SuccessAlert: React.FC<SuccessAlertProps> = ({
   onDismiss,
 }) => {
   return (
-    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-start gap-3">
-      <div className="h-5 w-5 rounded-full bg-green-600 dark:bg-green-400 flex items-center justify-center flex-shrink-0">
+    <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4 flex items-start gap-3">
+      <div className="h-5 w-5 rounded-full bg-primary-600 dark:bg-primary-400 flex items-center justify-center flex-shrink-0">
         <span className="text-white text-xs">✓</span>
       </div>
       <div className="flex-1">
-        <p className="text-sm text-green-600 dark:text-green-400">{message}</p>
+        <p className="text-sm text-primary-600 dark:text-primary-400">{message}</p>
       </div>
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300"
+          className="text-primary-600 dark:text-primary-400 hover:bg-primary-300"
         >
           ✕
         </button>

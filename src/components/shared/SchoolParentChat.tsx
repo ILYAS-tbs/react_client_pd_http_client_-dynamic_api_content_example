@@ -331,7 +331,7 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
                     <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   {chat.online && (
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white dark:border-gray-800"></div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -373,7 +373,7 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
                     <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   {currentChat.online && (
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary-500 rounded-full border-2 border-white dark:border-gray-800"></div>
                   )}
                 </div>
                 <div>

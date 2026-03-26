@@ -132,7 +132,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="all">{getTranslation('all', language)}</option>
             <option value="رياضية">{getTranslation('sports', language)}</option>
@@ -160,7 +160,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                 placeholder={getTranslation('searchPlaceholder', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -277,7 +277,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => setSelectedActivity(activity)}
-                        className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
+                        className="text-primary-500 hover:bg-primary-300"
                       >
                         <Eye className="h-4 w-4" />
                       </button>

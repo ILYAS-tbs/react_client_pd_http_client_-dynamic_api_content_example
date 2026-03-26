@@ -102,7 +102,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                 onClick={() => scrollToSection(item.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeSection === item.id
                   ? 'bg-primary-500 text-white shadow-lg'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-secondary-50 dark:hover:bg-gray-700 hover:text-primary-500 dark:hover:text-primary-300'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-primary-300'
                   }`}
               >
                 {item.label}
@@ -130,7 +130,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
                       onClick={() => {
                         handleLanguageChange(lang.code as any)
                       }}
-                      className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-secondary-50 dark:hover:bg-gray-700 transition-colors flex items-center space-x-3 rtl:space-x-reverse ${language === lang.code ? 'bg-secondary-50 dark:bg-gray-700 text-primary-500 dark:text-primary-300' : ''
+                      className={`w-full px-4 py-3 text-left rtl:text-right hover:bg-primary-300' : ''
                         } first:rounded-t-lg last:rounded-b-lg`}
                     >
                       <span>{lang.flag}</span>
@@ -153,7 +153,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             {user ?
               <button
                 onClick={() => handleLogoutAndNavigate(`/${role}-dashboard`)}
-                className="px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-700 hover:bg-primary-800 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {/* {getTranslation('register', language)} */}
                 لوحة البيانات
@@ -162,7 +162,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               : <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <button
                   onClick={() => handleLogoutAndNavigate("/login")}
-                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:text-primary-800 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:bg-primary-800 transition-colors"
                 >
                   {getTranslation('login', language)}
                 </button>

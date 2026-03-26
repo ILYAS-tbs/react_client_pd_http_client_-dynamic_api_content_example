@@ -150,7 +150,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       case "book":
         return "bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200";
       default:
-        return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
+        return "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200";
     }
   };
 
@@ -267,7 +267,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
         </h2>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Upload className="h-4 w-4" />
           <span>{getTranslation('uploadNewMaterial', language)}</span>
@@ -282,7 +282,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
               key={type.value}
               onClick={() => setSelectedType(type.value)}
               className={`flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg transition-colors ${selectedType === type.value
-                ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border-2 border-green-500"
+                ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 border-2 border-primary-500"
                 : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
             >
@@ -355,13 +355,13 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
               <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                   {/* No use for the eye button for now */}
-                  {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-1">
+                  {/* <button className="text-primary-500 hover:bg-primary-300 p-1">
                     <Eye className="h-4 w-4" />
                   </button> */}
 
                   <button
                     onClick={() => handleDownload(resource)}
-                    className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1"
+                    className="text-primary-600 hover:bg-primary-300 p-1"
                   >
                     <Download className="h-4 w-4" />
                   </button>
@@ -403,7 +403,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder={getTranslation('educationalMaterialTitle', language)}
                 />
               </div>
@@ -412,7 +412,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {getTranslation('materialType', language)}
                 </label>
-                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
                   <option value="document">{getTranslation('document', language)}</option>
                   <option value="video">{getTranslation('video', language)}</option>
                   <option value="book">{getTranslation('book', language)}</option>
@@ -462,7 +462,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder={getTranslation('shortMaterialDescription', language)}
                 />
               </div>
@@ -510,7 +510,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {getTranslation('save', language)}
                 </button>

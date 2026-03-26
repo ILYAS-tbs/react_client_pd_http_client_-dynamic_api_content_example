@@ -245,7 +245,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="all">{getTranslation('all', language)}</option>
             {[...new Set(exams.map((ex) => ex.className))].map((cls) => (
@@ -263,7 +263,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
             <span>{getTranslation('AddExam', language)}</span>
@@ -281,7 +281,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 placeholder={getTranslation('SearchSubjectClassOrRoom', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -403,7 +403,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                         {/* For now : no edit */}
                         {/* <button
                           onClick={() => setShowAddModal(true)}
-                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                          className="text-primary-600 hover:bg-primary-300"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
@@ -418,7 +418,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                         </button>
 
                         {/* For now : no eye */}
-                        {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                        {/* <button className="text-primary-500 hover:bg-primary-300">
                           <Eye className="h-4 w-4" />
                         </button> */}
                       </div>
@@ -452,7 +452,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   name="module_name"
                   value={newExamForm.module_name}
                   onChange={handleNewExamFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم المادة"
                 />
               </div>
@@ -466,7 +466,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   name="class_group_name"
                   value={newExamForm.class_group_name}
                   onChange={handleNewExamFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم الصف (مثل: الصف الخامس - أ)"
                 />
               </div>
@@ -480,7 +480,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   name="date"
                   value={newExamForm.date}
                   onChange={handleNewExamFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -493,7 +493,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   name="time"
                   value={newExamForm.time}
                   onChange={handleNewExamFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -507,7 +507,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   min={0}
                   value={newExamForm.duration}
                   onChange={handleNewExamFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="مدة الامتحان"
                 />
               </div>
@@ -521,7 +521,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                   name="room"
                   value={newExamForm.room}
                   onChange={handleNewExamFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="رقم القاعة (مثل: ص 10)"
                 />
               </div>
@@ -538,7 +538,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {editingExam ? "تحديث" : "إضافة"}
                 </button>

@@ -228,7 +228,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
           <span> {getTranslation('addParent',language)}</span>
@@ -246,7 +246,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 placeholder={getTranslation('searchParentsStudentsOrEmail',language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -254,7 +254,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option key={"all"} value={"all"}>
                 {"الكل"}
@@ -323,7 +323,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                      <button className="text-primary-500 hover:bg-primary-300">
                         <Eye className="h-4 w-4" />
                       </button>
                       {/* the parent has his data - can't be edited by school for now */}
@@ -335,7 +335,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                           });
                           setShowAddModal(true);
                         }}
-                        className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        className="text-primary-600 hover:bg-primary-300"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
@@ -369,7 +369,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="الاسم الكامل"
                 />
               </div> */}
@@ -383,7 +383,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="example@example.com"
                 />
               </div>
@@ -401,7 +401,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 </label>
                 <input
                   type="tel"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="0555 XX XX XX"
                 />
               </div> */}
@@ -412,7 +412,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="العنوان الكامل"
                 />
               </div> */}
@@ -426,7 +426,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                   name="students"
                   value={formData.students}
                   onChange={handleStudentsChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   {studentsList.map((student) => (
                     <option key={student.student_id} value={student.student_id}>
@@ -443,7 +443,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 >
                   إلغاء
                 </button>
-                <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
                   إضافة
                 </button>
               </div>

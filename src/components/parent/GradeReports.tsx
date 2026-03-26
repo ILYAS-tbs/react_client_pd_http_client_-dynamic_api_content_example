@@ -158,14 +158,14 @@ const GradeReports: React.FC<GradeReportsProps> = ({
       : currentData?.subjects?.filter((s: Subject) => s.name === selectedSubject);
 
   const getGradeColor = (grade: number) => {
-    if (grade >= 16) return "text-green-600";
+    if (grade >= 16) return "text-primary-600";
     if (grade >= 12) return "text-primary-500";
     if (grade >= 10) return "text-yellow-600";
     return "text-red-600";
   };
 
   const getGradeBgColor = (grade: number) => {
-    if (grade >= 16) return "bg-green-100 dark:bg-green-900";
+    if (grade >= 16) return "bg-primary-100 dark:bg-primary-900";
     if (grade >= 12) return "bg-primary-100 dark:bg-primary-900/20";
     if (grade >= 10) return "bg-yellow-100 dark:bg-yellow-900";
     return "bg-red-100 dark:bg-red-900";
@@ -173,7 +173,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
 
   const getTrendIcon = (current: number, previous: number) => {
     if (current > previous)
-      return <TrendingUp className="h-4 w-4 text-green-500" />;
+      return <TrendingUp className="h-4 w-4 text-primary-500" />;
     if (current < previous)
       return <TrendingDown className="h-4 w-4 text-red-500" />;
     return <div className="h-4 w-4"></div>;
@@ -188,7 +188,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           {getTranslation("gradeReports", language)}
         </h2>
-        <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+        <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
           <Download className="h-4 w-4" />
           <span>{getTranslation("exportReport", language)}</span>
         </button>
@@ -204,7 +204,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             <select
               value={selectedChild}
               onChange={(e) => setSelectedChild(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               {children.map((child) => (
                 <option key={child.id} value={child.id}>
@@ -221,7 +221,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               {periods.map((period) => (
                 <option key={period.id} value={period.id}>
@@ -238,7 +238,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="all">{getTranslation("allSubjects", language)}</option>
               {currentData?.subjects?.map((subject: Subject) => (

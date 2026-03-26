@@ -208,7 +208,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-400 rounded-lg text-sm">
             {success}
           </div>
         )}

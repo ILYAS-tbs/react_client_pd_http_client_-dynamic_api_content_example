@@ -39,7 +39,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
                 <p
                   className={`text-xs mt-2 ${
                     trend.direction === "up"
-                      ? "text-green-600 dark:text-green-400"
+                      ? "text-primary-600 dark:text-primary-400"
                       : "text-red-600 dark:text-red-400"
                   }`}
                 >

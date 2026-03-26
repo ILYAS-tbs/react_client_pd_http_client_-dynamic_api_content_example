@@ -175,7 +175,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
       case "book":
         return "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200";
       default:
-        return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
+        return "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200";
     }
   };
 
@@ -204,7 +204,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             {resourceTypes.map((type) => (
               <option key={type.value} value={type.value}>
@@ -224,7 +224,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
             placeholder={getTranslation('searchTitleDescriptionClass', language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
       </div>
@@ -315,13 +315,13 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <button
                       onClick={() => setSelectedResource(resource)}
-                      className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-1"
+                      className="text-primary-500 hover:bg-primary-300 p-1"
                     >
                       <Eye className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleAction(resource)}
-                      className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1"
+                      className="text-primary-600 hover:bg-primary-300 p-1"
                     >
                       <Download className="h-4 w-4" />
                     </button>
@@ -412,7 +412,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                     </>
                   )}
                   {selectedResource.originalPrice && (
-                    <Tag className="h-4 w-4 text-green-600 mr-2" />
+                    <Tag className="h-4 w-4 text-primary-600 mr-2" />
                   )}
                 </p>
               </div>
@@ -437,7 +437,7 @@ const ResourceLibrary: React.FC<ResourceLibraryProps> = ({ uploads }) => {
                   handleAction(selectedResource);
                   setSelectedResource(null);
                 }}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 {selectedResource.price === null ? getTranslation('download', language) : getTranslation('purchase', language)}
               </button>

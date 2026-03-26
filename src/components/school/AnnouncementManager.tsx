@@ -47,7 +47,7 @@ const AnnouncementManager: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">إدارة الإعلانات</h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
           <span>إعلان جديد</span>
@@ -63,14 +63,14 @@ const AnnouncementManager: React.FC = () => {
                 <div className="flex items-center space-x-3 rtl:space-x-reverse mb-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{announcement.title}</h3>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${announcement.type === 'امتحانات' ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' :
-                      announcement.type === 'إجازة' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                      announcement.type === 'إجازة' ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200' :
                         announcement.type === 'اجتماع' ? 'bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200' :
                           'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                     }`}>
                     {announcement.type}
                   </span>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${announcement.status === 'منشور'
-                      ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                      ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200'
                       : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
                     }`}>
                     {announcement.status}
@@ -93,10 +93,10 @@ const AnnouncementManager: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 p-2">
+                <button className="text-primary-500 hover:bg-primary-300 p-2">
                   <Eye className="h-4 w-4" />
                 </button>
-                <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-2">
+                <button className="text-primary-600 hover:bg-primary-300 p-2">
                   <Edit className="h-4 w-4" />
                 </button>
                 <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-2">
@@ -121,7 +121,7 @@ const AnnouncementManager: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="عنوان الإعلان"
                 />
               </div>
@@ -131,7 +131,7 @@ const AnnouncementManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     نوع الإعلان
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
                     {announcementTypes.map((type) => (
                       <option key={type} value={type}>{type}</option>
                     ))}
@@ -142,7 +142,7 @@ const AnnouncementManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     الجمهور المستهدف
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
                     {targetAudiences.map((audience) => (
                       <option key={audience} value={audience}>{audience}</option>
                     ))}
@@ -156,7 +156,7 @@ const AnnouncementManager: React.FC = () => {
                 </label>
                 <textarea
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اكتب محتوى الإعلان هنا..."
                 />
               </div>
@@ -167,7 +167,7 @@ const AnnouncementManager: React.FC = () => {
                 </label>
                 <input
                   type="date"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -175,7 +175,7 @@ const AnnouncementManager: React.FC = () => {
                 <input
                   type="checkbox"
                   id="urgent"
-                  className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <label htmlFor="urgent" className="text-sm text-gray-700 dark:text-gray-300">
                   إعلان عاجل
@@ -193,7 +193,7 @@ const AnnouncementManager: React.FC = () => {
               <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
                 حفظ كمسودة
               </button>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
                 نشر الآن
               </button>
             </div>

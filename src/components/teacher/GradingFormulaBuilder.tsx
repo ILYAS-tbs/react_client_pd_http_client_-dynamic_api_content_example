@@ -402,9 +402,9 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
               )}
 
               {successMessage && (
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700">
-                  <Check className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-green-800 dark:text-green-200">{successMessage}</p>
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700">
+                  <Check className="h-5 w-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-primary-800 dark:text-primary-200">{successMessage}</p>
                 </div>
               )}
 
@@ -415,7 +415,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                   </label>
                   <div className={`text-sm font-bold px-3 py-1 rounded-full ${
                     totalWeight === 100
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      ? 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200'
                       : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                   }`}>
                     {totalWeight}% / 100%
@@ -558,7 +558,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                 <button
                   onClick={handleSave}
                   disabled={!isValid || isSaving || !isModified}
-                  className="px-6 py-2 text-sm font-medium bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                  className="px-6 py-2 text-sm font-medium bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                 >
                   {isSaving ? (
                     <>

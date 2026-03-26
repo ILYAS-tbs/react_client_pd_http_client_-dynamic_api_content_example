@@ -122,22 +122,22 @@ export function Hero({ onGetStarted }: HeroProps) {
                   <div className="flex space-x-2 rtl:space-x-reverse">
                     <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                     <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-primary-400 rounded-full"></div>
                   </div>
                 </div>
 
                 {/* Grade Cards */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl border border-green-200 dark:border-green-700 opacity-80 grayscale-[30%] hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                  <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4 rounded-xl border border-primary-200 dark:border-primary-700 opacity-80 grayscale-[30%] hover:grayscale-0 hover:opacity-100 transition-all duration-300">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                      <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
                         {language === 'ar' ? 'الرياضيات' : language === 'fr' ? 'Mathématiques' : 'Mathematics'}
                       </span>
-                      <BarChart3 className="w-4 h-4 text-green-600" />
+                      <BarChart3 className="w-4 h-4 text-primary-600" />
                     </div>
-                    <div className="text-2xl font-bold text-green-800 dark:text-green-200">18/20</div>
-                    <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2 mt-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: '90%' }}></div>
+                    <div className="text-2xl font-bold text-primary-800 dark:text-primary-200">18/20</div>
+                    <div className="w-full bg-primary-200 dark:bg-primary-700 rounded-full h-2 mt-2">
+                      <div className="bg-primary-500 h-2 rounded-full" style={{ width: '90%' }}></div>
                     </div>
                   </div>
 
@@ -164,7 +164,7 @@ export function Hero({ onGetStarted }: HeroProps) {
                         {language === 'ar' ? 'الحضور اليوم' : language === 'fr' ? 'Présence Aujourd\'hui' : 'Today\'s Attendance'}
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-green-600">
+                    <span className="text-sm font-bold text-primary-600">
                       {language === 'ar' ? 'حاضر' : language === 'fr' ? 'Présent' : 'Present'}
                     </span>
                   </div>
@@ -191,7 +191,7 @@ export function Hero({ onGetStarted }: HeroProps) {
 
               <div className="absolute -bottom-4 -left-4 rtl:-left-auto rtl:-right-4 w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex items-center justify-center transform -rotate-12 hover:rotate-0 transition-transform duration-300 border border-gray-200 dark:border-gray-700">
                 <div className="text-center">
-                  <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-1" />
+                  <BarChart3 className="w-8 h-8 text-primary-500 mx-auto mb-1" />
                   <span className="text-xs font-bold text-gray-700 dark:text-gray-300">98%</span>
                 </div>
               </div>
@@ -214,7 +214,7 @@ export function Hero({ onGetStarted }: HeroProps) {
               </div>
 
               {/* Success Notification */}
-              <div className="absolute top-8 right-8 rtl:right-auto rtl:left-8 bg-green-500 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium animate-pulse">
+              <div className="absolute top-8 right-8 rtl:right-auto rtl:left-8 bg-primary-500 text-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium animate-pulse">
                 {language === 'ar' ? 'نجاح مؤكد!' : language === 'fr' ? 'Succès Assuré!' : 'Success Assured!'}
               </div>
             </div>

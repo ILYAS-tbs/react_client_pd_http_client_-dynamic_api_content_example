@@ -207,7 +207,7 @@ const ParentDashboard: React.FC = () => {
       title: getTranslation("totalAbsences", language),
       value: total_absences() || "0",
       icon: Calendar,
-      color: "bg-green-500",
+      color: "bg-primary-400",
     },
     {
       title: getTranslation("newMessages", language),
@@ -380,11 +380,11 @@ const ParentDashboard: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-green-50 dark:bg-green-900 rounded-lg">
+                    <div className="text-center p-3 bg-primary-50 dark:bg-primary-900 rounded-lg">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {getTranslation("overallGrade", language)}
                       </p>
-                      <p className="text-xl font-bold text-green-600">
+                      <p className="text-xl font-bold text-primary-600">
                         {child.trimester_grade}
                       </p>
                     </div>
@@ -406,9 +406,9 @@ const ParentDashboard: React.FC = () => {
                       className={
                         "px-3 py-1 rounded-full text-sm font-medium" +
                         (child.academic_state == "excellent"
-                          ? " bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 "
+                          ? " bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 "
                           : child.academic_state == "very_good"
-                            ? " bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 "
+                            ? " bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 "
                             : " bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 ")
                       }
                     >
@@ -444,14 +444,14 @@ const ParentDashboard: React.FC = () => {
                       >
                         <div
                           className={`p-2 rounded-lg ${update.type === "grade"
-                              ? "bg-green-100 dark:bg-green-900"
+                              ? "bg-primary-100 dark:bg-primary-900"
                               : update.type === "message"
                                 ? "bg-primary-100 dark:bg-primary-900/20"
                                 : "bg-orange-100 dark:bg-orange-900/20"
                             }`}
                         >
                           {update.type === "grade" ? (
-                            <FileText className="h-4 w-4 text-green-600" />
+                            <FileText className="h-4 w-4 text-primary-600" />
                           ) : update.type === "message" ? (
                             <MessageCircle className="h-4 w-4 text-primary-500" />
                           ) : (
@@ -510,7 +510,7 @@ const ParentDashboard: React.FC = () => {
                               ? "bg-red-500"
                               : task.priority === "مهم"
                               ? "bg-orange-500"
-                              : "bg-green-500"
+                              : "bg-primary-500"
                           }`}
                         ></div>
                         <div>

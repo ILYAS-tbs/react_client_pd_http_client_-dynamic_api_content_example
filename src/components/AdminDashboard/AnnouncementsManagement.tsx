@@ -319,7 +319,7 @@ export const AnnouncementsManagement: React.FC = () => {
                         <span
                           className={`font-medium ${
                             announcement.pinned
-                              ? "text-green-600 dark:text-green-400"
+                              ? "text-primary-600 dark:text-primary-400"
                               : "text-gray-500"
                           }`}
                         >
@@ -350,7 +350,7 @@ export const AnnouncementsManagement: React.FC = () => {
                             <button
                               onClick={() => handlePublishAnnouncement(announcement.id)}
                               disabled={actionLoading === `publish-${announcement.id}`}
-                              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400 disabled:opacity-50"
+                              className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400 disabled:opacity-50"
                             >
                               <Send className="h-4 w-4" /> {getTranslation("publish", language)}
                             </button>

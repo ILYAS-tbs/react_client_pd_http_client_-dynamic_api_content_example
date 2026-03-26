@@ -52,7 +52,7 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
 );
 
 const SchoolDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("levels");
+  const [activeTab, setActiveTab] = useState("home");
 
   const { language } = useLanguage();
 
@@ -283,15 +283,15 @@ const SchoolDashboard: React.FC = () => {
 
   const stats = [
     { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500" },
-    { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-green-500" },
+    { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-primary-400" },
     { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-purple-500" },
     { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-orange-500" },
   ]
 
 
   const tabs = [
-    { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "home", label: getTranslation("home", language), icon: Home },
+    { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "users", label: getTranslation("UserManagement", language), icon: Users },
     { id: "chat", label: getTranslation("Chat", language), icon: MessageCircle },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
@@ -370,7 +370,7 @@ const SchoolDashboard: React.FC = () => {
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       طلاب جدد
                     </span>
-                    <span className="text-sm font-semibold text-green-600">
+                    <span className="text-sm font-semibold text-primary-600">
                       +12
                     </span>
                   </div>

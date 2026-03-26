@@ -115,7 +115,7 @@ export function About() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary-500 transition-colors">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:bg-primary-500 transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">

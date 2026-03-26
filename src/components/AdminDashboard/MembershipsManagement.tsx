@@ -255,7 +255,7 @@ export const MembershipsManagement: React.FC = () => {
                           ) : isExpiringSoon(membership.expiry_date) ? (
                             <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                           ) : (
-                            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                           )}
                           {new Date(membership.expiry_date).toLocaleDateString()}
                         </div>
@@ -267,7 +267,7 @@ export const MembershipsManagement: React.FC = () => {
                               ? "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                               : isExpiringSoon(membership.expiry_date)
                               ? "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
-                              : "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                              : "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
                           }`}
                         >
                           {isExpired(membership.expiry_date)

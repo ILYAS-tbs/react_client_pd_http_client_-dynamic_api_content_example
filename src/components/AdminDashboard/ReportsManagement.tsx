@@ -129,7 +129,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
     const colors: { [key: string]: string } = {
       PENDING: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
       APPROVED:
-        "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+        "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400",
       REJECTED:
         "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
     };
@@ -311,7 +311,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                                         action: "approve",
                                       })
                                     }
-                                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400"
+                                    className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400"
                                   >
                                     <CheckCircle className="h-4 w-4" /> {getTranslation("approve", language)}
                                   </button>
@@ -415,7 +415,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                   disabled={actionLoading !== null}
                   className={`flex-1 px-4 py-2 rounded-lg text-white font-medium ${
                     approvalModal.action === "approve"
-                      ? "bg-green-600 hover:bg-green-700"
+                      ? "bg-primary-600 hover:bg-primary-700"
                       : "bg-red-600 hover:bg-red-700"
                   } disabled:opacity-50`}
                 >

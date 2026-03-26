@@ -200,7 +200,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "grade":
-        return <Award className="h-4 w-4 text-green-600" />;
+        return <Award className="h-4 w-4 text-primary-600" />;
       case "attendance":
         return <Calendar className="h-4 w-4 text-primary-500" />;
       case "behavior":
@@ -215,7 +215,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   };
 
   const getGradeColor = (grade: number) => {
-    if (grade >= 16) return "text-green-600";
+    if (grade >= 16) return "text-primary-600";
     if (grade >= 12) return "text-primary-500";
     if (grade >= 10) return "text-yellow-600";
     return "text-red-600";
@@ -235,7 +235,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
           <select
             value={selectedChild}
             onChange={(e) => setSelectedChild(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             {children.map((child) => (
               <option key={child.id} value={child.id}>
@@ -267,7 +267,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-3xl font-bold text-primary-600">
                   {currentChild.overallGrade}/20
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -303,11 +303,11 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   </p>
 
                   {currentChild.behavior == "excellent" ? (
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-2xl font-bold text-primary-600">
                       {mapBehaviour(currentChild.behavior)}
                     </p>
                   ) : currentChild.behavior == "very_good" ? (
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-2xl font-bold text-primary-600">
                       {mapBehaviour(currentChild.behavior)}
                     </p>
                   ) : (
@@ -320,12 +320,12 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
 
                 {/* acedemic performance  */}
                 {currentChild.behavior == "excellent" ? (
-                  <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  <div className="bg-primary-100 dark:bg-primary-900 p-3 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-primary-600" />
                   </div>
                 ) : currentChild.behavior == "very_good" ? (
-                  <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-green-600" />
+                  <div className="bg-primary-100 dark:bg-primary-900 p-3 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-primary-600" />
                   </div>
                 ) : (
                   <div className="bg-red-100 dark:bg-red-900 p-3 rounded-lg">
@@ -411,7 +411,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                           {activity.description}
                         </p>
                         {activity.grade && (
-                          <span className="text-sm font-semibold text-green-600">
+                          <span className="text-sm font-semibold text-primary-600">
                             {activity.grade}
                           </span>
                         )}
@@ -432,11 +432,11 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               {getTranslation("quickActions", language)}
             </h3>
             <div className="grid md:grid-cols-4 gap-4">
-              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors">
+              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors">
                 <BookOpen className="h-5 w-5" />
                 <span className="text-sm font-medium">{getTranslation('viewGrades',language)}</span>
               </button> */}
-              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors">
                 <Calendar className="h-5 w-5" />
                 <span className="text-sm font-medium">{getTranslation('attendanceRecord',language)}</span>
               </button> */}

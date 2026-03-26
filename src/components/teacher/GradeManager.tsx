@@ -632,7 +632,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             <Plus className="h-4 w-4" />
             <span>{getTranslation("addGrade", language)}</span>
@@ -650,7 +650,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               {classes.map((cls) => {
                 return (
@@ -674,7 +674,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
             <select
               value={selectedModule}
               onChange={(e) => setSelectedModule(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               {unique_modules.map((module) => (
                 <option key={module} value={module}>
@@ -696,7 +696,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
               onChange={(e) =>
                 setSelectedSemester(e.target.value as "s1" | "s2" | "s3")
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="s1">
                 {getTranslation("firstSemester", language)}
@@ -846,7 +846,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                           className={`text-sm font-bold ${(
                             student.grades[key]!.score ?? 0
                           ) >= 16
-                            ? "text-green-600"
+                            ? "text-primary-600"
                             : (student.grades[key]!.score ?? 0) >= 12
                             ? "text-primary-600"
                             : (student.grades[key]!.score ?? 0) >= 10
@@ -894,7 +894,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                           module: "",
                         })
                       }
-                      className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 mx-1"
+                      className="text-primary-600 hover:bg-primary-300 mx-1"
                     >
                       <Edit
                         onClick={() => {
@@ -932,7 +932,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       setNewGrade({ ...newGrade, studentId: e.target.value });
                       handleStudentGradeFormChange(e);
                     }}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">
                       {getTranslation("selectStudent", language)}
@@ -957,7 +957,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       setNewGrade({ ...newGrade, studentId: e.target.value });
                       handleStudentGradeFormChange(e);
                     }}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">
                       {getTranslation("selectSubject", language)}
@@ -985,7 +985,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     setGradeSemester(e.target.value);
                     handleStudentGradeFormChange(e);
                   }}
-                  className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option key={"s1"} value={"s1"}>
                     {getTranslation("firstSemester", language)}
@@ -1012,7 +1012,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s1_evaluation ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1028,7 +1028,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s1_devoir_1 ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1044,7 +1044,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s1_devoir_2 ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1060,7 +1060,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s1_homeworks ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1076,7 +1076,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s1_tests ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1092,7 +1092,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s1_exam ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1119,7 +1119,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s2_evaluation ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1135,7 +1135,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s2_devoir_1 ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1152,7 +1152,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s2_devoir_2 ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1168,7 +1168,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s2_homeworks ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1184,7 +1184,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s2_tests ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1200,7 +1200,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s2_exam ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1227,7 +1227,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s3_evaluation ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1243,7 +1243,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s3_devoir_1 ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1259,7 +1259,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s3_devoir_2 ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1275,7 +1275,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s3_homeworks ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1291,7 +1291,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s3_tests ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1307,7 +1307,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={postStudentGradeForm.s3_exam ?? 0}
                       onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1340,7 +1340,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {getTranslation("save", language)}
                 </button>
@@ -1367,7 +1367,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     name="student_id"
                     value={last_selected_student}
                     onChange={() => {}}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option
                       key={last_selected_student}
@@ -1389,7 +1389,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     name="module_id"
                     value={patchStudentGradeForm.module_id}
                     onChange={() => {}}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option
                       key={patchStudentGradeForm.module_id}
@@ -1417,7 +1417,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                     setGradeSemester(e.target.value);
                     handleStudentGradePatchFormChange(e);
                   }}
-                  className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option key={"s1"} value={"s1"}>
                     {getTranslation("firstSemester", language)}
@@ -1444,7 +1444,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s1_evaluation ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1460,7 +1460,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s1_devoir_1 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1476,7 +1476,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s1_devoir_2 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1492,7 +1492,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s1_homeworks ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1508,7 +1508,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s1_tests ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1524,7 +1524,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s1_exam ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1551,7 +1551,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s2_evaluation ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1567,7 +1567,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s2_devoir_1 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1583,7 +1583,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s2_devoir_2 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1599,7 +1599,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s2_homeworks ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1615,7 +1615,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s2_tests ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1631,7 +1631,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s2_exam ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1658,7 +1658,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s3_evaluation ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1674,7 +1674,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s3_devoir_1 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1690,7 +1690,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s3_devoir_2 ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1706,7 +1706,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s3_homeworks ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1722,7 +1722,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s3_tests ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1738,7 +1738,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                       step="0.01"
                       value={patchStudentGradeForm.s3_exam ?? 0}
                       onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       placeholder="0"
                     />
                   </div>
@@ -1772,7 +1772,7 @@ const GradeManager: React.FC<GradeManagerProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {getTranslation("save", language)}
                 </button>

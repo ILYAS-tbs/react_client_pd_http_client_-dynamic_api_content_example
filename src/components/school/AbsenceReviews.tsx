@@ -82,7 +82,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "accepted":
-        return "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200";
+        return "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200";
       case "rejected":
         return "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200";
       default:
@@ -132,7 +132,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="all">{getTranslation('all', language)}</option>
             <option value="pending">{getTranslation('UnderReview', language)}</option>
@@ -159,7 +159,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
             label: getTranslation('Accepted', language),
             value: absenceRequests.filter((r) => r.status === "accepted")
               .length,
-            color: "bg-green-500",
+            color: "bg-primary-500",
           },
           {
             label: getTranslation('Rejected', language),
@@ -256,7 +256,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                   </span>
                   <span
                     className={`px-2 py-1 text-xs font-semibold rounded-full ${request.proof_document
-                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                        ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
                         : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                       }`}
                   >
@@ -278,7 +278,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
                     onClick={() =>
                       handleAcceptance(request.absence_report_id, true)
                     }
-                    className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    className="flex items-center space-x-1 rtl:space-x-reverse px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     <Check className="h-4 w-4" />
                     <span>{getTranslation('Accept', language)}</span>

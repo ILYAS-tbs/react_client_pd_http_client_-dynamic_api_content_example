@@ -194,7 +194,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const loopThroughClassGroups = (teacher: Teacher) => {
     let exist: boolean = false;
 
-    teacher.modulesAndClassGroups?.[0]?.module.module_name
+    teacher.modulesGradeOverviewAndClassGroups?.[0]?.module.module_name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
 
@@ -370,7 +370,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
           <span>{getTranslation('addTeacher', language)}</span>
@@ -386,7 +386,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
             placeholder={getTranslation('searchTeachers', language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
       </div>
@@ -396,16 +396,17 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
         {filteredTeachers.map((teacher) => (
           <div
             key={teacher.user.id}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700 max-w-full min-w-0 w-full transition-transform hover:scale-[1.025] overflow-hidden"
+            style={{ maxWidth: '370px', margin: '0 auto', wordBreak: 'break-word' }}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                {/* Teacher Proifile pic if it exist */}
+              <div className="flex items-center space-x-3 rtl:space-x-reverse min-w-0">
+                {/* Teacher Profile pic if it exists */}
                 {teacher.profile_picture ? (
                   <img
                     src={`${SERVER_BASE_URL}${teacher.profile_picture}`}
                     alt=""
-                    className="rounded-full bg-cover w-[64px] h-[64px]"
+                    className="rounded-full bg-cover w-[64px] h-[64px] border-2 border-primary-400 object-cover"
                   />
                 ) : (
                   <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
@@ -413,20 +414,21 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   </div>
                 )}
 
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate max-w-[180px]">
                     {teacher.full_name}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[180px]">
                     {teacher.modulesAndClassGroups?.[0]?.module.module_name}
                   </p>
                 </div>
               </div>
               <span
-                className={`px-2 py-1 text-xs font-semibold rounded-full ${teacher.status === "نشط" || teacher.status === "active"
-                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${teacher.status === "نشط" || teacher.status === "active"
+                  ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
                   : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                   }`}
+                style={{ minWidth: '70px', textAlign: 'center' }}
               >
                 {teacher.status === "نشط" || teacher.status === "active"
                   ? getTranslation('active', language)
@@ -435,14 +437,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
             </div>
 
             <div className="space-y-2 mb-4">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation('classCount', language)}:
                 </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-sm font-medium text-gray-900 dark:text-white text-right max-w-[160px] truncate">
                   <ul className="flex flex-col items-end">
                     {teacher.modulesAndClassGroups?.map((x) => (
-                      <li key={`${x.module.module_id}-${x.class_group.class_group_id}`}>
+                      <li key={`${x.module.module_id}-${x.class_group.class_group_id}`} className="truncate max-w-[150px]">
                         {x.module.module_name} - {x.class_group.name}
                       </li>
                     ))}
@@ -450,7 +452,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </span>
               </div>
 
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation('experience', language)}:
                 </span>
@@ -458,28 +460,28 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   {teacher.years_of_experience}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation('phoneNumber', language)}:
                 </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
                   {teacher.phone_number}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation('email', language)}:
                 </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white text-left">
+                <span className="text-sm font-medium text-gray-900 dark:text-white text-left truncate max-w-[150px]">
                   {teacher.user.email}
                 </span>
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700 gap-2">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse min-w-0">
                 {/* hide teacher removed for now  */}
-                {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                {/* <button className="text-primary-500 hover:bg-primary-300">
                   <Eye className="h-4 w-4" />
                 </button> */}
 
@@ -488,7 +490,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                     setShowEditModel(true);
                     set_last_chosen_teacher_id(teacher.user.id);
                   }}
-                  className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                  className="text-primary-600 hover:bg-primary-300"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
@@ -498,12 +500,12 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </button> */}
               </div>
 
-              <div className="activation-buttons">
+              <div className="activation-buttons flex gap-2">
                 <button
                   onClick={() => handleActivateTeacher(teacher.user.id, true)}
                   className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${teacher.status === "نشط"
                     ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
-                    : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800"
+                    : "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 hover:bg-primary-800"
                     }`}
                 >
                   {teacher.status === "نشط" ? getTranslation('suspend', language) : getTranslation('activate', language)}
@@ -511,7 +513,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
                 <button
                   onClick={() => handleActivateTeacher(teacher.user.id, false)}
-                  className={`px-3 mx-1 py-1 text-xs font-medium rounded-lg transition-colors ${"bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"}`}
+                  className={`px-3 mx-1 py-1 text-xs font-medium rounded-lg transition-colors bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800`}
                 >
                   {getTranslation('suspend', language)}
                 </button>
@@ -539,7 +541,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="الاسم الكامل"
                 />
               </div>
@@ -553,7 +555,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="teacher@school.dz"
                 />
               </div>
@@ -567,7 +569,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="tel"
                   value={formData.phone_number}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="0555 XX XX XX"
                 />
               </div>
@@ -581,7 +583,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type={showPassword ? "text" : "password"}
                   value={formData.password1}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="كلمة السر"
                 />
 
@@ -607,7 +609,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type={showPassword ? "text" : "password"}
                   value={formData.password2}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="تأكيد كلمة المرور"
                 />
 
@@ -633,7 +635,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="number"
                   value={formData.years_of_experience}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="عدد السنوات"
                 />
               </div> */}
@@ -652,7 +654,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   إضافة
                 </button>
@@ -705,7 +707,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="text"
                   value={full_name_update}
                   onChange={(e) => set_full_name_update(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="الاسم الكامل"
                 />
               </div>
@@ -744,7 +746,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   name="class_group_id"
                   value={class_group_id}
                   onChange={(e) => setClassGrpID(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value={""}>اختر الفصل</option>
                   {class_groups_list.map((cls) => (
@@ -763,7 +765,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   name="modules_id"
                   value={modules_id}
                   onChange={(e) => setModuleID(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value={""}>اختر المادة</option>
                   {subjects.map((subject) => (
@@ -783,7 +785,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="teacher@school.dz"
                 />
               </div> */}
@@ -797,7 +799,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type="tel"
                   value={phone_number_update}
                   onChange={(e) => set_phone_number_update(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="0555 XX XX XX"
                 />
               </div>
@@ -811,7 +813,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type={showPassword ? "text" : "password"}
                   value={formData.password1}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="كلمة السر"
                 />
 
@@ -837,7 +839,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   type={showPassword ? "text" : "password"}
                   value={formData.password2}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="تأكيد كلمة المرور"
                 />
 
@@ -867,7 +869,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   }
                   min={0}
                   max={20}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="عدد السنوات"
                 />
               </div>
@@ -891,7 +893,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   إضافة
                 </button>

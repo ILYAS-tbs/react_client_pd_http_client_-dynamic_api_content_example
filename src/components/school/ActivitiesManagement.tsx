@@ -280,7 +280,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="all">{getTranslation('all', language)}</option>
             <option value="رياضية">{getTranslation('sports', language)}</option>
@@ -296,7 +296,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
             <span>{getTranslation('addActivity', language)}</span>
@@ -315,7 +315,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                 placeholder={getTranslation('searchActivity', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -413,7 +413,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                             set_last_selected_event(activity);
                             setShowEditModal(true);
                           }}
-                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                          className="text-primary-600 hover:bg-primary-300"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
@@ -425,7 +425,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                         </button>
 
                         {/* for now : now eye */}
-                        {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                        {/* <button className="text-primary-500 hover:bg-primary-300">
                           <Eye className="h-4 w-4" />
                         </button> */}
                       </div>
@@ -456,7 +456,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="title"
                   value={postEventForm.title}
                   onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم الفعالية"
                 />
               </div>
@@ -469,7 +469,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="category"
                   value={postEventForm.category}
                   onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">اختر الفئة</option>
                   <option value="رياضية">رياضية</option>
@@ -487,7 +487,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="date"
                   value={postEventForm.date}
                   onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -500,7 +500,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="time"
                   value={postEventForm.time}
                   onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -512,7 +512,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="desc"
                   value={postEventForm.desc}
                   onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="تفاصيل الفعالية"
                 />
               </div>
@@ -526,7 +526,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="place"
                   value={postEventForm.place}
                   onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="مكان الفعالية"
                 />
               </div>
@@ -559,7 +559,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   //   editingActivity ? handleUpdateActivity : handleAddActivity
                   // }
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {/* {editingActivity ? "تحديث" : "إضافة"} */}
                   إضافة
@@ -588,7 +588,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="title"
                   value={patchEventForm.title}
                   onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم الفعالية"
                 />
               </div>
@@ -601,7 +601,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="category"
                   value={patchEventForm.category}
                   onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">اختر الفئة</option>
                   <option value="رياضية">رياضية</option>
@@ -619,7 +619,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="date"
                   value={patchEventForm.date}
                   onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -632,7 +632,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="time"
                   value={patchEventForm.time}
                   onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -644,7 +644,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="desc"
                   value={patchEventForm.desc}
                   onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="تفاصيل الفعالية"
                 />
               </div>
@@ -658,7 +658,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   name="place"
                   value={patchEventForm.place}
                   onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="مكان الفعالية"
                 />
               </div>
@@ -691,7 +691,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                   //   editingActivity ? handleUpdateActivity : handleAddActivity
                   // }
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {/* {editingActivity ? "تحديث" : "إضافة"} */}
                   تحديث

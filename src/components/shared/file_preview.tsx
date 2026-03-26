@@ -51,7 +51,7 @@ export function FilePreview({ url, filename }: FilePreviewProps) {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 inline-block px-2 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-primary-500 transition"
+            className="mt-1 inline-block px-2 py-1 bg-primary-500 text-white rounded-md text-xs hover:bg-primary-600 transition"
           >
             Open
           </a>

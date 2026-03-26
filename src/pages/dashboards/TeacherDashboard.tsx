@@ -206,7 +206,7 @@ const TeacherDashboard: React.FC = () => {
       title: getTranslation('Classes', language),
       value: modules_class_groups.length || "0",
       icon: BookOpen,
-      color: "bg-green-500",
+      color: "bg-primary-400",
     },
     {
       title: getTranslation('newMessages', language),
@@ -476,7 +476,7 @@ const TeacherDashboard: React.FC = () => {
                 <div className="space-y-3">
                   <button
                     onClick={() => setActiveTab('grades')}
-                    className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors">
+                    className="w-full flex items-center space-x-3 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors">
                     <Edit className="h-5 w-5" />
                     <span>{getTranslation('enterNewGrades', language)}</span>
                   </button>

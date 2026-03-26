@@ -106,7 +106,7 @@ const SchoolAnnouncements: React.FC = () => {
       case 'امتحانات':
         return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
       case 'إجازة':
-        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+        return 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200';
       case 'اجتماع':
         return 'bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200';
       case 'نشاط':
@@ -149,7 +149,7 @@ const SchoolAnnouncements: React.FC = () => {
                 placeholder={getTranslation('searchAnnouncements', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -157,7 +157,7 @@ const SchoolAnnouncements: React.FC = () => {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               {announcementTypes.map((type) => (
                 <option key={type} value={type === 'الكل' ? 'all' : type}>
@@ -221,7 +221,7 @@ const SchoolAnnouncements: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <Pin className="h-4 w-4 text-yellow-600" />
-                    <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                    <button className="text-primary-500 hover:bg-primary-300">
                       <Eye className="h-4 w-4" />
                     </button>
                   </div>
@@ -279,7 +279,7 @@ const SchoolAnnouncements: React.FC = () => {
                     <span className="text-xs text-gray-500 dark:text-gray-400">{announcement.targetAudience}</span>
                   </div>
                 </div>
-                <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                <button className="text-primary-500 hover:bg-primary-300">
                   <Eye className="h-4 w-4" />
                 </button>
               </div>

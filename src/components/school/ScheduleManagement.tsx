@@ -172,7 +172,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
         {/* <div className="flex space-x-2 rtl:space-x-reverse">
           <button
             onClick={() => setShowUploadModal(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
           >
             <Plus className="h-5 w-5" />
             <span>إضافة جدول</span>
@@ -191,7 +191,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                 placeholder={getTranslation('searchClass', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -246,13 +246,13 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                             href={SERVER_BASE_URL + schedule.pdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary-400 hover:text-primary-300"
+                            className="text-primary-400 hover:bg-primary-300"
                           >
                             {schedule.className + ".pdf"}
                           </a>
                           {/* <button
                                                 // onClick={() => handleRemovePdf(cls.id)}
-                                                className="text-primary-400 hover:text-primary-300"
+                                                className="text-primary-400 hover:bg-primary-300"
                                               > */}
                           {/* <X className="h-5 w-5" /> */}
                           {/* <Download className="h-5 w-5" />
@@ -268,7 +268,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                         {/* {schedule.pdfUrl && (
                           <button
                             onClick={() => handleViewSchedule(schedule.pdfUrl)}
-                            className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
+                            className="text-primary-500 hover:bg-primary-300"
                           >
                             <Eye className="h-5 w-5" />
                           </button>
@@ -279,7 +279,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                             // latest clicked schedule
                             set_last_selected_schedule(schedule);
                           }}
-                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                          className="text-primary-600 hover:bg-primary-300"
                         >
                           <Upload className="h-5 w-5" />
                         </button>
@@ -321,7 +321,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                       className: e.target.value,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="مثل: الصف الخامس أ"
                   disabled={!!editingSchedule}
                 />
@@ -335,7 +335,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                   type="file"
                   accept="application/pdf"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </form>
@@ -354,7 +354,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
               </button>
               <button
                 onClick={() => selectedFile && handleFileUpload(selectedFile)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 disabled={!selectedFile}
               >
                 {editingSchedule ? "تحديث" : "رفع"}

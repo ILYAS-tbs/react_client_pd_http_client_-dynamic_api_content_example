@@ -321,7 +321,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
           <span>{getTranslation('addClass', language)}</span>
@@ -339,7 +339,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                 placeholder={getTranslation('searchClassesOrStudentsCount', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -389,13 +389,13 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                           href={SERVER_BASE_URL + cls.teacher_list}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary-400 hover:text-primary-300"
+                          className="text-primary-400 hover:bg-primary-300"
                         >
                           {cls.name + ".pdf"}
                         </a>
                         {/* <button
                           // onClick={() => handleRemovePdf(cls.id)}
-                          className="text-primary-400 hover:text-primary-300"
+                          className="text-primary-400 hover:bg-primary-300"
                         > */}
                         {/* <X className="h-5 w-5" /> */}
                         {/* <Download className="h-5 w-5" />
@@ -427,7 +427,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                           handleEditClass(cls);
                           set_chosen_class_id(cls.class_group_id!);
                         }}
-                        className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        className="text-primary-600 hover:bg-primary-300"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
@@ -477,7 +477,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                       handleCreationChange(e);
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم الصف (مثل: الصف الأول - أ)"
                 />
               </div>
@@ -537,7 +537,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                 <button
                   type="submit"
                   // onClick={editingClass ? handleUpdateClass : handleAddClass}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {editingClass ? "تحديث" : "إضافة"}
                 </button>

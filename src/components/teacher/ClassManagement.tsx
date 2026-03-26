@@ -208,7 +208,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             {classes.map((cls) => (
               <option key={cls.id} value={cls.id}>
@@ -249,7 +249,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation("averageGrades", language)} :
                 </span>
-                <span className="text-sm font-medium text-green-600">
+                <span className="text-sm font-medium text-primary-600">
                   {currentClass.averageGrade}
                 </span>
               </div>
@@ -266,8 +266,8 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
 
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
-                <Calendar className="h-6 w-6 text-green-600" />
+              <div className="bg-primary-100 dark:bg-primary-900 p-3 rounded-lg">
+                <Calendar className="h-6 w-6 text-primary-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {getTranslation("weeklySchedule", language)}
@@ -356,14 +356,14 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
             <div className="space-y-2">
               <button
                 onClick={() => setActiveTab("grades")}
-                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
+                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 <span>{getTranslation("addGrade", language)}</span>
               </button>
               <button
                 onClick={() => setShowAbsenseTakingModal(true)}
-                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors"
+                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors"
               >
                 <Edit className="h-4 w-4" />
                 <span>{getTranslation("recordAttendance", language)}</span>
@@ -414,7 +414,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
                       {student.trimester_grade ?? 0}
                     </span>
                   </td>
@@ -426,7 +426,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   {/* <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${student.status === "ممتاز"
-                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                        ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
                         : student.status === "جيد جداً"
                           ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
                           : student.status === "جيد"
@@ -439,10 +439,10 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   </td> */}
                   {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                      <button className="text-primary-500 hover:bg-primary-300">
                         <Eye className="h-4 w-4" />
                       </button>
-                      <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                      <button className="text-primary-600 hover:bg-primary-300">
                         <Edit className="h-4 w-4" />
                       </button>
                     </div>
@@ -469,7 +469,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                 placeholder={getTranslation("searchStudents", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -487,7 +487,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
                   <span
                     className={`text-sm font-semibold ${s.is_absent
                       ? "text-red-600 dark:text-red-400"
-                      : "text-green-600 dark:text-green-400"
+                      : "text-primary-600 dark:text-primary-400"
                       }`}
                   >
                     {s.is_absent
@@ -518,7 +518,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
               </button>
 
               {/* Confirmation for this will be unused for now, since we have to make a copy first then make the call */}
-              {/* <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              {/* <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
                 تأكيد
               </button> */}
             </div>

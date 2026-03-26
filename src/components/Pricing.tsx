@@ -116,7 +116,7 @@ export function Pricing() {
             {plans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 ${plan.popular ? "ring-2 ring-primary-500 scale-105" : ""
+                className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:bg-primary-500 scale-105" : ""
                   } ${isRTL ? "text-right" : "text-left"}`}
               >
                 {/* Popular Badge */}
@@ -132,7 +132,7 @@ export function Pricing() {
                 {/* Save Badge */}
                 {plan.badge && (
                   <div className="absolute -top-3 -right-3 rtl:-right-auto rtl:-left-3">
-                    <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 rtl:space-x-reverse">
+                    <div className="bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1 rtl:space-x-reverse">
                       <Zap className="w-3 h-3" />
                       <span>{plan.badge}</span>
                     </div>
@@ -174,7 +174,7 @@ export function Pricing() {
                         key={featureIndex}
                         className="flex items-start space-x-3 rtl:space-x-reverse"
                       >
-                        <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <Check className="w-5 h-5 text-primary-500 mt-0.5 flex-shrink-0" />
                         <span className="text-gray-700 dark:text-gray-300">
                           {feature}
                         </span>

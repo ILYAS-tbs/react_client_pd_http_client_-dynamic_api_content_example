@@ -97,7 +97,7 @@ const ParentScheduleTable: React.FC = () => {
             placeholder={getTranslation('searchChildClassSubjectType',language)}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
       </div>
@@ -137,7 +137,7 @@ const ParentScheduleTable: React.FC = () => {
                         <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                           <button
                             onClick={() => handleDownload(schedule.pdfUrl)}
-                            className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                            className="text-primary-600 hover:bg-primary-300"
                           >
                             <Download className="h-5 w-5" />
                           </button>

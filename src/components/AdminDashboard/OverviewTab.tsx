@@ -65,7 +65,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
       title: getTranslation("totalTeachers", language),
       value: dashboardStats?.roles.teachers.toString() || "0",
       icon: UserCheck,
-      color: "bg-green-500",
+      color: "bg-primary-500",
       trend: { value: 0, direction: "up" as const },
       isLoading,
     },
@@ -123,7 +123,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             <button
               onClick={handleRefresh}
               disabled={isLoading}
-              className="text-primary-500 hover:text-primary-600 text-sm font-medium disabled:opacity-50"
+              className="text-primary-500 hover:bg-primary-600 text-sm font-medium disabled:opacity-50"
             >
               {isLoading ? getTranslation("loading", language) : getTranslation("refresh", language)}
             </button>
@@ -196,9 +196,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-800">
+            <div className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
               <div className="flex items-center gap-3">
-                <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <Users className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {getTranslation("totalUsers", language)}
@@ -208,7 +208,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
                   </p>
                 </div>
               </div>
-              <span className="text-lg font-bold text-green-600 dark:text-green-400">
+              <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
                 {dashboardStats?.users.active || 0}
               </span>
             </div>
@@ -223,11 +223,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             {getTranslation("platformHealth", language)}
           </h4>
           <div className="flex items-center justify-between">
-            <span className="text-3xl font-bold text-green-600 dark:text-green-400">
+              <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
               {healthPercentage}%
             </span>
-            <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
-              <span className="text-sm font-bold text-green-600 dark:text-green-400">
+            <div className="h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
+              <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
                 ✓
               </span>
             </div>

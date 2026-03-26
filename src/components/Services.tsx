@@ -113,7 +113,7 @@ export function Services({ onGetStarted }: HeroProps) {
               <div className={`w-14 h-14 bg-gradient-to-br ${service.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-transform`}>
                 <service.icon className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-primary-500 transition-colors">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:bg-primary-500 transition-colors">
                 {service.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed text-sm">
@@ -153,7 +153,7 @@ export function Services({ onGetStarted }: HeroProps) {
                 </div>
               </div>
               <div className="p-4">
-                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-500 transition-colors">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:bg-primary-500 transition-colors">
                   {feature.title}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">

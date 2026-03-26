@@ -282,7 +282,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
           <span>{getTranslation('addStudent', language)}</span>
@@ -300,7 +300,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 placeholder={getTranslation('searchStudentsOrParents', language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -308,7 +308,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option key={"all"} value={"all"}>
                 الكل
@@ -380,7 +380,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
                       {student.trimester_grade}
                     </span>
                   </td>
@@ -392,7 +392,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       {/* hide student : disable for now  */}
-                      {/* <button className="text-primary-500 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300">
+                      {/* <button className="text-primary-500 hover:bg-primary-300">
                         <Eye className="h-4 w-4" />
                       </button> */}
 
@@ -401,7 +401,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                           setShowEditModal(true);
                           set_last_chosen_student(student.student_id);
                         }}
-                        className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        className="text-primary-600 hover:bg-primary-300"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
@@ -438,7 +438,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   type="text"
                   value={formData_creation.full_name}
                   onChange={handleChange_creation}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="الاسم الكامل"
                 />
               </div>
@@ -451,7 +451,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   name="class_group_id"
                   value={formData_creation.class_group_id}
                   onChange={handleChange_creation}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value={""}>اختر الصف</option>
                   {class_groups_list.map((cls) => (
@@ -471,7 +471,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   type="date"
                   value={formData_creation.date_of_birth}
                   onChange={handleChange_creation}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -482,7 +482,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم ولي الأمر"
                 />
               </div> */}
@@ -496,7 +496,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   name="phone"
                   value={formData_creation.phone}
                   onChange={handleChange_creation}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="0555 XX XX XX"
                 />
               </div>
@@ -515,7 +515,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   {getTranslation('add', language)}
                 </button>
@@ -543,7 +543,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   type="text"
                   value={formData_update.full_name}
                   onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="الاسم الكامل"
                 />
               </div>
@@ -557,7 +557,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   type="number"
                   value={formData_update.trimester_grade}
                   onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder=" معدل الفصل الدراسي"
                   min={0}
                   max={20}
@@ -572,7 +572,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   name="class_group_id"
                   value={formData_update.class_group_id}
                   onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value={""}>اختر الصف</option>
                   {class_groups_list.map((cls) => (
@@ -592,7 +592,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   type="date"
                   value={formData_update.date_of_birth}
                   onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -602,7 +602,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="اسم ولي الأمر"
                 />
               </div>
@@ -616,7 +616,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                   name="phone"
                   value={formData_update.phone}
                   onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="0555 XX XX XX"
                 />
               </div>
@@ -632,7 +632,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   تحديث
                 </button>

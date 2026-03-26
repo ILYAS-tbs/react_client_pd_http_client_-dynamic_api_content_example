@@ -233,7 +233,7 @@ export const SchoolsManagement: React.FC = () => {
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
                             school.is_active
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                              ? "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
                               : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                           }`}
                         >
@@ -279,7 +279,7 @@ export const SchoolsManagement: React.FC = () => {
                                     setOpenMenuId(null);
                                   }}
                                   disabled={actionLoading === `activate-${school.id}`}
-                                  className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400 disabled:opacity-50"
+                                  className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400 disabled:opacity-50"
                                 >
                                   <Unlock className="h-4 w-4" /> {getTranslation("activate", language)}
                                 </button>
@@ -367,7 +367,7 @@ export const SchoolsManagement: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-gray-500 dark:text-gray-400">{getTranslation("status", language)}</dt>
-                  <dd className={`font-medium ${detailSchool.is_active ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                  <dd className={`font-medium ${detailSchool.is_active ? "text-primary-600 dark:text-primary-400" : "text-red-600 dark:text-red-400"}`}>
                     {detailSchool.is_active ? getTranslation("active", language) : getTranslation("suspended", language)}
                   </dd>
                 </div>

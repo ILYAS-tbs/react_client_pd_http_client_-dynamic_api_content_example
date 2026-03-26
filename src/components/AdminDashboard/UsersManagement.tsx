@@ -112,7 +112,7 @@ export const UsersManagement: React.FC = () => {
       school: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
       teacher:
         "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
-      parent: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+      parent: "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400",
       student: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
       user: "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400",
     };
@@ -214,7 +214,7 @@ export const UsersManagement: React.FC = () => {
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
                             user.is_active
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                              ? "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
                               : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                           }`}
                         >
@@ -263,7 +263,7 @@ export const UsersManagement: React.FC = () => {
                                     setOpenMenuId(null);
                                   }}
                                   disabled={actionLoading === `reactivate-${user.id}`}
-                                  className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400 disabled:opacity-50"
+                                  className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400 disabled:opacity-50"
                                 >
                                   <CheckCircle className="h-4 w-4" /> {getTranslation("reactivate", language)}
                                 </button>
@@ -336,7 +336,7 @@ export const UsersManagement: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-gray-500 dark:text-gray-400">{getTranslation("status", language)}</dt>
-                  <dd className={`font-medium ${detailUser.is_active ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                  <dd className={`font-medium ${detailUser.is_active ? "text-primary-600 dark:text-primary-400" : "text-red-600 dark:text-red-400"}`}>
                     {detailUser.is_active ? getTranslation("active", language) : getTranslation("inactive", language)}
                   </dd>
                 </div>
