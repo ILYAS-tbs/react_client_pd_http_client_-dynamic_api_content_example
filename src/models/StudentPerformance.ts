@@ -1,81 +1,52 @@
-// To parse this data:
-//
-//   import { Convert, StudentPerformance } from "./file";
-//
-//   const studentPerformance = Convert.toStudentPerformance(json);
-
 export interface StudentPerformance {
-    student_id:                   string;
-    student_name:                 string;
-    student_overall_avg:          number;
-    class_group_id:               string;
-    class_group_name:             string;
-    class_group_students_number:  number;
-    class_group_students_average: number;
-    student_rank:                 number;
-    modules:                      Module[];
-    modules_stats:                ModulesStat[];
-}
-
-export interface Module {
-    module_id:   string;
-    module_name: string;
+    student_id:                  string;
+    student_name:                string;
+    class_group_id:              string | null;
+    class_group_name:            string;
+    class_group_students_number: number;
+    student_rank:                number;
+    /** Overall average across all modules for the semester. Null if no grades yet. */
+    s1_overall:                  number | null;
+    s2_overall:                  number | null;
+    s3_overall:                  number | null;
+    modules_stats:               ModulesStat[];
 }
 
 export interface ModulesStat {
-    module_name:   string;
-    module_marks:  ModuleMark[];
-    class_average: number;
-}
+    module_id:   number;
+    module_name: string;
 
-export interface ModuleMark {
-    id:            number;
-    student:       Student;
-    class_group:   ClassGroup;
-    s1_devoir_1:   number;
-    s1_devoir_2:   number;
-    s1_tests:      number;
-    s1_homeworks:  number;
-    s1_evaluation: number;
-    s1_exam:       number;
-    s1_average:    number;
-    s2_devoir_1:   number;
-    s2_devoir_2:   number;
-    s2_tests:      number;
-    s2_homeworks:  number;
-    s2_evaluation: number;
-    s2_exam:       number;
-    s2_average:    number;
-    year:          number;
-    teacher:       number;
-    module:        string;
-}
+    // Student's semester averages (read directly from StudentGrades, null if not set)
+    s1_average: number | null;
+    s2_average: number | null;
+    s3_average: number | null;
 
-export interface ClassGroup {
-    class_group_id: string;
-    name:           string;
-    school:         number;
-    teacher_list:   null;
-    academic_year:  string;
-}
+    // Individual grade fields — s1
+    s1_devoir_1:   number | null;
+    s1_devoir_2:   number | null;
+    s1_tests:      number | null;
+    s1_homeworks:  number | null;
+    s1_evaluation: number | null;
+    s1_exam:       number | null;
 
-export interface Student {
-    student_id:      string;
-    full_name:       string;
-    is_absent:       boolean;
-    phone:           string;
-    academic_state:  string;
-    date_of_birth:   Date;
-    trimester_grade: number;
-}
+    // Individual grade fields — s2
+    s2_devoir_1:   number | null;
+    s2_devoir_2:   number | null;
+    s2_tests:      number | null;
+    s2_homeworks:  number | null;
+    s2_evaluation: number | null;
+    s2_exam:       number | null;
 
-// Converts JSON strings to/from your types
-export class StudentPerformanceConvert {
-    public static toStudentPerformance(json: string): StudentPerformance {
-        return JSON.parse(json);
-    }
+    // Individual grade fields — s3
+    s3_devoir_1:   number | null;
+    s3_devoir_2:   number | null;
+    s3_tests:      number | null;
+    s3_homeworks:  number | null;
+    s3_evaluation: number | null;
+    s3_exam:       number | null;
 
-    public static studentPerformanceToJson(value: StudentPerformance): string {
-        return JSON.stringify(value);
-    }
+    // Class averages per semester for this module
+    class_s1_average: number | null;
+    class_s2_average: number | null;
+    class_s3_average: number | null;
 }

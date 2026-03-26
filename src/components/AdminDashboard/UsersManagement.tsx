@@ -57,7 +57,7 @@ export const UsersManagement: React.FC = () => {
       setUsers(results);
       setTotalPages(Math.ceil(count / 15));
     } catch (err) {
-      setError(err instanceof Error ? err.message : getTranslation("errorMessage", language));
+      setError(err instanceof Error ? err.message : getTranslation("admin.errorMessage", language));
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ export const UsersManagement: React.FC = () => {
       setActionLoading(`deactivate-${userId}`);
       setError(null);
       await adminApiClient.deactivateUser(userId);
-      setSuccess(getTranslation("userDeactivatedSuccessfully", language));
+      setSuccess(getTranslation("admin.userDeactivatedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       setConfirmAction(null);
       fetchUsers();
@@ -94,7 +94,7 @@ export const UsersManagement: React.FC = () => {
       setActionLoading(`reactivate-${userId}`);
       setError(null);
       await adminApiClient.reactivateUser(userId);
-      setSuccess(getTranslation("userReactivatedSuccessfully", language));
+      setSuccess(getTranslation("admin.userReactivatedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       setConfirmAction(null);
       fetchUsers();
@@ -131,7 +131,7 @@ export const UsersManagement: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("userManagement", language)}
+            {getTranslation("admin.userManagement", language)}
           </h3>
 
           <div className="flex flex-col md:flex-row gap-3">
@@ -139,7 +139,7 @@ export const UsersManagement: React.FC = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={getTranslation("searchUsers", language)}
+                placeholder={getTranslation("admin.searchUsers", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none w-full md:w-48"
@@ -151,11 +151,11 @@ export const UsersManagement: React.FC = () => {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allRoles", language)}</option>
-              <option value="school">{getTranslation("school", language)}</option>
-              <option value="teacher">{getTranslation("teacher", language)}</option>
-              <option value="parent">{getTranslation("parent", language)}</option>
-              <option value="student">{getTranslation("student", language)}</option>
+              <option value="all">{getTranslation("admin.allRoles", language)}</option>
+              <option value="school">{getTranslation("admin.schoolAdmin", language)}</option>
+              <option value="teacher">{getTranslation("admin.teacher", language)}</option>
+              <option value="parent">{getTranslation("admin.parent", language)}</option>
+              <option value="student">{getTranslation("admin.student", language)}</option>
             </select>
 
             <select
@@ -163,30 +163,30 @@ export const UsersManagement: React.FC = () => {
               onChange={(e) => setActiveFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allStatus", language)}</option>
-              <option value="active">{getTranslation("active", language)}</option>
-              <option value="inactive">{getTranslation("inactive", language)}</option>
+              <option value="all">{getTranslation("admin.allStatus", language)}</option>
+              <option value="active">{getTranslation("admin.active", language)}</option>
+              <option value="inactive">{getTranslation("admin.inactive", language)}</option>
             </select>
           </div>
         </div>
 
         {loading ? (
-          <LoadingSpinner message={getTranslation("loadingUsers", language)} />
+          <LoadingSpinner message={getTranslation("admin.loadingUsers", language)} />
         ) : (
           <>
             {users.length === 0 && (
-              <EmptyState message={getTranslation("noUsers", language)} />
+              <EmptyState message={getTranslation("admin.noUsers", language)} />
             )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
-                    <th className="pb-3 font-medium">{getTranslation("username", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("email", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("userType", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("status", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("joined", language)}</th>
-                    <th className="pb-3 font-medium text-right">{getTranslation("actions", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.username", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.email", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.userType", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.status", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.joined", language)}</th>
+                    <th className="pb-3 font-medium text-right">{getTranslation("admin.actions", language)}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -218,7 +218,7 @@ export const UsersManagement: React.FC = () => {
                               : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                           }`}
                         >
-                          {user.is_active ? getTranslation("active", language) : getTranslation("inactive", language)}
+                          {user.is_active ? getTranslation("admin.active", language) : getTranslation("admin.inactive", language)}
                         </span>
                       </td>
                       <td className="py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -243,7 +243,7 @@ export const UsersManagement: React.FC = () => {
                                 onClick={() => { setDetailUser(user); setOpenMenuId(null); }}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm text-gray-700 dark:text-gray-200"
                               >
-                                <Eye className="h-4 w-4" /> {getTranslation("viewDetails", language)}
+                                <Eye className="h-4 w-4" /> {getTranslation("admin.viewDetails", language)}
                               </button>
                               {user.is_active ? (
                                 <button
@@ -254,7 +254,7 @@ export const UsersManagement: React.FC = () => {
                                   disabled={actionLoading === `deactivate-${user.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400 disabled:opacity-50"
                                 >
-                                  <Ban className="h-4 w-4" /> {getTranslation("deactivate", language)}
+                                  <Ban className="h-4 w-4" /> {getTranslation("admin.deactivate", language)}
                                 </button>
                               ) : (
                                 <button
@@ -265,7 +265,7 @@ export const UsersManagement: React.FC = () => {
                                   disabled={actionLoading === `reactivate-${user.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400 disabled:opacity-50"
                                 >
-                                  <CheckCircle className="h-4 w-4" /> {getTranslation("reactivate", language)}
+                                  <CheckCircle className="h-4 w-4" /> {getTranslation("admin.reactivate", language)}
                                 </button>
                               )}
                             </div>
@@ -281,7 +281,7 @@ export const UsersManagement: React.FC = () => {
             {/* Pagination */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("page", language)} {currentPage} {getTranslation("of", language)} {totalPages}
+                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
@@ -323,25 +323,25 @@ export const UsersManagement: React.FC = () => {
               </div>
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("username", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.username", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{detailUser.username}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("email", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.email", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{detailUser.email}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("userType", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.userType", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium capitalize">{detailUser.role}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("status", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.status", language)}</dt>
                   <dd className={`font-medium ${detailUser.is_active ? "text-primary-600 dark:text-primary-400" : "text-red-600 dark:text-red-400"}`}>
-                    {detailUser.is_active ? getTranslation("active", language) : getTranslation("inactive", language)}
+                    {detailUser.is_active ? getTranslation("admin.active", language) : getTranslation("admin.inactive", language)}
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("joined", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.joined", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{new Date(detailUser.date_joined).toLocaleDateString()}</dd>
                 </div>
               </dl>
@@ -356,18 +356,18 @@ export const UsersManagement: React.FC = () => {
       {/* Confirm Deactivate/Reactivate */}
       {confirmAction && (
         <ConfirmDialog
-          title={getTranslation("confirmActionTitle", language)}
+          title={getTranslation("admin.confirmActionTitle", language)}
           message={
             confirmAction.type === "deactivate"
-              ? getTranslation("confirmDeactivate", language)
-              : getTranslation("confirmReactivate", language)
+              ? getTranslation("admin.confirmDeactivate", language)
+              : getTranslation("admin.confirmReactivate", language)
           }
           confirmLabel={
             confirmAction.type === "deactivate"
-              ? getTranslation("deactivate", language)
-              : getTranslation("reactivate", language)
+              ? getTranslation("admin.deactivate", language)
+              : getTranslation("admin.reactivate", language)
           }
-          cancelLabel={getTranslation("cancel", language)}
+          cancelLabel={getTranslation("admin.cancel", language)}
           onConfirm={() =>
             confirmAction.type === "deactivate"
               ? handleDeactivateUser(confirmAction.id)

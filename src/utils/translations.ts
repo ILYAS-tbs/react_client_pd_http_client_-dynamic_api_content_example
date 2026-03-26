@@ -1694,6 +1694,16 @@ export const translations: Translations = {
     en: "Grade Reports",
     fr: "Rapports de Notes",
   },
+  noGradeDataAvailable: {
+    ar: "لا توجد بيانات درجات متاحة بعد لهذا الطالب",
+    en: "No grade data available yet for this student",
+    fr: "Aucune note disponible pour cet élève",
+  },
+  noStudentsFound: {
+    ar: "لا يوجد طلاب مرتبطون بهذا الحساب",
+    en: "No students linked to this account",
+    fr: "Aucun élève lié à ce compte",
+  },
   exportReport: {
     ar: "تصدير التقرير",
     en: "Export Report",
@@ -2359,8 +2369,11 @@ export const translations: Translations = {
     fr: "Soumettre le rapport",
   },
 
+  schools: { ar: "المدارس", en: "Schools", fr: "Écoles" },
+
   // Admin Dashboard :: 
-  platformAdmin: {
+  admin: {
+    platformAdmin: {
     ar: "مسؤول المنصة",
     en: "Platform Admin",
     fr: "Administrateur de Plateforme",
@@ -2456,6 +2469,21 @@ export const translations: Translations = {
     ar: "ثانوي",
     en: "High",
     fr: "Secondaire",
+  },
+  primarySchool: {
+    ar: "مدرسة ابتدائية",
+    en: "Primary School",
+    fr: "École Primaire",
+  },
+  middleSchool: {
+    ar: "مدرسة متوسطة",
+    en: "Middle School",
+    fr: "École Moyenne",
+  },
+  highSchool: {
+    ar: "مدرسة ثانوية",
+    en: "High School",
+    fr: "École Secondaire",
   },
   schoolType: {
     ar: "نوع المدرسة",
@@ -2553,6 +2581,11 @@ export const translations: Translations = {
     ar: "جميع الأدوار",
     en: "All Roles",
     fr: "Tous les Rôles",
+  },
+  schoolAdmin: {
+    ar: "إدارة مدرسة",
+    en: "School Admin",
+    fr: "Administration Scolaire",
   },
   allStatus: {
     ar: "جميع الحالات",
@@ -2732,11 +2765,6 @@ export const translations: Translations = {
     ar: "متوسطة",
     en: "Medium",
     fr: "Moyenne",
-  },
-  high: {
-    ar: "عالية",
-    en: "High",
-    fr: "Élevée",
   },
   targetGroup: {
     ar: "المجموعة المستهدفة",
@@ -2928,11 +2956,6 @@ export const translations: Translations = {
     en: "Pending Actions",
     fr: "Actions en attente",
   },
-  pendingReports: {
-    ar: "التقارير المعلقة",
-    en: "Pending Reports",
-    fr: "Rapports en attente",
-  },
   absenceReportsAwaitingReview: {
     ar: "تقارير الغياب بانتظار المراجعة",
     en: "Absence reports awaiting review",
@@ -3060,112 +3083,21 @@ export const translations: Translations = {
     en: "Currently online",
     fr: "En ligne actuellement",
   },
-  // Additional missing keys
+  // Confirmation and status messages
   created: {
     ar: "تاريخ الإنشاء",
     en: "Created",
     fr: "Créé",
-  },
-  published: {
-    ar: "منشور",
-    en: "Published",
-    fr: "Publié",
-  },
-  draft: {
-    ar: "مسودة",
-    en: "Draft",
-    fr: "Brouillon",
   },
   target: {
     ar: "الهدف",
     en: "Target",
     fr: "Cible",
   },
-  publish: {
-    ar: "نشر",
-    en: "Publish",
-    fr: "Publier",
-  },
-  archive: {
-    ar: "أرشيف",
-    en: "Archive",
-    fr: "Archiver",
-  },
   new: {
     ar: "جديد",
     en: "New",
     fr: "Nouveau",
-  },
-  loadingSchools: {
-    ar: "جاري تحميل المدارس...",
-    en: "Loading schools...",
-    fr: "Chargement des écoles...",
-  },
-  loadingAnnouncements: {
-    ar: "جاري تحميل الإعلانات...",
-    en: "Loading announcements...",
-    fr: "Chargement des annonces...",
-  },
-  loadingReports: {
-    ar: "جاري تحميل التقارير...",
-    en: "Loading reports...",
-    fr: "Chargement des rapports...",
-  },
-  loadingSubscriptions: {
-    ar: "جاري تحميل الاشتراكات...",
-    en: "Loading subscriptions...",
-    fr: "Chargement des abonnements...",
-  },
-  // Announcement-specific keys
-  cancel: {
-    ar: "إلغاء",
-    en: "Cancel",
-    fr: "Annuler",
-  },
-  create: {
-    ar: "إنشاء",
-    en: "Create",
-    fr: "Créer",
-  },
-  title: {
-    ar: "العنوان",
-    en: "Title",
-    fr: "Titre",
-  },
-  content: {
-    ar: "المحتوى",
-    en: "Content",
-    fr: "Contenu",
-  },
-  priority: {
-    ar: "الأولوية",
-    en: "Priority",
-    fr: "Priorité",
-  },
-  low: {
-    ar: "منخفضة",
-    en: "Low",
-    fr: "Faible",
-  },
-  medium: {
-    ar: "متوسطة",
-    en: "Medium",
-    fr: "Moyen",
-  },
-  high: {
-    ar: "عالية",
-    en: "High",
-    fr: "Élevé",
-  },
-  targetGroup: {
-    ar: "مجموعة الهدف",
-    en: "Target Group",
-    fr: "Groupe cible",
-  },
-  category: {
-    ar: "الفئة",
-    en: "Category",
-    fr: "Catégorie",
   },
   announcementTitle: {
     ar: "عنوان الإعلان",
@@ -3239,16 +3171,6 @@ export const translations: Translations = {
     en: "Subscriptions Management",
     fr: "Gestion des abonnements",
   },
-  searchSubscriptions: {
-    ar: "ابحث عن الاشتراكات...",
-    en: "Search subscriptions...",
-    fr: "Rechercher des abonnements...",
-  },
-  allStatus: {
-    ar: "جميع الحالات",
-    en: "All Status",
-    fr: "Tous les statuts",
-  },
   sub200: {
     ar: "اشتراك 200",
     en: "Sub 200",
@@ -3258,31 +3180,6 @@ export const translations: Translations = {
     ar: "اشتراك 500",
     en: "Sub 500",
     fr: "Abonnement 500",
-  },
-  free: {
-    ar: "مجاني",
-    en: "Free",
-    fr: "Gratuit",
-  },
-  inactive: {
-    ar: "غير نشط",
-    en: "Inactive",
-    fr: "Inactif",
-  },
-  startDate: {
-    ar: "تاريخ البداية",
-    en: "Start Date",
-    fr: "Date de début",
-  },
-  expiryDate: {
-    ar: "تاريخ الانتهاء",
-    en: "Expiry Date",
-    fr: "Date d'expiration",
-  },
-  expired: {
-    ar: "منتهي الصلاحية",
-    en: "Expired",
-    fr: "Expiré",
   },
   durationMonths: {
     ar: "المدة (بالأشهر)",
@@ -3333,13 +3230,11 @@ export const translations: Translations = {
   cancelSubscription: { ar: "إلغاء الاشتراك", en: "Cancel Subscription", fr: "Annuler l'abonnement" },
   confirmCancelSubscription: { ar: "هل أنت متأكد من إلغاء هذا الاشتراك؟", en: "Are you sure you want to cancel this subscription?", fr: "Êtes-vous sûr de vouloir annuler cet abonnement ?" },
   deleteAnnouncement: { ar: "حذف الإعلان", en: "Delete Announcement", fr: "Supprimer l'annonce" },
-  confirmDeleteAnnouncement: { ar: "هل أنت متأكد من حذف هذا الإعلان؟", en: "Are you sure you want to delete this announcement?", fr: "Êtes-vous sûr de vouloir supprimer cette annonce ?" },
+  confirmDeleteAnnouncement: { ar: "هل أنت متأكد من حذف هذا الإعلان؟", en: "Are you sure you want to delete this announcement?", fr: "Êtes-vous sûر de vouloir supprimer cette annonce ?" },
   totalUsers: { ar: "إجمالي المستخدمين", en: "Total Users", fr: "Total des utilisateurs" },
   activeUserAccounts: { ar: "حسابات المستخدمين النشطة", en: "Active user accounts", fr: "Comptes utilisateurs actifs" },
-  platformHealth: { ar: "صحة المنصة", en: "Platform Health", fr: "Santé de la plateforme" },
   activeUsersRatio: { ar: "نسبة المستخدمين النشطين", en: "Active users ratio", fr: "Ratio des utilisateurs actifs" },
   totalRegistrations: { ar: "إجمالي التسجيلات", en: "Total Registrations", fr: "Total des inscriptions" },
-  activeUsers: { ar: "المستخدمون النشطون", en: "Active Users", fr: "Utilisateurs actifs" },
   currentlyActive: { ar: "نشط حالياً", en: "Currently active", fr: "Actuellement actif" },
   selectSchoolForAnnouncement: { ar: "اختر المدرسة للإعلان", en: "Select school for announcement", fr: "Sélectionner l'école pour l'annonce" },
   schoolActivatedSuccessfully: { ar: "تم تفعيل المدرسة بنجاح", en: "School activated successfully", fr: "École activée avec succès" },
@@ -3347,9 +3242,27 @@ export const translations: Translations = {
   userDeactivatedSuccessfully: { ar: "تم تعطيل المستخدم بنجاح", en: "User deactivated successfully", fr: "Utilisateur désactivé avec succès" },
   userReactivatedSuccessfully: { ar: "تم إعادة تفعيل المستخدم بنجاح", en: "User reactivated successfully", fr: "Utilisateur réactivé avec succès" },
   classes: { ar: "الفصول", en: "Classes", fr: "Classes" },
+  // Additional missing keys for Admin Dashboard
+  cancel: { ar: "إلغاء", en: "Cancel", fr: "Annuler" },
+  selectSchool: { ar: "اختر المدرسة", en: "Select School", fr: "Sélectionner l'École" },
+  category: { ar: "الفئة", en: "Category", fr: "Catégorie" },
+  users: { ar: "المستخدمون", en: "Users", fr: "Utilisateurs" },
+  teachers: { ar: "المعلمون", en: "Teachers", fr: "Enseignants" },
+  },
 };
 
 export function getTranslation(key: string, language: string): string {
+  // Handle nested keys (e.g., "admin.overview")
+  if (key.includes('.')) {
+    const keys = key.split('.');
+    let entry = translations;
+    for (const k of keys) {
+      entry = entry?.[k];
+      if (!entry) return key;
+    }
+    return entry[language] || entry.ar || key;
+  }
+
   const entry = translations[key];
 
   // Return key if translation doesn't exist

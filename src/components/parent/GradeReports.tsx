@@ -1,327 +1,264 @@
 import { useState } from "react";
-import {
-  TrendingUp,
-  TrendingDown,
-  Download,
-  Filter,
-} from "lucide-react";
+import { TrendingUp, TrendingDown, ChevronDown, ChevronUp } from "lucide-react";
 import { GradeReportsProps } from "../../types";
 import { Student } from "../../models/Student";
+import { ModulesStat, StudentPerformance } from "../../models/StudentPerformance";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
 
-interface Subject {
-  name: string;
-  current: number;
-  previous: number;
-  average: number;
-  assessments: Assessment[];
-}
+type Semester = "s1" | "s2" | "s3";
 
-interface Assessment {
-  name: string;
-  grade: number;
-  max: number;
-  date: Date;
-  weight: number;
-}
-
-interface ChildPerformance {
-  overall: number;
-  trend: string;
-  position: number;
-  totalStudents: number;
-  subjects: Subject[];
-}
-
-const translateMarkType = (type: string | undefined): string => {
-  if (!type) return "غير محدد";
-  type = type.replace(/^s\d_/, "").trim().toLowerCase();
-  const match = type.match(/([a-zA-Z]+)_?(\d*)/);
-  if (!match) return type ?? "غير محدد";
-
-  const base = match[1];
-  const num = parseInt(match[2] ?? "0") || 0;
-
-  let baseAr: string;
-  switch (base) {
-    case "devoir": baseAr = "الفرض"; break;
-    case "exam": baseAr = "الامتحان"; break;
-    case "test":
-    case "tests": baseAr = "الاختبار"; break;
-    case "homework":
-    case "homeworks": baseAr = "الواجب المنزلي"; break;
-    case "evaluation": baseAr = "التقييم المستمر"; break;
-    case "quiz": baseAr = "الاختبار القصير"; break;
-    case "project": baseAr = "المشروع"; break;
-    case "assignment": baseAr = "التكليف"; break;
-    case "presentation": baseAr = "العرض الشفوي"; break;
-    case "participation": baseAr = "المشاركة الصفية"; break;
-    case "oral": baseAr = "الشفهي"; break;
-    case "practical": baseAr = "العملي"; break;
-    case "final": baseAr = "الامتحان النهائي"; break;
-    case "midterm": baseAr = "الامتحان النصفي"; break;
-    case "average": baseAr = "المعدل"; break;
-    default: return type;
-  }
-
-  const numbersAr = [
-    "", "الأول", "الثاني", "الثالث", "الرابع", "الخامس",
-    "السادس", "السابع", "الثامن", "التاسع", "العاشر"
-  ];
-
-  return num > 0 && num < numbersAr.length ? `${baseAr} ${numbersAr[num]}` : baseAr;
+const semesterLabels: Record<Semester, { ar: string; en: string; fr: string }> = {
+  s1: { ar: "الفصل الأول", en: "Semester 1", fr: "Semestre 1" },
+  s2: { ar: "الفصل الثاني", en: "Semester 2", fr: "Semestre 2" },
+  s3: { ar: "الفصل الثالث", en: "Semester 3", fr: "Semestre 3" },
 };
 
-const GradeReports: React.FC<GradeReportsProps> = ({
-  students,
-  studentPerformances,
-}) => {
-  const children = students.map((s: Student) => ({
-    id: s.student_id,
-    name: s.full_name,
-  }));
+const gradeFieldLabels: Record<string, { ar: string; en: string; fr: string }> = {
+  devoir_1:   { ar: "الفرض الأول",          en: "Exam 1",        fr: "Devoir 1" },
+  devoir_2:   { ar: "الفرض الثاني",         en: "Exam 2",        fr: "Devoir 2" },
+  tests:      { ar: "الاختبار",             en: "Test",          fr: "Test" },
+  homeworks:  { ar: "الواجب المنزلي",       en: "Homework",      fr: "Devoir maison" },
+  evaluation: { ar: "التقييم المستمر",      en: "Assessment",    fr: "Contrôle continu" },
+  exam:       { ar: "الامتحان الفصلي",      en: "Final Exam",    fr: "Examen" },
+};
 
-  const { language } = useLanguage();
+function getGradeColor(g: number | null) {
+  if (g === null) return "text-gray-400 dark:text-gray-500";
+  if (g >= 16) return "text-emerald-600 dark:text-emerald-400";
+  if (g >= 12) return "text-primary-600 dark:text-primary-400";
+  if (g >= 10) return "text-yellow-600 dark:text-yellow-400";
+  return "text-red-600 dark:text-red-400";
+}
 
-  const [selectedChild, setSelectedChild] = useState(children[0]?.id || "");
-  const [selectedPeriod, setSelectedPeriod] = useState("current");
-  const [selectedSubject, setSelectedSubject] = useState("all");
+function fmt(v: number | null): string {
+  return v !== null && v !== undefined ? v.toFixed(2) : "—";
+}
 
-  const periods = [
-    { id: "current", label: getTranslation("currentSemester", language) },
-    { id: "semester1", label: getTranslation("firstSemester", language) },
-    { id: "semester2", label: getTranslation("secondSemester", language) },
-    { id: "semester3", label: getTranslation("thirdSemester", language) },
-    { id: "year", label: getTranslation("academicYear", language) },
-  ];
-
-  const gradeData: Record<string, ChildPerformance> = students.reduce(
-    (acc, student, index) => {
-      const perf = studentPerformances[index];
-      if (!perf) return acc;
-
-      const mapped_subjects: Subject[] = perf.modules_stats
-        .map((module_stat) => {
-          const moduleMark = module_stat.module_marks[0];
-          if (!moduleMark) return null;
-
-          // Dynamic semester prefix
-          let prefix = "s1_"; // default
-          if (selectedPeriod.startsWith("semester")) {
-            prefix = `s${selectedPeriod.slice(-1)}_`;
-          }
-
-          const fields = Object.entries(moduleMark)
-            .filter(([key]) => key.startsWith(prefix))
-            .map(([key, value]) => ({ key, value }));
-
-          const assessments: Assessment[] = fields
-            .filter(f => !f.key.endsWith("average") && typeof f.value === "number")
-            .map(f => ({
-              name: translateMarkType(f.key.replace(prefix, "")),
-              grade: f.value as number,
-              max: 20,
-              date: new Date(),
-              weight: 0,
-            }));
-
-          const currentAverage = (moduleMark as any)[`${prefix}average`] ?? 0;
-
-          return {
-            name: module_stat.module_name,
-            current: currentAverage,
-            previous: 0,
-            average: module_stat.class_average,
-            assessments,
-          } as Subject;
-        })
-        .filter(Boolean) as Subject[];
-
-      acc[student.student_id] = {
-        overall: perf.student_overall_avg,
-        trend: "+0.8",
-        position: perf.student_rank,
-        totalStudents: perf.class_group_students_number,
-        subjects: mapped_subjects,
-      };
-
-      return acc;
-    },
-    {} as Record<string, ChildPerformance>
+// --- Loading skeleton ---
+function GradeSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      {[1, 2].map((i) => (
+        <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+          <div className="h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+          <div className="flex gap-3 mb-5">
+            {[1, 2, 3].map((j) => (
+              <div key={j} className="h-9 w-28 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+            ))}
+          </div>
+          <div className="grid md:grid-cols-3 gap-4 mb-5">
+            {[1, 2, 3].map((j) => (
+              <div key={j} className="h-20 bg-gray-100 dark:bg-gray-700 rounded-lg" />
+            ))}
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((j) => (
+              <div key={j} className="h-12 bg-gray-100 dark:bg-gray-700 rounded-lg" />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
+}
 
-  const currentData: ChildPerformance | undefined = gradeData[selectedChild];
-  const filteredSubjects =
-    selectedSubject === "all"
-      ? currentData?.subjects
-      : currentData?.subjects?.filter((s: Subject) => s.name === selectedSubject);
+// --- Per-module row ---
+interface ModuleRowProps {
+  mod: ModulesStat;
+  semester: Semester;
+  language: string;
+}
 
-  const getGradeColor = (grade: number) => {
-    if (grade >= 16) return "text-primary-600";
-    if (grade >= 12) return "text-primary-500";
-    if (grade >= 10) return "text-yellow-600";
-    return "text-red-600";
-  };
+function ModuleRow({ mod, semester, language }: ModuleRowProps) {
+  const [expanded, setExpanded] = useState(false);
 
-  const getGradeBgColor = (grade: number) => {
-    if (grade >= 16) return "bg-primary-100 dark:bg-primary-900";
-    if (grade >= 12) return "bg-primary-100 dark:bg-primary-900/20";
-    if (grade >= 10) return "bg-yellow-100 dark:bg-yellow-900";
-    return "bg-red-100 dark:bg-red-900";
-  };
+  const studentAvg = mod[`${semester}_average`] as number | null;
+  const classAvg = mod[`class_${semester}_average`] as number | null;
+  const diff = studentAvg !== null && classAvg !== null ? studentAvg - classAvg : null;
 
-  const getTrendIcon = (current: number, previous: number) => {
-    if (current > previous)
-      return <TrendingUp className="h-4 w-4 text-primary-500" />;
-    if (current < previous)
-      return <TrendingDown className="h-4 w-4 text-red-500" />;
-    return <div className="h-4 w-4"></div>;
-  };
+  const gradeFields = ["devoir_1", "devoir_2", "tests", "homeworks", "evaluation", "exam"] as const;
 
+  return (
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      {/* Main row */}
+      <button
+        onClick={() => setExpanded((p) => !p)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+      >
+        <span className="font-medium text-gray-900 dark:text-white">{mod.module_name}</span>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <span className={`text-base font-bold ${getGradeColor(studentAvg)}`}>
+              {fmt(studentAvg)}/20
+            </span>
+            {classAvg !== null && (
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                ({getTranslation("classAverage", language)}: {fmt(classAvg)})
+              </span>
+            )}
+            {diff !== null && (
+              <span className={`ml-2 inline-flex items-center gap-0.5 text-xs font-medium ${diff >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                {diff >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                {diff >= 0 ? "+" : ""}{diff.toFixed(2)}
+              </span>
+            )}
+          </div>
+          {expanded ? (
+            <ChevronUp className="h-4 w-4 text-gray-500" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-gray-500" />
+          )}
+        </div>
+      </button>
 
+      {/* Expanded individual grades */}
+      {expanded && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 bg-white dark:bg-gray-800">
+          {gradeFields.map((field) => {
+            const key = `${semester}_${field}` as keyof ModulesStat;
+            const val = mod[key] as number | null;
+            const label = gradeFieldLabels[field]?.[language as "ar" | "en" | "fr"] ?? field;
+            return (
+              <div key={field} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 truncate">{label}</p>
+                <p className={`text-lg font-bold ${getGradeColor(val)}`}>
+                  {fmt(val)}{val !== null ? "/20" : ""}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Per-student card ---
+interface StudentCardProps {
+  student: Student;
+  perf: StudentPerformance | undefined;
+  language: string;
+}
+
+function StudentCard({ student, perf, language }: StudentCardProps) {
+  const [semester, setSemester] = useState<Semester>("s1");
+
+  if (!perf) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{student.full_name}</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {getTranslation("noGradeDataAvailable", language)}
+        </p>
+      </div>
+    );
+  }
+
+  const overallAvg = perf[`${semester}_overall`] as number | null;
+  const semesters: Semester[] = ["s1", "s2", "s3"];
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Card header */}
+      <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{perf.student_name}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {perf.class_group_name}
+              {perf.class_group_students_number > 0 && (
+                <> &mdash; {getTranslation("rank", language)}: <span className="font-medium text-primary-600">#{perf.student_rank}</span> / {perf.class_group_students_number}</>
+              )}
+            </p>
+          </div>
+          {/* Semester toggle */}
+          <div className="flex gap-2">
+            {semesters.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSemester(s)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  semester === s
+                    ? "bg-primary-600 text-white"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                }`}
+              >
+                {semesterLabels[s][language as "ar" | "en" | "fr"] ?? s.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Semester overview */}
+      <div className="px-5 pt-4 pb-2">
+        <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl mb-4">
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{getTranslation("average", language)}</p>
+            <p className={`text-3xl font-bold ${getGradeColor(overallAvg)}`}>{fmt(overallAvg)}<span className="text-base font-normal text-gray-400">/20</span></p>
+          </div>
+          {overallAvg !== null && (
+            <div className="flex-1 text-sm text-gray-500 dark:text-gray-400">
+              {overallAvg >= 10
+                ? <span className="text-emerald-600 dark:text-emerald-400 font-medium">✓ {language === "ar" ? "ناجح" : language === "fr" ? "Admis" : "Passing"}</span>
+                : <span className="text-red-500 font-medium">✗ {language === "ar" ? "راسب" : language === "fr" ? "Insuffisant" : "Below average"}</span>
+              }
+            </div>
+          )}
+        </div>
+
+        {/* Module list */}
+        {perf.modules_stats.length === 0 ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
+            {getTranslation("noGradeDataAvailable", language)}
+          </p>
+        ) : (
+          <div className="space-y-2 pb-4">
+            {perf.modules_stats.map((mod) => (
+              <ModuleRow key={mod.module_id} mod={mod} semester={semester} language={language} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- Main component ---
+const GradeReports: React.FC<GradeReportsProps> = ({ students, studentPerformances }) => {
+  const { language } = useLanguage();
+  const isLoading = students.length > 0 && studentPerformances.length === 0;
 
   return (
     <div className="space-y-6">
-      {/* Header and Filters */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation("gradeReports", language)}
-        </h2>
-        <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-          <Download className="h-4 w-4" />
-          <span>{getTranslation("exportReport", language)}</span>
-        </button>
-      </div>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        {getTranslation("gradeReports", language)}
+      </h2>
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-        <div className="grid md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation("child", language)}
-            </label>
-            <select
-              value={selectedChild}
-              onChange={(e) => setSelectedChild(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              {children.map((child) => (
-                <option key={child.id} value={child.id}>
-                  {child.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation("Filtering", language)}
-            </label>
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              {periods.map((period) => (
-                <option key={period.id} value={period.id}>
-                  {period.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation("Subject", language)}
-            </label>
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="all">{getTranslation("allSubjects", language)}</option>
-              {currentData?.subjects?.map((subject: Subject) => (
-                <option key={subject.name} value={subject.name}>
-                  {subject.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-end">
-            <button className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors">
-              <Filter className="h-4 w-4" />
-              <span>{getTranslation("apply", language)}</span>
-            </button>
-          </div>
+      {isLoading ? (
+        <GradeSkeleton />
+      ) : students.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
+          {getTranslation("noStudentsFound", language)}
         </div>
-      </div>
-
-      {/* Overall Performance */}
-      <div className="grid md:grid-cols-4 gap-6">
-        {/* ... Your existing cards (Overall, Rank, Subjects, Highest Score) */}
-      </div>
-
-      {/* Subject Performance */}
-      <div className="min-h-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {getTranslation("subjectPerformance", language)}
-        </h3>
-        <div className="space-y-4">
-          {filteredSubjects?.map((subject: Subject, index: number) => (
-            <div key={index} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {subject.name}
-                  </h4>
-                  {getTrendIcon(subject.current, subject.previous)}
-                </div>
-                <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                  <div className="text-center">
-                    <div className={`text-lg font-bold ${getGradeColor(subject.current)}`}>
-                      {subject.current}/20
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {getTranslation("currentGrade", language)}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {subject.average}/20
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {getTranslation("classAverage", language)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
-                {subject.assessments.map((assessment: Assessment, assessmentIndex: number) => (
-                  <div key={assessmentIndex} className={`p-3 rounded-lg ${getGradeBgColor(assessment.grade)}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <h5 className="text-sm font-medium text-gray-900 dark:text-white">
-                        {assessment.name}
-                      </h5>
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
-                        {assessment.weight}%
-                      </span>
-                    </div>
-                    <div className={`text-lg font-bold ${getGradeColor(assessment.grade)}`}>
-                      {assessment.grade}/{assessment.max}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {assessment.date.toLocaleDateString()}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+      ) : (
+        <div className="space-y-6">
+          {students.map((student: Student) => {
+            const perf = studentPerformances.find(
+              (p) => String(p.student_id) === String(student.student_id)
+            );
+            return (
+              <StudentCard
+                key={student.student_id}
+                student={student}
+                perf={perf}
+                language={language}
+              />
+            );
+          })}
         </div>
-      </div>
+      )}
     </div>
   );
 };

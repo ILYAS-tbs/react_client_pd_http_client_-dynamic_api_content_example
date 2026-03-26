@@ -4,13 +4,12 @@ import {
   BookOpen,
   Calendar,
   TrendingUp,
-  Award,
-  Clock,
   AlertTriangle,
   TrendingDown,
 } from "lucide-react";
 import { ChildrenOverviewProps } from "../../types";
 import { Student } from "../../models/Student";
+import { StudentPerformance } from "../../models/StudentPerformance";
 import { getAge } from "../../lib/dateUtils";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -19,6 +18,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
   students,
   one_student_absences,
   setActiveTab,
+  studentPerformances,
 }) => {
   const [selectedChild, setSelectedChild] = useState(students?.[0]?.student_id);
 
@@ -151,68 +151,35 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
 
     return getTranslation("poorPerformance", language);
   }
-  const children = students.map((student: Student) => ({
+  const children = students.map((student: Student) => {
+    const perf: StudentPerformance | undefined = studentPerformances.find(
+      (p) => String(p.student_id) === String(student.student_id)
+    );
+    const overallScore = perf?.s1_overall ?? perf?.s2_overall ?? perf?.s3_overall ?? null;
+    return ({
     id: student.student_id,
     name: student.full_name,
     class: student.class_group?.name,
     age: getAge(new Date(student.date_of_birth ?? "2000-01-01").toString()),
     school: student.school.school_name,
     teacher: "...",
-    overallGrade: student.trimester_grade || 0,
+    overallGrade: overallScore ?? student.trimester_grade ?? 0,
     attendance: one_student_absences(student),
     behavior: student.academic_state,
-    subjects: student.module_grades?.["s1"]?.map((module_grade) => {
-      const key = Object.keys(module_grade)[0]!; // e.g. "الرياضيات"
-
+    subjects: perf?.modules_stats?.map((mod) => ({
+      name: mod.module_name,
+      grade: mod.s1_average ?? 0,
+      teacher: "",
+    })) ?? student.module_grades?.["s1"]?.map((module_grade) => {
+      const key = Object.keys(module_grade)[0]!;
       const value = module_grade[key]!;
-
-      const grade = {
-        name: key,
-        grade: value.average,
-        teacher: value.teacher_name,
-        // lastUpdate: "2024-01-15",
-      };
-      return grade;
+      return { name: key, grade: value.average, teacher: value.teacher_name };
     }),
-    recentActivities: [
-      {
-        type: "grade",
-        subject: "الرياضيات",
-        description: "امتحان الفصل الأول",
-        grade: "18/20",
-        date: "2024-01-15",
-      },
-      {
-        type: "attendance",
-        description: "حضور ممتاز هذا الأسبوع",
-        date: "2024-01-14",
-      },
-      {
-        type: "behavior",
-        description: "مشاركة فعالة في الصف",
-        date: "2024-01-13",
-      },
-    ],
-  }));
+    recentActivities: [],
+  });});
 
   const currentChild = children.find((child) => child.id === selectedChild);
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case "grade":
-        return <Award className="h-4 w-4 text-primary-600" />;
-      case "attendance":
-        return <Calendar className="h-4 w-4 text-primary-500" />;
-      case "behavior":
-        return <TrendingUp className="h-4 w-4 text-purple-600" />;
-      case "achievement":
-        return <Award className="h-4 w-4 text-yellow-600" />;
-      case "homework":
-        return <BookOpen className="h-4 w-4 text-orange-600" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-600" />;
-    }
-  };
 
   const getGradeColor = (grade: number) => {
     if (grade >= 16) return "text-primary-600";
@@ -228,25 +195,31 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           {getTranslation("childrenOverview", language)}
         </h2>
-        <div className="flex items-center space-x-4 rtl:space-x-reverse">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {getTranslation("selectChild", language)}:
-          </span>
-          <select
-            value={selectedChild}
-            onChange={(e) => setSelectedChild(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            {children.map((child) => (
-              <option key={child.id} value={child.id}>
-                {child.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {students.length > 0 && (
+          <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {getTranslation("selectChild", language)}:
+            </span>
+            <select
+              value={selectedChild}
+              onChange={(e) => setSelectedChild(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              {children.map((child) => (
+                <option key={child.id} value={child.id}>
+                  {child.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
-      {currentChild && (
+      {students.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
+          {getTranslation("noStudentsFound", language)}
+        </div>
+      ) : !currentChild ? null : (
         <>
           {/* Child Profile Card */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -432,10 +405,13 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
               {getTranslation("quickActions", language)}
             </h3>
             <div className="grid md:grid-cols-4 gap-4">
-              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors">
+              <button
+                onClick={() => setActiveTab("grades")}
+                className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
+              >
                 <BookOpen className="h-5 w-5" />
-                <span className="text-sm font-medium">{getTranslation('viewGrades',language)}</span>
-              </button> */}
+                <span className="text-sm font-medium">{getTranslation("viewGrades", language)}</span>
+              </button>
               {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors">
                 <Calendar className="h-5 w-5" />
                 <span className="text-sm font-medium">{getTranslation('attendanceRecord',language)}</span>

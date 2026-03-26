@@ -101,7 +101,7 @@ export const AnnouncementsManagement: React.FC = () => {
 
   const handleCreateAnnouncement = async () => {
     if (!formData.title || !formData.content) {
-      setError(getTranslation("titleAndContentRequired", language));
+      setError(getTranslation("admin.titleAndContentRequired", language));
       return;
     }
 
@@ -120,7 +120,7 @@ export const AnnouncementsManagement: React.FC = () => {
       };
 
       if (!formData.school) {
-        setError(getTranslation("selectSchool", language));
+        setError(getTranslation("admin.selectSchool", language));
         setActionLoading(null);
         return;
       }
@@ -134,7 +134,7 @@ export const AnnouncementsManagement: React.FC = () => {
         school: Number(formData.school),
       } as any);
 
-      setSuccess(getTranslation("announcementCreatedSuccessfully", language));
+      setSuccess(getTranslation("admin.announcementCreatedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       setFormData((prev) => ({
         title: "",
@@ -148,7 +148,7 @@ export const AnnouncementsManagement: React.FC = () => {
       fetchAnnouncements();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : getTranslation("failedCreateAnnouncement", language)
+        err instanceof Error ? err.message : getTranslation("admin.failedCreateAnnouncement", language)
       );
     } finally {
       setActionLoading(null);
@@ -160,12 +160,12 @@ export const AnnouncementsManagement: React.FC = () => {
       setActionLoading(`publish-${id}`);
       setError(null);
       await adminApiClient.publishAnnouncement(id);
-      setSuccess(getTranslation("announcementPublishedSuccessfully", language));
+      setSuccess(getTranslation("admin.announcementPublishedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       fetchAnnouncements();
       setOpenMenuId(null);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : getTranslation("failedPublishAnnouncement", language);
+      const errorMsg = err instanceof Error ? err.message : getTranslation("admin.failedPublishAnnouncement", language);
       setError(errorMsg);
       console.error("Publish announcement error:", err);
     } finally {
@@ -178,12 +178,12 @@ export const AnnouncementsManagement: React.FC = () => {
       setActionLoading(`archive-${id}`);
       setError(null);
       await adminApiClient.archiveAnnouncement(id);
-      setSuccess(getTranslation("announcementArchivedSuccessfully", language));
+      setSuccess(getTranslation("admin.announcementArchivedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       fetchAnnouncements();
       setOpenMenuId(null);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : getTranslation("failedArchiveAnnouncement", language);
+      const errorMsg = err instanceof Error ? err.message : getTranslation("admin.failedArchiveAnnouncement", language);
       setError(errorMsg);
       console.error("Archive announcement error:", err);
     } finally {
@@ -196,7 +196,7 @@ export const AnnouncementsManagement: React.FC = () => {
       setActionLoading(`delete-${id}`);
       setError(null);
       await adminApiClient.deleteAnnouncement(id);
-      setSuccess(getTranslation("deleteAnnouncement", language) + " successful");
+      setSuccess(getTranslation("admin.deleteAnnouncement", language) + " successful");
       setTimeout(() => setSuccess(null), 3000);
       setConfirmDelete(null);
       fetchAnnouncements();
@@ -233,7 +233,7 @@ export const AnnouncementsManagement: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("announcementsManagement", language)}
+            {getTranslation("admin.announcementsManagement", language)}
           </h3>
 
           <div className="flex flex-col md:flex-row gap-3">
@@ -241,7 +241,7 @@ export const AnnouncementsManagement: React.FC = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={getTranslation("searchAnnouncements", language)}
+                placeholder={getTranslation("admin.searchAnnouncements", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none w-full md:w-48"
@@ -253,26 +253,26 @@ export const AnnouncementsManagement: React.FC = () => {
               onChange={(e) => setTargetFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allAudiences", language)}</option>
-              <option value="جميع الطلاب">{getTranslation("students", language)}</option>
-              <option value="أولياء الأمور">{getTranslation("parents", language)}</option>
-              <option value="الجميع">{getTranslation("everyone", language)}</option>
+              <option value="all">{getTranslation("admin.allAudiences", language)}</option>
+              <option value="جميع الطلاب">{getTranslation("admin.students", language)}</option>
+              <option value="أولياء الأمور">{getTranslation("admin.parent", language)}</option>
+              <option value="الجميع">{getTranslation("admin.everyone", language)}</option>
             </select>
 
             <button
               onClick={() => setCreateModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-colors"
             >
-              <Plus className="h-4 w-4" /> {getTranslation("new", language)}
+              <Plus className="h-4 w-4" /> {getTranslation("admin.createNew", language)}
             </button>
           </div>
         </div>
 
         {loading ? (
-          <LoadingSpinner message={getTranslation("loadingAnnouncements", language)} />
+          <LoadingSpinner message={getTranslation("admin.loadingAnnouncements", language)} />
         ) : (
           <>            {announcements.length === 0 && (
-              <EmptyState message={getTranslation("noAnnouncements", language)} />
+              <EmptyState message={getTranslation("admin.noAnnouncements", language)} />
             )}            <div className="space-y-4">
               {announcements.map((announcement) => (
                 <div
@@ -304,16 +304,16 @@ export const AnnouncementsManagement: React.FC = () => {
                       <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
                         {announcement.school_name && (
                           <span>
-                            {getTranslation("school", language)}:{" "}
+                            {getTranslation("admin.schoolName", language)}:{" "}
                             <span className="font-medium">{announcement.school_name}</span>
                           </span>
                         )}
                         <span>
-                          {getTranslation("target", language)}:{" "}
+                          {getTranslation("admin.targetGroup", language)}:{" "}
                           <span className="font-medium">{announcement.target_group}</span>
                         </span>
                         <span>
-                          {getTranslation("created", language)}:{" "}
+                          {getTranslation("admin.created", language)}:{" "}
                           {new Date(announcement.created_at).toLocaleDateString()}
                         </span>
                         <span
@@ -324,8 +324,8 @@ export const AnnouncementsManagement: React.FC = () => {
                           }`}
                         >
                           {announcement.pinned
-                            ? getTranslation("published", language)
-                            : getTranslation("draft", language)}
+                            ? getTranslation("admin.published", language)
+                            : getTranslation("admin.draft", language)}
                         </span>
                       </div>
                     </div>
@@ -352,7 +352,7 @@ export const AnnouncementsManagement: React.FC = () => {
                               disabled={actionLoading === `publish-${announcement.id}`}
                               className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400 disabled:opacity-50"
                             >
-                              <Send className="h-4 w-4" /> {getTranslation("publish", language)}
+                              <Send className="h-4 w-4" /> {getTranslation("admin.publish", language)}
                             </button>
                           )}
                           {announcement.pinned && (
@@ -361,7 +361,7 @@ export const AnnouncementsManagement: React.FC = () => {
                               disabled={actionLoading === `archive-${announcement.id}`}
                               className="w-full flex items-center gap-2 px-4 py-2 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 text-sm text-yellow-700 dark:text-yellow-400 disabled:opacity-50"
                             >
-                              <Archive className="h-4 w-4" /> {getTranslation("archive", language)}
+                              <Archive className="h-4 w-4" /> {getTranslation("admin.archive", language)}
                             </button>
                           )}
                           <button
@@ -371,7 +371,7 @@ export const AnnouncementsManagement: React.FC = () => {
                             }}
                             className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400"
                           >
-                            <Trash2 className="h-4 w-4" /> {getTranslation("delete", language)}
+                            <Trash2 className="h-4 w-4" /> {getTranslation("admin.delete", language)}
                           </button>
                         </div>
                       )}
@@ -384,7 +384,7 @@ export const AnnouncementsManagement: React.FC = () => {
             {/* Pagination */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("page", language)} {currentPage} {getTranslation("of", language)} {totalPages}
+                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
@@ -414,10 +414,10 @@ export const AnnouncementsManagement: React.FC = () => {
       {/* Delete Confirmation */}
       {confirmDelete && (
         <ConfirmDialog
-          title={getTranslation("deleteAnnouncement", language)}
-          message={getTranslation("confirmDeleteAnnouncement", language)}
-          confirmLabel={getTranslation("delete", language)}
-          cancelLabel={getTranslation("cancel", language)}
+          title={getTranslation("admin.deleteAnnouncement", language)}
+          message={getTranslation("admin.confirmDeleteAnnouncement", language)}
+          confirmLabel={getTranslation("admin.delete", language)}
+          cancelLabel={getTranslation("admin.cancel", language)}
           onConfirm={() => handleDeleteAnnouncement(confirmDelete)}
           onCancel={() => setConfirmDelete(null)}
           isLoading={actionLoading === `delete-${confirmDelete}`}
@@ -430,14 +430,14 @@ export const AnnouncementsManagement: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation("createNewAnnouncement", language)}
+                {getTranslation("admin.createNewAnnouncement", language)}
               </h3>
 
               <div className="space-y-4">
                 {/* School selector */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("school", language)} *
+                    {getTranslation("admin.schoolName", language)} *
                   </label>
                   {schools.length === 0 ? (
                     <p className="text-sm text-red-500">No schools available</p>
@@ -457,7 +457,7 @@ export const AnnouncementsManagement: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("title", language)} *
+                    {getTranslation("admin.title", language)} *
                   </label>
                   <input
                     type="text"
@@ -466,13 +466,13 @@ export const AnnouncementsManagement: React.FC = () => {
                       setFormData({ ...formData, title: e.target.value })
                     }
                     className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
-                    placeholder={getTranslation("announcementTitle", language)}
+                    placeholder={getTranslation("admin.announcementTitle", language)}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("content", language)} *
+                    {getTranslation("admin.content", language)} *
                   </label>
                   <textarea
                     value={formData.content}
@@ -480,14 +480,14 @@ export const AnnouncementsManagement: React.FC = () => {
                       setFormData({ ...formData, content: e.target.value })
                     }
                     className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none h-24 focus:ring-2 focus:ring-primary-500 outline-none"
-                    placeholder={getTranslation("announcementContent", language)}
+                    placeholder={getTranslation("admin.announcementContent", language)}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("priority", language)}
+                      {getTranslation("admin.priority", language)}
                     </label>
                     <select
                       value={formData.priority}
@@ -496,15 +496,15 @@ export const AnnouncementsManagement: React.FC = () => {
                       }
                       className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
                     >
-                      <option value="low">{getTranslation("low", language)}</option>
-                      <option value="medium">{getTranslation("medium", language)}</option>
-                      <option value="high">{getTranslation("high", language)}</option>
+                    <option value="low">{getTranslation("admin.low", language)}</option>
+                    <option value="medium">{getTranslation("admin.medium", language)}</option>
+                      <option value="high">{getTranslation("admin.high", language)}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("targetGroup", language)}
+                      {getTranslation("admin.targetGroup", language)}
                     </label>
                     <select
                       value={formData.target_group}
@@ -516,16 +516,16 @@ export const AnnouncementsManagement: React.FC = () => {
                       }
                       className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
                     >
-                      <option value="STUDENTS">{getTranslation("students", language)}</option>
-                      <option value="PARENTS">{getTranslation("parents", language)}</option>
-                      <option value="EVERYONE">{getTranslation("everyone", language)}</option>
+                      <option value="STUDENTS">{getTranslation("admin.students", language)}</option>
+                      <option value="PARENTS">{getTranslation("admin.parent", language)}</option>
+                      <option value="EVERYONE">{getTranslation("admin.everyone", language)}</option>
                     </select>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("category", language)}
+                    {getTranslation("admin.category", language)}
                   </label>
                   <input
                     type="text"
@@ -534,7 +534,7 @@ export const AnnouncementsManagement: React.FC = () => {
                       setFormData({ ...formData, category: e.target.value })
                     }
                     className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
-                    placeholder={getTranslation("categoryPlaceholder", language)}
+                    placeholder={getTranslation("admin.categoryPlaceholder", language)}
                   />
                 </div>
               </div>
@@ -554,14 +554,14 @@ export const AnnouncementsManagement: React.FC = () => {
                   }}
                   className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
                 >
-                  {getTranslation("cancel", language)}
+                  {getTranslation("admin.cancel", language)}
                 </button>
                 <button
                   onClick={handleCreateAnnouncement}
                   disabled={actionLoading === "create"}
                   className="flex-1 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium disabled:opacity-50"
                 >
-                  {getTranslation("create", language)}
+                  {getTranslation("admin.create", language)}
                 </button>
               </div>
             </div>

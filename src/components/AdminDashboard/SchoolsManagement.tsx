@@ -32,17 +32,19 @@ export const SchoolsManagement: React.FC = () => {
 
   const getLevelTranslation = (level: string): string => {
     const levelMap: { [key: string]: string } = {
-      primary: "primary",
-      middle: "middle",
-      high: "high",
+      primary: "primarySchool",
+      middle: "middleSchool",
+      high: "highSchool",
     };
     return getTranslation(levelMap[level] || level, language);
   };
 
   const getTypeTranslation = (type: string): string => {
     const typeMap: { [key: string]: string } = {
-      PUBLIC: "public",
-      PRIVATE: "private",
+      public: "admin.public",
+      PUBLIC: "admin.public",
+      private: "admin.private",
+      PRIVATE: "admin.private",
     };
     return getTranslation(typeMap[type] || type, language);
   };
@@ -87,7 +89,7 @@ export const SchoolsManagement: React.FC = () => {
       setActionLoading(`activate-${schoolId}`);
       setError(null);
       await adminApiClient.activateSchool(schoolId);
-      setSuccess(getTranslation("schoolActivatedSuccessfully", language));
+      setSuccess(getTranslation("admin.schoolActivatedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       setConfirmAction(null);
       fetchSchools();
@@ -104,7 +106,7 @@ export const SchoolsManagement: React.FC = () => {
       setActionLoading(`suspend-${schoolId}`);
       setError(null);
       await adminApiClient.suspendSchool(schoolId);
-      setSuccess(getTranslation("schoolSuspendedSuccessfully", language));
+      setSuccess(getTranslation("admin.schoolSuspendedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       setConfirmAction(null);
       fetchSchools();
@@ -137,7 +139,7 @@ export const SchoolsManagement: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("schoolManagement", language)}
+            {getTranslation("admin.schoolManagement", language)}
           </h3>
 
           <div className="flex flex-col md:flex-row gap-3">
@@ -145,7 +147,7 @@ export const SchoolsManagement: React.FC = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={getTranslation("searchSchools", language)}
+                placeholder={getTranslation("admin.searchSchools", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none w-full md:w-48"
@@ -157,10 +159,10 @@ export const SchoolsManagement: React.FC = () => {
               onChange={(e) => setLevelFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allLevels", language)}</option>
-              <option value="primary">{getTranslation("primary", language)}</option>
-              <option value="middle">{getTranslation("middle", language)}</option>
-              <option value="high">{getTranslation("high", language)}</option>
+              <option value="all">{getTranslation("admin.allLevels", language)}</option>
+              <option value="primary">{getTranslation("admin.primary", language)}</option>
+              <option value="middle">{getTranslation("admin.middle", language)}</option>
+              <option value="high">{getTranslation("admin.high", language)}</option>
             </select>
 
             <select
@@ -168,31 +170,31 @@ export const SchoolsManagement: React.FC = () => {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allTypes", language)}</option>
-              <option value="PUBLIC">{getTranslation("public", language)}</option>
-              <option value="PRIVATE">{getTranslation("private", language)}</option>
+              <option value="all">{getTranslation("admin.allTypes", language)}</option>
+              <option value="private">{getTranslation("admin.private", language)}</option>
+              <option value="public">{getTranslation("admin.public", language)}</option>
             </select>
           </div>
         </div>
 
         {loading ? (
-          <LoadingSpinner message={getTranslation("loadingSchools", language)} />
+          <LoadingSpinner message={getTranslation("admin.loadingSchools", language)} />
         ) : (
           <>
             {schools.length === 0 && (
-              <EmptyState message={getTranslation("noSchools", language)} />
+              <EmptyState message={getTranslation("admin.noSchools", language)} />
             )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
-                    <th className="pb-3 font-medium">{getTranslation("schoolName", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("email", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("level", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("type", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("students", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("status", language)}</th>
-                    <th className="pb-3 font-medium text-right">{getTranslation("actions", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.schoolName", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.email", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.level", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.type", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.students", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.status", language)}</th>
+                    <th className="pb-3 font-medium text-right">{getTranslation("admin.actions", language)}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -213,17 +215,19 @@ export const SchoolsManagement: React.FC = () => {
                           )}`}
                         >
                           {getLevelTranslation(school.school_level)}
+                          
                         </span>
                       </td>
                       <td className="py-4 text-sm">
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
-                            school.school_type === "PUBLIC"
+                            school.school_type?.toLowerCase() === "public"
                               ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
                               : "bg-pink-100 text-pink-700 dark:bg-pink-900/20 dark:text-pink-400"
                           }`}
                         >
                           {getTypeTranslation(school.school_type)}
+                          
                         </span>
                       </td>
                       <td className="py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -237,7 +241,7 @@ export const SchoolsManagement: React.FC = () => {
                               : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                           }`}
                         >
-                          {school.is_active ? getTranslation("active", language) : getTranslation("suspended", language)}
+                          {school.is_active ? getTranslation("admin.active", language) : getTranslation("admin.suspended", language)}
                         </span>
                       </td>
                       <td className="py-4 text-right relative">
@@ -259,7 +263,7 @@ export const SchoolsManagement: React.FC = () => {
                                 onClick={() => { setDetailSchool(school); setOpenMenuId(null); }}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm text-gray-700 dark:text-gray-200"
                               >
-                                <Eye className="h-4 w-4" /> {getTranslation("viewDetails", language)}
+                                <Eye className="h-4 w-4" /> {getTranslation("admin.viewDetails", language)}
                               </button>
                               {school.is_active ? (
                                 <button
@@ -270,7 +274,7 @@ export const SchoolsManagement: React.FC = () => {
                                   disabled={actionLoading === `suspend-${school.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400 disabled:opacity-50"
                                 >
-                                  <Lock className="h-4 w-4" /> {getTranslation("suspend", language)}
+                                  <Lock className="h-4 w-4" /> {getTranslation("admin.suspend", language)}
                                 </button>
                               ) : (
                                 <button
@@ -281,7 +285,7 @@ export const SchoolsManagement: React.FC = () => {
                                   disabled={actionLoading === `activate-${school.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400 disabled:opacity-50"
                                 >
-                                  <Unlock className="h-4 w-4" /> {getTranslation("activate", language)}
+                                  <Unlock className="h-4 w-4" /> {getTranslation("admin.activate", language)}
                                 </button>
                               )}
                             </div>
@@ -297,7 +301,7 @@ export const SchoolsManagement: React.FC = () => {
             {/* Pagination */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("page", language)} {currentPage} {getTranslation("of", language)} {totalPages}
+                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
@@ -342,33 +346,33 @@ export const SchoolsManagement: React.FC = () => {
               </div>
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("email", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.email", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.email || detailSchool.user_email}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("level", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.level", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{getLevelTranslation(detailSchool.school_level)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("type", language)}</dt>
-                  <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.school_type}</dd>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.type", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{getTypeTranslation(detailSchool.school_type)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("students", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.students", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.total_students ?? 0}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("teachers", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.teachers", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.total_teachers ?? 0}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("classes", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.classes", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.total_classes ?? 0}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("status", language)}</dt>
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.status", language)}</dt>
                   <dd className={`font-medium ${detailSchool.is_active ? "text-primary-600 dark:text-primary-400" : "text-red-600 dark:text-red-400"}`}>
-                    {detailSchool.is_active ? getTranslation("active", language) : getTranslation("suspended", language)}
+                    {detailSchool.is_active ? getTranslation("admin.active", language) : getTranslation("admin.suspended", language)}
                   </dd>
                 </div>
               </dl>
@@ -386,18 +390,18 @@ export const SchoolsManagement: React.FC = () => {
       {/* Confirm Suspend/Activate */}
       {confirmAction && (
         <ConfirmDialog
-          title={getTranslation("confirmActionTitle", language)}
+          title={getTranslation("admin.confirmActionTitle", language)}
           message={
             confirmAction.type === "suspend"
-              ? getTranslation("confirmSuspend", language)
-              : getTranslation("confirmActivate", language)
+              ? getTranslation("admin.confirmSuspend", language)
+              : getTranslation("admin.confirmActivate", language)
           }
           confirmLabel={
             confirmAction.type === "suspend"
-              ? getTranslation("suspend", language)
-              : getTranslation("activate", language)
+              ? getTranslation("admin.suspend", language)
+              : getTranslation("admin.activate", language)
           }
-          cancelLabel={getTranslation("cancel", language)}
+          cancelLabel={getTranslation("admin.cancel", language)}
           onConfirm={() =>
             confirmAction.type === "suspend"
               ? handleSuspendSchool(confirmAction.id)

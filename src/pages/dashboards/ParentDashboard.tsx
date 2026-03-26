@@ -7,8 +7,6 @@ import {
   Calendar,
   TrendingUp,
   AlertTriangle,
-  Clock,
-  BookOpen,
   Star,
   LayoutGrid,
 } from "lucide-react";
@@ -46,15 +44,27 @@ const ParentDashboard: React.FC = () => {
   const { language } = useLanguage();
 
   // ! Fetching the parent's id (which is the user id)
-  const lc_user: User = JSON.parse(
-    localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
-  );
-  if (!lc_user) {
-    console.error("TeacherAbsenceMAnagement lc_user is null");
-    // return
-  }
-  const parent_id: number = JSON.parse(lc_user.id);
-  console.log("parent_id's id : ", parent_id);
+  const lc_user: User | null = (() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("schoolParentOrTeacherManagementUser") || "null"
+      );
+    } catch {
+      return null;
+    }
+  })();
+  const parent_id: number | null = (() => {
+    try {
+      if (!lc_user?.id) return null;
+      const id = typeof lc_user.id === 'string' ? JSON.parse(lc_user.id) : lc_user.id;
+      return Number.isInteger(id) ? id : null;
+    } catch {
+      console.error("Failed to parse parent_id:", lc_user?.id);
+      return null;
+    }
+  })();
+
+  const [isLoadingStudents, setIsLoadingStudents] = useState(true);
 
   // ! Fetch from the API
   const [students, setStudents] = useState<Student[]>([]);
@@ -77,73 +87,123 @@ const ParentDashboard: React.FC = () => {
   >([]);
 
   const get_current_parent_students = async () => {
-    const res = await parent_dashboard_client.get_current_parent_students();
-    if (res.ok) {
-      const new_students_list: Student[] = res.data;
-      setStudents(new_students_list);
+    try {
+      setIsLoadingStudents(true);
+      const res = await parent_dashboard_client.get_current_parent_students();
+      if (res.ok) {
+        setStudents(res.data);
+      } else {
+        console.error("Failed to fetch students:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    } finally {
+      setIsLoadingStudents(false);
     }
   };
 
   const get_current_parent_absence_reports = async () => {
-    const res =
-      await parent_dashboard_client.get_current_parent_absence_reports();
-    if (res.ok) {
-      const new_absence_reports_list: AbsenceReport[] = res.data;
-      setAbsenceReports(new_absence_reports_list);
+    try {
+      const res =
+        await parent_dashboard_client.get_current_parent_absence_reports();
+      if (res.ok) {
+        const new_absence_reports_list: AbsenceReport[] = res.data;
+        setAbsenceReports(new_absence_reports_list);
+      } else {
+        console.error("Failed to fetch absence reports:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching absence reports:", error);
     }
   };
 
   const get_current_parent_behaviour_reports = async () => {
-    const res =
-      await parent_dashboard_client.get_current_parent_behaviour_reports();
-    if (res.ok) {
-      const new_behaviour_reports_list: BehaviourReport[] = res.data;
-      setBehabiourReports(new_behaviour_reports_list);
+    try {
+      const res =
+        await parent_dashboard_client.get_current_parent_behaviour_reports();
+      if (res.ok) {
+        const new_behaviour_reports_list: BehaviourReport[] = res.data;
+        setBehabiourReports(new_behaviour_reports_list);
+      } else {
+        console.error("Failed to fetch behaviour reports:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching behaviour reports:", error);
     }
   };
 
   const get_current_parent_all_students_uploads = async () => {
-    const res =
-      await parent_dashboard_client.get_current_parent_all_students_uploads();
-    if (res.ok) {
-      const new_uploads_list: TeacherUpload[] = res.data;
-      setUploads(new_uploads_list);
+    try {
+      const res =
+        await parent_dashboard_client.get_current_parent_all_students_uploads();
+      if (res.ok) {
+        const new_uploads_list: TeacherUpload[] = res.data;
+        setUploads(new_uploads_list);
+      } else {
+        console.error("Failed to fetch uploads:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching uploads:", error);
     }
   };
 
   const current_parent_students_absences = async () => {
-    const res =
-      await parent_dashboard_client.current_parent_students_absences();
-    if (res.ok) {
-      const parent_absences_list: ParentAbsence[] = res.data;
-      setParentAbsences(parent_absences_list);
+    try {
+      const res =
+        await parent_dashboard_client.current_parent_students_absences();
+      if (res.ok) {
+        const parent_absences_list: ParentAbsence[] = res.data;
+        setParentAbsences(parent_absences_list);
+      } else {
+        console.error("Failed to fetch student absences:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching student absences:", error);
     }
   };
 
   const get_current_parent_students_performances = async () => {
-    const res =
-      await parent_dashboard_client.get_current_parent_students_performances();
-    if (res.ok) {
-      const performances_list: StudentPerformance[] = res.data;
-      setStudentPerformances(performances_list);
+    try {
+      const res =
+        await parent_dashboard_client.get_current_parent_students_performances();
+      if (res.ok) {
+        const performances_list: StudentPerformance[] = res.data;
+        setStudentPerformances(performances_list);
+      } else {
+        console.error("Failed to fetch student performances:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching student performances:", error);
     }
   };
 
   const parent_students_events = async () => {
-    const res = await parent_dashboard_client.parent_students_events();
-    if (res.ok) {
-      const new_events_list: ParentStudentEvent[] = res.data;
-      setParentStudentsEvents(new_events_list);
+    try {
+      const res = await parent_dashboard_client.parent_students_events();
+      if (res.ok) {
+        const new_events_list: ParentStudentEvent[] = res.data;
+        setParentStudentsEvents(new_events_list);
+      } else {
+        console.error("Failed to fetch parent student events:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching parent student events:", error);
     }
   };
 
   const get_parent_class_groups = async () => {
-    const res = await parent_dashboard_client.get_parent_class_groups();
-    if (res.ok) {
-      const class_groups = res.data.map((classGroupJson: ClassGroupJson) =>
-        ClassGroup.formJson(classGroupJson)
-      );
-      setClassGroups(class_groups);
+    try {
+      const res = await parent_dashboard_client.get_parent_class_groups();
+      if (res.ok && Array.isArray(res.data)) {
+        const class_groups = (res.data as ClassGroupJson[]).map((classGroupJson: ClassGroupJson) =>
+          ClassGroup.formJson(classGroupJson)
+        );
+        setClassGroups(class_groups);
+      } else {
+        console.error("Failed to fetch class groups:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching class groups:", error);
     }
   };
 
@@ -153,10 +213,16 @@ const ParentDashboard: React.FC = () => {
 
   //! API CALL : 1. retrieving the teachers for this parent
   const get_current_parent_schools_teachers = async () => {
-    const res = await chat_http_client.get_current_parent_schools_teachers();
-    if (res.ok) {
-      const new_teachers_list: Teacher[] = res.data;
-      setTeachersList(new_teachers_list);
+    try {
+      const res = await chat_http_client.get_current_parent_schools_teachers();
+      if (res.ok) {
+        const new_teachers_list: Teacher[] = res.data;
+        setTeachersList(new_teachers_list);
+      } else {
+        console.error("Failed to fetch teachers:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
     }
   };
 
@@ -211,13 +277,13 @@ const ParentDashboard: React.FC = () => {
     },
     {
       title: getTranslation("newMessages", language),
-      value: "3",
+      value: "—",
       icon: MessageCircle,
       color: "bg-purple-500",
     },
     {
       title: getTranslation("notifications", language),
-      value: "5",
+      value: notifications.length || "0",
       icon: AlertTriangle,
       color: "bg-orange-500",
     },
@@ -276,6 +342,7 @@ const ParentDashboard: React.FC = () => {
             students={students ?? []}
             one_student_absences={one_student_absences}
             setActiveTab={setActiveTab}
+            studentPerformances={studentPerformances}
           />
         );
       case "grades":
@@ -300,7 +367,7 @@ const ParentDashboard: React.FC = () => {
           <ParentChat
             userType="parent"
             teachers_list={teachers_list}
-            parent_id={parent_id}
+            parent_id={parent_id ?? 0}
           />
         );
       case "announcements":
@@ -360,7 +427,34 @@ const ParentDashboard: React.FC = () => {
             ]
             */}
             <div className="grid md:grid-cols-2 gap-6">
-              {students.map((child, index) => (
+              {isLoadingStudents ? (
+              <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 animate-pulse">
+                <div className="h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-3" />
+                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+              </div>
+            ) : students.length === 0 ? (
+              <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
+                {getTranslation("noStudentsFound", language)}
+              </div>
+            ) : students.map((child, index) => {
+                const perf = studentPerformances.find(
+                  (p) => String(p.student_id) === String(child.student_id)
+                );
+                const displayGrade =
+                  perf?.s1_overall !== null && perf?.s1_overall !== undefined
+                    ? perf.s1_overall.toFixed(2)
+                    : perf?.s2_overall !== null && perf?.s2_overall !== undefined
+                    ? perf.s2_overall.toFixed(2)
+                    : perf?.s3_overall !== null && perf?.s3_overall !== undefined
+                    ? perf.s3_overall.toFixed(2)
+                    : child.trimester_grade != null
+                    ? String(child.trimester_grade)
+                    : "—";
+                const overallScore = perf?.s1_overall ?? perf?.s2_overall ?? perf?.s3_overall ?? null;
+                const derived_state = overallScore !== null
+                  ? overallScore >= 16 ? "excellent" : overallScore >= 14 ? "very_good" : "needs_improvement"
+                  : (child.academic_state ?? "needs_improvement");
+                return (
                 <div
                   key={index}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
@@ -385,7 +479,7 @@ const ParentDashboard: React.FC = () => {
                         {getTranslation("overallGrade", language)}
                       </p>
                       <p className="text-xl font-bold text-primary-600">
-                        {child.trimester_grade}
+                        {displayGrade}
                       </p>
                     </div>
                     <div className="text-center p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
@@ -405,22 +499,23 @@ const ParentDashboard: React.FC = () => {
                     <span
                       className={
                         "px-3 py-1 rounded-full text-sm font-medium" +
-                        (child.academic_state == "excellent"
+                        (derived_state === "excellent"
                           ? " bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 "
-                          : child.academic_state == "very_good"
+                          : derived_state === "very_good"
                             ? " bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 "
                             : " bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 ")
                       }
                     >
-                      {child.academic_state == "excellent"
+                      {derived_state === "excellent"
                         ? getTranslation("excellent", language)
-                        : child.academic_state == "very_good"
+                        : derived_state === "very_good"
                           ? getTranslation("veryGood", language)
                           : getTranslation("poorPerformance", language)}
                     </span>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Recent Updates */}
@@ -435,7 +530,6 @@ const ParentDashboard: React.FC = () => {
                       type: not.type,
                       message: not.title,
                       time: timeAgoArabic(not.timestamp),
-                      child: "..",
                     }))
                     .map((update, index) => (
                       <div
@@ -462,10 +556,7 @@ const ParentDashboard: React.FC = () => {
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {update.message}
                           </p>
-                          <div className="flex items-center justify-between mt-1">
-                            <span className="text-xs text-gray-600 dark:text-gray-400">
-                              {update.child}
-                            </span>
+                          <div className="flex items-center justify-end mt-1">
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                               {update.time}
                             </span>

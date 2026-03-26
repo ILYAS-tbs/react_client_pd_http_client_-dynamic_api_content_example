@@ -1,5 +1,16 @@
 import { PostAbsenceReportPayload } from "../payloads_types/parent_client_payload_types";
 import { SERVER_BASE_URL } from "../server_constants";
+import { StudentPerformance } from "../../../models/StudentPerformance";
+import { Student } from "../../../models/Student";
+import { AbsenceReport } from "../../../models/AbsenceReports";
+import { BehaviourReport } from "../../../models/BehaviorReport";
+import { TeacherUpload } from "../../../models/TeacherUpload";
+import { ParentAbsence } from "../../../models/ParentAbsence";
+import { ParentStudentEvent } from "../../../models/ParentStudentEvent";
+
+type ApiOk<T> = { ok: true; status: number; data: T };
+type ApiError = { ok: false; error: unknown };
+type ApiResult<T> = ApiOk<T> | ApiError;
 
 const BASE_URL = SERVER_BASE_URL;
 const URLS = {
@@ -14,74 +25,74 @@ const URLS = {
   parent_students_events: `${BASE_URL}/parent/parents/parent_students_events/`,
 };
 
-async function get_current_parent_students() {
+async function get_current_parent_students(): Promise<ApiResult<Student[]>> {
   try {
     const response = await fetch(URLS.get_current_parent_students, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: Student[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
 
-async function get_current_parent_absence_reports() {
+async function get_current_parent_absence_reports(): Promise<ApiResult<AbsenceReport[]>> {
   try {
     const response = await fetch(URLS.get_current_parent_absence_reports, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: AbsenceReport[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
-async function get_current_parent_behaviour_reports() {
+async function get_current_parent_behaviour_reports(): Promise<ApiResult<BehaviourReport[]>> {
   try {
     const response = await fetch(URLS.get_current_parent_behaviour_reports, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: BehaviourReport[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
-async function get_current_parent_all_students_uploads() {
+async function get_current_parent_all_students_uploads(): Promise<ApiResult<TeacherUpload[]>> {
   try {
     const response = await fetch(URLS.get_current_parent_all_students_uploads, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: TeacherUpload[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
-async function current_parent_students_absences() {
+async function current_parent_students_absences(): Promise<ApiResult<ParentAbsence[]>> {
   try {
     const response = await fetch(URLS.current_parent_students_absences, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: ParentAbsence[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
 
-async function get_current_parent_students_performances() {
+async function get_current_parent_students_performances(): Promise<ApiResult<StudentPerformance[]>> {
   try {
     const response = await fetch(
       URLS.get_current_parent_students_performances,
@@ -90,38 +101,38 @@ async function get_current_parent_students_performances() {
         credentials: "include",
       }
     );
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: StudentPerformance[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
-async function parent_students_events() {
+async function parent_students_events(): Promise<ApiResult<ParentStudentEvent[]>> {
   try {
     const response = await fetch(URLS.parent_students_events, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: ParentStudentEvent[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
 
-async function get_parent_class_groups() {
+async function get_parent_class_groups(): Promise<ApiResult<unknown[]>> {
   try {
     const response = await fetch(URLS.get_parent_class_groups, {
       method: "GET",
       credentials: "include",
     });
-
-    const data = await response.json(); // Automatically parse the response data
-    return { ok: response.ok, status: response.status, data: data };
+    const data: unknown[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
   } catch (error) {
-    return { ok: false, error: error };
+    return { ok: false, error };
   }
 }
 async function post_absence_report(

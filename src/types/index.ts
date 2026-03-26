@@ -26,7 +26,7 @@ export interface Translation {
 }
 
 export interface Translations {
-  [key: string]: Translation;
+  [key: string]: Translation | { [key: string]: Translation } | any;
 }
 
 export interface User {
@@ -184,6 +184,7 @@ export interface ChildrenOverviewProps {
   students: Student[];
   one_student_absences: (s: Student) => number | undefined;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+  studentPerformances: StudentPerformance[];
 }
 
 export interface GradeReportsProps {

@@ -140,9 +140,9 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           school_level: userData?.school_level ?? "",
           website: "",
           address: "",
-          wilaya: "",
-          commun: "",
-          school_type: "",
+          wilaya: userData?.wilaya ?? "",
+          commun: userData?.commune ?? "",
+          school_type: userData?.schoolType ?? "public",
           established_year: 0,
           description: "",
         };
@@ -156,7 +156,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
       } else {
         //* 2.Creating A parent
         const parent_payload: RegisterParentPayload = {
-          full_name: userData?.email ?? "",
+          full_name: userData?.name ?? "",
           phone_number: userData?.phone ?? "",
           address: "",
           relationship_to_student: "",
@@ -187,7 +187,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           if (user_role) {
             setTimeout(() => {
               navigate(`/${user_role}-dashboard`);
-              onClose?.();
+              onClose?.();register_school
             }, 1500);
           }
         }

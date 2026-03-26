@@ -84,7 +84,7 @@ export const MembershipsManagement: React.FC = () => {
       setActionLoading(`cancel-${membershipId}`);
       setError(null);
       await adminApiClient.cancelMembership(membershipId);
-      setSuccess(getTranslation("cancelSubscription", language) + " successful");
+      setSuccess(getTranslation("admin.cancelSubscription", language) + " successful");
       setTimeout(() => setSuccess(null), 3000);
       setConfirmCancel(null);
       fetchMemberships();
@@ -98,7 +98,7 @@ export const MembershipsManagement: React.FC = () => {
 
   const handleExtendMembership = async (membershipId: string) => {
     if (extendMonths < 1) {
-      setError(getTranslation("extendDurationMinimum", language));
+      setError(getTranslation("admin.extendDurationMinimum", language));
       return;
     }
 
@@ -111,7 +111,7 @@ export const MembershipsManagement: React.FC = () => {
         extendReason
       );
 
-      setSuccess(getTranslation("membershipExtendedSuccessfully", language));
+      setSuccess(getTranslation("admin.membershipExtendedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       setExtendModal(null);
       setExtendMonths(1);
@@ -119,7 +119,7 @@ export const MembershipsManagement: React.FC = () => {
       fetchMemberships();
       setOpenMenuId(null);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : getTranslation("failedExtendMembership", language);
+      const errorMsg = err instanceof Error ? err.message : getTranslation("admin.failedExtendMembership", language);
       setError(errorMsg);
       console.error("Extend membership error:", err);
     } finally {
@@ -162,7 +162,7 @@ export const MembershipsManagement: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("subscriptionsManagement", language)}
+            {getTranslation("admin.subscriptionsManagement", language)}
           </h3>
 
           <div className="flex flex-col md:flex-row gap-3">
@@ -170,7 +170,7 @@ export const MembershipsManagement: React.FC = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={getTranslation("searchSubscriptions", language)}
+                placeholder={getTranslation("admin.searchSubscriptions", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none w-full md:w-48"
@@ -182,10 +182,10 @@ export const MembershipsManagement: React.FC = () => {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allTypes", language)}</option>
-              <option value="FREE">{getTranslation("free", language)}</option>
-              <option value="SUB_200">{getTranslation("sub200", language)}</option>
-              <option value="SUB_500">{getTranslation("sub500", language)}</option>
+              <option value="all">{getTranslation("admin.allTypes", language)}</option>
+              <option value="FREE">{getTranslation("admin.free", language)}</option>
+              <option value="SUB_200">{getTranslation("admin.sub200", language)}</option>
+              <option value="SUB_500">{getTranslation("admin.sub500", language)}</option>
             </select>
 
             <select
@@ -193,31 +193,31 @@ export const MembershipsManagement: React.FC = () => {
               onChange={(e) => setActiveFilter(e.target.value)}
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
-              <option value="all">{getTranslation("allStatus", language)}</option>
-              <option value="active">{getTranslation("active", language)}</option>
-              <option value="inactive">{getTranslation("inactive", language)}</option>
+              <option value="all">{getTranslation("admin.allStatus", language)}</option>
+              <option value="active">{getTranslation("admin.active", language)}</option>
+              <option value="inactive">{getTranslation("admin.inactive", language)}</option>
             </select>
           </div>
         </div>
 
         {loading ? (
-          <LoadingSpinner message={getTranslation("loadingSubscriptions", language)} />
+          <LoadingSpinner message={getTranslation("admin.loadingSubscriptions", language)} />
         ) : (
           <>
             {memberships.length === 0 && (
-              <EmptyState message={getTranslation("noMemberships", language)} />
+              <EmptyState message={getTranslation("admin.noMemberships", language)} />
             )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
-                    <th className="pb-3 font-medium">{getTranslation("parent", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("email", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("type", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("startDate", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("expiryDate", language)}</th>
-                    <th className="pb-3 font-medium">{getTranslation("status", language)}</th>
-                    <th className="pb-3 font-medium text-right">{getTranslation("actions", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.parent", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.email", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.type", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.startDate", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.expiryDate", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.status", language)}</th>
+                    <th className="pb-3 font-medium text-right">{getTranslation("admin.actions", language)}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -271,10 +271,10 @@ export const MembershipsManagement: React.FC = () => {
                           }`}
                         >
                           {isExpired(membership.expiry_date)
-                            ? getTranslation("expired", language)
+                            ? getTranslation("admin.expired", language)
                             : isExpiringSoon(membership.expiry_date)
-                            ? getTranslation("expiringSoon", language)
-                            : getTranslation("active", language)}
+                            ? getTranslation("admin.expiringSoon", language)
+                            : getTranslation("admin.active", language)}
                         </span>
                       </td>
                       <td className="py-4 text-right relative">
@@ -298,7 +298,7 @@ export const MembershipsManagement: React.FC = () => {
                                 onClick={() => setExtendModal(String(membership.id))}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm text-blue-700 dark:text-blue-400"
                               >
-                                <Plus className="h-4 w-4" /> {getTranslation("extend", language)}
+                                <Plus className="h-4 w-4" /> {getTranslation("admin.extend", language)}
                               </button>
                               <button
                                 onClick={() => {
@@ -307,7 +307,7 @@ export const MembershipsManagement: React.FC = () => {
                                 }}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400"
                               >
-                                <CheckCircle className="h-4 w-4" /> {getTranslation("cancelSubscription", language)}
+                                <CheckCircle className="h-4 w-4" /> {getTranslation("admin.cancelSubscription", language)}
                               </button>
                             </div>
                           )}
@@ -322,7 +322,7 @@ export const MembershipsManagement: React.FC = () => {
             {/* Pagination */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("page", language)} {currentPage} {getTranslation("of", language)} {totalPages}
+                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
@@ -352,10 +352,10 @@ export const MembershipsManagement: React.FC = () => {
       {/* Cancel Confirmation */}
       {confirmCancel && (
         <ConfirmDialog
-          title={getTranslation("cancelSubscription", language)}
-          message={getTranslation("confirmCancelSubscription", language)}
-          confirmLabel={getTranslation("cancelSubscription", language)}
-          cancelLabel={getTranslation("cancel", language)}
+          title={getTranslation("admin.cancelSubscription", language)}
+          message={getTranslation("admin.confirmCancelSubscription", language)}
+          confirmLabel={getTranslation("admin.cancelSubscription", language)}
+          cancelLabel={getTranslation("admin.cancel", language)}
           onConfirm={() => handleCancelMembership(confirmCancel)}
           onCancel={() => setConfirmCancel(null)}
           isLoading={actionLoading === `cancel-${confirmCancel}`}
@@ -369,13 +369,13 @@ export const MembershipsManagement: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-md w-full">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation("extendSubscription", language)}
+                {getTranslation("admin.extendSubscription", language)}
               </h3>
 
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("durationMonths", language)} *
+                    {getTranslation("admin.durationMonths", language)} *
                   </label>
                   <input
                     type="number"
@@ -389,12 +389,12 @@ export const MembershipsManagement: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("reasonOptional", language)}
+                    {getTranslation("admin.reasonOptional", language)}
                   </label>
                   <textarea
                     value={extendReason}
                     onChange={(e) => setExtendReason(e.target.value)}
-                    placeholder={getTranslation("reasonForExtensionPlaceholder", language)}
+                    placeholder={getTranslation("admin.reasonForExtensionPlaceholder", language)}
                     className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none h-20 focus:ring-2 focus:ring-primary-500 outline-none"
                   />
                 </div>
@@ -409,14 +409,14 @@ export const MembershipsManagement: React.FC = () => {
                   }}
                   className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
                 >
-                  {getTranslation("cancel", language)}
+                  {getTranslation("admin.cancel", language)}
                 </button>
                 <button
                   onClick={() => handleExtendMembership(extendModal)}
                   disabled={actionLoading !== null}
                   className="flex-1 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium disabled:opacity-50"
                 >
-                  {getTranslation("extend", language)}
+                  {getTranslation("admin.extend", language)}
                 </button>
               </div>
             </div>

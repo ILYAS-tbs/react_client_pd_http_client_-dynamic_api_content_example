@@ -206,7 +206,7 @@ export const adminApiClient = {
     pageSize: number = 20,
     filters?: {
       school_level?: string;
-      type?: string;
+      school_type?: string;
       search?: string;
       ordering?: string;
     }
@@ -215,7 +215,7 @@ export const adminApiClient = {
       page: page.toString(),
       page_size: pageSize.toString(),
       ...(filters?.school_level && { school_level: filters.school_level }),
-      ...(filters?.type && { type: filters.type }),
+      ...(filters?.school_type && { school_type: filters.school_type }),
       ...(filters?.search && { search: filters.search }),
       ...(filters?.ordering && { ordering: filters.ordering }),
     });

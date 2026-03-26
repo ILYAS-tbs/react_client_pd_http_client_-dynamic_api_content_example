@@ -54,7 +54,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
 
   const stats = [
     {
-      title: getTranslation("totalSchools", language),
+      title: getTranslation("admin.totalSchools", language),
       value: dashboardStats?.schools.total.toString() || "0",
       icon: School,
       color: "bg-blue-500",
@@ -62,7 +62,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
       isLoading,
     },
     {
-      title: getTranslation("totalTeachers", language),
+      title: getTranslation("admin.totalTeachers", language),
       value: dashboardStats?.roles.teachers.toString() || "0",
       icon: UserCheck,
       color: "bg-primary-500",
@@ -70,7 +70,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
       isLoading,
     },
     {
-      title: getTranslation("totalParents", language),
+      title: getTranslation("admin.totalParents", language),
       value: dashboardStats?.roles.parents.toString() || "0",
       icon: Users,
       color: "bg-purple-500",
@@ -78,7 +78,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
       isLoading,
     },
     {
-      title: getTranslation("pendingReports", language),
+      title: getTranslation("admin.pendingReports", language),
       value: dashboardStats?.reports.absence_pending.toString() || "0",
       icon: FileText,
       color: "bg-orange-500",
@@ -118,14 +118,14 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {getTranslation("recentActivity", language)}
+              {getTranslation("admin.recentActivity", language)}
             </h3>
             <button
               onClick={handleRefresh}
               disabled={isLoading}
               className="text-primary-500 hover:bg-primary-600 text-sm font-medium disabled:opacity-50"
             >
-              {isLoading ? getTranslation("loading", language) : getTranslation("refresh", language)}
+              {isLoading ? getTranslation("admin.loading", language) : getTranslation("admin.refresh", language)}
             </button>
           </div>
 
@@ -149,7 +149,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
               ))
             ) : (
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {getTranslation("noActivity", language) || "No recent activity"}
+                {getTranslation("admin.noActivity", language) || "No recent activity"}
               </p>
             )}
           </div>
@@ -158,7 +158,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
         {/* Quick Stats */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {getTranslation("pendingActions", language)}
+            {getTranslation("admin.pendingActions", language)}
           </h3>
 
           <div className="space-y-4">
@@ -167,10 +167,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
                 <FileText className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("pendingReports", language)}
+                    {getTranslation("admin.pendingReports", language)}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("absenceReportsAwaitingReview", language)}
+                    {getTranslation("admin.absenceReportsAwaitingReview", language)}
                   </p>
                 </div>
               </div>
@@ -184,10 +184,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
                 <School className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("totalSchools", language)}
+                    {getTranslation("admin.totalSchools", language)}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("activeSchoolAccounts", language)}
+                    {getTranslation("admin.activeSchoolAccounts", language)}
                   </p>
                 </div>
               </div>
@@ -201,10 +201,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
                 <Users className="h-5 w-5 text-primary-600 dark:text-primary-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("totalUsers", language)}
+                    {getTranslation("admin.totalUsers", language)}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("activeUserAccounts", language)}
+                    {getTranslation("admin.activeUserAccounts", language)}
                   </p>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("platformHealth", language)}
+            {getTranslation("admin.platformHealth", language)}
           </h4>
           <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
@@ -233,13 +233,13 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("activeUsersRatio", language) || "Active users ratio"}
+            {getTranslation("admin.activeUsersRatio", language) || "Active users ratio"}
           </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("totalRegistrations", language) || "Total Registrations"}
+            {getTranslation("admin.totalRegistrations", language) || "Total Registrations"}
           </h4>
           <div className="flex items-center justify-between">
             <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
@@ -250,13 +250,13 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("schools", language)} + {getTranslation("users", language)}
+            {getTranslation("admin.schools", language)} + {getTranslation("admin.users", language)}
           </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("activeUsers", language)}
+            {getTranslation("admin.activeUsers", language)}
           </h4>
           <div className="flex items-center justify-between">
             <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
@@ -267,7 +267,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("currentlyActive", language) || "Currently active"}
+            {getTranslation("admin.currentlyActive", language) || "Currently active"}
           </p>
         </div>
       </div>

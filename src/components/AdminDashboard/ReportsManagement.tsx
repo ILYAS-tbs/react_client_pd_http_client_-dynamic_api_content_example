@@ -138,9 +138,9 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
 
   const getStatusText = (status: string) => {
     const statusMap: { [key: string]: string } = {
-      PENDING: getTranslation("pending", language),
-      APPROVED: getTranslation("approved", language),
-      REJECTED: getTranslation("rejected", language),
+      PENDING: getTranslation("admin.pending", language),
+      APPROVED: getTranslation("admin.approved", language),
+      REJECTED: getTranslation("admin.rejected", language),
     };
     return statusMap[status] || status;
   };
@@ -168,7 +168,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {reportType === "absence" ? getTranslation("absenceReports", language) : getTranslation("behaviourReports", language)}
+            {reportType === "absence" ? getTranslation("admin.absenceReports", language) : getTranslation("admin.behaviourReports", language)}
           </h3>
 
           <div className="flex flex-col md:flex-row gap-3">
@@ -176,7 +176,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={getTranslation("searchReports", language)}
+                placeholder={getTranslation("admin.searchReports", language)}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none w-full md:w-48"
@@ -189,21 +189,21 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
               >
-                <option value="all">{getTranslation("allStatus", language)}</option>
-                <option value="PENDING">{getTranslation("pending", language)}</option>
-                <option value="APPROVED">{getTranslation("approved", language)}</option>
-                <option value="REJECTED">{getTranslation("rejected", language)}</option>
+                <option value="all">{getTranslation("admin.allStatus", language)}</option>
+                <option value="PENDING">{getTranslation("admin.pending", language)}</option>
+                <option value="APPROVED">{getTranslation("admin.approved", language)}</option>
+                <option value="REJECTED">{getTranslation("admin.rejected", language)}</option>
               </select>
             )}
           </div>
         </div>
 
         {loading ? (
-          <LoadingSpinner message={getTranslation("loadingReports", language)} />
+          <LoadingSpinner message={getTranslation("admin.loadingReports", language)} />
         ) : (
           <>
             {reports.length === 0 && (
-              <EmptyState message={getTranslation("noReports", language)} />
+              <EmptyState message={getTranslation("admin.noReports", language)} />
             )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -211,23 +211,23 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                   <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
                     {reportType === "absence" ? (
                       <>
-                        <th className="pb-3 font-medium">{getTranslation("student", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("parent", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("absenceDate", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("reason", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("status", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("submitted", language)}</th>
-                        <th className="pb-3 font-medium text-right">{getTranslation("actions", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.student", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.parent", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.absenceDate", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.reason", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.status", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.submitted", language)}</th>
+                        <th className="pb-3 font-medium text-right">{getTranslation("admin.actions", language)}</th>
                       </>
                     ) : (
                       <>
-                        <th className="pb-3 font-medium">{getTranslation("student", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("teacher", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("date", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("severity", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("description", language)}</th>
-                        <th className="pb-3 font-medium">{getTranslation("submitted", language)}</th>
-                        <th className="pb-3 font-medium text-right">{getTranslation("actions", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.student", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.teacher", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.date", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.severity", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.description", language)}</th>
+                        <th className="pb-3 font-medium">{getTranslation("admin.submitted", language)}</th>
+                        <th className="pb-3 font-medium text-right">{getTranslation("admin.actions", language)}</th>
                       </>
                     )}
                   </tr>
@@ -313,7 +313,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                                     }
                                     className="w-full flex items-center gap-2 px-4 py-2 hover:bg-primary-400"
                                   >
-                                    <CheckCircle className="h-4 w-4" /> {getTranslation("approve", language)}
+                                    <CheckCircle className="h-4 w-4" /> {getTranslation("admin.approve", language)}
                                   </button>
                                   <button
                                     onClick={() =>
@@ -324,7 +324,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                                     }
                                     className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400"
                                   >
-                                    <XCircle className="h-4 w-4" /> {getTranslation("reject", language)}
+                                    <XCircle className="h-4 w-4" /> {getTranslation("admin.reject", language)}
                                   </button>
                                 </div>
                               )}
@@ -340,7 +340,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
             {/* Pagination */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("page", language)} {currentPage} {getTranslation("of", language)} {totalPages}
+                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
@@ -374,8 +374,8 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 {approvalModal.action === "approve"
-                  ? getTranslation("approveReport", language)
-                  : getTranslation("rejectReport", language)}
+                  ? getTranslation("admin.approveReport", language)
+                  : getTranslation("admin.rejectReport", language)}
               </h3>
 
               <textarea
@@ -383,8 +383,8 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                 onChange={(e) => setComments(e.target.value)}
                 placeholder={
                   approvalModal.action === "approve"
-                    ? getTranslation("addCommentOptional", language)
-                    : getTranslation("addRejectionReason", language)
+                    ? getTranslation("admin.addCommentOptional", language)
+                    : getTranslation("admin.addRejectionReason", language)
                 }
                 className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none h-24 focus:ring-2 focus:ring-primary-500 outline-none"
                 required={approvalModal.action === "reject"}
@@ -398,7 +398,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                   }}
                   className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
                 >
-                  {getTranslation("cancel", language)}
+                  {getTranslation("admin.cancel", language)}
                 </button>
                 <button
                   onClick={() => {
@@ -406,7 +406,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                       handleApproveReport(approvalModal.reportId);
                     } else {
                       if (!comments.trim()) {
-                        setError(getTranslation("rejectionReasonRequired", language));
+                        setError(getTranslation("admin.rejectionReasonRequired", language));
                         return;
                       }
                       handleRejectReport(approvalModal.reportId);
@@ -419,7 +419,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                       : "bg-red-600 hover:bg-red-700"
                   } disabled:opacity-50`}
                 >
-                  {approvalModal.action === "approve" ? getTranslation("approve", language) : getTranslation("reject", language)}
+                  {approvalModal.action === "approve" ? getTranslation("admin.approve", language) : getTranslation("admin.reject", language)}
                 </button>
               </div>
             </div>

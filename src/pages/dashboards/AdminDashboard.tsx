@@ -23,12 +23,12 @@ const AdminDashboard: React.FC = () => {
   const { language } = useLanguage();
 
   const tabs = [
-    { id: "overview", label: getTranslation("overview", language), icon: LayoutGrid },
-    { id: "schools", label: getTranslation("schools", language), icon: School },
-    { id: "users", label: getTranslation("userManagement", language), icon: Users },
-    { id: "reports", label: getTranslation("reports", language), icon: FileText },
-    { id: "announcements", label: getTranslation("announcements", language), icon: MessageSquare },
-    { id: "subscriptions", label: getTranslation("subscriptions", language), icon: CreditCard },
+    { id: "overview", label: getTranslation("admin.overview", language), icon: LayoutGrid },
+    { id: "schools", label: getTranslation("admin.schools", language), icon: School },
+    { id: "users", label: getTranslation("admin.userManagement", language), icon: Users },
+    { id: "reports", label: getTranslation("admin.reports", language), icon: FileText },
+    { id: "announcements", label: getTranslation("admin.announcements", language), icon: MessageSquare },
+    { id: "subscriptions", label: getTranslation("admin.subscriptions", language), icon: CreditCard },
   ];
 
   const renderContent = () => {
@@ -51,7 +51,7 @@ const AdminDashboard: React.FC = () => {
                     : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                 }`}
               >
-                {getTranslation("absenceReports", language)}
+                {getTranslation("admin.absenceReports", language)}
               </button>
               <button
                 onClick={() => setActiveReportType("behaviour")}
@@ -61,7 +61,7 @@ const AdminDashboard: React.FC = () => {
                     : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                 }`}
               >
-                {getTranslation("behaviourReports", language)}
+                {getTranslation("admin.behaviourReports", language)}
               </button>
             </div>
             <ReportsManagement reportType={activeReportType} />
@@ -81,7 +81,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <DashboardLayout
-      title={getTranslation("platformAdmin", language)}
+      title={getTranslation("admin.platformAdmin", language)}
       subtitle="Universal platform management & control center"
       tabs={tabs}
       activeTab={activeTab}
