@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   School,
   Users,
@@ -7,10 +7,14 @@ import {
   FileText,
   MessageSquare,
   CreditCard,
+  AlertCircle,
 } from "lucide-react";
 import { StatsGrid } from "./StatsCard";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
+import { DashboardStats, AdminAuditLog } from "../../services/http_api/platform-admin/admin_types";
+import { ErrorAlert } from "./ui";
 
 interface OverviewTabProps {
   onRefresh?: () => void;
@@ -18,55 +22,93 @@ interface OverviewTabProps {
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
   const { language } = useLanguage();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AdminAuditLog[]>([]);
 
-  // Mock stats - in production, these would come from API
-  // TODO: Add API endpoint for dashboard stats
+  const fetchStats = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const stats = await adminApiClient.getDashboardStats();
+      const logsResponse = await adminApiClient.listAuditLogs(1, 5, {
+        ordering: "-timestamp",
+      });
+      
+      setDashboardStats(stats);
+      setAuditLogs(Array.isArray(logsResponse) ? logsResponse : logsResponse.results || []);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to fetch dashboard statistics";
+      setError(errorMsg);
+      console.error("Dashboard stats error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
   const stats = [
     {
       title: getTranslation("totalSchools", language),
-      value: "243",
+      value: dashboardStats?.schools.total.toString() || "0",
       icon: School,
       color: "bg-blue-500",
-      trend: { value: 12, direction: "up" as const },
+      trend: { value: 0, direction: "up" as const },
       isLoading,
     },
     {
       title: getTranslation("totalTeachers", language),
-      value: "1,842",
+      value: dashboardStats?.roles.teachers.toString() || "0",
       icon: UserCheck,
       color: "bg-green-500",
-      trend: { value: 8, direction: "up" as const },
+      trend: { value: 0, direction: "up" as const },
       isLoading,
     },
     {
       title: getTranslation("totalParents", language),
-      value: "5,324",
+      value: dashboardStats?.roles.parents.toString() || "0",
       icon: Users,
       color: "bg-purple-500",
-      trend: { value: 15, direction: "up" as const },
+      trend: { value: 0, direction: "up" as const },
       isLoading,
     },
     {
-      title: getTranslation("activeSubscriptions", language),
-      value: "892",
-      icon: CreditCard,
+      title: getTranslation("pendingReports", language),
+      value: dashboardStats?.reports.absence_pending.toString() || "0",
+      icon: FileText,
       color: "bg-orange-500",
-      trend: { value: 5, direction: "up" as const },
+      trend: { value: 0, direction: "up" as const },
       isLoading,
     },
   ];
 
-  const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onRefresh?.();
-    }, 1000);
+  const handleRefresh = async () => {
+    await fetchStats();
+    onRefresh?.();
   };
+
+  const getActivityDescription = (log: AdminAuditLog): string => {
+    const entityName = log.entity_display || log.entity_type;
+    const action = log.action_type.replace(/_/g, " ").toLowerCase();
+    return `${action} ${entityName}`;
+  };
+
+  // Calculate health based on active vs total
+  const totalUsers = dashboardStats?.users.total || 1;
+  const activeUsers = dashboardStats?.users.active || 0;
+  const healthPercentage = ((activeUsers / totalUsers) * 100).toFixed(1);
 
   return (
     <div className="space-y-6">
+      {error && (
+        <ErrorAlert message={error} onDismiss={() => setError(null)} />
+      )}
+
       {/* Stats Grid */}
       <StatsGrid stats={stats} />
 
@@ -80,29 +122,36 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             </h3>
             <button
               onClick={handleRefresh}
-              className="text-primary-500 hover:text-primary-600 text-sm font-medium"
+              disabled={isLoading}
+              className="text-primary-500 hover:text-primary-600 text-sm font-medium disabled:opacity-50"
             >
-              {getTranslation("refresh", language)}
+              {isLoading ? getTranslation("loading", language) : getTranslation("refresh", language)}
             </button>
           </div>
 
           <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 pb-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-              >
-                <div className="h-2 w-2 rounded-full bg-primary-500 mt-2 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {getTranslation("schoolRegistrationApproved", language)}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {getTranslation("hoursAgo", language)}
-                  </p>
+            {auditLogs.length > 0 ? (
+              auditLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className="flex items-start gap-3 pb-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                >
+                  <div className="h-2 w-2 rounded-full bg-primary-500 mt-2 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {getActivityDescription(log)}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(log.timestamp).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {getTranslation("noActivity", language) || "No recent activity"}
+              </p>
+            )}
           </div>
         </div>
 
@@ -126,86 +175,48 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
                 </div>
               </div>
               <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                24
+                {dashboardStats?.reports.absence_pending || 0}
               </span>
             </div>
 
             <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800">
               <div className="flex items-center gap-3">
-                <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <School className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("pendingSchools", language)}
+                    {getTranslation("totalSchools", language)}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("schoolsAwaitingApproval", language)}
+                    {getTranslation("activeSchoolAccounts", language)}
                   </p>
                 </div>
               </div>
               <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                7
+                {dashboardStats?.schools.active || 0}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-100 dark:border-orange-800">
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-800">
               <div className="flex items-center gap-3">
-                <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("expiringSoon", language)}
+                    {getTranslation("totalUsers", language)}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("subscriptionsExpiringIn30Days", language)}
+                    {getTranslation("activeUserAccounts", language)}
                   </p>
                 </div>
               </div>
-              <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                42
+              <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                {dashboardStats?.users.active || 0}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Platform Analytics */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-          {getTranslation("platformGrowth", language)}
-        </h3>
-
-        <div className="h-64 flex items-end justify-between gap-2">
-          {[40, 60, 45, 90, 80, 100, 120, 95, 110, 85, 130, 140].map((h, i) => (
-            <div
-              key={i}
-              className="bg-gradient-to-t from-primary-500 to-primary-300 w-full rounded-t-lg transition-all hover:from-primary-600 hover:to-primary-400 cursor-pointer relative group"
-              style={{ height: `${h}%` }}
-            >
-              <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                  {h} {getTranslation("registrations", language)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <span>{getTranslation("jan", language)}</span>
-          <span>{getTranslation("feb", language)}</span>
-          <span>{getTranslation("mar", language)}</span>
-          <span>{getTranslation("apr", language)}</span>
-          <span>{getTranslation("may", language)}</span>
-          <span>{getTranslation("jun", language)}</span>
-          <span>{getTranslation("jul", language)}</span>
-          <span>{getTranslation("aug", language)}</span>
-          <span>{getTranslation("sep", language)}</span>
-          <span>{getTranslation("oct", language)}</span>
-          <span>{getTranslation("nov", language)}</span>
-          <span>{getTranslation("dec", language)}</span>
-        </div>
-      </div>
-
-      {/* Performance Metrics */}
+      {/* Platform Health Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
@@ -213,7 +224,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
           </h4>
           <div className="flex items-center justify-between">
             <span className="text-3xl font-bold text-green-600 dark:text-green-400">
-              99.8%
+              {healthPercentage}%
             </span>
             <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
               <span className="text-sm font-bold text-green-600 dark:text-green-400">
@@ -222,24 +233,24 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("uptimeThisMonth", language)}
+            {getTranslation("activeUsersRatio", language) || "Active users ratio"}
           </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("avgResponseTime", language)}
+            {getTranslation("totalRegistrations", language) || "Total Registrations"}
           </h4>
           <div className="flex items-center justify-between">
             <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-              245
+              {((dashboardStats?.users.total || 0) + (dashboardStats?.schools.total || 0))}
             </span>
             <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-              <span className="text-xs text-blue-600 dark:text-blue-400">{getTranslation("milliseconds", language)}</span>
+              <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("milliseconds", language)}
+            {getTranslation("schools", language)} + {getTranslation("users", language)}
           </p>
         </div>
 
@@ -249,14 +260,14 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
           </h4>
           <div className="flex items-center justify-between">
             <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-              1.2K
+              {(dashboardStats?.users.active || 0).toLocaleString()}
             </span>
             <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
               <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("currentlyOnline", language)}
+            {getTranslation("currentlyActive", language) || "Currently active"}
           </p>
         </div>
       </div>

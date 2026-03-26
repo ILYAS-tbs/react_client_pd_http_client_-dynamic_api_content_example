@@ -9,9 +9,9 @@ import {
   Archive,
   Trash2,
 } from "lucide-react";
-import { Announcement } from "../../services/http_api/platform-admin/admin_types";
+import { Announcement, School } from "../../services/http_api/platform-admin/admin_types";
 import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
-import { LoadingSpinner, ErrorAlert, SuccessAlert } from "./ui";
+import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
@@ -28,12 +28,15 @@ export const AnnouncementsManagement: React.FC = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [createModal, setCreateModal] = useState(false);
+  const [schools, setSchools] = useState<School[]>([]);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     priority: "medium",
-    target_group: "STUDENTS",
+    target_group: "EVERYONE",
     category: "",
+    school: "",
   });
 
   const fetchAnnouncements = async () => {
@@ -56,8 +59,12 @@ export const AnnouncementsManagement: React.FC = () => {
         filters
       );
 
-      setAnnouncements(response.results);
-      setTotalPages(Math.ceil(response.count / 15));
+      // Handle both array and paginated object responses
+      const results = Array.isArray(response) ? response : response.results ?? [];
+      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+
+      setAnnouncements(results);
+      setTotalPages(Math.ceil(count / 15));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch announcements"
@@ -66,6 +73,23 @@ export const AnnouncementsManagement: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const fetchSchools = async () => {
+    try {
+      const response = await adminApiClient.listSchools(1, 100);
+      const results = Array.isArray(response) ? response : response.results ?? [];
+      setSchools(results);
+      if (results.length > 0) {
+        setFormData((prev) => ({ ...prev, school: String(results[0].id) }));
+      }
+    } catch (err) {
+      console.warn("Could not fetch schools for announcement selector:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSchools();
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -83,22 +107,43 @@ export const AnnouncementsManagement: React.FC = () => {
 
     try {
       setActionLoading("create");
+      
+      const priorityMap: Record<string, string> = {
+        low: "منخفض",
+        medium: "متوسط",
+        high: "عالي",
+      };
+      const targetGroupMap: Record<string, string> = {
+        STUDENTS: "جميع الطلاب",
+        PARENTS: "أولياء الأمور",
+        EVERYONE: "الجميع",
+      };
+
+      if (!formData.school) {
+        setError(getTranslation("selectSchool", language));
+        setActionLoading(null);
+        return;
+      }
+
       await adminApiClient.createAnnouncement({
         title: formData.title,
         content: formData.content,
-        priority: formData.priority as any,
-        target_group: formData.target_group as any,
+        priority: priorityMap[formData.priority] || "متوسط",
+        target_group: targetGroupMap[formData.target_group] || "الجميع",
         category: formData.category,
+        school: Number(formData.school),
       } as any);
 
       setSuccess(getTranslation("announcementCreatedSuccessfully", language));
-      setFormData({
+      setTimeout(() => setSuccess(null), 3000);
+      setFormData((prev) => ({
         title: "",
         content: "",
         priority: "medium",
-        target_group: "STUDENTS",
+        target_group: "EVERYONE",
         category: "",
-      });
+        school: prev.school,
+      }));
       setCreateModal(false);
       fetchAnnouncements();
     } catch (err) {
@@ -113,14 +158,16 @@ export const AnnouncementsManagement: React.FC = () => {
   const handlePublishAnnouncement = async (id: string) => {
     try {
       setActionLoading(`publish-${id}`);
+      setError(null);
       await adminApiClient.publishAnnouncement(id);
       setSuccess(getTranslation("announcementPublishedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
       fetchAnnouncements();
       setOpenMenuId(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : getTranslation("failedPublishAnnouncement", language)
-      );
+      const errorMsg = err instanceof Error ? err.message : getTranslation("failedPublishAnnouncement", language);
+      setError(errorMsg);
+      console.error("Publish announcement error:", err);
     } finally {
       setActionLoading(null);
     }
@@ -129,14 +176,32 @@ export const AnnouncementsManagement: React.FC = () => {
   const handleArchiveAnnouncement = async (id: string) => {
     try {
       setActionLoading(`archive-${id}`);
+      setError(null);
       await adminApiClient.archiveAnnouncement(id);
       setSuccess(getTranslation("announcementArchivedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
       fetchAnnouncements();
       setOpenMenuId(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : getTranslation("failedArchiveAnnouncement", language)
-      );
+      const errorMsg = err instanceof Error ? err.message : getTranslation("failedArchiveAnnouncement", language);
+      setError(errorMsg);
+      console.error("Archive announcement error:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    try {
+      setActionLoading(`delete-${id}`);
+      setError(null);
+      await adminApiClient.deleteAnnouncement(id);
+      setSuccess(getTranslation("deleteAnnouncement", language) + " successful");
+      setTimeout(() => setSuccess(null), 3000);
+      setConfirmDelete(null);
+      fetchAnnouncements();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete announcement");
     } finally {
       setActionLoading(null);
     }
@@ -144,12 +209,16 @@ export const AnnouncementsManagement: React.FC = () => {
 
   const getPriorityColor = (priority: string) => {
     const colors: { [key: string]: string } = {
+      // Arabic values from backend
+      "منخفض": "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+      "متوسط": "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+      "عالي": "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+      // English fallback
       low: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-      medium:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+      medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
       high: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
     };
-    return colors[priority] || colors.medium;
+    return colors[priority] || colors["متوسط"];
   };
 
   return (
@@ -185,9 +254,9 @@ export const AnnouncementsManagement: React.FC = () => {
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
               <option value="all">{getTranslation("allAudiences", language)}</option>
-              <option value="STUDENTS">{getTranslation("students", language)}</option>
-              <option value="PARENTS">{getTranslation("parents", language)}</option>
-              <option value="EVERYONE">{getTranslation("everyone", language)}</option>
+              <option value="جميع الطلاب">{getTranslation("students", language)}</option>
+              <option value="أولياء الأمور">{getTranslation("parents", language)}</option>
+              <option value="الجميع">{getTranslation("everyone", language)}</option>
             </select>
 
             <button
@@ -202,8 +271,9 @@ export const AnnouncementsManagement: React.FC = () => {
         {loading ? (
           <LoadingSpinner message={getTranslation("loadingAnnouncements", language)} />
         ) : (
-          <>
-            <div className="space-y-4">
+          <>            {announcements.length === 0 && (
+              <EmptyState message={getTranslation("noAnnouncements", language)} />
+            )}            <div className="space-y-4">
               {announcements.map((announcement) => (
                 <div
                   key={announcement.id}
@@ -216,11 +286,11 @@ export const AnnouncementsManagement: React.FC = () => {
                           {announcement.title}
                         </h4>
                         <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
+                            className={`px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(
                             announcement.priority
                           )}`}
                         >
-                          {announcement.priority.toUpperCase()}
+                          {announcement.priority}
                         </span>
                         {announcement.pinned && (
                           <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
@@ -231,25 +301,29 @@ export const AnnouncementsManagement: React.FC = () => {
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
                         {announcement.content}
                       </p>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
+                        {announcement.school_name && (
+                          <span>
+                            {getTranslation("school", language)}:{" "}
+                            <span className="font-medium">{announcement.school_name}</span>
+                          </span>
+                        )}
                         <span>
                           {getTranslation("target", language)}:{" "}
-                          <span className="font-medium">
-                            {announcement.target_group}
-                          </span>
+                          <span className="font-medium">{announcement.target_group}</span>
                         </span>
                         <span>
                           {getTranslation("created", language)}:{" "}
                           {new Date(announcement.created_at).toLocaleDateString()}
                         </span>
                         <span
-                          className={`${
-                            announcement.is_published
+                          className={`font-medium ${
+                            announcement.pinned
                               ? "text-green-600 dark:text-green-400"
                               : "text-gray-500"
                           }`}
                         >
-                          {announcement.is_published
+                          {announcement.pinned
                             ? getTranslation("published", language)
                             : getTranslation("draft", language)}
                         </span>
@@ -272,32 +346,33 @@ export const AnnouncementsManagement: React.FC = () => {
 
                       {openMenuId === announcement.id && (
                         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
-                          {!announcement.is_published && (
+                          {!announcement.pinned && (
                             <button
-                              onClick={() =>
-                                handlePublishAnnouncement(announcement.id)
-                              }
-                              disabled={
-                                actionLoading === `publish-${announcement.id}`
-                              }
+                              onClick={() => handlePublishAnnouncement(announcement.id)}
+                              disabled={actionLoading === `publish-${announcement.id}`}
                               className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400 disabled:opacity-50"
                             >
                               <Send className="h-4 w-4" /> {getTranslation("publish", language)}
                             </button>
                           )}
-                          {announcement.is_published && (
+                          {announcement.pinned && (
                             <button
-                              onClick={() =>
-                                handleArchiveAnnouncement(announcement.id)
-                              }
-                              disabled={
-                                actionLoading === `archive-${announcement.id}`
-                              }
+                              onClick={() => handleArchiveAnnouncement(announcement.id)}
+                              disabled={actionLoading === `archive-${announcement.id}`}
                               className="w-full flex items-center gap-2 px-4 py-2 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 text-sm text-yellow-700 dark:text-yellow-400 disabled:opacity-50"
                             >
                               <Archive className="h-4 w-4" /> {getTranslation("archive", language)}
                             </button>
                           )}
+                          <button
+                            onClick={() => {
+                              setConfirmDelete(announcement.id);
+                              setOpenMenuId(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400"
+                          >
+                            <Trash2 className="h-4 w-4" /> {getTranslation("delete", language)}
+                          </button>
                         </div>
                       )}
                     </div>
@@ -336,16 +411,50 @@ export const AnnouncementsManagement: React.FC = () => {
         )}
       </div>
 
+      {/* Delete Confirmation */}
+      {confirmDelete && (
+        <ConfirmDialog
+          title={getTranslation("deleteAnnouncement", language)}
+          message={getTranslation("confirmDeleteAnnouncement", language)}
+          confirmLabel={getTranslation("delete", language)}
+          cancelLabel={getTranslation("cancel", language)}
+          onConfirm={() => handleDeleteAnnouncement(confirmDelete)}
+          onCancel={() => setConfirmDelete(null)}
+          isLoading={actionLoading === `delete-${confirmDelete}`}
+        />
+      )}
+
       {/* Create Modal */}
       {createModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-2xl w-full max-h-96 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 {getTranslation("createNewAnnouncement", language)}
               </h3>
 
               <div className="space-y-4">
+                {/* School selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation("school", language)} *
+                  </label>
+                  {schools.length === 0 ? (
+                    <p className="text-sm text-red-500">No schools available</p>
+                  ) : (
+                    <select
+                      value={formData.school}
+                      onChange={(e) => setFormData({ ...formData, school: e.target.value })}
+                      className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
+                    >
+                      {schools.map((s) => (
+                        <option key={s.id} value={String(s.id)}>
+                          {s.school_name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {getTranslation("title", language)} *
@@ -434,13 +543,14 @@ export const AnnouncementsManagement: React.FC = () => {
                 <button
                   onClick={() => {
                     setCreateModal(false);
-                    setFormData({
+                    setFormData((prev) => ({
                       title: "",
                       content: "",
                       priority: "medium",
-                      target_group: "STUDENTS",
+                      target_group: "EVERYONE",
                       category: "",
-                    });
+                      school: prev.school,
+                    }));
                   }}
                   className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
                 >

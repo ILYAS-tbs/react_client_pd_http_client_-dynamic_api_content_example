@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Membership } from "../../services/http_api/platform-admin/admin_types";
 import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
-import { LoadingSpinner, ErrorAlert, SuccessAlert } from "./ui";
+import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
@@ -30,6 +30,7 @@ export const MembershipsManagement: React.FC = () => {
   const [extendModal, setExtendModal] = useState<string | null>(null);
   const [extendMonths, setExtendMonths] = useState(1);
   const [extendReason, setExtendReason] = useState("");
+  const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
 
   const fetchMemberships = async () => {
     try {
@@ -55,8 +56,12 @@ export const MembershipsManagement: React.FC = () => {
         filters
       );
 
-      setMemberships(response.results);
-      setTotalPages(Math.ceil(response.count / 15));
+      // Handle both array and paginated object responses
+      const results = Array.isArray(response) ? response : response.results ?? [];
+      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+
+      setMemberships(results);
+      setTotalPages(Math.ceil(count / 15));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch memberships"
@@ -74,6 +79,23 @@ export const MembershipsManagement: React.FC = () => {
     fetchMemberships();
   }, [currentPage, searchTerm, typeFilter, activeFilter]);
 
+  const handleCancelMembership = async (membershipId: string) => {
+    try {
+      setActionLoading(`cancel-${membershipId}`);
+      setError(null);
+      await adminApiClient.cancelMembership(membershipId);
+      setSuccess(getTranslation("cancelSubscription", language) + " successful");
+      setTimeout(() => setSuccess(null), 3000);
+      setConfirmCancel(null);
+      fetchMemberships();
+      setOpenMenuId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to cancel membership");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleExtendMembership = async (membershipId: string) => {
     if (extendMonths < 1) {
       setError(getTranslation("extendDurationMinimum", language));
@@ -82,6 +104,7 @@ export const MembershipsManagement: React.FC = () => {
 
     try {
       setActionLoading(`extend-${membershipId}`);
+      setError(null);
       await adminApiClient.extendMembership(
         membershipId,
         extendMonths,
@@ -89,15 +112,16 @@ export const MembershipsManagement: React.FC = () => {
       );
 
       setSuccess(getTranslation("membershipExtendedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
       setExtendModal(null);
       setExtendMonths(1);
       setExtendReason("");
       fetchMemberships();
       setOpenMenuId(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : getTranslation("failedExtendMembership", language)
-      );
+      const errorMsg = err instanceof Error ? err.message : getTranslation("failedExtendMembership", language);
+      setError(errorMsg);
+      console.error("Extend membership error:", err);
     } finally {
       setActionLoading(null);
     }
@@ -180,6 +204,9 @@ export const MembershipsManagement: React.FC = () => {
           <LoadingSpinner message={getTranslation("loadingSubscriptions", language)} />
         ) : (
           <>
+            {memberships.length === 0 && (
+              <EmptyState message={getTranslation("noMemberships", language)} />
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -219,7 +246,7 @@ export const MembershipsManagement: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-4 text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(membership.start_date).toLocaleDateString()}
+                        {membership.start_date ? new Date(membership.start_date).toLocaleDateString() : "-"}
                       </td>
                       <td className="py-4 text-sm">
                         <div className="flex items-center gap-2">
@@ -255,9 +282,9 @@ export const MembershipsManagement: React.FC = () => {
                           <button
                             onClick={() =>
                               setOpenMenuId(
-                                openMenuId === membership.id
+                                openMenuId === String(membership.id)
                                   ? null
-                                  : membership.id
+                                  : String(membership.id)
                               )
                             }
                             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
@@ -265,15 +292,22 @@ export const MembershipsManagement: React.FC = () => {
                             <MoreVertical className="h-4 w-4" />
                           </button>
 
-                          {openMenuId === membership.id && (
+                          {openMenuId === String(membership.id) && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
                               <button
-                                onClick={() =>
-                                  setExtendModal(membership.id)
-                                }
+                                onClick={() => setExtendModal(String(membership.id))}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm text-blue-700 dark:text-blue-400"
                               >
                                 <Plus className="h-4 w-4" /> {getTranslation("extend", language)}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setConfirmCancel(String(membership.id));
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400"
+                              >
+                                <CheckCircle className="h-4 w-4" /> {getTranslation("cancelSubscription", language)}
                               </button>
                             </div>
                           )}
@@ -314,6 +348,20 @@ export const MembershipsManagement: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Cancel Confirmation */}
+      {confirmCancel && (
+        <ConfirmDialog
+          title={getTranslation("cancelSubscription", language)}
+          message={getTranslation("confirmCancelSubscription", language)}
+          confirmLabel={getTranslation("cancelSubscription", language)}
+          cancelLabel={getTranslation("cancel", language)}
+          onConfirm={() => handleCancelMembership(confirmCancel)}
+          onCancel={() => setConfirmCancel(null)}
+          isLoading={actionLoading === `cancel-${confirmCancel}`}
+          confirmClassName="bg-red-500 hover:bg-red-600 text-white"
+        />
+      )}
 
       {/* Extend Modal */}
       {extendModal && (

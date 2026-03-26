@@ -10,17 +10,11 @@ import {
 } from "lucide-react";
 import { School } from "../../services/http_api/platform-admin/admin_types";
 import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
-import { LoadingSpinner, ErrorAlert, SuccessAlert } from "./ui";
+import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
-interface SchoolsManagementProps {
-  onSchoolSelect?: (school: School) => void;
-}
-
-export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
-  onSchoolSelect,
-}) => {
+export const SchoolsManagement: React.FC = () => {
   const { language } = useLanguage();
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +27,25 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [detailSchool, setDetailSchool] = useState<School | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: "suspend" | "activate"; id: string } | null>(null);
+
+  const getLevelTranslation = (level: string): string => {
+    const levelMap: { [key: string]: string } = {
+      primary: "primary",
+      middle: "middle",
+      high: "high",
+    };
+    return getTranslation(levelMap[level] || level, language);
+  };
+
+  const getTypeTranslation = (type: string): string => {
+    const typeMap: { [key: string]: string } = {
+      PUBLIC: "public",
+      PRIVATE: "private",
+    };
+    return getTranslation(typeMap[type] || type, language);
+  };
 
  const fetchSchools = async () => {
   try {
@@ -45,7 +58,7 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
     };
 
     if (levelFilter !== "all") filters.school_level = levelFilter;
-    if (typeFilter !== "all") filters.type = typeFilter;
+    if (typeFilter !== "all") filters.school_type = typeFilter;
 
     const response = await adminApiClient.listSchools(currentPage, 15, filters);
 
@@ -72,8 +85,11 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
   const handleActivateSchool = async (schoolId: string) => {
     try {
       setActionLoading(`activate-${schoolId}`);
+      setError(null);
       await adminApiClient.activateSchool(schoolId);
-      setSuccess("School activated successfully");
+      setSuccess(getTranslation("schoolActivatedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
+      setConfirmAction(null);
       fetchSchools();
       setOpenMenuId(null);
     } catch (err) {
@@ -86,8 +102,11 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
   const handleSuspendSchool = async (schoolId: string) => {
     try {
       setActionLoading(`suspend-${schoolId}`);
+      setError(null);
       await adminApiClient.suspendSchool(schoolId);
-      setSuccess("School suspended successfully");
+      setSuccess(getTranslation("schoolSuspendedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
+      setConfirmAction(null);
       fetchSchools();
       setOpenMenuId(null);
     } catch (err) {
@@ -99,12 +118,11 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
 
   const getLevelBadgeColor = (level: string) => {
     const colors: { [key: string]: string } = {
-      PRIMARY: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-      MIDDLE:
-        "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
-      HIGH: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+      primary: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+      middle: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+      high: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
     };
-    return colors[level] || colors.MIDDLE;
+    return colors[level] || colors.middle;
   };
 
   return (
@@ -140,9 +158,9 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
               <option value="all">{getTranslation("allLevels", language)}</option>
-              <option value="PRIMARY">{getTranslation("primary", language)}</option>
-              <option value="MIDDLE">{getTranslation("middle", language)}</option>
-              <option value="HIGH">{getTranslation("high", language)}</option>
+              <option value="primary">{getTranslation("primary", language)}</option>
+              <option value="middle">{getTranslation("middle", language)}</option>
+              <option value="high">{getTranslation("high", language)}</option>
             </select>
 
             <select
@@ -161,6 +179,9 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
           <LoadingSpinner message={getTranslation("loadingSchools", language)} />
         ) : (
           <>
+            {schools.length === 0 && (
+              <EmptyState message={getTranslation("noSchools", language)} />
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -180,7 +201,8 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
                       key={school.id}
                       className="text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50"
                     >
-                      <td className="py-4 text-sm font-medium">{school.name}</td>
+
+                      <td className="py-4 text-sm font-medium">{school.school_name}</td>
                       <td className="py-4 text-sm text-gray-600 dark:text-gray-400">
                         {school.email}
                       </td>
@@ -190,18 +212,18 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
                             school.school_level
                           )}`}
                         >
-                          {school.school_level}
+                          {getLevelTranslation(school.school_level)}
                         </span>
                       </td>
                       <td className="py-4 text-sm">
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
-                            school.type === "PUBLIC"
+                            school.school_type === "PUBLIC"
                               ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
                               : "bg-pink-100 text-pink-700 dark:bg-pink-900/20 dark:text-pink-400"
                           }`}
                         >
-                          {school.type}
+                          {getTypeTranslation(school.school_type)}
                         </span>
                       </td>
                       <td className="py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -223,7 +245,7 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
                           <button
                             onClick={() =>
                               setOpenMenuId(
-                                openMenuId === school.id ? null : school.id
+                                openMenuId === String(school.id) ? null : String(school.id)
                               )
                             }
                             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
@@ -231,34 +253,32 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
                             <MoreVertical className="h-4 w-4" />
                           </button>
 
-                          {openMenuId === school.id && (
+                          {openMenuId === String(school.id) && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
                               <button
-                                onClick={() => onSchoolSelect?.(school)}
+                                onClick={() => { setDetailSchool(school); setOpenMenuId(null); }}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm text-gray-700 dark:text-gray-200"
                               >
                                 <Eye className="h-4 w-4" /> {getTranslation("viewDetails", language)}
                               </button>
                               {school.is_active ? (
                                 <button
-                                  onClick={() =>
-                                    handleSuspendSchool(school.id)
-                                  }
-                                  disabled={
-                                    actionLoading === `suspend-${school.id}`
-                                  }
+                                  onClick={() => {
+                                    setConfirmAction({ type: "suspend", id: String(school.id) });
+                                    setOpenMenuId(null);
+                                  }}
+                                  disabled={actionLoading === `suspend-${school.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400 disabled:opacity-50"
                                 >
                                   <Lock className="h-4 w-4" /> {getTranslation("suspend", language)}
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() =>
-                                    handleActivateSchool(school.id)
-                                  }
-                                  disabled={
-                                    actionLoading === `activate-${school.id}`
-                                  }
+                                  onClick={() => {
+                                    setConfirmAction({ type: "activate", id: String(school.id) });
+                                    setOpenMenuId(null);
+                                  }}
+                                  disabled={actionLoading === `activate-${school.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400 disabled:opacity-50"
                                 >
                                   <Unlock className="h-4 w-4" /> {getTranslation("activate", language)}
@@ -303,6 +323,93 @@ export const SchoolsManagement: React.FC<SchoolsManagementProps> = ({
           </>
         )}
       </div>
+
+      {/* School Detail Modal */}
+      {detailSchool && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {detailSchool.school_name}
+                </h3>
+                <button
+                  onClick={() => setDetailSchool(null)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  ✕
+                </button>
+              </div>
+              <dl className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("email", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.email || detailSchool.user_email}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("level", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{getLevelTranslation(detailSchool.school_level)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("type", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.school_type}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("students", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.total_students ?? 0}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("teachers", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.total_teachers ?? 0}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("classes", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailSchool.total_classes ?? 0}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("status", language)}</dt>
+                  <dd className={`font-medium ${detailSchool.is_active ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                    {detailSchool.is_active ? getTranslation("active", language) : getTranslation("suspended", language)}
+                  </dd>
+                </div>
+              </dl>
+              <button
+                onClick={() => setDetailSchool(null)}
+                className="mt-6 w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium"
+              >
+                {getTranslation("close", language)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Suspend/Activate */}
+      {confirmAction && (
+        <ConfirmDialog
+          title={getTranslation("confirmActionTitle", language)}
+          message={
+            confirmAction.type === "suspend"
+              ? getTranslation("confirmSuspend", language)
+              : getTranslation("confirmActivate", language)
+          }
+          confirmLabel={
+            confirmAction.type === "suspend"
+              ? getTranslation("suspend", language)
+              : getTranslation("activate", language)
+          }
+          cancelLabel={getTranslation("cancel", language)}
+          onConfirm={() =>
+            confirmAction.type === "suspend"
+              ? handleSuspendSchool(confirmAction.id)
+              : handleActivateSchool(confirmAction.id)
+          }
+          onCancel={() => setConfirmAction(null)}
+          isLoading={
+            actionLoading === `${confirmAction.type}-${confirmAction.id}`
+          }
+          confirmClassName="bg-red-500 hover:bg-red-600 text-white"
+        />
+      )}
     </div>
   );
 };

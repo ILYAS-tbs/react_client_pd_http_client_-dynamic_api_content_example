@@ -10,17 +10,11 @@ import {
 } from "lucide-react";
 import { User } from "../../services/http_api/platform-admin/admin_types";
 import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
-import { LoadingSpinner, ErrorAlert, SuccessAlert } from "./ui";
+import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
-interface UsersManagementProps {
-  onUserSelect?: (user: User) => void;
-}
-
-export const UsersManagement: React.FC<UsersManagementProps> = ({
-  onUserSelect,
-}) => {
+export const UsersManagement: React.FC = () => {
   const { language } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +27,8 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [detailUser, setDetailUser] = useState<User | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: "deactivate" | "reactivate"; id: number } | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -54,8 +50,12 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
 
       const response = await adminApiClient.listUsers(currentPage, 15, filters);
 
-      setUsers(response.results);
-      setTotalPages(Math.ceil(response.count / 15));
+      // Handle both array and paginated object responses
+      const results = Array.isArray(response) ? response : response.results ?? [];
+      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+
+      setUsers(results);
+      setTotalPages(Math.ceil(count / 15));
     } catch (err) {
       setError(err instanceof Error ? err.message : getTranslation("errorMessage", language));
     } finally {
@@ -74,12 +74,16 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
   const handleDeactivateUser = async (userId: number) => {
     try {
       setActionLoading(`deactivate-${userId}`);
+      setError(null);
       await adminApiClient.deactivateUser(userId);
-      setSuccess(getTranslation("successMessage", language));
+      setSuccess(getTranslation("userDeactivatedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
+      setConfirmAction(null);
       fetchUsers();
       setOpenMenuId(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : getTranslation("errorMessage", language));
+      setError(err instanceof Error ? err.message : "Failed to deactivate user");
+      console.error("Deactivate user error:", err);
     } finally {
       setActionLoading(null);
     }
@@ -88,12 +92,16 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
   const handleReactivateUser = async (userId: number) => {
     try {
       setActionLoading(`reactivate-${userId}`);
+      setError(null);
       await adminApiClient.reactivateUser(userId);
-      setSuccess(getTranslation("successMessage", language));
+      setSuccess(getTranslation("userReactivatedSuccessfully", language));
+      setTimeout(() => setSuccess(null), 3000);
+      setConfirmAction(null);
       fetchUsers();
       setOpenMenuId(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : getTranslation("errorMessage", language));
+      setError(err instanceof Error ? err.message : "Failed to reactivate user");
+      console.error("Reactivate user error:", err);
     } finally {
       setActionLoading(null);
     }
@@ -166,6 +174,9 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
           <LoadingSpinner message={getTranslation("loadingUsers", language)} />
         ) : (
           <>
+            {users.length === 0 && (
+              <EmptyState message={getTranslation("noUsers", language)} />
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -185,7 +196,7 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
                       className="text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50"
                     >
                       <td className="py-4 text-sm font-medium">
-                        {user.first_name} {user.last_name}
+                        {(user.first_name && user.last_name ? user.first_name + " " + user.last_name : user.username)}
                       </td>
                       <td className="py-4 text-sm text-gray-600 dark:text-gray-400">
                         {user.email}
@@ -229,31 +240,29 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
                           {openMenuId === user.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
                               <button
-                                onClick={() => onUserSelect?.(user)}
+                                onClick={() => { setDetailUser(user); setOpenMenuId(null); }}
                                 className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600 text-sm text-gray-700 dark:text-gray-200"
                               >
                                 <Eye className="h-4 w-4" /> {getTranslation("viewDetails", language)}
                               </button>
                               {user.is_active ? (
                                 <button
-                                  onClick={() =>
-                                    handleDeactivateUser(user.id)
-                                  }
-                                  disabled={
-                                    actionLoading === `deactivate-${user.id}`
-                                  }
+                                  onClick={() => {
+                                    setConfirmAction({ type: "deactivate", id: user.id });
+                                    setOpenMenuId(null);
+                                  }}
+                                  disabled={actionLoading === `deactivate-${user.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-700 dark:text-red-400 disabled:opacity-50"
                                 >
                                   <Ban className="h-4 w-4" /> {getTranslation("deactivate", language)}
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() =>
-                                    handleReactivateUser(user.id)
-                                  }
-                                  disabled={
-                                    actionLoading === `reactivate-${user.id}`
-                                  }
+                                  onClick={() => {
+                                    setConfirmAction({ type: "reactivate", id: user.id });
+                                    setOpenMenuId(null);
+                                  }}
+                                  disabled={actionLoading === `reactivate-${user.id}`}
                                   className="w-full flex items-center gap-2 px-4 py-2 hover:bg-green-50 dark:hover:bg-green-900/20 text-sm text-green-700 dark:text-green-400 disabled:opacity-50"
                                 >
                                   <CheckCircle className="h-4 w-4" /> {getTranslation("reactivate", language)}
@@ -298,6 +307,77 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({
           </>
         )}
       </div>
+
+      {/* User Detail Modal */}
+      {detailUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {detailUser.first_name && detailUser.last_name
+                    ? `${detailUser.first_name} ${detailUser.last_name}`
+                    : detailUser.username}
+                </h3>
+                <button onClick={() => setDetailUser(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">✕</button>
+              </div>
+              <dl className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("username", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailUser.username}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("email", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{detailUser.email}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("userType", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium capitalize">{detailUser.role}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("status", language)}</dt>
+                  <dd className={`font-medium ${detailUser.is_active ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                    {detailUser.is_active ? getTranslation("active", language) : getTranslation("inactive", language)}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("joined", language)}</dt>
+                  <dd className="text-gray-900 dark:text-white font-medium">{new Date(detailUser.date_joined).toLocaleDateString()}</dd>
+                </div>
+              </dl>
+              <button onClick={() => setDetailUser(null)} className="mt-6 w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium">
+                {getTranslation("close", language)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Deactivate/Reactivate */}
+      {confirmAction && (
+        <ConfirmDialog
+          title={getTranslation("confirmActionTitle", language)}
+          message={
+            confirmAction.type === "deactivate"
+              ? getTranslation("confirmDeactivate", language)
+              : getTranslation("confirmReactivate", language)
+          }
+          confirmLabel={
+            confirmAction.type === "deactivate"
+              ? getTranslation("deactivate", language)
+              : getTranslation("reactivate", language)
+          }
+          cancelLabel={getTranslation("cancel", language)}
+          onConfirm={() =>
+            confirmAction.type === "deactivate"
+              ? handleDeactivateUser(confirmAction.id)
+              : handleReactivateUser(confirmAction.id)
+          }
+          onCancel={() => setConfirmAction(null)}
+          isLoading={actionLoading === `${confirmAction.type}-${confirmAction.id}`}
+          confirmClassName="bg-red-500 hover:bg-red-600 text-white"
+        />
+      )}
     </div>
   );
 };

@@ -13,7 +13,7 @@ import {
   BehaviourReport,
 } from "../../services/http_api/platform-admin/admin_types";
 import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
-import { LoadingSpinner, ErrorAlert, SuccessAlert } from "./ui";
+import { LoadingSpinner, ErrorAlert, SuccessAlert, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
@@ -64,8 +64,12 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
         filters
       );
 
-      setReports(response.results);
-      setTotalPages(Math.ceil(response.count / 15));
+      // Handle both array and paginated object responses
+      const results = Array.isArray(response) ? response : response.results ?? [];
+      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+
+      setReports(results);
+      setTotalPages(Math.ceil(count / 15));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch reports");
     } finally {
@@ -84,14 +88,18 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
   const handleApproveReport = async (reportId: string) => {
     try {
       setActionLoading(`approve-${reportId}`);
+      setError(null);
       await adminApiClient.approveReport(reportId, comments);
       setSuccess("Report approved successfully");
+      setTimeout(() => setSuccess(null), 3000);
       fetchReports();
       setApprovalModal(null);
       setComments("");
       setOpenMenuId(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to approve report");
+      const errorMsg = err instanceof Error ? err.message : "Failed to approve report";
+      setError(errorMsg);
+      console.error("Approve report error:", err);
     } finally {
       setActionLoading(null);
     }
@@ -100,14 +108,18 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
   const handleRejectReport = async (reportId: string) => {
     try {
       setActionLoading(`reject-${reportId}`);
+      setError(null);
       await adminApiClient.rejectReport(reportId, comments);
       setSuccess("Report rejected successfully");
+      setTimeout(() => setSuccess(null), 3000);
       fetchReports();
       setApprovalModal(null);
       setComments("");
       setOpenMenuId(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reject report");
+      const errorMsg = err instanceof Error ? err.message : "Failed to reject report";
+      setError(errorMsg);
+      console.error("Reject report error:", err);
     } finally {
       setActionLoading(null);
     }
@@ -190,6 +202,9 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
           <LoadingSpinner message={getTranslation("loadingReports", language)} />
         ) : (
           <>
+            {reports.length === 0 && (
+              <EmptyState message={getTranslation("noReports", language)} />
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>

@@ -16,15 +16,17 @@ export interface PlatformAdmin {
 
 // School Management
 export interface School {
-  id: string;
-  name: string;
+  id: number;
+  user: number;
+  school_name: string;
   email: string;
-  phone: string;
+  phone_number: string;
   address: string;
   commune: string;
+  commun: string;
   wilaya: string;
-  school_level: "PRIMARY" | "MIDDLE" | "HIGH";
-  type: "PUBLIC" | "PRIVATE";
+  school_level: "primary" | "middle" | "high";
+  school_type: string;
   director_name: string;
   director_email: string;
   director_phone: string;
@@ -35,8 +37,8 @@ export interface School {
   created_at: string;
   updated_at: string;
   description: string;
-  user_id: number;
-  user_is_active: boolean;
+  user_email: string;
+  user_username: string;
 }
 
 // User Management
@@ -93,30 +95,30 @@ export interface BehaviourReport {
 // Announcement Management
 export interface Announcement {
   id: string;
-  school_id: string;
+  announcement_id: string;
+  school: number;
+  school_name: string;
   title: string;
   content: string;
   category: string;
-  priority: "low" | "medium" | "high";
-  target_group: "STUDENTS" | "PARENTS" | "EVERYONE";
-  image_url: string | null;
+  priority: string;
+  target_group: string;
   pinned: boolean;
   is_published: boolean;
-  publish_date: string | null;
-  scheduled_at: string | null;
+  date: string;
   created_at: string;
   updated_at: string;
 }
 
 // Subscription Management
 export interface Membership {
-  id: string;
-  parent_id: string;
+  id: number;
+  user: number;
   parent_email: string;
   parent_name: string;
-  type: "FREE" | "SUB_200" | "SUB_500";
+  type: string;
   is_active: boolean;
-  start_date: string;
+  start_date?: string;
   expiry_date: string;
   created_at: string;
   updated_at: string;
@@ -143,11 +145,45 @@ export interface ErrorResponse {
 
 // Dashboard Stats
 export interface DashboardStats {
-  total_schools: number;
-  total_teachers: number;
-  total_parents: number;
-  total_students: number;
-  active_subscriptions: number;
-  pending_reports: number;
-  active_admins: number;
+  schools: {
+    total: number;
+    active: number;
+    inactive: number;
+  };
+  users: {
+    total: number;
+    active: number;
+    inactive: number;
+  };
+  reports: {
+    absence_pending: number;
+    absence_approved: number;
+    absence_rejected: number;
+    behaviour_total: number;
+  };
+  roles: {
+    teachers: number;
+    parents: number;
+    students: number;
+    admins: number;
+  };
+}
+
+// Audit Log
+export interface AdminAuditLog {
+  id: string;
+  admin?: {
+    id: string;
+    username: string;
+    email: string;
+  } | null;
+  action_type: "create" | "update" | "delete" | "approve" | "reject" | "publish" | "deactivate" | "reactivate" | "bulk_action" | "other";
+  entity_type: string;
+  entity_id: string;
+  entity_display: string;
+  changes: Record<string, any>;
+  details: Record<string, any>;
+  ip_address: string | null;
+  user_agent: string;
+  timestamp: string;
 }
