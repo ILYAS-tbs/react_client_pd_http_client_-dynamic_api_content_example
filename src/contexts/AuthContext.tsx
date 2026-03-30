@@ -134,7 +134,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     let is_admin = false;
     try {
       const admin_check = await fetch(
-        `${SERVER_BASE_URL}/admin/overview/stats/`,
+        `${SERVER_BASE_URL}/api/admin/overview/stats/`,
         {
           method: "GET",
           credentials: "include",
