@@ -49,7 +49,14 @@ function App() {
                     element={<ConfirmationCode />}
                   />
 
-                    <Route path="/admin" element={<AdminDashboard />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute allowedRoles={["super-admin"]}>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
 
 
                   <Route
