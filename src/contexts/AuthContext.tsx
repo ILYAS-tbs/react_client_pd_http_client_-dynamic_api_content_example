@@ -21,6 +21,7 @@ export interface User {
   role: "school" | "teacher" | "parent" | "super-admin";
   schoolId?: string;
   schoolType?: "public" | "private";
+  is_admin?: boolean;
 }
 export interface UserData {
   commune?: string;
@@ -129,11 +130,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     change_role(role_from_server); // auth context rule
 
+    // Check if user is an admin
+    let is_admin = false;
+    try {
+      const admin_check = await fetch(
+        `${SERVER_BASE_URL}/admin/overview/stats/`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      // If successful (200-299), user has admin access
+      is_admin = admin_check.ok;
+    } catch (error) {
+      console.log("No admin access");
+      is_admin = false;
+    }
+
     const newUser: User = {
       id: backend_user?.data.user.id.toString() ?? "-1",
       name: backend_user.data.user.username,
       email: backend_user.data.user.email || "NO EMAIL!",
       role: role_from_server as "school" | "teacher" | "parent" | "super-admin",
+      is_admin: is_admin,
       // schoolId: role_from_server !== "school" ? "school-1" : undefined,
       // schoolType: role_from_server === "school" ? "private" : undefined,
     };
@@ -169,6 +188,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
               : "Fatima Bourahla",
       email: user.email || "NO EMAIL!",
       role: role as "school" | "teacher" | "parent" | "super-admin",
+      is_admin: user.is_admin,
       schoolId: role !== "school" ? "school-1" : undefined,
       schoolType: role === "school" ? "private" : undefined,
     };

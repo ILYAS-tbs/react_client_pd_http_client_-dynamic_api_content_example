@@ -4,12 +4,14 @@ import { useAuth } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles: string[];
+  allowedRoles?: string[];
+  requireAdmin?: boolean;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   allowedRoles,
+  requireAdmin = false,
 }) => {
   const { user, isLoading } = useAuth();
 
@@ -25,7 +27,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
+  // If admin access is required, check if user is admin
+  if (requireAdmin) {
+    if (!user.is_admin) {
+      const path = `/${user.role}-dashboard`;
+      return <Navigate to={path} replace />;
+    }
+  } else if (allowedRoles && !allowedRoles.includes(user.role)) {
+    // If role-based access, check role
     const path = `/${user.role}-dashboard`;
     return <Navigate to={path} replace />;
   }
