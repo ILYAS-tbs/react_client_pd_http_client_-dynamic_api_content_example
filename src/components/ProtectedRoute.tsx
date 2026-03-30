@@ -30,8 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // If admin access is required, check if user is admin
   if (requireAdmin) {
     if (!user.is_admin) {
-      const path = `/${user.role}-dashboard`;
-      return <Navigate to={path} replace />;
+      return <Navigate to="/login" replace />;
     }
   } else if (allowedRoles && !allowedRoles.includes(user.role)) {
     // If role-based access, check role
