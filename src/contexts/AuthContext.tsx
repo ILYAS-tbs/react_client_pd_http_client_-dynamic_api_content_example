@@ -142,8 +142,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       );
       // If successful (200-299), user has admin access
       is_admin = admin_check.ok;
+      console.log(`Admin check status: ${admin_check.status}, is_admin: ${is_admin}`);
     } catch (error) {
-      console.log("No admin access");
+      console.log("No admin access - error:", error);
       is_admin = false;
     }
 
