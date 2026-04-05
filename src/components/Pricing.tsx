@@ -186,7 +186,7 @@ export function Pricing() {
                   <button
                     onClick={() => pay_func(1000)}
                     className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-200 ${plan.popular
-                      ? "bg-primary-500 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl"
+                      ? "bg-gradient-to-r from-primary-500 to-secondary-600 hover:from-primary-600 hover:to-secondary-700 text-white shadow-lg hover:shadow-xl"
                       : "bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
                       }`}
                   >

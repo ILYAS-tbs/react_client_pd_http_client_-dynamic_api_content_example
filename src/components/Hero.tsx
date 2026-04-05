@@ -61,7 +61,7 @@ export function Hero({ onGetStarted }: HeroProps) {
             <div className={`flex flex-col sm:flex-row gap-4 ${isRTL ? 'sm:justify-end' : 'sm:justify-start'}`}>
               <button
                 onClick={onGetStarted}
-                className="group flex items-center justify-center px-8 py-4 bg-primary-500 hover:bg-primary-700 text-white rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="group flex items-center justify-center px-8 py-4 bg-gradient-to-r from-primary-500 to-secondary-600 hover:from-primary-600 hover:to-secondary-700 text-white rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 <span className="mr-2 rtl:mr-0 rtl:ml-2">{getTranslation('getStarted', language)}</span>
                 <ArrowIcon className="w-5 h-5 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
@@ -69,7 +69,7 @@ export function Hero({ onGetStarted }: HeroProps) {
 
               <button
                 onClick={() => scrollTo("about")}
-                className="group flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-[#bcc6d2] dark:border-gray-700 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                className="group flex items-center justify-center px-8 py-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-primary-300 dark:border-gray-700 rounded-xl text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
 
                 <Play className="w-5 h-5 mr-2 rtl:mr-0 rtl:ml-2 text-primary-500 group-hover:scale-110 transition-transform" />
                 <span>{getTranslation('learnMore', language)}</span>

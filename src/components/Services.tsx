@@ -45,7 +45,7 @@ export function Services({ onGetStarted }: HeroProps) {
         language === 'ar' ? 'التواصل مع أولياء الأمور' : language === 'fr' ? 'Communication avec les parents' : 'Parent communication',
         language === 'ar' ? 'مكتبة الموارد' : language === 'fr' ? 'Bibliothèque de ressources' : 'Resource library'
       ],
-      color: 'from-purple-500 to-purple-600'
+      color: 'from-primary-600 to-secondary-600'
     },
     {
       icon: MessageSquare,
@@ -57,7 +57,7 @@ export function Services({ onGetStarted }: HeroProps) {
         language === 'ar' ? 'مشاركة الملفات' : language === 'fr' ? 'Partage de fichiers' : 'File sharing',
         language === 'ar' ? 'سجل المحادثات' : language === 'fr' ? 'Historique des conversations' : 'Chat history'
       ],
-      color: 'from-orange-500 to-orange-600'
+      color: 'from-secondary-500 to-secondary-700'
     }
   ];
 
@@ -174,7 +174,7 @@ export function Services({ onGetStarted }: HeroProps) {
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-500/90 to-primary-700/90 backdrop-blur-[2px]"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-500/90 to-secondary-600/90 backdrop-blur-[2px]"></div>
             </div>
             <div className="relative p-8 md:p-12 z-10">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">

@@ -12,7 +12,7 @@ export default {
           300: "var(--primary-300)",
           400: "var(--primary-400)",
           500: "var(--primary-500)",
-          600: "var(--primary-600)", // Main Brand Color
+          600: "var(--primary-600)", // Main Brand Color - Teal #3fa7a3
           700: "var(--primary-700)",
           800: "var(--primary-800)",
           900: "var(--primary-900)",
@@ -24,16 +24,18 @@ export default {
           300: "var(--secondary-300)",
           400: "var(--secondary-400)",
           500: "var(--secondary-500)",
-          600: "var(--secondary-600)",
+          600: "var(--secondary-600)", // Brand Secondary - Blue #2f6f9e
           700: "var(--secondary-700)",
           800: "var(--secondary-800)",
           900: "var(--secondary-900)",
         },
-        // ! My Custom colors :
+        // Brand colors aliases
         "brand-primary": "var(--primary-500)",
         "brand-secondary": "var(--secondary-600)",
       },
-
+      backgroundImage: {
+        "gradient-brand": "var(--gradient-brand)",
+      },
       fontFamily: {
         arabic: ["Cairo", "Tajawal", "Noto Sans Arabic", "sans-serif"],
       },

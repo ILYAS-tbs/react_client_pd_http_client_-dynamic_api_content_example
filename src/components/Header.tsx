@@ -153,7 +153,7 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
             {user ?
               <button
                 onClick={() => handleLogoutAndNavigate(`/${role}-dashboard`)}
-                className="px-6 py-2 bg-gradient-to-r from-primary-500 to-primary-700 hover:bg-primary-800 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-600 hover:from-primary-600 hover:to-secondary-700 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {/* {getTranslation('register', language)} */}
                 لوحة البيانات
@@ -162,13 +162,13 @@ export function Header({ activeSection, setActiveSection }: HeaderProps) {
               : <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <button
                   onClick={() => handleLogoutAndNavigate("/login")}
-                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:bg-primary-800 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-primary-500 hover:bg-primary-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   {getTranslation('login', language)}
                 </button>
                 <button
                   onClick={() => handleLogoutAndNavigate('/register')}
-                  className="px-6 py-2 bg-primary-500 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-600 hover:from-primary-600 hover:to-secondary-700 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {getTranslation('register', language)}
                 </button>
