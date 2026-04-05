@@ -146,7 +146,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     full_name: "",
     date_of_birth: "2020-08-09",
     class_group_id: "",
-    phone: "",
   });
 
   const handleChange_creation = (
@@ -173,7 +172,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       full_name: formData_creation.full_name,
       date_of_birth: formData_creation.date_of_birth,
       class_group_id: formData_creation.class_group_id,
-      phone: formData_creation.phone,
+      phone: "0000-0000-0000", // Mock phone number
     };
     const latest_csrf = getCSRFToken()!;
     const res = await school_dashboard_client.post_student(
@@ -202,7 +201,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     date_of_birth: "2020-08-09",
     trimester_grade: 0,
     class_group_id: "",
-    phone: "",
   });
 
   const handleChange_update = (
@@ -228,9 +226,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     // fallback to existing name if empty
     const full_name =
       formData_update.full_name.trim() || student_to_update?.full_name || "";
-    // fall back to existing number if empty :
-    const phone_num =
-      formData_update.phone.trim() || student_to_update?.phone || "empty";
     // API CALL
     const student_payload: PostStudentPayload = {
       full_name: full_name,
@@ -239,7 +234,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       class_group_id:
         formData_update.class_group_id ||
         student_to_update?.class_group?.class_group_id,
-      phone: phone_num,
+      phone: "0000-0000-0000", // Mock phone number
     };
     const id = last_chosen_student;
     const latest_csrf = getCSRFToken()!;
@@ -281,7 +276,15 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
           {getTranslation("studentManagement", language)}
         </h2>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            setShowAddModal(true);
+            setFormData_creation({
+              full_name: "",
+              date_of_birth: "2020-08-09",
+              class_group_id: "",
+            });
+            setErrorAddModal("");
+          }}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
@@ -324,7 +327,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       </div>
 
       {/* Students Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden max-h-96 overflow-y-auto">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
@@ -375,9 +378,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                     <div className="text-sm text-gray-900 dark:text-white">
                       {student.parent?.full_name}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {student.phone}
-                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
@@ -400,6 +400,12 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                         onClick={() => {
                           setShowEditModal(true);
                           set_last_chosen_student(student.student_id);
+                          setFormData_update({
+                            full_name: "",
+                            date_of_birth: "2020-08-09",
+                            trimester_grade: 0,
+                            class_group_id: "",
+                          });
                         }}
                         className="text-primary-600 hover:bg-primary-300"
                       >
@@ -487,20 +493,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 />
               </div> */}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('phoneNumber', language)}
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData_creation.phone}
-                  onChange={handleChange_creation}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="0555 XX XX XX"
-                />
-              </div>
-
               {/* Error */}
               {errorAddModal && (
                 <div className="text text-red-600 text-sm">{errorAddModal}</div>
@@ -508,7 +500,15 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setFormData_creation({
+                      full_name: "",
+                      date_of_birth: "2020-08-09",
+                      class_group_id: "",
+                    });
+                    setErrorAddModal("");
+                  }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   {getTranslation('cancel', language)}
@@ -607,24 +607,17 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  رقم الهاتف
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData_update.phone}
-                  onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="0555 XX XX XX"
-                />
-              </div>
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
                   onClick={() => {
                     setShowEditModal(false);
                     set_last_chosen_student("");
+                    setFormData_update({
+                      full_name: "",
+                      date_of_birth: "2020-08-09",
+                      trimester_grade: 0,
+                      class_group_id: "",
+                    });
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >

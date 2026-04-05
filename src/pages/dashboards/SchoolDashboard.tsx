@@ -293,7 +293,7 @@ const SchoolDashboard: React.FC = () => {
     { id: "home", label: getTranslation("home", language), icon: Home },
     { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "users", label: getTranslation("UserManagement", language), icon: Users },
-    { id: "chat", label: getTranslation("Chat", language), icon: MessageCircle },
+    { id: "chat", label: getTranslation("chat", language), icon: MessageCircle },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
     { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },

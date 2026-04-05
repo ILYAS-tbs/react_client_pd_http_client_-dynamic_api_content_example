@@ -392,7 +392,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       </div>
 
       {/* Teachers Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-96 overflow-y-auto p-2">
         {filteredTeachers.map((teacher) => (
           <div
             key={teacher.user.id}
