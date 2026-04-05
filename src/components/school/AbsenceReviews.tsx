@@ -153,7 +153,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
           {
             label: getTranslation('UnderReview', language),
             value: absenceRequests.filter((r) => r.status === "pending").length,
-            color: "bg-yellow-500",
+            color: "bg-primary-400",
           },
           {
             label: getTranslation('Accepted', language),
@@ -165,7 +165,7 @@ const AbsenceReviews: React.FC<AbsenceReviewsProps> = ({
             label: getTranslation('Rejected', language),
             value: absenceRequests.filter((r) => r.status === "rejected")
               .length,
-            color: "bg-red-500",
+            color: "bg-primary-400",
           },
         ].map((stat, index) => (
           <div

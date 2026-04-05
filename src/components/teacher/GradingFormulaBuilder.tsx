@@ -315,7 +315,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
       {!isExpanded && (
         <div
           onClick={() => setIsExpanded(true)}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 cursor-pointer hover:shadow-lg transition-shadow"
+          className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg p-4 cursor-pointer hover:shadow-lg transition-shadow"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -324,7 +324,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                 <h3 className="text-white font-semibold">
                   {language === 'ar' ? 'منشئ صيغة التقييم' : 'Grading Formula Builder'}
                 </h3>
-                <p className="text-blue-100 text-sm">
+                <p className="text-primary-100 text-sm">
                   {language === 'ar'
                     ? 'خصص وزن كل نوع تقييم'
                     : 'Customize weights for each assessment type'}
@@ -333,7 +333,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
             </div>
             <div className="flex items-center gap-2">
               {isModified && (
-                <span className="bg-yellow-400 text-blue-900 text-xs font-bold px-3 py-1 rounded-full">
+                <span className="bg-yellow-400 text-primary-900 text-xs font-bold px-3 py-1 rounded-full">
                   {language === 'ar' ? 'معدل' : 'Modified'}
                 </span>
               )}
@@ -365,7 +365,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
 
           {isLoading ? (
              <div className="flex justify-center items-center py-10">
-               <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+               <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
              </div>
           ) : (
             <>
@@ -425,7 +425,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                   {ASSESSMENT_TYPES.map(assessment => (
                     <div
                       key={assessment.key}
-                      className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
+                      className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500 transition-colors"
                     >
                       <label className="block mb-2">
                         <span className="text-2xl mr-2">{assessment.icon}</span>
@@ -440,13 +440,13 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                           max="100"
                           value={formula[assessment.key]}
                           onChange={(e) => handleWeightChange(assessment.key, parseInt(e.target.value))}
-                          className="w-16 px-2 py-2 border border-gray-300 dark:border-gray-500 rounded text-center font-bold bg-white dark:bg-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-16 px-2 py-2 border border-gray-300 dark:border-gray-500 rounded text-center font-bold bg-white dark:bg-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                         <span className="text-gray-600 dark:text-gray-400 font-medium">%</span>
                       </div>
                       <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                         <div
-                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
+                          className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all"
                           style={{ width: `${Math.min(100, formula[assessment.key])}%` }}
                         />
                       </div>
@@ -455,7 +455,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                 </div>
               </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 rounded-lg p-4">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <span>👁️</span>
                   {language === 'ar' ? 'معاينة الحساب' : 'Calculation Preview'}
@@ -478,7 +478,7 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                             step="0.5"
                             value={sampleGrades[assessment.key] || ''}
                             onChange={(e) => handleSampleGradeChange(assessment.key, parseFloat(e.target.value))}
-                            className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                             placeholder="0"
                           />
                           <span className="text-xs text-gray-500">/20</span>
@@ -490,10 +490,10 @@ const GradingFormulaBuilder: React.FC<GradingFormulaBuilderProps> = ({
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                       {language === 'ar' ? 'النتيجة المتوقعة' : 'Expected Result'}
                     </p>
-                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4 border-2 border-blue-500">
+                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4 border-2 border-primary-500">
                       {sampleAverage !== null ? (
                         <div>
-                          <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                          <div className="text-4xl font-bold text-primary-600 dark:text-primary-400">
                             {sampleAverage.toFixed(2)}
                           </div>
                           <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">/ 20</p>

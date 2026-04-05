@@ -99,12 +99,12 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
     {
       label: getTranslation("highestGrade", language),
       value: `${semStats?.school_max_average ?? "—"}/20`,
-      color: "bg-primary-500",
+      color: "bg-primary-400",
     },
     {
       label: getTranslation("lowestGrade", language),
       value: `${semStats?.school_min_average ?? "—"}/20`,
-      color: "bg-red-500",
+      color: "bg-primary-500",
     },
     {
       label: getTranslation("passingRate", language),
@@ -115,7 +115,7 @@ const GradeOverview: React.FC<GradeOverviewProps> = ({
             100
           ).toFixed(1)}%`
         : "—",
-      color: "bg-purple-500",
+      color: "bg-primary-400",
     },
   ];
 

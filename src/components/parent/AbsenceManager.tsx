@@ -376,7 +376,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           {
             label: getTranslation("UnderReview", language),
             value: stats.pending,
-            color: "bg-yellow-500",
+            color: "bg-primary-400",
             icon: Clock,
           },
           {
@@ -388,7 +388,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
           {
             label: getTranslation("Rejected", language),
             value: stats.rejected,
-            color: "bg-red-500",
+            color: "bg-primary-400",
             icon: XCircle,
           },
         ].map((stat, index) => (
