@@ -196,30 +196,10 @@ const TeacherDashboard: React.FC = () => {
   }
 
   const stats = [
-    {
-      title: getTranslation('myStudents', language),
-      value: students.length || "0",
-      icon: Users,
-      color: "bg-primary-500",
-    },
-    {
-      title: getTranslation('Classes', language),
-      value: modules_class_groups.length || "0",
-      icon: BookOpen,
-      color: "bg-primary-400",
-    },
-    {
-      title: getTranslation('newMessages', language),
-      value: "7",
-      icon: MessageCircle,
-      color: "bg-primary-500",
-    },
-    {
-      title: getTranslation('uploadedMaterials', language),
-      value: teacher_uploads.length ?? "0",
-      icon: Upload,
-      color: "bg-primary-400",
-    },
+    { title: getTranslation('myStudents', language), value: students.length || "0", icon: Users, color: "bg-primary-500" },
+    { title: getTranslation('Classes', language), value: modules_class_groups.length || "0", icon: BookOpen, color: "bg-primary-400" },
+    { title: getTranslation('newMessages', language), value: newMessages.length || "0", icon: MessageCircle, color: "bg-primary-500" },
+    { title: getTranslation('uploadedMaterials', language), value: teacher_uploads.length || "0", icon: Upload, color: "bg-primary-400" },
   ];
 
   const tabs = [

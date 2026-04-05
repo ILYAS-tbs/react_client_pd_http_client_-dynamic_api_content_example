@@ -263,31 +263,13 @@ const ParentDashboard: React.FC = () => {
     return absences_num;
   };
   const stats = [
-    {
-      title: getTranslation("myChildren", language),
-      value: students.length || "0",
-      icon: UserIcon,
-      color: "bg-primary-500",
-    },
-    {
-      title: getTranslation("totalAbsences", language),
-      value: total_absences() || "0",
-      icon: Calendar,
-      color: "bg-primary-400",
-    },
-    {
-      title: getTranslation("newMessages", language),
-      value: "—",
-      icon: MessageCircle,
-      color: "bg-primary-500",
-    },
-    {
-      title: getTranslation("notifications", language),
-      value: notifications.length || "0",
-      icon: AlertTriangle,
-      color: "bg-primary-400",
-    },
+    { title: getTranslation("myChildren", language), value: students.length || "0", icon: UserIcon, color: "bg-primary-500" },
+    { title: getTranslation("totalAbsences", language), value: total_absences() || "0", icon: Calendar, color: "bg-primary-400" },
+    { title: getTranslation("newMessages", language), value: notifications.length || "0", icon: MessageCircle, color: "bg-primary-500" },
+    { title: getTranslation("notifications", language), value: notifications.length || "0", icon: AlertTriangle, color: "bg-primary-400" },
   ];
+
+  
 
   const tabs = [
     {
