@@ -279,13 +279,13 @@ const ParentDashboard: React.FC = () => {
       title: getTranslation("newMessages", language),
       value: "—",
       icon: MessageCircle,
-      color: "bg-purple-500",
+      color: "bg-primary-500",
     },
     {
       title: getTranslation("notifications", language),
       value: notifications.length || "0",
       icon: AlertTriangle,
-      color: "bg-orange-500",
+      color: "bg-primary-400",
     },
   ];
 

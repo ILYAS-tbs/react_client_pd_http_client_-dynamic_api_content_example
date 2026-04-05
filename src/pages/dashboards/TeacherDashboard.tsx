@@ -212,13 +212,13 @@ const TeacherDashboard: React.FC = () => {
       title: getTranslation('newMessages', language),
       value: "7",
       icon: MessageCircle,
-      color: "bg-purple-500",
+      color: "bg-primary-500",
     },
     {
       title: getTranslation('uploadedMaterials', language),
       value: teacher_uploads.length ?? "0",
       icon: Upload,
-      color: "bg-orange-500",
+      color: "bg-primary-400",
     },
   ];
 
