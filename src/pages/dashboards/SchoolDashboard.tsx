@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Home,
   Users,
@@ -8,6 +8,7 @@ import {
   BarChart2,
   Star,
   MessageCircle,
+  ClipboardList,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import StudentManagement from "../../components/school/StudentManagement";
@@ -20,6 +21,7 @@ import AbsenceReviews from "../../components/school/AbsenceReviews";
 import GradeOverview from "../../components/school/GradeOverview";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import SchoolParentChat from "../../components/shared/SchoolParentChat";
+import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { Student } from "../../models/Student";
@@ -32,10 +34,8 @@ import { ExamSchedule } from "../../models/ExamSchedule";
 import { SchoolStat } from "../../models/SchoolStat";
 import TeacherManagement from "../../components/school/TeacherManagement";
 import { Module } from "../../models/Module";
+import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
 import { User } from "../../contexts/AuthContext";
-import { notifications_client } from "../../services/http_api/notifications/notifications_client";
-import { timeAgo } from "../../lib/timeago";
-import { NotificationAPI } from "../../models/notifications/NotificationAPI";
 import { timeAgoArabic } from "../../lib/timeAgoArabic";
 import { useNotifications } from "../../contexts/NotificationContext";
 
@@ -82,6 +82,7 @@ const SchoolDashboard: React.FC = () => {
   const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
   const [school_stat, setSchoolStat] = useState<SchoolStat | null>(null);
   const [modules, SetModules] = useState<Module[]>([]);
+  const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
 
 
   const get_current_school_students = async () => {
@@ -152,6 +153,13 @@ const SchoolDashboard: React.FC = () => {
       setBehaviourReports(behaviour_reports_list);
     }
   };
+  const get_current_school_monthly_evaluations = async () => {
+    const res = await school_dashboard_client.get_current_school_monthly_evaluations();
+    if (res.ok) {
+      const evaluations_list: MonthlyEvaluation[] = res.data;
+      setMonthlyEvaluations(evaluations_list);
+    }
+  };
   const get_current_school_stats = async () => {
     const res = await school_dashboard_client.get_current_school_stats();
     if (res.ok) {
@@ -178,6 +186,7 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_events();
     get_current_school_absence_reports();
     get_current_school_behaviour_reports();
+    get_current_school_monthly_evaluations();
     get_current_school_exam_schedules();
     get_current_school_stats();
     get_modules();
@@ -234,7 +243,7 @@ const SchoolDashboard: React.FC = () => {
     notifications_data?.map((not) => ({
       action: not.title,
       name: not.message,
-      time: timeAgo(not.created_at),
+      time: timeAgoArabic(not.created_at),
     }))
   );
 
@@ -296,6 +305,7 @@ const SchoolDashboard: React.FC = () => {
     { id: "chat", label: getTranslation("chat", language), icon: MessageCircle },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
+    { id: "evaluations", label: getTranslation("monthlyEvaluation", language), icon: ClipboardList },
     { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },
     { id: "grades", label: getTranslation("GradeOverview", language), icon: FileText },
     { id: "activities", label: getTranslation('Activities', language), icon: Star },
@@ -472,6 +482,10 @@ const SchoolDashboard: React.FC = () => {
               students_list={students}
             />
           </div>
+        );
+      case "evaluations":
+        return (
+          <MonthlyEvaluationSection evaluations={monthlyEvaluations} />
         );
       case "grades":
         return (

@@ -2071,6 +2071,216 @@ export const translations: Translations = {
     fr: "Bonjour M/Mde, voici un résumé de vos activités quotidiennes",
   },
   myStudents: { ar: "طلابي", en: "My Students", fr: "Mes élèves" },
+  monthlyEvaluation: {
+    ar: "التقييم الشهري",
+    en: "Monthly Evaluation",
+    fr: "Évaluation mensuelle",
+  },
+  addMonthlyEvaluation: {
+    ar: "إضافة تقييم شهري",
+    en: "Add Monthly Evaluation",
+    fr: "Ajouter une évaluation mensuelle",
+  },
+  monthlyEvaluationDescription: {
+    ar: "سجل شهري لمتابعة مشاركة الطالب وواجباته وملاحظات الأستاذ دون التأثير على المعدلات.",
+    en: "A monthly record for classroom participation, homework, and teacher remarks without affecting averages.",
+    fr: "Un relevé mensuel de la participation en classe, des devoirs et des remarques de l'enseignant sans impact sur les moyennes.",
+  },
+  participationMark: {
+    ar: "علامة المشاركة الصفية",
+    en: "Class Participation Mark",
+    fr: "Note de participation en classe",
+  },
+  homeworksMark: {
+    ar: "علامة الواجبات",
+    en: "Homework Mark",
+    fr: "Note des devoirs",
+  },
+  addEvaluation: {
+    ar: "إضافة التقييم",
+    en: "Add Evaluation",
+    fr: "Ajouter l'évaluation",
+  },
+  updateEvaluation: {
+    ar: "تحديث التقييم",
+    en: "Update Evaluation",
+    fr: "Mettre à jour l'évaluation",
+  },
+  saveEvaluation: {
+    ar: "حفظ التقييم",
+    en: "Save Evaluation",
+    fr: "Enregistrer l'évaluation",
+  },
+  savingEvaluation: {
+    ar: "جارٍ الحفظ...",
+    en: "Saving...",
+    fr: "Enregistrement...",
+  },
+  evaluationSaved: {
+    ar: "تم حفظ التقييم بنجاح",
+    en: "Evaluation saved successfully",
+    fr: "Évaluation enregistrée avec succès",
+  },
+  evaluationSaveFailed: {
+    ar: "تعذر حفظ التقييم",
+    en: "Failed to save evaluation",
+    fr: "Échec de l'enregistrement de l'évaluation",
+  },
+  evaluationDeleted: {
+    ar: "تم حذف التقييم بنجاح",
+    en: "Evaluation deleted successfully",
+    fr: "Évaluation supprimée avec succès",
+  },
+  evaluationDeleteFailed: {
+    ar: "تعذر حذف التقييم",
+    en: "Failed to delete evaluation",
+    fr: "Échec de la suppression de l'évaluation",
+  },
+  deletingEvaluation: {
+    ar: "جارٍ الحذف...",
+    en: "Deleting...",
+    fr: "Suppression...",
+  },
+  confirmDeleteMonthlyEvaluation: {
+    ar: "هل أنت متأكد من حذف هذا التقييم الشهري؟",
+    en: "Are you sure you want to delete this monthly evaluation?",
+    fr: "Voulez-vous vraiment supprimer cette évaluation mensuelle ?",
+  },
+  monthlyEvaluationRemarksPlaceholder: {
+    ar: "اكتب ملاحظات الأستاذ حول أداء الطالب داخل القسم...",
+    en: "Write the teacher's remarks about the student's classroom performance...",
+    fr: "Rédigez les remarques de l'enseignant sur la performance de l'élève en classe...",
+  },
+  existingMonthlyEvaluation: {
+    ar: "يوجد تقييم محفوظ لهذا الشهر",
+    en: "An evaluation already exists for this month",
+    fr: "Une évaluation existe déjà pour ce mois",
+  },
+  newMonthlyEvaluation: {
+    ar: "تقييم جديد لهذا الشهر",
+    en: "New evaluation for this month",
+    fr: "Nouvelle évaluation pour ce mois",
+  },
+  noMonthlyEvaluations: {
+    ar: "لا توجد تقييمات شهرية متاحة حالياً",
+    en: "No monthly evaluations available right now",
+    fr: "Aucune évaluation mensuelle disponible pour le moment",
+  },
+  monthlyEvaluationForSchool: {
+    ar: "التقييمات الشهرية لطلاب المدرسة",
+    en: "Monthly Evaluations For School Students",
+    fr: "Évaluations mensuelles des élèves de l'école",
+  },
+  monthlyEvaluationForParents: {
+    ar: "التقييمات الشهرية لأطفالك",
+    en: "Monthly Evaluations For Your Children",
+    fr: "Évaluations mensuelles de vos enfants",
+  },
+  monthlyEvaluationTeacherHint: {
+    ar: "اختر الطالب ثم أضف أو حدّث أو احذف تقييمه الشهري مع المرفقات.",
+    en: "Select a student, then add, update, or delete their monthly evaluations with attachments.",
+    fr: "Sélectionnez un élève, puis ajoutez, mettez à jour ou supprimez ses évaluations mensuelles avec pièces jointes.",
+  },
+  allClasses: {
+    ar: "جميع الفصول",
+    en: "All Classes",
+    fr: "Toutes les classes",
+  },
+  allMonths: {
+    ar: "جميع الأشهر",
+    en: "All Months",
+    fr: "Tous les mois",
+  },
+  clearFilters: {
+    ar: "مسح الفلاتر",
+    en: "Clear Filters",
+    fr: "Effacer les filtres",
+  },
+  classParticipationSection: {
+    ar: "المشاركة الصفية",
+    en: "Class Participation",
+    fr: "Participation en classe",
+  },
+  homeworkMarksSectionTitle: {
+    ar: "علامات الواجبات",
+    en: "Homework Marks",
+    fr: "Notes des devoirs",
+  },
+  remarksAndNotes: {
+    ar: "الملاحظات والتعليقات",
+    en: "Remarks & Notes",
+    fr: "Remarques et notes",
+  },
+  module: {
+    ar: "المادة",
+    en: "Module",
+    fr: "Module",
+  },
+  evaluationTitle: {
+    ar: "عنوان التقييم",
+    en: "Evaluation Title",
+    fr: "Titre de l'évaluation",
+  },
+  evaluationDescription: {
+    ar: "وصف التقييم",
+    en: "Evaluation Description",
+    fr: "Description de l'évaluation",
+  },
+  evaluationAttachment: {
+    ar: "مرفق (PDF/صورة)",
+    en: "Attachment (PDF/Image)",
+    fr: "Pièce jointe (PDF/Image)",
+  },
+  homeworkAttachmentHint: {
+    ar: "ارفع صورة أو ملف PDF للواجب المنزلي (JPG، PNG، PDF فقط).",
+    en: "Upload a scan or photo of the homework (PDF, JPG, PNG only).",
+    fr: "Téléversez un scan ou une photo du devoir (PDF, JPG, PNG uniquement).",
+  },
+  evaluationMonth: {
+    ar: "شهر التقييم",
+    en: "Evaluation Month",
+    fr: "Mois d'évaluation",
+  },
+  selectStudentPrompt: {
+    ar: "اختر طالبا لبدء إضافة التقييمات الشهرية.",
+    en: "Select a student to start managing monthly evaluations.",
+    fr: "Sélectionnez un élève pour commencer à gérer les évaluations mensuelles.",
+  },
+  noMonthlyEvaluationsForStudent: {
+    ar: "لا توجد تقييمات شهرية لهذا الطالب حاليا.",
+    en: "No monthly evaluations found for this student yet.",
+    fr: "Aucune évaluation mensuelle pour cet élève pour le moment.",
+  },
+  viewAttachment: {
+    ar: "عرض المرفق",
+    en: "View Attachment",
+    fr: "Voir la pièce jointe",
+  },
+  evaluationLoadFailed: {
+    ar: "تعذر تحميل التقييمات الشهرية.",
+    en: "Failed to load monthly evaluations.",
+    fr: "Échec du chargement des évaluations mensuelles.",
+  },
+  savedEvaluationsCount: {
+    ar: "عدد التقييمات المحفوظة",
+    en: "Saved Evaluations",
+    fr: "Évaluations enregistrées",
+  },
+  noMonthlyEvaluationAssignments: {
+    ar: "لا توجد أقسام أو مواد مرتبطة بحساب الأستاذ حالياً، لذلك لا يمكن إضافة تقييمات شهرية بعد.",
+    en: "No class or module assignments are linked to this teacher account yet, so monthly evaluations cannot be added right now.",
+    fr: "Aucune classe ni aucun module n'est encore lié à ce compte enseignant, donc les évaluations mensuelles ne peuvent pas être ajoutées pour le moment.",
+  },
+  noModulesForSelectedClass: {
+    ar: "لا توجد مادة مرتبطة بالقسم المحدد لهذا الأستاذ.",
+    en: "No module is assigned to the selected class for this teacher.",
+    fr: "Aucun module n'est affecté à la classe sélectionnée pour cet enseignant.",
+  },
+  selectModuleToManageEvaluation: {
+    ar: "اختر المادة أولاً لتفعيل إضافة أو تحديث التقييم.",
+    en: "Select a module first to enable adding or updating the evaluation.",
+    fr: "Sélectionnez d'abord un module pour activer l'ajout ou la mise à jour de l'évaluation.",
+  },
   uploadedMaterials: {
     ar: "المواد المرفوعة",
     en: "Uploaded Materials",

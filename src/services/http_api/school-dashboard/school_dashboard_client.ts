@@ -46,6 +46,7 @@ const URLS = {
   patch_absence_report: `${BASE_URL}/school/absence-reports/`,
 
   get_current_school_behaviour_reports: `${BASE_URL}/school/behaviour-reports/get_current_school_behaviour_reports/`,
+  get_current_school_monthly_evaluations: `${BASE_URL}/student/monthly-evaluations/`,
 
   create_or_update_TeacherModuleClassGroup: `${BASE_URL}/teacher/create_or_update_TeacherModuleClassGroup/`,
 
@@ -564,6 +565,20 @@ export async function get_current_school_behaviour_reports() {
   }
 }
 
+export async function get_current_school_monthly_evaluations() {
+  try {
+    const response = await fetch(URLS.get_current_school_monthly_evaluations, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 //! fetch modules : english,arabic .. :
 export async function get_modules() {
   try {
@@ -636,6 +651,7 @@ export const school_dashboard_client = {
   get_current_school_absence_reports: get_current_school_absence_reports,
 
   get_current_school_behaviour_reports: get_current_school_behaviour_reports,
+  get_current_school_monthly_evaluations: get_current_school_monthly_evaluations,
 
   create_or_update_TeacherModuleClassGroup:
     create_or_update_TeacherModuleClassGroup,

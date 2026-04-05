@@ -4,6 +4,7 @@ import { StudentPerformance } from "../../../models/StudentPerformance";
 import { Student } from "../../../models/Student";
 import { AbsenceReport } from "../../../models/AbsenceReports";
 import { BehaviourReport } from "../../../models/BehaviorReport";
+import { MonthlyEvaluation } from "../../../models/MonthlyEvaluation";
 import { TeacherUpload } from "../../../models/TeacherUpload";
 import { ParentAbsence } from "../../../models/ParentAbsence";
 import { ParentStudentEvent } from "../../../models/ParentStudentEvent";
@@ -17,6 +18,7 @@ const URLS = {
   get_current_parent_students: `${BASE_URL}/parent/parents/get_current_parent_students/`,
   get_current_parent_absence_reports: `${BASE_URL}/parent/parents/get_current_parent_absence_reports/`,
   get_current_parent_behaviour_reports: `${BASE_URL}/parent/parents/get_current_parent_behaviour_reports/`,
+  get_current_parent_monthly_evaluations: `${BASE_URL}/student/monthly-evaluations/`,
   get_current_parent_all_students_uploads: `${BASE_URL}/parent/parents/get_current_parent_all_students_uploads/`,
   current_parent_students_absences: `${BASE_URL}/parent/parents/current_parent_students_absences/`,
   get_current_parent_students_performances: `${BASE_URL}/parent/parents/get_current_parent_students_performances/`,
@@ -59,6 +61,19 @@ async function get_current_parent_behaviour_reports(): Promise<ApiResult<Behavio
       credentials: "include",
     });
     const data: BehaviourReport[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+async function get_current_parent_monthly_evaluations(): Promise<ApiResult<MonthlyEvaluation[]>> {
+  try {
+    const response = await fetch(URLS.get_current_parent_monthly_evaluations, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: MonthlyEvaluation[] = await response.json();
     if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
     return { ok: true, status: response.status, data };
   } catch (error) {
@@ -170,6 +185,7 @@ export const parent_dashboard_client = {
   get_current_parent_students: get_current_parent_students,
   get_current_parent_absence_reports: get_current_parent_absence_reports,
   get_current_parent_behaviour_reports: get_current_parent_behaviour_reports,
+  get_current_parent_monthly_evaluations: get_current_parent_monthly_evaluations,
   get_current_parent_all_students_uploads:
     get_current_parent_all_students_uploads,
   current_parent_students_absences: current_parent_students_absences,

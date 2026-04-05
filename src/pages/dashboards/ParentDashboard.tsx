@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Star,
   LayoutGrid,
+  ClipboardList,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import ChildrenOverview from "../../components/parent/ChildrenOverview";
@@ -19,6 +20,7 @@ import ActivitiesView from "../../components/parent/ActivitiesManagement";
 import ParentScheduleTable from "../../components/parent/HomeworksManagement.tsx";
 import ResourceLibrary from "../../components/parent/ResourceLibrary";
 import ParentChat from "../../components/shared/ParentChat";
+import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
 import SchoolAnnouncements from "../../components/parent/SchoolAnnouncements";
 import { Student } from "../../models/Student.ts";
 import { AbsenceReport } from "../../models/AbsenceReports.ts";
@@ -31,6 +33,7 @@ import { ParentStudentEvent } from "../../models/ParentStudentEvent.ts";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups.ts";
 import { chat_http_client } from "../../services/chat/chat_http_client.ts";
 import { Teacher } from "../../models/Teacher.ts";
+import { MonthlyEvaluation } from "../../models/MonthlyEvaluation.ts";
 import { User } from "../../contexts/AuthContext.tsx";
 import { getTranslation } from "../../utils/translations.ts";
 import { useLanguage } from "../../contexts/LanguageContext.tsx";
@@ -77,6 +80,7 @@ const ParentDashboard: React.FC = () => {
   const [uploads, setUploads] = useState<TeacherUpload[]>([]);
 
   const [parent_absences, setParentAbsences] = useState<ParentAbsence[]>([]);
+  const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
 
   const [studentPerformances, setStudentPerformances] = useState<
     StudentPerformance[]
@@ -129,6 +133,19 @@ const ParentDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching behaviour reports:", error);
+    }
+  };
+  const get_current_parent_monthly_evaluations = async () => {
+    try {
+      const res = await parent_dashboard_client.get_current_parent_monthly_evaluations();
+      if (res.ok) {
+        const evaluations_list: MonthlyEvaluation[] = res.data;
+        setMonthlyEvaluations(evaluations_list);
+      } else {
+        console.error("Failed to fetch monthly evaluations:", res);
+      }
+    } catch (error) {
+      console.error("Error fetching monthly evaluations:", error);
     }
   };
 
@@ -233,6 +250,7 @@ const ParentDashboard: React.FC = () => {
     get_current_parent_students();
     get_current_parent_absence_reports();
     get_current_parent_behaviour_reports();
+    get_current_parent_monthly_evaluations();
     get_current_parent_all_students_uploads();
     current_parent_students_absences();
     get_current_parent_students_performances();
@@ -284,6 +302,11 @@ const ParentDashboard: React.FC = () => {
     },
     { id: "grades", label: getTranslation("grade", language), icon: FileText },
     {
+      id: "evaluations",
+      label: getTranslation("monthlyEvaluation", language),
+      icon: ClipboardList,
+    },
+    {
       id: "absences",
       label: getTranslation("absencesAndReports", language),
       icon: Calendar,
@@ -329,10 +352,16 @@ const ParentDashboard: React.FC = () => {
         );
       case "grades":
         return (
-          <GradeReports
-            students={students}
-            studentPerformances={studentPerformances}
-          />
+          <div className="space-y-6">
+            <GradeReports
+              students={students}
+              studentPerformances={studentPerformances}
+            />
+          </div>
+        );
+      case "evaluations":
+        return (
+          <MonthlyEvaluationSection evaluations={monthlyEvaluations} />
         );
       case "absences":
         return (

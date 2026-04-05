@@ -32,7 +32,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
   setAbsences,
   teacher_id,
   setActiveTab,
-  teacher
+  teacher,
 }) => {
   //! Translations ::
   const { language } = useLanguage();
@@ -146,6 +146,7 @@ const ClassManagement: React.FC<ClassManagementProps> = ({
     name: student.full_name,
     trimester_grade: student.trimester_grade,
     is_absent: student.is_absent,
+    class_group_id: student.class_group?.class_group_id,
     status: "مقبول",
   }));
 

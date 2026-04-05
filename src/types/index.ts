@@ -12,12 +12,12 @@ import { TeacherAbsence } from "../models/TeacherAbsence";
 import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
 
 import { TeacherModuleClassGrp } from "../models/TeacherModuleClassGrp";
-import { Mark } from "../models/Mark";
 import { StudentGrade } from "../models/StudentGrade";
 import { TeacherUpload } from "../models/TeacherUpload";
 import { StudentPerformance } from "../models/StudentPerformance";
 import { ParentStudentEvent } from "../models/ParentStudentEvent";
 import { Module } from "../models/Module";
+import { MonthlyEvaluation } from "../models/MonthlyEvaluation";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -151,6 +151,13 @@ export interface ClassManagementProps {
   teacher_id: number;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   teacher : Teacher | null
+}
+
+export interface MonthylEvaluationProps {
+  students_list: Student[];
+  modules_class_groups: TeacherModuleClassGroup[];
+  monthly_evaluations: MonthlyEvaluation[];
+  setMonthlyEvaluations: React.Dispatch<React.SetStateAction<MonthlyEvaluation[]>>;
 }
 
 export interface TeacherAbsenceManagerProps {

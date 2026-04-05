@@ -103,6 +103,32 @@ export interface PatchStudentGradesPayload {
   s3_average?: number | null;
 }
 
+export interface PostMonthlyEvaluationPayload {
+  student_id: string;
+  month: string;
+  title?: string | null;
+  description?: string | null;
+  attachment?: File | null;
+  module_id: string;
+  class_group_id?: string | null;
+  mark_of_participation_in_class?: number | null;
+  homeworks_mark?: number | null;
+  remarks?: string | null;
+}
+
+export interface PatchMonthlyEvaluationPayload {
+  student_id?: string;
+  month?: string;
+  title?: string | null;
+  description?: string | null;
+  attachment?: File | null;
+  module_id?: string | null;
+  class_group_id?: string | null;
+  mark_of_participation_in_class?: number | null;
+  homeworks_mark?: number | null;
+  remarks?: string | null;
+}
+
 // Will be "FormData"
 // export interface PostTeacherUploadPayload {
 //   title: string;

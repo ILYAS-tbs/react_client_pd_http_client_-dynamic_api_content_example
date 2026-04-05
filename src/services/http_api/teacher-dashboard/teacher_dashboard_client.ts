@@ -1,5 +1,7 @@
 import {
+  PatchMonthlyEvaluationPayload,
   PatchStudentPayload,
+  PostMonthlyEvaluationPayload,
   PostAbsencePayload,
   PostBehaviourReportPayload,
   PostMarkPayload,
@@ -16,6 +18,8 @@ const URLS = {
   get_current_teacher_behaviour_reports: `${BASE_URL}/teacher/teachers/get_current_teacher_behaviour_reports/`,
   current_teacher_school_modules: `${BASE_URL}/teacher/teachers/current_teacher_school_modules/`,
   current_teacher_students_grades: `${BASE_URL}/teacher/teachers/current_teacher_students_grades/`,
+  get_monthly_evaluations: `${BASE_URL}/student/monthly-evaluations/`,
+  student_monthly_evaluations: `${BASE_URL}/student/students/`,
   get_grading_formula: `${BASE_URL}/teacher/grading-formulas/get_formula/`,
   save_grading_formula: `${BASE_URL}/teacher/grading-formulas/save_formula/`,
   recalculate_all_averages: `${BASE_URL}/teacher/grading-formulas/recalculate_all_averages/`,
@@ -89,6 +93,39 @@ async function get_current_teacher_modules_and_class_groups() {
 async function current_teacher_students_grades() {
   try {
     const response = await fetch(URLS.current_teacher_students_grades, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function get_monthly_evaluations() {
+  try {
+    const response = await fetch(URLS.get_monthly_evaluations, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function get_student_monthly_evaluations(studentId: string) {
+  const GET_URL = `${URLS.student_monthly_evaluations}${studentId}/monthly-evaluations/`;
+  try {
+    const response = await fetch(GET_URL, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -249,6 +286,97 @@ async function post_grades(
       body: JSON.stringify(payload),
     });
     const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+function buildMonthlyEvaluationFormData(
+  payload: PostMonthlyEvaluationPayload | PatchMonthlyEvaluationPayload
+) {
+  const formData = new FormData();
+  const entries: Array<[string, string | File]> = [];
+
+  if (payload.month) entries.push(["month", payload.month]);
+  if (payload.title) entries.push(["title", payload.title]);
+  if (payload.description) entries.push(["description", payload.description]);
+  if (payload.remarks) entries.push(["remarks", payload.remarks]);
+  if (payload.student_id) entries.push(["student_id", payload.student_id]);
+  if (payload.module_id) entries.push(["module_id", payload.module_id]);
+  if (payload.class_group_id) entries.push(["class_group_id", payload.class_group_id]);
+
+  if (payload.mark_of_participation_in_class !== undefined && payload.mark_of_participation_in_class !== null) {
+    entries.push(["mark_of_participation_in_class", String(payload.mark_of_participation_in_class)]);
+  }
+  if (payload.homeworks_mark !== undefined && payload.homeworks_mark !== null) {
+    entries.push(["homeworks_mark", String(payload.homeworks_mark)]);
+  }
+  if (payload.attachment) entries.push(["attachment", payload.attachment]);
+
+  entries.forEach(([key, value]) => formData.append(key, value));
+  return formData;
+}
+
+async function post_monthly_evaluation(
+  studentId: string,
+  payload: PostMonthlyEvaluationPayload,
+  csrfToken: string
+) {
+  const POST_URL = `${URLS.student_monthly_evaluations}${studentId}/monthly-evaluations/`;
+  const formData = buildMonthlyEvaluationFormData(payload);
+  try {
+    const response = await fetch(POST_URL, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function patch_monthly_evaluation(
+  id: number,
+  payload: PatchMonthlyEvaluationPayload,
+  csrfToken: string
+) {
+  const PATCH_URL = URLS.get_monthly_evaluations + id + "/";
+  const formData = buildMonthlyEvaluationFormData(payload);
+  try {
+    const response = await fetch(PATCH_URL, {
+      method: "PATCH",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
+async function delete_monthly_evaluation(id: number, csrfToken: string) {
+  const DELETE_URL = URLS.get_monthly_evaluations + id + "/";
+  try {
+    const response = await fetch(DELETE_URL, {
+      method: "DELETE",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+
+    const rawBody = await response.text();
+    const data = rawBody ? JSON.parse(rawBody) : null;
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
@@ -483,6 +611,8 @@ export const teacher_dashboard_client = {
   get_current_teacher_behaviour_reports: get_current_teacher_behaviour_reports,
   current_teacher_school_modules: current_teacher_school_modules,
   current_teacher_students_grades: current_teacher_students_grades,
+  get_monthly_evaluations: get_monthly_evaluations,
+  get_student_monthly_evaluations: get_student_monthly_evaluations,
 
   patch_student: patch_student,
 
@@ -492,6 +622,9 @@ export const teacher_dashboard_client = {
 
   post_mark: post_mark,
   post_grades: post_grades,
+  post_monthly_evaluation: post_monthly_evaluation,
+  patch_monthly_evaluation: patch_monthly_evaluation,
+  delete_monthly_evaluation: delete_monthly_evaluation,
   patch_grades: patch_grades,
   calculate_average: calculate_average,
   calculate_batch_averages: calculate_batch_averages,

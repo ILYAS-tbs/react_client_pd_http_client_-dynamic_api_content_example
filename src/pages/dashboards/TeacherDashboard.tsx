@@ -4,20 +4,18 @@ import {
   Users,
   MessageCircle,
   FileText,
-  Calendar,
   TrendingUp,
   Upload,
   Edit,
   FileX2,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
+import MonthylEvaluation from "../../components/teacher/MonthylEvaluation";
 import ClassManagement from "../../components/teacher/ClassManagement";
 import GradeManager from "../../components/teacher/GradeManager";
 import ResourceManager from "../../components/teacher/ResourceManager";
-import ParentChat from "../../components/shared/ParentChat";
 import { Student } from "../../models/Student";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
-import { Mark } from "../../models/Mark";
 import { TeacherUpload } from "../../models/TeacherUpload";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import TeacherAbsenceManager from "../../components/teacher/TeacherAbsenceManager";
@@ -25,10 +23,7 @@ import { TeacherAbsence } from "../../models/TeacherAbsence";
 import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
 import { User } from "../../contexts/AuthContext";
 import { BehaviourReport } from "../../models/BehaviorReport";
-import {
-  TeacherModuleClassGrp,
-  ModuleClass,
-} from "../../models/TeacherModuleClassGrp";
+import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
 import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
@@ -38,6 +33,7 @@ import { getTranslation } from "../../utils/translations";
 import { Message } from "../../models/chat_system/Message";
 import { timeAgoArabic } from "../../lib/timeAgoArabic";
 import { Teacher } from "../../models/Teacher";
+import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -91,6 +87,7 @@ const TeacherDashboard: React.FC = () => {
   );
   const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
+  const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
 
   const [newMessages, setNewMessages] = useState<Message[]>([]);
 
@@ -205,6 +202,7 @@ const TeacherDashboard: React.FC = () => {
   const tabs = [
     { id: "overview", label: getTranslation('overview', language), icon: TrendingUp },
     { id: "classes", label: getTranslation('myClasses', language), icon: Users },
+    { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
     { id: "grades", label: getTranslation('marks', language), icon: FileText },
     { id: "resources", label: getTranslation('educationalMaterials', language), icon: BookOpen },
     { id: "chat", label: getTranslation('communication_teacher', language), icon: MessageCircle },
@@ -244,6 +242,15 @@ const TeacherDashboard: React.FC = () => {
             teacher_id={teacher_id}
             setActiveTab={setActiveTab}
             teacher={teacher}
+          />
+        );
+      case "monthly_evaluation":
+        return (
+          <MonthylEvaluation
+            students_list={students}
+            modules_class_groups={modules_class_groups}
+            monthly_evaluations={monthlyEvaluations}
+            setMonthlyEvaluations={setMonthlyEvaluations}
           />
         );
       case "grades":
