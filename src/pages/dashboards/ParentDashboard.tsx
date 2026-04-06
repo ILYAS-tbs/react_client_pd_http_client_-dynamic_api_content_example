@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   User as UserIcon,
   GraduationCap,
@@ -81,6 +81,7 @@ const ParentDashboard: React.FC = () => {
 
   const [parent_absences, setParentAbsences] = useState<ParentAbsence[]>([]);
   const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
+  const [isLoadingMonthlyEvaluations, setIsLoadingMonthlyEvaluations] = useState(true);
 
   const [studentPerformances, setStudentPerformances] = useState<
     StudentPerformance[]
@@ -137,6 +138,7 @@ const ParentDashboard: React.FC = () => {
   };
   const get_current_parent_monthly_evaluations = async () => {
     try {
+      setIsLoadingMonthlyEvaluations(true);
       const res = await parent_dashboard_client.get_current_parent_monthly_evaluations();
       if (res.ok) {
         const evaluations_list: MonthlyEvaluation[] = res.data;
@@ -146,6 +148,8 @@ const ParentDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching monthly evaluations:", error);
+    } finally {
+      setIsLoadingMonthlyEvaluations(false);
     }
   };
 
@@ -250,7 +254,6 @@ const ParentDashboard: React.FC = () => {
     get_current_parent_students();
     get_current_parent_absence_reports();
     get_current_parent_behaviour_reports();
-    get_current_parent_monthly_evaluations();
     get_current_parent_all_students_uploads();
     current_parent_students_absences();
     get_current_parent_students_performances();
@@ -261,6 +264,17 @@ const ParentDashboard: React.FC = () => {
     get_current_parent_schools_teachers();
 
     //?
+  }, []);
+
+  useEffect(() => {
+    get_current_parent_monthly_evaluations();
+    const intervalId = window.setInterval(() => {
+      get_current_parent_monthly_evaluations();
+    }, 60000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   const one_student_absences = (s: Student) => {
@@ -281,11 +295,92 @@ const ParentDashboard: React.FC = () => {
     return absences_num;
   };
   const stats = [
-    { title: getTranslation("myChildren", language), value: students.length || "0", icon: UserIcon, color: "bg-primary-500" },
-    { title: getTranslation("totalAbsences", language), value: total_absences() || "0", icon: Calendar, color: "bg-primary-400" },
-    { title: getTranslation("newMessages", language), value: notifications.length || "0", icon: MessageCircle, color: "bg-primary-500" },
-    { title: getTranslation("notifications", language), value: notifications.length || "0", icon: AlertTriangle, color: "bg-primary-400" },
+    { title: getTranslation("myChildren", language), value: students.length || "0", icon: UserIcon, color: "bg-primary-500", tab: "children" },
+    { title: getTranslation("totalAbsences", language), value: total_absences() || "0", icon: Calendar, color: "bg-primary-400", tab: "absences" },
+    { title: getTranslation("newMessages", language), value: notifications.length || "0", icon: MessageCircle, color: "bg-primary-500", tab: "chat" },
+    { title: getTranslation("notifications", language), value: notifications.length || "0", icon: AlertTriangle, color: "bg-primary-400", tab: null },
   ];
+
+  const evaluationLocale =
+    language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "ar-DZ";
+
+  const formatEvaluationMonth = (value?: string | null) => {
+    if (!value) return "—";
+    const monthValue = value.length >= 7 ? value.slice(0, 7) : value;
+    const date = new Date(monthValue + "-01");
+    if (Number.isNaN(date.getTime())) return monthValue;
+    return new Intl.DateTimeFormat(evaluationLocale, {
+      year: "numeric",
+      month: "long",
+    }).format(date);
+  };
+
+  const evaluationsByStudent = useMemo(() => {
+    const map = new Map<string, MonthlyEvaluation[]>();
+    monthlyEvaluations.forEach((evaluation) => {
+      const studentId = String(
+        evaluation.student.student_id ?? evaluation.student.full_name
+      );
+      const list = map.get(studentId) ?? [];
+      list.push(evaluation);
+      map.set(studentId, list);
+    });
+    return map;
+  }, [monthlyEvaluations]);
+
+  const buildPerformanceSummary = (studentId: string) => {
+    const evaluations = evaluationsByStudent.get(studentId) ?? [];
+    let marksTotal = 0;
+    let marksCount = 0;
+    let participationTotal = 0;
+    let participationCount = 0;
+    let homeworkTotal = 0;
+    let homeworkCount = 0;
+
+    evaluations.forEach((evaluation) => {
+      if (typeof evaluation.mark_of_participation_in_class === "number") {
+        participationTotal += evaluation.mark_of_participation_in_class;
+        participationCount += 1;
+        marksTotal += evaluation.mark_of_participation_in_class;
+        marksCount += 1;
+      }
+      if (typeof evaluation.homeworks_mark === "number") {
+        homeworkTotal += evaluation.homeworks_mark;
+        homeworkCount += 1;
+        marksTotal += evaluation.homeworks_mark;
+        marksCount += 1;
+      }
+    });
+
+    const overallAverage = marksCount ? marksTotal / marksCount : null;
+    const participationAverage = participationCount
+      ? participationTotal / participationCount
+      : null;
+    const homeworkAverage = homeworkCount ? homeworkTotal / homeworkCount : null;
+
+    const latestMonth = evaluations
+      .map((evaluation) => evaluation.month)
+      .filter(Boolean)
+      .sort((a, b) => b.localeCompare(a))[0];
+
+    const performanceLevel =
+      overallAverage === null
+        ? "needs_improvement"
+        : overallAverage < 10
+        ? "weak"
+        : overallAverage < 15
+        ? "good"
+        : "excellent";
+
+    return {
+      evaluations,
+      overallAverage,
+      participationAverage,
+      homeworkAverage,
+      latestMonth,
+      performanceLevel,
+    };
+  };
 
   
 
@@ -401,13 +496,189 @@ const ParentDashboard: React.FC = () => {
         return <ActivitiesView parentStudentsEvents={parentStudentsEvents} />;
       default:
         return (
-          <div className="space-y-6">
-            {/* Stats Grid */}
+          <div className="space-y-8">
+            {/* ════ STUDENTS GENERAL INFORMATION - MAIN FOCUS ════ */}
+            <div className="rounded-3xl border-2 border-primary-200 dark:border-primary-800/60 bg-gradient-to-br from-primary-50/30 via-white to-primary-50/20 dark:from-primary-950/20 dark:via-gray-800 dark:to-primary-950/10 shadow-2xl p-8 lg:p-10 ring-1 ring-primary-100 dark:ring-primary-900/40">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div>
+                  <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
+                    {getTranslation("studentsGeneralInformation", language)}
+                  </h1>
+                  <p className="text-base text-gray-600 dark:text-gray-300">
+                    {getTranslation("monthlyEvaluationForParents", language)}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 dark:bg-emerald-900/40 px-4 py-2 text-sm font-bold text-emerald-700 dark:text-emerald-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    {getTranslation("excellent", language)}
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 dark:bg-amber-900/40 px-4 py-2 text-sm font-bold text-amber-700 dark:text-amber-200">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    {getTranslation("veryGood", language)}
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-red-100 dark:bg-red-900/40 px-4 py-2 text-sm font-bold text-red-700 dark:text-red-200">
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                    {getTranslation("poorPerformance", language)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+                {isLoadingStudents || isLoadingMonthlyEvaluations ? (
+                  <div className="col-span-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 animate-pulse">
+                    <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4" />
+                    <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+                  </div>
+                ) : students.length === 0 ? (
+                  <div className="col-span-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
+                    {getTranslation("noStudentsFound", language)}
+                  </div>
+                ) : (
+                  students.map((child, index) => {
+                    const studentId = String(child.student_id);
+                    const summary = buildPerformanceSummary(studentId);
+                    const overallMark = summary.overallAverage;
+
+                    const stateLabel =
+                      summary.performanceLevel === "excellent"
+                        ? getTranslation("excellent", language)
+                        : summary.performanceLevel === "good"
+                        ? getTranslation("veryGood", language)
+                        : getTranslation("poorPerformance", language);
+
+                    const stateStyles =
+                      summary.performanceLevel === "excellent"
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
+                        : summary.performanceLevel === "good"
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+                        : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200";
+
+                    const markBackgroundColor =
+                      overallMark === null
+                        ? "bg-gray-100 dark:bg-gray-700"
+                        : overallMark < 10
+                        ? "bg-red-100 dark:bg-red-900/30"
+                        : overallMark < 15
+                        ? "bg-amber-100 dark:bg-amber-900/30"
+                        : "bg-emerald-100 dark:bg-emerald-900/30";
+
+                    const markTextColor =
+                      overallMark === null
+                        ? "text-gray-700 dark:text-gray-300"
+                        : overallMark < 10
+                        ? "text-red-700 dark:text-red-300"
+                        : overallMark < 15
+                        ? "text-amber-700 dark:text-amber-300"
+                        : "text-emerald-700 dark:text-emerald-300";
+
+                    return (
+                      <div
+                        key={index}
+                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 p-7 transition-all duration-300 transform hover:scale-105"
+                      >
+                        {/* Header with student info and performance badge */}
+                        <div className="flex items-start justify-between gap-3 mb-5">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/40 dark:to-primary-800/40 p-3 rounded-full">
+                              <UserIcon className="h-6 w-6 text-primary-600 dark:text-primary-300" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                {child.full_name}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {child.class_group?.name}
+                              </p>
+                            </div>
+                          </div>
+                          <span className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap ${stateStyles}`}>
+                            {stateLabel}
+                          </span>
+                        </div>
+
+                        {/* Overall Mark - Prominent Display */}
+                        <div className={`rounded-xl p-5 mb-5 border-2 border-gray-200 dark:border-gray-700 ${markBackgroundColor}`}>
+                          <p className={`text-xs font-semibold uppercase tracking-wider ${markTextColor} mb-2`}>
+                            {getTranslation("overallPerformance", language)}
+                          </p>
+                          <div className="flex items-baseline gap-2">
+                            <p className={`text-4xl font-black ${markTextColor}`}>
+                              {overallMark !== null ? overallMark.toFixed(1) : "—"}
+                            </p>
+                            <p className={`text-lg font-bold ${markTextColor}`}>/20</p>
+                          </div>
+                        </div>
+
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 gap-4 mb-5">
+                          <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4 border border-blue-200 dark:border-blue-800">
+                            <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                              {getTranslation("participationMark", language)}
+                            </p>
+                            <p className="text-2xl font-bold text-blue-700 dark:text-blue-200">
+                              {summary.participationAverage !== null
+                                ? summary.participationAverage.toFixed(1)
+                                : "—"}
+                            </p>
+                          </div>
+                          <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-4 border border-purple-200 dark:border-purple-800">
+                            <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">
+                              {getTranslation("homeworksMark", language)}
+                            </p>
+                            <p className="text-2xl font-bold text-purple-700 dark:text-purple-200">
+                              {summary.homeworkAverage !== null
+                                ? summary.homeworkAverage.toFixed(1)
+                                : "—"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Absences & Month */}
+                        <div className="rounded-lg bg-gray-50 dark:bg-gray-700/50 p-4 border border-gray-200 dark:border-gray-600 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {getTranslation("absences", language)}
+                            </span>
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 font-bold text-sm">
+                              {one_student_absences(child) || "0"}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {getTranslation("evaluationMonth", language)}
+                            </span>
+                            <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
+                              {formatEvaluationMonth(summary.latestMonth)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                              {getTranslation("monthlyEvaluation", language)}
+                            </span>
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-bold text-xs">
+                              {summary.evaluations.length}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Stats Grid - Secondary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
                 <div
                   key={index}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+                  onClick={() => stat.tab && setActiveTab(stat.tab)}
+                  className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-transform duration-150${
+                    stat.tab
+                      ? " cursor-pointer hover:scale-105 hover:shadow-xl hover:border-primary-400 dark:hover:border-primary-500"
+                      : ""
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -424,110 +695,6 @@ const ParentDashboard: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Children Summary 
-             mock data : 
-            [
-              {
-                  name: "أحمد محمد",
-                  class: "الصف الخامس أ",
-                  grade: "16/20",
-                  attendance: "96%",
-                  status: "ممتاز",
-                },
-            ]
-            */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {isLoadingStudents ? (
-              <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 animate-pulse">
-                <div className="h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-3" />
-                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
-              </div>
-            ) : students.length === 0 ? (
-              <div className="col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
-                {getTranslation("noStudentsFound", language)}
-              </div>
-            ) : students.map((child, index) => {
-                const perf = studentPerformances.find(
-                  (p) => String(p.student_id) === String(child.student_id)
-                );
-                const displayGrade =
-                  perf?.s1_overall !== null && perf?.s1_overall !== undefined
-                    ? perf.s1_overall.toFixed(2)
-                    : perf?.s2_overall !== null && perf?.s2_overall !== undefined
-                    ? perf.s2_overall.toFixed(2)
-                    : perf?.s3_overall !== null && perf?.s3_overall !== undefined
-                    ? perf.s3_overall.toFixed(2)
-                    : child.trimester_grade != null
-                    ? String(child.trimester_grade)
-                    : "—";
-                const overallScore = perf?.s1_overall ?? perf?.s2_overall ?? perf?.s3_overall ?? null;
-                const derived_state = overallScore !== null
-                  ? overallScore >= 16 ? "excellent" : overallScore >= 14 ? "very_good" : "needs_improvement"
-                  : (child.academic_state ?? "needs_improvement");
-                return (
-                <div
-                  key={index}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
-                >
-                  <div className="flex items-center space-x-4 rtl:space-x-reverse mb-4">
-                    <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
-                      <UserIcon className="h-6 w-6 text-primary-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {child.full_name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {child.class_group?.name}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-primary-50 dark:bg-primary-900 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {getTranslation("overallGrade", language)}
-                      </p>
-                      <p className="text-xl font-bold text-primary-600">
-                        {displayGrade}
-                      </p>
-                    </div>
-                    <div className="text-center p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {getTranslation("absences", language)}
-                      </p>
-                      <p className="text-xl font-bold text-primary-500">
-                        {one_student_absences(child) || "0"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {getTranslation("academicStatus", language)}
-                    </span>
-                    <span
-                      className={
-                        "px-3 py-1 rounded-full text-sm font-medium" +
-                        (derived_state === "excellent"
-                          ? " bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 "
-                          : derived_state === "very_good"
-                            ? " bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 "
-                            : " bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 ")
-                      }
-                    >
-                      {derived_state === "excellent"
-                        ? getTranslation("excellent", language)
-                        : derived_state === "very_good"
-                          ? getTranslation("veryGood", language)
-                          : getTranslation("poorPerformance", language)}
-                    </span>
-                  </div>
-                </div>
-                );
-              })}
             </div>
 
             {/* Recent Updates */}

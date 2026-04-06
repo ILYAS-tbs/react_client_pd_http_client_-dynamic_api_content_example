@@ -5,7 +5,7 @@ import { getCSRFToken } from "../../lib/get_CSRFToken";
 import {
   AddCurrectSchoolStudentsToParent,
   AddorRemoveParentToSchoolPayload,
-  FindParentByIdPayload,
+  SearchParentResult,
 } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { ParentManagementProps } from "../../types";
@@ -96,15 +96,25 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
   });
 
   const [formData, setFormData] = useState({
-    email: "",
     students: [""],
   });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+
+  // Parent search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchParentResult[]>([]);
+  const [selectedParentPk, setSelectedParentPk] = useState<number | null>(null);
+  const [selectedParentName, setSelectedParentName] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const resetModalState = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setSelectedParentPk(null);
+    setSelectedParentName("");
+    setErrorAddParent("");
+    setFormData({ students: [""] });
   };
+
   // ! CUSTOM FOR MULTIPLE SELECT :
   const handleStudentsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = Array.from(
@@ -114,76 +124,75 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
     setFormData({ ...formData, students: selected });
   };
 
-  //! 1. Parent Addition Logic : 1-SearchForParent -> 2.AddParentToSchool
-  //! -> 3. add selected student to the parent :
+  const handleSearchParents = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    setSearchResults([]);
+    setSelectedParentPk(null);
+    setSelectedParentName("");
+    setErrorAddParent("");
+    const res = await school_dashboard_client.search_parents(searchQuery);
+    if (res.ok && res.data) {
+      setSearchResults(res.data);
+      if (res.data.length === 0) {
+        setErrorAddParent("لم يتم العثور على نتائج مطابقة، حاول بكلمة أخرى");
+      }
+    } else {
+      setErrorAddParent("حدث خطأ أثناء البحث، يرجى المحاولة لاحقًا");
+    }
+    setIsSearching(false);
+  };
+
+  //! Parent Addition Logic: select parent from search -> add to school -> link students
   const handleAddParentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
 
-    //? Look for the parent in the system
-    const payload: FindParentByIdPayload = {
-      email: formData.email,
-    };
+    if (!selectedParentPk) {
+      setErrorAddParent("الرجاء اختيار ولي أمر من نتائج البحث");
+      return;
+    }
+
     const latest_csrf = getCSRFToken()!;
-    const res = await school_dashboard_client.find_parent_by_email(
-      payload,
+    const add_payload: AddorRemoveParentToSchoolPayload = {
+      parent_pk: selectedParentPk,
+    };
+    const add_parent_res = await school_dashboard_client.add_parent_to_school(
+      add_payload,
       latest_csrf
     );
-    //? parent exist or not
-    if (res.ok) {
-      const parent_pk = res.data.user;
-      // success
-      const payload: AddorRemoveParentToSchoolPayload = {
-        parent_pk: parent_pk,
+
+    if (add_parent_res.ok) {
+      const latest_csrf2 = getCSRFToken()!;
+      const students_payload: AddCurrectSchoolStudentsToParent = {
+        parent_pk: String(selectedParentPk),
+        students: formData.students,
       };
-      const latest_csrf = getCSRFToken()!;
-      const add_parent_res = await school_dashboard_client.add_parent_to_school(
-        payload,
-        latest_csrf
-      );
+      const add_students_res =
+        await school_dashboard_client.add_current_school_students_to_parent(
+          students_payload,
+          latest_csrf2
+        );
 
-      if (add_parent_res.ok) {
-        //? 3. Adding students to this parent
-        const latest_csrf = getCSRFToken()!;
-        const payload: AddCurrectSchoolStudentsToParent = {
-          parent_pk: parent_pk,
-          students: formData.students,
-        };
-        const add_students_to_parent_res =
-          await school_dashboard_client.add_current_school_students_to_parent(
-            payload,
-            latest_csrf
+      if (add_students_res.ok) {
+        const new_res =
+          await school_dashboard_client.get_current_school_parents();
+        if (new_res.ok) {
+          const new_parents_list: Parent[] = new_res.data.map(
+            (p: ParentJson) => Parent.fromJson(p)
           );
-
-        if (add_students_to_parent_res.ok) {
-          //* ALL SUCCESSFUL RE-FRESH DATA
-          const new_res =
-            await school_dashboard_client.get_current_school_parents();
-          if (new_res.ok) {
-            const new_parents_list: Parent[] = new_res.data.map(
-              (p: ParentJson) => Parent.fromJson(p)
-            );
-            setParentList(new_parents_list);
-            setShowAddModal(false);
-          }
-          //* New Student
-          RefetchStudents();
-        } else {
-          setErrorAddParent(
-            "حدث خطأ غير متوقع أثناء معالجة طلبك، يرجى المحاولة لاحقًا. إذا استمر هذا الأمر، يرجى التواصل معنا."
-          );
+          setParentList(new_parents_list);
+          setShowAddModal(false);
+          resetModalState();
         }
+        RefetchStudents();
       } else {
         setErrorAddParent(
           "حدث خطأ غير متوقع أثناء معالجة طلبك، يرجى المحاولة لاحقًا. إذا استمر هذا الأمر، يرجى التواصل معنا."
         );
-        setTimeout(() => {
-          setErrorAddParent("");
-        }, 7000);
       }
     } else {
       setErrorAddParent(
-        "لم يتم العثور على حساب ولي أمر بهذا البريد الإلكتروني، تحقق من بياناتك المدخلة"
+        "حدث خطأ غير متوقع أثناء معالجة طلبك، يرجى المحاولة لاحقًا. إذا استمر هذا الأمر، يرجى التواصل معنا."
       );
       setTimeout(() => {
         setErrorAddParent("");
@@ -329,10 +338,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                       {/* the parent has his data - can't be edited by school for now */}
                       <button
                         onClick={() => {
-                          setFormData({
-                            ...formData,
-                            email: parent.email,
-                          });
+                          setSearchQuery(parent.email);
                           setShowAddModal(true);
                         }}
                         className="text-primary-600 hover:bg-primary-300"
@@ -357,36 +363,89 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
       {/* Add or Update Parent Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               إضافة ولي أمر جديد
             </h3>
 
             <form className="space-y-4" onSubmit={handleAddParentSubmit}>
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  اسم ولي الأمر
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="الاسم الكامل"
-                />
-              </div> */}
-
+              {/* Search by name or email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  البريد الإلكتروني
+                  ابحث بالاسم أو البريد الإلكتروني
                 </label>
-                <input
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="example@example.com"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleSearchParents();
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="اسم ولي الأمر أو بريده الإلكتروني..."
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSearchParents}
+                    disabled={isSearching || !searchQuery.trim()}
+                    className="px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                  >
+                    {isSearching ? (
+                      <span className="text-xs">...</span>
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
+
+              {/* Search Results */}
+              {searchResults.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    نتائج البحث
+                  </label>
+                  <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden max-h-40 overflow-y-auto">
+                    {searchResults.map((result) => (
+                      <button
+                        key={result.user}
+                        type="button"
+                        onClick={() => {
+                          setSelectedParentPk(result.user);
+                          setSelectedParentName(result.full_name);
+                          setErrorAddParent("");
+                        }}
+                        className={`w-full text-right px-4 py-2 flex justify-between items-center text-sm hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors ${
+                          selectedParentPk === result.user
+                            ? "bg-primary-100 dark:bg-primary-900/40 border-r-2 border-primary-600"
+                            : "bg-white dark:bg-gray-800"
+                        }`}
+                      >
+                        <span className="text-gray-900 dark:text-white font-medium">
+                          {result.full_name}
+                        </span>
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">
+                          {result.phone_number}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Selected parent confirmation */}
+              {selectedParentPk && (
+                <div className="flex items-center gap-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-3 py-2 rounded-lg">
+                  <span>✓</span>
+                  <span>
+                    تم اختيار: <strong>{selectedParentName}</strong>
+                  </span>
+                </div>
+              )}
 
               {/* Error */}
               {errorAddParent && (
@@ -395,28 +454,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 </div>
               )}
 
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  رقم الهاتف
-                </label>
-                <input
-                  type="tel"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="0555 XX XX XX"
-                />
-              </div> */}
-
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  العنوان
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="العنوان الكامل"
-                />
-              </div> */}
-
+              {/* Students */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   الطلاب المرتبطون
@@ -438,12 +476,20 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
-                  onClick={() => setShowAddModal(false)}
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    resetModalState();
+                  }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   إلغاء
                 </button>
-                <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                <button
+                  type="submit"
+                  disabled={!selectedParentPk}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
                   إضافة
                 </button>
               </div>

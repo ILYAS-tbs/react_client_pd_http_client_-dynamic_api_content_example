@@ -307,7 +307,7 @@ const SchoolDashboard: React.FC = () => {
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
     { id: "evaluations", label: getTranslation("monthlyEvaluation", language), icon: ClipboardList },
     { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },
-    { id: "grades", label: getTranslation("GradeOverview", language), icon: FileText },
+    // { id: "grades", label: getTranslation("GradeOverview", language), icon: FileText },
     { id: "activities", label: getTranslation('Activities', language), icon: Star },
   ];
 
@@ -487,14 +487,14 @@ const SchoolDashboard: React.FC = () => {
         return (
           <MonthlyEvaluationSection evaluations={monthlyEvaluations} />
         );
-      case "grades":
-        return (
-          <GradeOverview
-            school_stat={school_stat}
-            setSchoolStat={setSchoolStat}
-            class_groups={class_groups}
-          />
-        );
+      // case "grades":
+      //   return (
+      //     <GradeOverview
+      //       school_stat={school_stat}
+      //       setSchoolStat={setSchoolStat}
+      //       class_groups={class_groups}
+      //     />
+      //   );
       case "activities":
         return (
           <ActivitiesManagement

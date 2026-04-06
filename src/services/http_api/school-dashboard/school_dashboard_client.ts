@@ -2,6 +2,7 @@ import {
   AddCurrectSchoolStudentsToParent,
   AddorRemoveParentToSchoolPayload,
   FindParentByIdPayload,
+  SearchParentResult,
   PatchAbsenceReportPayload,
   PatchEventPayload,
   PostPutClassGroupPayload as PostClassGroupPayload,
@@ -38,6 +39,7 @@ const URLS = {
   delete_exam_schedule: `${BASE_URL}/school/exam-schedules/`,
 
   find_parent_by_email: `${BASE_URL}/school/schools/find_parent_by_email/`,
+  search_parents: `${BASE_URL}/school/schools/search_parents/`,
   add_parent_to_school: `${BASE_URL}/school/schools/add_parent_to_school/`,
   add_current_school_students_to_parent: `${BASE_URL}/school/schools/add_current_school_students_to_parent/`,
   remove_parent_from_school: `${BASE_URL}/school/schools/remove_parent_from_school/`,
@@ -380,6 +382,22 @@ async function find_parent_by_email(
     return { ok: false, error: error };
   }
 }
+
+async function search_parents(query: string): Promise<{ ok: boolean; status?: number; data?: SearchParentResult[]; error?: unknown }> {
+  try {
+    const response = await fetch(
+      `${URLS.search_parents}?query=${encodeURIComponent(query)}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
 async function add_parent_to_school(
   payload: AddorRemoveParentToSchoolPayload,
   csrfToken: string
@@ -707,6 +725,7 @@ export const school_dashboard_client = {
   delete_exam_schedule: delete_exam_schedule,
 
   find_parent_by_email: find_parent_by_email,
+  search_parents: search_parents,
   add_parent_to_school: add_parent_to_school,
   add_current_school_students_to_parent: add_current_school_students_to_parent,
   remove_parent_from_school: remove_parent_from_school,

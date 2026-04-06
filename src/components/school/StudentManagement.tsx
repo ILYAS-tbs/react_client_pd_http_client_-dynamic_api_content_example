@@ -468,19 +468,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation('dateOfBirth', language)}
-                </label>
-                <input
-                  name="date_of_birth"
-                  type="date"
-                  value={formData_creation.date_of_birth}
-                  onChange={handleChange_creation}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-
               {/* parent name deleted for now */}
               {/* <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -581,19 +568,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  تاريخ الميلاد
-                </label>
-                <input
-                  name="date_of_birth"
-                  type="date"
-                  value={formData_update.date_of_birth}
-                  onChange={handleChange_update}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
               </div>
 
               <div>

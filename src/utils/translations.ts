@@ -2349,6 +2349,16 @@ export const translations: Translations = {
     en: "Record Absences",
     fr: "Enregistrer les absences",
   },
+  studentsGeneralInformation: {
+    ar: "معلومات الطلاب العامة",
+    en: "Students General Information",
+    fr: "Informations Générales sur les Élèves",
+  },
+  overallPerformance: {
+    ar: "الأداء العام",
+    en: "Overall Performance",
+    fr: "Performance Globale",
+  },
   searchStudents: {
     ar: "البحث عن الطلاب...",
     en: "Search for students...",

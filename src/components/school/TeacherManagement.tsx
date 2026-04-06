@@ -856,24 +856,6 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </button>
               </div> */}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  سنوات الخبرة
-                </label>
-                <input
-                  name="years_of_experience"
-                  type="number"
-                  value={years_of_experience_update}
-                  onChange={(e) =>
-                    set_years_of_experience_update(e.target.value)
-                  }
-                  min={0}
-                  max={20}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="عدد السنوات"
-                />
-              </div>
-
               {/* Modal Error */}
               {editModalError && (
                 <h1 className=" text-red-600 text-sm">{editModalError}</h1>

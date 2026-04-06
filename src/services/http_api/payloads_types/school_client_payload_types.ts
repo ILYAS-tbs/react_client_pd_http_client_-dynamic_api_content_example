@@ -83,6 +83,15 @@ export interface FindParentByIdPayload {
   email: string;
 }
 
+// search parents by name or email
+export interface SearchParentResult {
+  user: number;
+  full_name: string;
+  phone_number: string;
+  address: string;
+  relationship_to_student: string;
+}
+
 export interface AddorRemoveParentToSchoolPayload {
   parent_pk: number;
 }
