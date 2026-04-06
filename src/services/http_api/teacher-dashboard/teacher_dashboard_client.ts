@@ -18,6 +18,7 @@ const URLS = {
   get_current_teacher_behaviour_reports: `${BASE_URL}/teacher/teachers/get_current_teacher_behaviour_reports/`,
   current_teacher_school_modules: `${BASE_URL}/teacher/teachers/current_teacher_school_modules/`,
   current_teacher_students_grades: `${BASE_URL}/teacher/teachers/current_teacher_students_grades/`,
+  get_current_teacher_schedules: `${BASE_URL}/teacher/teachers/get_current_teacher_schedules/`,
   get_monthly_evaluations: `${BASE_URL}/student/monthly-evaluations/`,
   student_monthly_evaluations: `${BASE_URL}/student/students/`,
   get_grading_formula: `${BASE_URL}/teacher/grading-formulas/get_formula/`,
@@ -602,6 +603,20 @@ async function recalculate_all_averages(
   }
 }
 
+async function get_current_teacher_schedules() {
+  try {
+    const response = await fetch(URLS.get_current_teacher_schedules, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 export const teacher_dashboard_client = {
   get_teacher_by_id:get_teacher_by_id,
   get_current_teacher_students: get_current_teacher_students,
@@ -635,4 +650,5 @@ export const teacher_dashboard_client = {
 
   create_teacher_upload: create_teacher_upload,
   delete_teacher_upload: delete_teacher_upload,
+  get_current_teacher_schedules: get_current_teacher_schedules,
 };

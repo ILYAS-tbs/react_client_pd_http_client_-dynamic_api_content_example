@@ -1,363 +1,297 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar,
-  Edit,
   Trash2,
-  Plus,
   Search,
-  Eye,
   Upload,
+  Eye,
+  FileText,
 } from "lucide-react";
 import { ScheduleManagementProps } from "../../types";
-import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
+import { ClassGroup } from "../../models/ClassGroups";
+import { Schedule } from "../../models/Schedule";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
-interface ScheduleItem {
-  id: string;
-  className: string; // e.g., "الصف الخامس أ"
-  pdfUrl: string | null; // URL or base64 of the uploaded PDF
-  uploadedAt: string; // Timestamp of upload
-}
 
 const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
   class_groups_list,
-  setClassGroupList,
 }) => {
-  function mapClassGroupToSchedule(
-    class_groups_list: ClassGroup[]
-  ): ScheduleItem[] {
-    return class_groups_list.map((classGroup: ClassGroup) => ({
-      id: classGroup.class_group_id,
-      className: classGroup.name,
-      pdfUrl: classGroup.time_table,
-      uploadedAt: "",
-    }));
-  }
+  const { language } = useLanguage();
 
-  //! Translation:
-  const { language } = useLanguage()
-  // mock schedule data : { id: "s1", className: "الصف الخامس أ", pdfUrl: null, uploadedAt: "" },
-
-  const [schedules, setSchedules] = useState<ScheduleItem[]>(
-    mapClassGroupToSchedule(class_groups_list)
-  );
-  const [newSchedule, setNewSchedule] = useState<
-    Omit<ScheduleItem, "id" | "uploadedAt">
-  >({ className: "", pdfUrl: null });
-  const [editingSchedule, setEditingSchedule] = useState<ScheduleItem | null>(
-    null
-  );
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedClassGroupId, setSelectedClassGroupId] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
 
-  const [last_selected_schedule, set_last_selected_schedule] =
-    useState<ScheduleItem | null>(null);
-
-  //? API CALL PUT class_group
-  async function handleUpdateSubmit() {
-    const formData_update = new FormData();
-
-    if (!last_selected_schedule) {
-      console.error("No Schedule  was set");
-      return;
-    }
-
-    const name = last_selected_schedule.className;
-    formData_update.append("name", name);
-
-    if (selectedFile) {
-      formData_update.append("time_table", selectedFile);
-    }
-
-    const latest_csrf = getCSRFToken()!;
-    const id = last_selected_schedule.id;
-    // * API CALL UPDATE IN THE BACKEND
-    const res = await school_dashboard_client.put_class_group(
-      id,
-      formData_update,
-      latest_csrf
-    );
-    // * UPDATE THE DATA IN THE FRONTEND :
-    if (res.ok) {
-      // Re-fetch all classes from backend instead of patching one
-      const new_res =
-        await school_dashboard_client.get_current_school_class_groups();
-      if (new_res.ok) {
-        console.log("ScheduleManageemnt updating classgroups OK");
-        const new_class_groups_list: ClassGroupJson[] = new_res.data.map(
-          (classGroupJson: ClassGroupJson) =>
-            ClassGroup.formJson(classGroupJson)
-        );
-        console.log("new list");
-        console.log(new_class_groups_list);
-        //? update parent state
-        setClassGroupList(new_class_groups_list);
-        //? Update the local state from it
-        setSchedules(mapClassGroupToSchedule(new_class_groups_list));
-      }
-    }
-  }
-
-  const handleFileUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const pdfUrl = reader.result as string;
-
-      //* API CALL
-      handleUpdateSubmit();
-
-      setSelectedFile(null);
-      setShowUploadModal(false);
-      setEditingSchedule(null);
-    };
-    reader.readAsDataURL(file);
+  const fetchSchedules = async () => {
+    setLoading(true);
+    const res = await school_dashboard_client.get_current_school_schedules();
+    if (res.ok) setSchedules(res.data as Schedule[]);
+    setLoading(false);
   };
 
-  const handleEditSchedule = (schedule: ScheduleItem) => {
-    setEditingSchedule(schedule);
-    setNewSchedule({ className: schedule.className, pdfUrl: schedule.pdfUrl });
+  useEffect(() => {
+    fetchSchedules();
+  }, []);
+
+  // class_group_id → Schedule lookup
+  const scheduleByClassGroup: Record<string, Schedule> = {};
+  schedules.forEach((s) => {
+    if (s.class_group_info) {
+      scheduleByClassGroup[s.class_group_info.class_group_id] = s;
+    }
+  });
+
+  const filteredClassGroups = class_groups_list.filter((cg: ClassGroup) =>
+    cg.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const openUploadModal = (classGroup: ClassGroup) => {
+    const existing = scheduleByClassGroup[classGroup.class_group_id];
+    setEditingSchedule(existing ?? null);
+    setSelectedClassGroupId(classGroup.class_group_id);
+    setSelectedFile(null);
     setShowUploadModal(true);
   };
 
-  //! OPTIMISTIC UPDATE TECHNIQUE
-  const handleDeleteSchedule = async (id: string) => {
-    setSchedules(schedules.filter((sch) => sch.id !== id));
-    // API CALL  DELETE
-    const latest_csrf = getCSRFToken()!;
-    const res = await school_dashboard_client.delete_class_group(
-      id,
-      latest_csrf
-    );
-    // Fetch & Update new data : GET
-    const new_res =
-      await school_dashboard_client.get_current_school_class_groups();
-    if (new_res.ok) {
-      const new_class_group_list: ClassGroup[] = new_res.data.map(
-        (classGroup: ClassGroup) => ClassGroup.formJson(classGroup)
+  const handleSubmit = async () => {
+    const csrf = getCSRFToken()!;
+    const formData = new FormData();
+    formData.append("class_group_id", selectedClassGroupId);
+    if (selectedFile) formData.append("schedule_file", selectedFile);
+
+    let res;
+    if (editingSchedule) {
+      res = await school_dashboard_client.update_schedule(
+        editingSchedule.schedule_id,
+        formData,
+        csrf
       );
-      setClassGroupList(new_class_group_list);
+    } else {
+      res = await school_dashboard_client.upload_schedule(formData, csrf);
     }
+    if (res.ok) await fetchSchedules();
+    setShowUploadModal(false);
+    setEditingSchedule(null);
+    setSelectedFile(null);
   };
 
-  const handleViewSchedule = (pdfUrl: string | null) => {
-    if (pdfUrl) {
-      window.open(pdfUrl, "_blank");
-    }
+  const handleDelete = async (scheduleId: string) => {
+    const csrf = getCSRFToken()!;
+    setSchedules((prev) => prev.filter((s) => s.schedule_id !== scheduleId));
+    await school_dashboard_client.delete_schedule(scheduleId, csrf);
+    await fetchSchedules();
   };
-
-  const filteredSchedules = schedules.filter((sch) =>
-    sch.className.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const daysOfWeek = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-  const timeSlots = Array.from(
-    { length: 9 },
-    (_, i) => `${(8 + i).toString().padStart(2, "0")}:00`
-  );
 
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation('schedulesManagement', language)}
+          {getTranslation("schedulesManagement", language)}
         </h2>
-
-        {/* Hide Creation For Now it isnt working */}
-        {/* <div className="flex space-x-2 rtl:space-x-reverse">
-          <button
-            onClick={() => setShowUploadModal(true)}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
-          >
-            <Plus className="h-5 w-5" />
-            <span>إضافة جدول</span>
-          </button>
-        </div> */}
       </div>
 
-      {/* Filters */}
+      {/* Search */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder={getTranslation('searchClass', language)}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-          </div>
+        <div className="relative">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            placeholder={getTranslation("searchClass", language)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
         </div>
       </div>
 
-      {/* Schedule Display */}
+      {/* Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="p-6">
-          <h3 className="ltr:text-left text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-            {getTranslation('classSchedule', language)}
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+            {getTranslation("classSchedule", language)}
           </h3>
-          <div className="min-w-full">
+          {loading ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <Calendar className="h-12 w-12 mx-auto mb-3 animate-pulse text-gray-300" />
+              <p>{getTranslation("loading", language)}</p>
+            </div>
+          ) : filteredClassGroups.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <p>{getTranslation("noClassesFound", language)}</p>
+            </div>
+          ) : (
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-700">
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('className', language)}
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                    {getTranslation("className", language)}
                   </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('uploadStatus', language)}
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                    {getTranslation("uploadStatus", language)}
                   </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('lessonSchedule', language)}
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                    {getTranslation("lessonSchedule", language)}
                   </th>
-                  <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation('actions', language)}
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
+                    {getTranslation("actions", language)}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredSchedules.map((schedule) => (
-                  <tr
-                    key={schedule.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <td className="px-4 py-2 text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
-                      {schedule.className}
-                    </td>
-                    <td className="px-4 py-2 text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
-                      {schedule.pdfUrl ? "تم الرفع" : "لم يتم الرفع"}
-                    </td>
-                    <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                      {/* {schedule.uploadedAt
-                        ? new Date(schedule.uploadedAt).toLocaleDateString(
-                            "ar-DZ"
-                          )
-                        : "-"} */}
-                      {schedule.pdfUrl ? (
-                        <div className="flex items-center space-x-2 justify-start rtl:space-x-reverse">
-                          <a
-                            href={SERVER_BASE_URL + schedule.pdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary-400 hover:bg-primary-300"
-                          >
-                            {schedule.className + ".pdf"}
-                          </a>
-                          {/* <button
-                                                // onClick={() => handleRemovePdf(cls.id)}
-                                                className="text-primary-400 hover:bg-primary-300"
-                                              > */}
-                          {/* <X className="h-5 w-5" /> */}
-                          {/* <Download className="h-5 w-5" />
-                                              </button> */}
-                        </div>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 relative">
-                      <div className="flex space-x-2 rtl:space-x-reverse">
-                        {/* no need for the eye  */}
-                        {/* {schedule.pdfUrl && (
+                {filteredClassGroups.map((cg: ClassGroup) => {
+                  const schedule = scheduleByClassGroup[cg.class_group_id];
+                  return (
+                    <tr
+                      key={cg.class_group_id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                        {cg.name}
+                      </td>
+                      <td className="px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700">
+                        {schedule?.schedule_file ? (
+                          <span className="inline-flex items-center gap-1 text-primary-600 dark:text-primary-400 font-medium">
+                            <FileText className="h-4 w-4" />
+                            {getTranslation("uploaded", language)}
+                          </span>
+                        ) : (
+                          <span className="text-red-500">
+                            {getTranslation("notUploaded", language)}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                        {schedule?.schedule_file ? (
                           <button
-                            onClick={() => handleViewSchedule(schedule.pdfUrl)}
-                            className="text-primary-500 hover:bg-primary-300"
+                            onClick={() =>
+                              window.open(
+                                SERVER_BASE_URL + schedule.schedule_file,
+                                "_blank"
+                              )
+                            }
+                            className="inline-flex items-center gap-1 text-primary-500 hover:text-primary-700 underline text-sm"
                           >
-                            <Eye className="h-5 w-5" />
+                            <Eye className="h-4 w-4" />
+                            {cg.name}.pdf
                           </button>
-                        )} */}
-                        <button
-                          onClick={() => {
-                            handleEditSchedule(schedule);
-                            // latest clicked schedule
-                            set_last_selected_schedule(schedule);
-                          }}
-                          className="text-primary-600 hover:bg-primary-300"
-                        >
-                          <Upload className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteSchedule(schedule.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => openUploadModal(cg)}
+                            className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200"
+                            title={getTranslation("upload", language)}
+                          >
+                            <Upload className="h-5 w-5" />
+                          </button>
+                          {schedule && (
+                            <button
+                              onClick={() =>
+                                handleDelete(schedule.schedule_id)
+                              }
+                              className="text-red-600 hover:text-red-800 dark:text-red-400"
+                              title={getTranslation("delete", language)}
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Upload/Edit Schedule Modal */}
+      {/* Upload / Update Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {editingSchedule ? "تعديل جدول" : "رفع جدول جديد"}
+              {editingSchedule
+                ? getTranslation("updateSchedule", language)
+                : getTranslation("uploadSchedule", language)}
             </h3>
 
-            <form className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  اسم الفصل
+                  {getTranslation("className", language)}
                 </label>
-                <input
-                  type="text"
-                  value={newSchedule.className}
-                  onChange={(e) =>
-                    setNewSchedule({
-                      ...newSchedule,
-                      className: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="مثل: الصف الخامس أ"
-                  disabled={!!editingSchedule}
-                />
+                <p className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm">
+                  {class_groups_list.find(
+                    (cg: ClassGroup) =>
+                      cg.class_group_id === selectedClassGroupId
+                  )?.name ?? "—"}
+                </p>
               </div>
+
+              {editingSchedule?.schedule_file && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {getTranslation("currentFile", language)}
+                  </label>
+                  <a
+                    href={SERVER_BASE_URL + editingSchedule.schedule_file}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-500 underline text-sm"
+                  >
+                    {getTranslation("viewCurrentSchedule", language)}
+                  </a>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  ملف الجدول (PDF)
+                  {getTranslation("scheduleFile", language)} (PDF)
                 </label>
                 <input
                   type="file"
                   accept="application/pdf"
-                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  onChange={(e) =>
+                    setSelectedFile(e.target.files?.[0] ?? null)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 />
               </div>
-            </form>
+            </div>
 
-            <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => {
                   setShowUploadModal(false);
                   setEditingSchedule(null);
-                  setNewSchedule({ className: "", pdfUrl: null });
                   setSelectedFile(null);
                 }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
               >
-                إلغاء
+                {getTranslation("cancel", language)}
               </button>
               <button
-                onClick={() => selectedFile && handleFileUpload(selectedFile)}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                disabled={!selectedFile}
+                onClick={handleSubmit}
+                disabled={!selectedFile && !editingSchedule}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 text-sm"
               >
-                {editingSchedule ? "تحديث" : "رفع"}
+                {editingSchedule
+                  ? getTranslation("update", language)
+                  : getTranslation("upload", language)}
               </button>
             </div>
           </div>

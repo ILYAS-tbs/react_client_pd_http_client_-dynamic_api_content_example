@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   BookOpen,
+  Calendar,
   Users,
   MessageCircle,
   FileText,
@@ -27,6 +28,7 @@ import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
 import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
+import ScheduleViewer from "../../components/teacher/ScheduleViewer";
 import { Parent } from "../../models/Parent";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
@@ -203,10 +205,11 @@ const TeacherDashboard: React.FC = () => {
     { id: "overview", label: getTranslation('overview', language), icon: TrendingUp },
     { id: "classes", label: getTranslation('myClasses', language), icon: Users },
     { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
+    { id: "schedule", label: getTranslation('classSchedule', language), icon: Calendar },
+
     { id: "grades", label: getTranslation('marks', language), icon: FileText },
     { id: "resources", label: getTranslation('educationalMaterials', language), icon: BookOpen },
     { id: "chat", label: getTranslation('communication_teacher', language), icon: MessageCircle },
-    // { id: "schedule", label: "الجدول", icon: Calendar },
     {
       id: "absences",
       label: getTranslation('unexcusedAbsencesAndBehaviorReports', language),
@@ -282,17 +285,8 @@ const TeacherDashboard: React.FC = () => {
           />
         );
 
-      // Might be implemented later :
-      // case "schedule":
-      //   return (
-      //     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-      //       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-      //         الجدول الأسبوعي
-      //       </h3>
-      //       <div className="overflow-x-auto">
-      //         <table className="w-full border-collapse">
-      //           <thead>
-      //             <tr className="bg-gray-50 dark:bg-gray-700">
+      case "schedule":
+        return <ScheduleViewer modules_class_groups={modules_class_groups} />;
       //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2 text-right">
       //                 الوقت
       //               </th>

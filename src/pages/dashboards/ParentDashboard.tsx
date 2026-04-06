@@ -300,6 +300,11 @@ const ParentDashboard: React.FC = () => {
       label: getTranslation("myChildren", language),
       icon: UserIcon,
     },
+      {
+      id: "timetable",
+      label: getTranslation("timetable", language),
+      icon: LayoutGrid,
+    },
     { id: "grades", label: getTranslation("grade", language), icon: FileText },
     {
       id: "evaluations",
@@ -321,11 +326,7 @@ const ParentDashboard: React.FC = () => {
     //   label: getTranslation("notificationsAndAlarms", language),
     //   icon: AlertTriangle,
     // },
-    {
-      id: "timetable",
-      label: getTranslation("timetable", language),
-      icon: LayoutGrid,
-    },
+
     // {
     //   id: "homework",
     //   label: getTranslation("homeworks", language),

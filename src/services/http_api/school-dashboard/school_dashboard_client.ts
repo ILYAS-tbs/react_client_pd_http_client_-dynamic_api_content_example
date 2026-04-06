@@ -53,6 +53,10 @@ const URLS = {
   post_event: `${BASE_URL}/school/events/`,
   patch_event: `${BASE_URL}/school/events/`,
   delete_event: `${BASE_URL}/school/events/`,
+
+  // Schedules
+  get_current_school_schedules: `${BASE_URL}/school/schedules/get_current_school_schedules/`,
+  schedules_base: `${BASE_URL}/school/schedules/`,
 };
 async function get_current_school_students() {
   try {
@@ -619,6 +623,65 @@ async function create_or_update_TeacherModuleClassGroup(
   }
 }
 
+// ─── Schedule API ──────────────────────────────────────────────────────────
+async function get_current_school_schedules() {
+  try {
+    const response = await fetch(URLS.get_current_school_schedules, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function upload_schedule(formData: FormData, csrfToken: string) {
+  try {
+    const response = await fetch(URLS.schedules_base, {
+      method: "POST",
+      headers: { "X-CSRFToken": csrfToken },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function update_schedule(scheduleId: string, formData: FormData, csrfToken: string) {
+  const url = URLS.schedules_base + scheduleId + "/";
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: { "X-CSRFToken": csrfToken },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function delete_schedule(scheduleId: string, csrfToken: string) {
+  const url = URLS.schedules_base + scheduleId + "/";
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "X-CSRFToken": csrfToken },
+      credentials: "include",
+    });
+    return { ok: response.ok, status: response.status, data: null };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 export const school_dashboard_client = {
   get_current_school_students: get_current_school_students,
   get_current_school_teachers: get_current_school_teachers,
@@ -661,4 +724,10 @@ export const school_dashboard_client = {
   post_event: post_event,
   patch_event: patch_event,
   delete_event: delete_event,
+
+  // Schedule management
+  get_current_school_schedules: get_current_school_schedules,
+  upload_schedule: upload_schedule,
+  update_schedule: update_schedule,
+  delete_schedule: delete_schedule,
 };

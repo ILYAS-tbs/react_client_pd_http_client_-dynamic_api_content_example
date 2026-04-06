@@ -25,6 +25,7 @@ const URLS = {
   get_parent_class_groups: `${BASE_URL}/parent/parents/get_parent_class_groups/`,
   post_absence_report: `${BASE_URL}/school/absence-reports/`,
   parent_students_events: `${BASE_URL}/parent/parents/parent_students_events/`,
+  get_current_parent_schedules: `${BASE_URL}/parent/parents/get_current_parent_schedules/`,
 };
 
 async function get_current_parent_students(): Promise<ApiResult<Student[]>> {
@@ -181,6 +182,22 @@ async function post_absence_report(
     return { ok: false, error: error };
   }
 }
+import { Schedule } from "../../../models/Schedule";
+
+async function get_current_parent_schedules(): Promise<ApiResult<Schedule[]>> {
+  try {
+    const response = await fetch(URLS.get_current_parent_schedules, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: Schedule[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 export const parent_dashboard_client = {
   get_current_parent_students: get_current_parent_students,
   get_current_parent_absence_reports: get_current_parent_absence_reports,
@@ -196,4 +213,5 @@ export const parent_dashboard_client = {
     get_current_parent_students_performances,
 
   post_absence_report: post_absence_report,
+  get_current_parent_schedules: get_current_parent_schedules,
 };

@@ -219,3 +219,7 @@ export interface ScheduleManagementParentProps {
   class_groups_list: ClassGroup[];
   setClassGroupList: React.Dispatch<React.SetStateAction<ClassGroup[]>>;
 }
+
+export interface ScheduleViewerProps {
+  modules_class_groups?: import("../models/TeacherModuleClassGroup").TeacherModuleClassGroup[];
+}
