@@ -1,5 +1,23 @@
 import { Translations } from "../types";
 
+/**
+ * Builds a correct media URL from a value returned by the backend.
+ * DRF FileField with request context returns a full absolute URL
+ * (e.g. "http://127.0.0.1:8000/media/...").  If somehow only a
+ * relative path is returned, serverBaseUrl is prepended so the link
+ * still works.
+ */
+export function getMediaUrl(
+  path: string | null | undefined,
+  serverBaseUrl: string
+): string | null {
+  if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const base = serverBaseUrl.replace(/\/$/, "");
+  const rel  = path.startsWith("/") ? path : "/" + path;
+  return base + rel;
+}
+
 export const translations: Translations = {
   // Navigation
   home: {
@@ -1651,6 +1669,16 @@ export const translations: Translations = {
     en: "Attendance Record",
     fr: "Registre de Présence",
   },
+  day: {
+    ar: "يوم",
+    en: "day",
+    fr: "jour",
+  },
+  record: {
+    ar: "سجل",
+    en: "record",
+    fr: "record",
+  },
   justifyAbsence: {
     ar: "تبرير غياب",
     en: "Justify Absence",
@@ -2072,9 +2100,9 @@ export const translations: Translations = {
   },
   myStudents: { ar: "طلابي", en: "My Students", fr: "Mes élèves" },
   monthlyEvaluation: {
-    ar: "التقييم الشهري",
-    en: "Monthly Evaluation",
-    fr: "Évaluation mensuelle",
+    ar: "الأداء الأكاديمي",
+    en: "Academic Performance",
+    fr: "Performance académique",
   },
   addMonthlyEvaluation: {
     ar: "إضافة تقييم شهري",
@@ -2220,6 +2248,11 @@ export const translations: Translations = {
     ar: "عنوان التقييم",
     en: "Evaluation Title",
     fr: "Titre de l'évaluation",
+  },
+  evaluationRemark: {
+    ar: "ملاحظة",
+    en: "Remark",
+    fr: "Remarque",
   },
   evaluationDescription: {
     ar: "وصف التقييم",

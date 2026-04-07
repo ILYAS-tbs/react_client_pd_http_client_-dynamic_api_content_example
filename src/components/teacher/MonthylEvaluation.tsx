@@ -161,7 +161,7 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
       student_id: selectedStudentId,
       module_id: selectedModuleId,
       month: `${formState.month}-01`,
-      title: formState.title.trim() || null,
+      title: "Remarks", // Default title value
       description: formState.description.trim() || null,
       remarks: formState.description.trim() || null,
       attachment: formState.attachment ?? undefined,
@@ -294,20 +294,6 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {getTranslation("evaluationTitle", language)}
-                  </label>
-                  <input
-                    type="text"
-                    value={formState.title}
-                    onChange={(e) =>
-                      setFormState((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {getTranslation("evaluationMonth", language)}
                   </label>
                   <input
@@ -381,7 +367,7 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {getTranslation("evaluationDescription", language)}
+                    {getTranslation("evaluationRemark", language)}
                   </label>
                   <textarea
                     value={formState.description}

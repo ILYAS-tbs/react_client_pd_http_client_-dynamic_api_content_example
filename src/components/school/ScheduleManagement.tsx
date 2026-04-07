@@ -14,7 +14,7 @@ import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { getTranslation } from "../../utils/translations";
+import { getTranslation, getMediaUrl } from "../../utils/translations";
 
 
 const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
@@ -172,18 +172,15 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
                         {schedule?.schedule_file ? (
-                          <button
-                            onClick={() =>
-                              window.open(
-                                SERVER_BASE_URL + schedule.schedule_file,
-                                "_blank"
-                              )
-                            }
+                          <a
+                            href={getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)!}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-primary-500 hover:text-primary-700 underline text-sm"
                           >
                             <Eye className="h-4 w-4" />
                             {cg.name}.pdf
-                          </button>
+                          </a>
                         ) : (
                           <span className="text-gray-400">—</span>
                         )}
@@ -248,7 +245,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                     {getTranslation("currentFile", language)}
                   </label>
                   <a
-                    href={SERVER_BASE_URL + editingSchedule.schedule_file}
+                    href={getMediaUrl(editingSchedule.schedule_file, SERVER_BASE_URL) ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary-500 underline text-sm"

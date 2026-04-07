@@ -6,7 +6,7 @@ import { Student } from "../../models/Student";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { parent_dashboard_client } from "../../services/http_api/parent-dashboard/parent_dashboard_client";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { getTranslation } from "../../utils/translations";
+import { getTranslation, getMediaUrl } from "../../utils/translations";
 
 const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
   students,
@@ -131,18 +131,15 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                       {schedule.schedule_file ? (
-                        <button
-                          onClick={() =>
-                            window.open(
-                              SERVER_BASE_URL + schedule.schedule_file,
-                              "_blank"
-                            )
-                          }
+                        <a
+                          href={getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200"
                           title={getTranslation("view", language)}
                         >
                           <Eye className="h-5 w-5" />
-                        </button>
+                        </a>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}

@@ -338,9 +338,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('class', language)}
                 </th>
-                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                {/* <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('age', language)}
-                </th>
+                </th> */}
                 <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('parent', language)}
                 </th>
@@ -371,9 +371,9 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                       {student.class_group?.name}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {student.age} {getTranslation('years', language)}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
                       {student.parent?.full_name}
