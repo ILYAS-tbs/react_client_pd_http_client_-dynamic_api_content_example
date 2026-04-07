@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { StudentManagementProps } from "../../types";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
@@ -7,6 +7,7 @@ import { PostStudentPayload } from "../../services/http_api/payloads_types/schoo
 import { Student } from "../../models/Student";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 const StudentManagement: React.FC<StudentManagementProps> = ({
   studentsList,
@@ -142,10 +143,24 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
   });
 
   //! 1. Student Creation
-  const [formData_creation, setFormData_creation] = useState({
+  const createStudentCreationForm = () => ({
     full_name: "",
     date_of_birth: "2020-08-09",
     class_group_id: "",
+  });
+  const [formData_creation, setFormData_creation] = useState({
+    ...createStudentCreationForm(),
+  });
+
+  const resetCreationForm = useCallback(() => {
+    setFormData_creation(createStudentCreationForm());
+    setErrorAddModal("");
+  }, []);
+
+  const { formKey: addStudentFormKey } = useModalFormReset({
+    isOpen: showAddModal,
+    mode: "add",
+    resetForm: resetCreationForm,
   });
 
   const handleChange_creation = (
@@ -180,6 +195,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
       latest_csrf
     );
     if (res.ok) {
+      resetCreationForm();
       setShowAddModal(false);
       // Fresh data from server:
       const get_students_res =
@@ -196,11 +212,48 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
   };
 
   //! 2. Student update
-  const [formData_update, setFormData_update] = useState({
+  const createStudentUpdateForm = () => ({
     full_name: "",
     date_of_birth: "2020-08-09",
     trimester_grade: 0,
     class_group_id: "",
+  });
+  const [formData_update, setFormData_update] = useState({
+    ...createStudentUpdateForm(),
+  });
+
+  const resetUpdateForm = useCallback(() => {
+    set_last_chosen_student("");
+    setFormData_update(createStudentUpdateForm());
+  }, []);
+
+  const populateUpdateForm = useCallback((student: Student) => {
+    const dateOfBirthValue =
+      typeof student.date_of_birth === "string"
+        ? student.date_of_birth
+        : student.date_of_birth instanceof Date
+          ? student.date_of_birth.toISOString().slice(0, 10)
+          : "2020-08-09";
+
+    setFormData_update({
+      full_name: student.full_name ?? "",
+      date_of_birth: dateOfBirthValue,
+      trimester_grade: Number(student.trimester_grade ?? 0),
+      class_group_id: student.class_group?.class_group_id ?? "",
+    });
+  }, []);
+
+  const selectedStudentForEdit =
+    studentsList.find((student) => student.student_id === last_chosen_student) ??
+    null;
+
+  const { formKey: editStudentFormKey } = useModalFormReset({
+    isOpen: showEditModal,
+    mode: selectedStudentForEdit ? "edit" : "add",
+    selectedItem: selectedStudentForEdit,
+    selectedKey: selectedStudentForEdit?.student_id ?? null,
+    resetForm: resetUpdateForm,
+    populateForm: populateUpdateForm,
   });
 
   const handleChange_update = (
@@ -216,7 +269,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
     e.preventDefault();
     console.log(formData_update);
     console.log(`Student id : ${last_chosen_student}`);
-    setShowEditModal(false);
 
     // case no other name was provided
     const student_to_update = studentsList.find(
@@ -247,6 +299,8 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
     // Refresh Frontend data :
     if (res.ok) {
+      resetUpdateForm();
+      setShowEditModal(false);
       const get_students_res =
         await school_dashboard_client.get_current_school_students();
 
@@ -278,12 +332,6 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
         <button
           onClick={() => {
             setShowAddModal(true);
-            setFormData_creation({
-              full_name: "",
-              date_of_birth: "2020-08-09",
-              class_group_id: "",
-            });
-            setErrorAddModal("");
           }}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
@@ -398,14 +446,8 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
                       <button
                         onClick={() => {
-                          setShowEditModal(true);
                           set_last_chosen_student(student.student_id);
-                          setFormData_update({
-                            full_name: "",
-                            date_of_birth: "2020-08-09",
-                            trimester_grade: 0,
-                            class_group_id: "",
-                          });
+                          setShowEditModal(true);
                         }}
                         className="text-primary-600 hover:bg-primary-300"
                       >
@@ -434,7 +476,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
               {getTranslation('addNewStudent', language)}
             </h3>
 
-            <form className="space-y-4" onSubmit={handleCreationSubmit}>
+            <form key={addStudentFormKey} className="space-y-4" onSubmit={handleCreationSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {getTranslation('studentName', language)}
@@ -487,14 +529,10 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowAddModal(false);
-                    setFormData_creation({
-                      full_name: "",
-                      date_of_birth: "2020-08-09",
-                      class_group_id: "",
-                    });
-                    setErrorAddModal("");
+                    resetCreationForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
@@ -520,7 +558,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
               تحديث معلومات الطالب
             </h3>
 
-            <form className="space-y-4" onSubmit={handleUpdateSubmit}>
+            <form key={editStudentFormKey} className="space-y-4" onSubmit={handleUpdateSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   اسم الطالب
@@ -583,15 +621,10 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowEditModal(false);
-                    set_last_chosen_student("");
-                    setFormData_update({
-                      full_name: "",
-                      date_of_birth: "2020-08-09",
-                      trimester_grade: 0,
-                      class_group_id: "",
-                    });
+                    resetUpdateForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >

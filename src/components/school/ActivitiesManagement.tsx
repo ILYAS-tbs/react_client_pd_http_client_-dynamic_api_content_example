@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Calendar, Edit, Trash2, Plus, Search, Star, Eye } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { Calendar, Edit, Trash2, Plus, Search } from "lucide-react";
 import { ActivitiesManagementProps } from "../../types";
 import { Event } from "../../models/Event";
 import {
@@ -10,6 +10,7 @@ import { school_dashboard_client } from "../../services/http_api/school-dashboar
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 interface Activity {
   event_id: string;
@@ -31,14 +32,6 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   const { language } = useLanguage()
 
   const [activities, setActivities] = useState<Event[]>(events_list);
-  const [newActivity, setNewActivity] = useState({
-    title: "",
-    date: "",
-    time: "",
-    category: "",
-    description: "",
-    location: "",
-  });
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -66,21 +59,6 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   //     setShowAddModal(false);
   //   }
   // };
-
-  const handleEditActivity = (activity: Activity) => {
-    setEditingActivity(activity);
-    setNewActivity({
-      title: activity.title,
-      date: activity.date,
-      time: activity.time,
-      category: activity.category,
-      description: activity.desc,
-      location: activity.place,
-    });
-
-    //? my implementation
-    setShowEditModal(true);
-  };
 
   // const handleUpdateActivity = () => {
   //   if (
@@ -110,10 +88,6 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   //   }
   // };
 
-  const handleDeleteActivity = (id: string) => {
-    setActivities(activities.filter((act) => act.event_id !== id));
-  };
-
   const filteredActivities = activities.filter(
     (act) =>
       (act.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -130,7 +104,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   }
 
   //! Post Event ::
-  const [postEventForm, setPostEventForm] = useState<PostEventPayload>({
+  const createPostEventForm = () => ({
     title: "",
     category: "",
     date: "",
@@ -138,6 +112,9 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
     place: "",
     desc: "",
     school_id: school_id,
+  });
+  const [postEventForm, setPostEventForm] = useState<PostEventPayload>({
+    ...createPostEventForm(),
   });
 
   const [postModalError, setPostModalError] = useState("");
@@ -147,6 +124,18 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       setPostModalError("");
     }, 7000);
   }
+
+  const resetPostEventForm = useCallback(() => {
+    setPostEventForm(createPostEventForm());
+    setPostModalError("");
+    setEditingActivity(null);
+  }, [school_id]);
+
+  const { formKey: addActivityFormKey } = useModalFormReset({
+    isOpen: showAddModal,
+    mode: "add",
+    resetForm: resetPostEventForm,
+  });
 
   const handlePostFormChange = (
     e: React.ChangeEvent<
@@ -185,6 +174,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       //? Update Events
       RefetchEvents();
 
+      resetPostEventForm();
       setShowAddModal(false);
     } else {
       showPostError("حدث خطأ، يرجى ملء جميع الحقول");
@@ -192,7 +182,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   };
   //! DeleteEvent
   const handleDeleteEvent = async (event_id: string) => {
-    const delete_event_res = await school_dashboard_client.delete_event(
+    await school_dashboard_client.delete_event(
       event_id,
       getCSRFToken()!
     );
@@ -206,14 +196,17 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   );
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [patchEventForm, setPatchEventForm] = useState<PostEventPayload>({
-    title: last_selected_event?.title ?? "",
-    category: last_selected_event?.category ?? "",
-    date: last_selected_event?.date ?? "",
-    time: last_selected_event?.time ?? "",
-    place: last_selected_event?.place ?? "",
-    desc: last_selected_event?.desc ?? "",
+  const createPatchEventForm = () => ({
+    title: "",
+    category: "",
+    date: "",
+    time: "",
+    place: "",
+    desc: "",
     school_id: school_id,
+  });
+  const [patchEventForm, setPatchEventForm] = useState<PostEventPayload>({
+    ...createPatchEventForm(),
   });
 
   const [patchModalError, setPatchModalError] = useState("");
@@ -223,6 +216,33 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       setPatchModalError("");
     }, 7000);
   }
+
+  const resetPatchEventForm = useCallback(() => {
+    setPatchEventForm(createPatchEventForm());
+    setPatchModalError("");
+    set_last_selected_event(null);
+  }, [school_id]);
+
+  const populatePatchEventForm = useCallback((event: Event) => {
+    setPatchEventForm({
+      title: event.title ?? "",
+      category: event.category ?? "",
+      date: event.date ?? "",
+      time: event.time ?? "",
+      place: event.place ?? "",
+      desc: event.desc ?? "",
+      school_id: school_id,
+    });
+  }, [school_id]);
+
+  const { formKey: editActivityFormKey } = useModalFormReset({
+    isOpen: showEditModal,
+    mode: last_selected_event ? "edit" : "add",
+    selectedItem: last_selected_event,
+    selectedKey: last_selected_event?.event_id ?? null,
+    resetForm: resetPatchEventForm,
+    populateForm: populatePatchEventForm,
+  });
 
   const handlePatchFormChange = (
     e: React.ChangeEvent<
@@ -258,6 +278,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       console.log("patch_event_res OK");
       //? Refresh data
       RefetchEvents();
+      resetPatchEventForm();
       setShowEditModal(false);
     } else {
       showPatchError("حدث خطأ، يرجى ملء جميع الحقول");
@@ -446,7 +467,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
               {editingActivity ? "تعديل الفعالية" : "إضافة فعالية جديدة"}
             </h3>
 
-            <form className="space-y-4" onSubmit={handlePostEvent}>
+            <form key={addActivityFormKey} className="space-y-4" onSubmit={handlePostEvent}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   العنوان
@@ -538,17 +559,10 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowAddModal(false);
-                    setEditingActivity(null);
-                    setNewActivity({
-                      title: "",
-                      date: "",
-                      time: "",
-                      category: "",
-                      description: "",
-                      location: "",
-                    });
+                    resetPostEventForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
@@ -578,7 +592,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
               تعديل الفعالية
             </h3>
 
-            <form className="space-y-4" onSubmit={handlePatchEvent}>
+            <form key={editActivityFormKey} className="space-y-4" onSubmit={handlePatchEvent}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   العنوان
@@ -670,17 +684,10 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowEditModal(false);
-                    setEditingActivity(null);
-                    setNewActivity({
-                      title: "",
-                      date: "",
-                      time: "",
-                      category: "",
-                      description: "",
-                      location: "",
-                    });
+                    resetPatchEventForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >

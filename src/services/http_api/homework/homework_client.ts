@@ -19,6 +19,7 @@ async function apiFetch<T>(
 ): Promise<ApiResult<T>> {
   try {
     const res = await fetch(url, { credentials: "include", ...options });
+    if (res.status === 204) return { ok: true, status: 204, data: undefined as T };
     const data: T = await res.json();
     if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
     return { ok: true, status: res.status, data };
@@ -34,7 +35,7 @@ function getCookie(name: string): string | null {
   return null;
 }
 
-// ─── Teacher endpoints ────────────────────────────────────────────────────────
+// ─── Teacher: Homework CRUD ───────────────────────────────────────────────────
 
 export async function getTeacherHomeworks(
   classGroupId?: string
@@ -73,6 +74,8 @@ export async function deleteHomework(id: string): Promise<ApiResult<void>> {
   });
 }
 
+// ─── Teacher: Submission management ──────────────────────────────────────────
+
 export async function getHomeworkSubmissions(
   homeworkId: string
 ): Promise<ApiResult<HomeworkSubmission[]>> {
@@ -81,13 +84,30 @@ export async function getHomeworkSubmissions(
   );
 }
 
-export async function gradeSubmission(
+export async function createSubmission(
   homeworkId: string,
-  submissionId: string,
-  payload: { mark: number; remarks?: string }
+  payload: { student: string; mark?: number | null; remarks?: string }
 ): Promise<ApiResult<HomeworkSubmission>> {
   return apiFetch<HomeworkSubmission>(
-    `${HW_BASE}/homeworks/${homeworkId}/grade/${submissionId}/`,
+    `${HW_BASE}/homeworks/${homeworkId}/submissions/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken") ?? "",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+}
+
+export async function updateSubmission(
+  homeworkId: string,
+  submissionId: string,
+  payload: { mark?: number | null; remarks?: string }
+): Promise<ApiResult<HomeworkSubmission>> {
+  return apiFetch<HomeworkSubmission>(
+    `${HW_BASE}/homeworks/${homeworkId}/submissions/${submissionId}/`,
     {
       method: "PATCH",
       headers: {
@@ -95,6 +115,19 @@ export async function gradeSubmission(
         "X-CSRFToken": getCookie("csrftoken") ?? "",
       },
       body: JSON.stringify(payload),
+    }
+  );
+}
+
+export async function deleteSubmission(
+  homeworkId: string,
+  submissionId: string
+): Promise<ApiResult<void>> {
+  return apiFetch<void>(
+    `${HW_BASE}/homeworks/${homeworkId}/submissions/${submissionId}/`,
+    {
+      method: "DELETE",
+      headers: { "X-CSRFToken": getCookie("csrftoken") ?? "" },
     }
   );
 }
@@ -117,13 +150,34 @@ export async function getParentHomeworksByStudent(): Promise<
   );
 }
 
+export async function getSchoolHomeworks(filters?: {
+  class_group?: string;
+  teacher?: number;
+}): Promise<ApiResult<Homework[]>> {
+  const params = new URLSearchParams();
+  if (filters?.class_group) {
+    params.set("class_group", filters.class_group);
+  }
+  if (filters?.teacher) {
+    params.set("teacher", String(filters.teacher));
+  }
+  const query = params.toString();
+  return apiFetch<Homework[]>(
+    `${HW_BASE}/school-homeworks/${query ? `?${query}` : ""}`
+  );
+}
+
 export const homework_client = {
   getTeacherHomeworks,
   createHomework,
   updateHomework,
   deleteHomework,
   getHomeworkSubmissions,
-  gradeSubmission,
+  createSubmission,
+  updateSubmission,
+  deleteSubmission,
   getHomeworkStats,
   getParentHomeworksByStudent,
+  getSchoolHomeworks,
 };
+

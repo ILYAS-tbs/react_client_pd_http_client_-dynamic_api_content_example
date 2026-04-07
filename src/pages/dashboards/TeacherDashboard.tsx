@@ -51,14 +51,19 @@ const TeacherDashboard: React.FC = () => {
   const { language } = useLanguage()
 
   // ! Storing the teacher's id (which is the user id)
-  const lc_user: User = JSON.parse(
-    localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
-  );
+  const lc_user: User | null = (() => {
+    try {
+      const raw = localStorage.getItem("schoolParentOrTeacherManagementUser");
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.error("Failed to parse stored teacher session", error);
+      return null;
+    }
+  })();
   if (!lc_user) {
-    console.error("TeacherAbsenceMAnagement lc_user is null");
-    // return
+    console.error("Teacher dashboard session is missing");
   }
-  const teacher_id: number = JSON.parse(lc_user.id);
+  const teacher_id = Number(lc_user?.id ?? -1);
   console.log("teacher's id : ", teacher_id);
 
   //*: New Messages Frontend shape ::
@@ -108,6 +113,9 @@ const TeacherDashboard: React.FC = () => {
   };
 
   const get_teacher_by_id = async () => {
+    if (!Number.isFinite(teacher_id) || teacher_id <= 0) {
+      return;
+    }
     const res = await teacher_dashboard_client.get_teacher_by_id(teacher_id);
     if (res.status === 401 || res.status === 403) {
       handleDeactivated();
@@ -313,6 +321,7 @@ const TeacherDashboard: React.FC = () => {
         return (
           <TeacherHomeworks
             modules_class_groups={modules_class_groups}
+            students={students}
           />
         );
       case "resources":

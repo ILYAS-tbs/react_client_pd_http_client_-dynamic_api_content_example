@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ isOpen = true, onClose }) => {
 
     try {
       // Call 00 : logout first - removing the session_id if it was there from signup
-      logout();
+      await logout();
 
       // call 01 - authenticate user
       const success_result = await login(email, password);

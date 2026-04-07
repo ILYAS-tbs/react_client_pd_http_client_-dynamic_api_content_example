@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Plus,
   Calendar,
@@ -17,6 +17,7 @@ import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { parent_dashboard_client } from "../../services/http_api/parent-dashboard/parent_dashboard_client";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   students,
@@ -30,7 +31,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const [selectedChild, setSelectedChild] = useState("all");
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [activeTab, setActiveTab] = useState("absences");
-  const [newRequest, setNewRequest] = useState({
+  const createEmptyRequest = () => ({
     childId: "",
     date: "",
     reason: "",
@@ -38,6 +39,9 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
     status: "",
     urgent: false,
     documents: null as File[] | null,
+  });
+  const [newRequest, setNewRequest] = useState({
+    ...createEmptyRequest(),
   });
 
   //! mock data to map the API to:
@@ -280,6 +284,23 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
   const [student_id, setStudentID] = useState("");
 
   const [requestError, setRequestError] = useState("");
+  const resetRequestForm = useCallback(() => {
+    setNewRequest(createEmptyRequest());
+    setAbsenceDate("");
+    setAbsenceReason("");
+    setMoreDetails("");
+    setIsUrgent(false);
+    setProofDocument(null);
+    setStudentID("");
+    setRequestError("");
+  }, []);
+
+  const { formKey: requestModalFormKey } = useModalFormReset({
+    isOpen: showRequestModal,
+    mode: "add",
+    resetForm: resetRequestForm,
+  });
+
   const showRequestError = (error: string) => {
     setRequestError(error);
     setTimeout(() => {
@@ -348,6 +369,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
       showRequestError("حدث خطأ غير متوقع، يرجى المحاولة لاحقًا");
       return;
     }
+    resetRequestForm();
     setShowRequestModal(false);
 
     //? Refreshing data :
@@ -722,7 +744,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
               {getTranslation("leaveRequest", language)}
             </h3>
 
-            <form onSubmit={handleSubmitRequest} className="space-y-4">
+            <form key={requestModalFormKey} onSubmit={handleSubmitRequest} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {getTranslation("selectChild", language)}
@@ -886,15 +908,7 @@ const AbsenceManager: React.FC<AbsenceManagerProps> = ({
                   type="button"
                   onClick={() => {
                     setShowRequestModal(false);
-                    setNewRequest({
-                      childId: "",
-                      date: "",
-                      reason: "",
-                      details: "",
-                      urgent: false,
-                      status: "",
-                      documents: null,
-                    });
+                    resetRequestForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >

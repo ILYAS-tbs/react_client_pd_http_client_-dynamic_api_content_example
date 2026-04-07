@@ -4,12 +4,12 @@ export interface HomeworkSubmission {
   student: string;
   student_name: string;
   student_id: string;
-  submission_text: string | null;
-  submission_file: string | null;
-  submitted_at: string;
+  teacher: number | null;
+  teacher_name: string | null;
   mark: number | null;
   remarks: string | null;
-  is_graded: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Homework {
@@ -49,6 +49,7 @@ export interface StudentHomework {
   remarks: string | null;
   created_at: string;
   submission: HomeworkSubmission | null;
+  submission_status: "graded" | "submitted" | "missed" | "pending";
 }
 
 export interface StudentHomeworkGroup {
@@ -58,8 +59,9 @@ export interface StudentHomeworkGroup {
   stats: {
     total: number;
     submitted: number;
-    not_submitted: number;
     graded: number;
+    awaiting_grade: number;
+    not_submitted: number;
     average_mark: number | null;
   };
 }
@@ -68,6 +70,6 @@ export interface HomeworkStats {
   total_students: number;
   submitted: number;
   not_submitted: number;
-  graded: number;
   average_mark: number | null;
 }
+

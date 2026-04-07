@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useCallback, useState } from "react";
 import {
   Plus,
   Search,
@@ -25,6 +25,7 @@ import {
 import { Teacher } from "../../models/Teacher";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
@@ -36,18 +37,33 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalError, SetModalError] = useState("");
-  const [formData, setFormData] = useState({
+  const defaultTeacherForm = {
     name: "",
     email: "",
     phone_number: "",
     password1: "",
     password2: "",
     years_of_experience: 0,
+  };
+  const [formData, setFormData] = useState({
+    ...defaultTeacherForm,
   });
 
   const [showPassword, setShowPassword] = useState(false);
 
   const { language } = useLanguage()
+
+  const resetAddTeacherForm = useCallback(() => {
+    setFormData(defaultTeacherForm);
+    SetModalError("");
+    setShowPassword(false);
+  }, []);
+
+  const { formKey: addTeacherFormKey } = useModalFormReset({
+    isOpen: showAddModal,
+    mode: "add",
+    resetForm: resetAddTeacherForm,
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -61,7 +77,6 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData); // send to backend API here
-    setShowAddModal(false);
 
     // basic validation :
     if (formData.password1 !== formData.password2) {
@@ -104,6 +119,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     const res = await school_dashboard_client.get_current_school_teachers();
     if (res.ok) {
       setTeacherList(res.data);
+      resetAddTeacherForm();
+      setShowAddModal(false);
     }
   };
 
@@ -237,6 +254,10 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     useState("0");
   const [weekly_schedule, setWeeklySchedue] = useState<File | null>(null)
 
+  const selectedTeacherForEdit =
+    teacherList.find((teacher) => teacher.user.id === last_chosen_teacher_id) ??
+    null;
+
   // Assignment Management Modal state
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assign_teacher_id, set_assign_teacher_id] = useState<number>(-1);
@@ -294,12 +315,32 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       resetUpdateForm();
     }
   };
-  const resetUpdateForm = () => {
+  const resetUpdateForm = useCallback(() => {
     setProfilPic_update(null);
     set_full_name_update("");
     set_phone_number_update("");
     set_years_of_experience_update("0");
-  };
+    setWeeklySchedue(null);
+  }, []);
+
+  const populateUpdateForm = useCallback((teacher: Teacher) => {
+    setProfilPic_update(null);
+    set_full_name_update(teacher.full_name ?? "");
+    set_phone_number_update(teacher.phone_number ?? "");
+    set_years_of_experience_update(
+      String(teacher.years_of_experience ?? 0)
+    );
+    setWeeklySchedue(null);
+  }, []);
+
+  const { formKey: editTeacherFormKey } = useModalFormReset({
+    isOpen: showEditModal,
+    mode: selectedTeacherForEdit ? "edit" : "add",
+    selectedItem: selectedTeacherForEdit,
+    selectedKey: selectedTeacherForEdit?.user.id ?? null,
+    resetForm: resetUpdateForm,
+    populateForm: populateUpdateForm,
+  });
   //! Activate teacher :
   const handleActivateTeacher = async (id: number, activate: boolean) => {
     const latest_csrf = getCSRFToken()!;
@@ -354,7 +395,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
           {getTranslation('teacherManagement', language)}
         </h2>
         <button
-          onClick={() => setShowAddModal(true)}
+                  onClick={() => setShowAddModal(true)}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2 rtl:space-x-reverse"
         >
           <Plus className="h-5 w-5" />
@@ -522,7 +563,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               إضافة معلم جديد
             </h3>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form key={addTeacherFormKey} className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   اسم المعلم
@@ -638,6 +679,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => setShowAddModal(false)}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
@@ -663,7 +705,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               تحديث بيانات المعلم
             </h3>
 
-            <form className="space-y-4" onSubmit={handleEditSubmit}>
+            <form key={editTeacherFormKey} className="space-y-4" onSubmit={handleEditSubmit}>
               {/* Profil Pic */}
               <div className="profile-picture-container">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -811,6 +853,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               {/* Modal Error */}
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowEditModel(false);
                     resetUpdateForm();

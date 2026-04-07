@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Layers,
   Edit,
@@ -17,6 +17,7 @@ import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 interface Class {
   class_group_id: string;
@@ -72,6 +73,41 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
 
   //! Translations ::
   const { language } = useLanguage()
+
+  const resetClassModalForm = useCallback(() => {
+    setEditingClass(null);
+    setNewClass({
+      class_group_id: "",
+      name: "",
+      students: 0,
+      teachersPdf: null,
+    });
+    setFormData_creation({ name: "" });
+    set_updated_class_title("");
+    setFile_teachers(null);
+    set_chosen_class_id("");
+  }, []);
+
+  const populateClassModalForm = useCallback((cls: Class) => {
+    setNewClass({
+      class_group_id: cls.class_group_id,
+      name: cls.name,
+      students: cls.students,
+      teachersPdf: cls.teachersPdf,
+    });
+    set_updated_class_title(cls.name ?? "");
+    setFile_teachers(null);
+    set_chosen_class_id(cls.class_group_id ?? "");
+  }, []);
+
+  const { formKey: classModalFormKey } = useModalFormReset({
+    isOpen: showAddModal,
+    mode: editingClass ? "edit" : "add",
+    selectedItem: editingClass,
+    selectedKey: editingClass?.class_group_id ?? null,
+    resetForm: resetClassModalForm,
+    populateForm: populateClassModalForm,
+  });
 
   //?: 1. ClassGroup Creation
   const [formData_creation, setFormData_creation] = useState({
@@ -137,13 +173,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       }
 
       // Reset modal/input
-      setNewClass({
-        class_group_id: "",
-        name: "",
-        students: 0,
-        teachersPdf: null,
-      });
-      setFormData_creation({ name: "" });
+      resetClassModalForm();
       setShowAddModal(false);
     } else {
       console.error("Failed to create class");
@@ -172,12 +202,6 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
   const handleEditClass = (cls: Class | ClassGroup) => {
     cls = cls as Class; // will be a class from the UI that's what we pass to it
     setEditingClass(cls);
-    setNewClass({
-      class_group_id: cls.class_group_id,
-      name: cls.name,
-      students: cls.students,
-      teachersPdf: cls.teachersPdf,
-    });
     setShowAddModal(true);
   };
 
@@ -191,21 +215,13 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       //       : cls
       //   )
       // );
-      setEditingClass(null);
-      setNewClass({
-        class_group_id: "",
-        name: "",
-        students: 0,
-        teachersPdf: null,
-      });
+      resetClassModalForm();
       setShowAddModal(false);
     }
   };
   // API CALL PUT class_group
   async function handleUpdateSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setShowAddModal(false);
-
     const formData_update = new FormData();
 
     if (updated_class_title) {
@@ -252,15 +268,8 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
       // setClasses(mapClassGrpToClass(fresh_list.data.map(ClassGroup.formJson)));
 
       // reset temp states
-      setEditingClass(null);
-      setNewClass({
-        class_group_id: "",
-        name: "",
-        students: 0,
-        teachersPdf: null,
-      });
-      setFile_teachers(null);
-      set_updated_class_title("");
+      resetClassModalForm();
+      setShowAddModal(false);
     }
   }
 
@@ -455,6 +464,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
             </h3>
 
             <form
+              key={classModalFormKey}
               className="space-y-4"
               onSubmit={editingClass ? handleUpdateSubmit : handleCreateSubmit}
             >
@@ -516,19 +526,10 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
               )}
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowAddModal(false);
-                    setEditingClass(null);
-                    setNewClass({
-                      class_group_id: "",
-                      name: "",
-                      students: 0,
-                      teachersPdf: null,
-                    });
-                    // reset states
-                    setFile_teachers(null);
-                    setFormData_creation({ ...formData_creation, name: "" });
-                    set_updated_class_title("");
+                    resetClassModalForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >

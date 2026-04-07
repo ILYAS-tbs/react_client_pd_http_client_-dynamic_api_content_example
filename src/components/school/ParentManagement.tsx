@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react";
+import React, { useCallback, useMemo, useState } from "react";
+import { Plus, Search, Edit, Trash2, Eye, X } from "lucide-react";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import {
@@ -11,6 +11,7 @@ import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { ParentManagementProps } from "../../types";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 const ParentManagement: React.FC<ParentManagementProps> = ({
   parentsList,
@@ -95,10 +96,6 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
     return matchesSearch && matchesClass;
   });
 
-  const [formData, setFormData] = useState({
-    students: [""],
-  });
-
   // Parent search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchParentResult[]>([]);
@@ -106,22 +103,52 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
   const [selectedParentName, setSelectedParentName] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  const resetModalState = () => {
+  // Student selection state
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [studentSearchQuery, setStudentSearchQuery] = useState("");
+
+  const resetModalState = useCallback(() => {
     setSearchQuery("");
     setSearchResults([]);
     setSelectedParentPk(null);
     setSelectedParentName("");
     setErrorAddParent("");
-    setFormData({ students: [""] });
-  };
+    setSelectedStudentIds([]);
+    setStudentSearchQuery("");
+  }, []);
 
-  // ! CUSTOM FOR MULTIPLE SELECT :
-  const handleStudentsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value
+  const { formKey: parentModalFormKey } = useModalFormReset({
+    isOpen: showAddModal,
+    mode: "add",
+    resetForm: resetModalState,
+  });
+
+  // Filter students in modal by name or class
+  const filteredModalStudents = useMemo(() => {
+    const q = studentSearchQuery.toLowerCase().trim();
+    if (!q) return studentsList;
+    return studentsList.filter(
+      (s) =>
+        s.full_name.toLowerCase().includes(q) ||
+        (s.class_group?.name ?? "").toLowerCase().includes(q)
     );
-    setFormData({ ...formData, students: selected });
+  }, [studentsList, studentSearchQuery]);
+
+  // Group filtered students by class
+  const groupedModalStudents = useMemo(() => {
+    const groups: Record<string, typeof filteredModalStudents> = {};
+    filteredModalStudents.forEach((s) => {
+      const key = s.class_group?.name ?? "—";
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(s);
+    });
+    return groups;
+  }, [filteredModalStudents]);
+
+  const toggleStudent = (id: string) => {
+    setSelectedStudentIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
   const handleSearchParents = async () => {
@@ -130,6 +157,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
     setSearchResults([]);
     setSelectedParentPk(null);
     setSelectedParentName("");
+    setSelectedStudentIds([]);
     setErrorAddParent("");
     const res = await school_dashboard_client.search_parents(searchQuery);
     if (res.ok && res.data) {
@@ -141,6 +169,19 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
       setErrorAddParent("حدث خطأ أثناء البحث، يرجى المحاولة لاحقًا");
     }
     setIsSearching(false);
+  };
+
+  const handleSelectParent = (pk: number, name: string) => {
+    setSelectedParentPk(pk);
+    setSelectedParentName(name);
+    setErrorAddParent("");
+    // Pre-fill students already assigned to this parent
+    const parent = parentsList.find((p) => p.id === pk);
+    if (parent?.students) {
+      setSelectedStudentIds(parent.students.map((s) => s.student_id));
+    } else {
+      setSelectedStudentIds([]);
+    }
   };
 
   //! Parent Addition Logic: select parent from search -> add to school -> link students
@@ -165,7 +206,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
       const latest_csrf2 = getCSRFToken()!;
       const students_payload: AddCurrectSchoolStudentsToParent = {
         parent_pk: String(selectedParentPk),
-        students: formData.students,
+        students: selectedStudentIds,
       };
       const add_students_res =
         await school_dashboard_client.add_current_school_students_to_parent(
@@ -340,6 +381,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                         onClick={() => {
                           setSearchQuery(parent.email);
                           setShowAddModal(true);
+                          handleSelectParent(parent.id, parent.name);
                         }}
                         className="text-primary-600 hover:bg-primary-300"
                       >
@@ -368,7 +410,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
               إضافة ولي أمر جديد
             </h3>
 
-            <form className="space-y-4" onSubmit={handleAddParentSubmit}>
+            <form key={parentModalFormKey} className="space-y-4" onSubmit={handleAddParentSubmit}>
               {/* Search by name or email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -414,11 +456,7 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                       <button
                         key={result.user}
                         type="button"
-                        onClick={() => {
-                          setSelectedParentPk(result.user);
-                          setSelectedParentName(result.full_name);
-                          setErrorAddParent("");
-                        }}
+                        onClick={() => handleSelectParent(result.user, result.full_name)}
                         className={`w-full text-right px-4 py-2 flex justify-between items-center text-sm hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors ${
                           selectedParentPk === result.user
                             ? "bg-primary-100 dark:bg-primary-900/40 border-r-2 border-primary-600"
@@ -454,24 +492,119 @@ const ParentManagement: React.FC<ParentManagementProps> = ({
                 </div>
               )}
 
-              {/* Students */}
+              {/* Students section */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الطلاب المرتبطون
-                </label>
-                <select
-                  multiple
-                  name="students"
-                  value={formData.students}
-                  onChange={handleStudentsChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  {studentsList.map((student) => (
-                    <option key={student.student_id} value={student.student_id}>
-                      {student.full_name}
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {getTranslation("assignStudents", language)}
+                  </label>
+                  {selectedStudentIds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedStudentIds([])}
+                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      {getTranslation("clearSelection", language)}
+                    </button>
+                  )}
+                </div>
+
+                {/* Selected student chips */}
+                {selectedStudentIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 p-2 mb-2 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 rounded-lg">
+                    {selectedStudentIds.map((id) => {
+                      const s = studentsList.find((st) => st.student_id === id);
+                      const isPreAssigned =
+                        selectedParentPk !== null &&
+                        parentsList
+                          .find((p) => p.id === selectedParentPk)
+                          ?.students?.some((st) => st.student_id === id);
+                      return s ? (
+                        <span
+                          key={id}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                            isPreAssigned
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                              : "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
+                          }`}
+                        >
+                          {s.full_name}
+                          {s.class_group && (
+                            <span className="opacity-60">· {s.class_group.name}</span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => toggleStudent(id)}
+                            className="ml-0.5 hover:opacity-70"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+
+                {/* Search input */}
+                <div className="relative mb-2">
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={studentSearchQuery}
+                    onChange={(e) => setStudentSearchQuery(e.target.value)}
+                    placeholder={getTranslation("searchByNameOrClass", language)}
+                    className="w-full pr-9 pl-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                {/* Grouped student list */}
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden max-h-52 overflow-y-auto">
+                  {Object.keys(groupedModalStudents).length === 0 ? (
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
+                      {getTranslation("noStudentsMatchSearch", language)}
+                    </p>
+                  ) : (
+                    Object.entries(groupedModalStudents).map(([className, students]) => (
+                      <div key={className}>
+                        {/* Class group header */}
+                        <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky top-0">
+                          {className}
+                        </div>
+                        {students.map((student) => {
+                          const isSelected = selectedStudentIds.includes(student.student_id);
+                          const isPreAssigned =
+                            selectedParentPk !== null &&
+                            parentsList
+                              .find((p) => p.id === selectedParentPk)
+                              ?.students?.some((s) => s.student_id === student.student_id);
+                          return (
+                            <label
+                              key={student.student_id}
+                              className={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                                isSelected ? "bg-primary-50 dark:bg-primary-900/20" : ""
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleStudent(student.student_id)}
+                                className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                              />
+                              <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                                {student.full_name}
+                              </span>
+                              {isPreAssigned && (
+                                <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 rounded-full">
+                                  {getTranslation("alreadyAssigned", language)}
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">

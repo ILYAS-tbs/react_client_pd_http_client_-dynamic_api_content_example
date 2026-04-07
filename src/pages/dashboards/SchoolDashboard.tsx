@@ -3,6 +3,7 @@ import {
   Home,
   Users,
   Layers,
+  BookOpen,
   Calendar,
   FileText,
   BarChart2,
@@ -18,8 +19,8 @@ import ActivitiesManagement from "../../components/school/ActivitiesManagement";
 import BehaviorReports from "../../components/school/BehaviorReports";
 import ExamScheduleManagemen from "../../components/school/ExamScheduleManagemen";
 import AbsenceReviews from "../../components/school/AbsenceReviews";
-import GradeOverview from "../../components/school/GradeOverview";
 import ClassesManagement from "../../components/school/ClassesManagement";
+import SchoolHomeworksManagement from "../../components/school/HomeworksManagement";
 import SchoolParentChat from "../../components/shared/SchoolParentChat";
 import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
@@ -59,14 +60,19 @@ const SchoolDashboard: React.FC = () => {
 
 
   //! Getting the schools's id (which is the user id)
-  const lc_user: User = JSON.parse(
-    localStorage.getItem("schoolParentOrTeacherManagementUser") || ""
-  );
+  const lc_user: User | null = (() => {
+    try {
+      const raw = localStorage.getItem("schoolParentOrTeacherManagementUser");
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.error("Failed to parse stored school session", error);
+      return null;
+    }
+  })();
   if (!lc_user) {
-    console.error("TeacherAbsenceMAnagement lc_user is null");
-    // return
+    console.error("School dashboard session is missing");
   }
-  const school_id: number = JSON.parse(lc_user.id);
+  const school_id = Number(lc_user?.id ?? -1);
   console.log("schools's id : ", school_id);
 
   // to inspect some data we got from the server :
@@ -80,7 +86,7 @@ const SchoolDashboard: React.FC = () => {
     []
   );
   const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
-  const [school_stat, setSchoolStat] = useState<SchoolStat | null>(null);
+  const [, setSchoolStat] = useState<SchoolStat | null>(null);
   const [modules, SetModules] = useState<Module[]>([]);
   const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
 
@@ -302,6 +308,7 @@ const SchoolDashboard: React.FC = () => {
     { id: "home", label: getTranslation("home", language), icon: Home },
     { id: "levels", label: getTranslation("ClassManagement", language), icon: Layers },
     { id: "users", label: getTranslation("UserManagement", language), icon: Users },
+    { id: "homeworks", label: getTranslation("homeworksTab", language), icon: BookOpen },
     { id: "chat", label: getTranslation("chat", language), icon: MessageCircle },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
@@ -438,6 +445,13 @@ const SchoolDashboard: React.FC = () => {
               RefetchStudents={RefetchStudents}
             />
           </div>
+        );
+      case "homeworks":
+        return (
+          <SchoolHomeworksManagement
+            teachers={teachers}
+            class_groups={class_groups}
+          />
         );
       case "chat":
         return (

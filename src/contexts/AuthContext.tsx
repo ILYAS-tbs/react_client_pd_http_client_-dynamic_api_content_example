@@ -89,7 +89,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       "schoolParentOrTeacherManagementUser"
     );
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (error) {
+        console.error("Failed to parse stored user session", error);
+        localStorage.removeItem("schoolParentOrTeacherManagementUser");
+      }
     }
     setIsLoading(false);
   }, []);

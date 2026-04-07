@@ -1205,6 +1205,36 @@ export const translations: Translations = {
     en: "Children",
     fr: "Enfants",
   },
+  selectedStudents: {
+    ar: "الطلاب المختارون",
+    en: "Selected Students",
+    fr: "Élèves sélectionnés",
+  },
+  clearSelection: {
+    ar: "مسح الاختيار",
+    en: "Clear Selection",
+    fr: "Effacer la sélection",
+  },
+  alreadyAssigned: {
+    ar: "مسجل مسبقاً",
+    en: "Already Assigned",
+    fr: "Déjà assigné",
+  },
+  searchByNameOrClass: {
+    ar: "ابحث باسم الطالب أو الصف...",
+    en: "Search by student name or class...",
+    fr: "Rechercher par nom ou classe...",
+  },
+  noStudentsMatchSearch: {
+    ar: "لا توجد نتائج مطابقة",
+    en: "No matching students",
+    fr: "Aucun élève correspondant",
+  },
+  assignStudents: {
+    ar: "تعيين الطلاب",
+    en: "Assign Students",
+    fr: "Assigner des élèves",
+  },
   //?: ClassesManagement ::
   classManagement: {
     ar: "إدارة الصفوف",
@@ -3520,14 +3550,21 @@ export const translations: Translations = {
   graded: { ar: "تم التصحيح", en: "Graded", fr: "Corrige" },
   missed: { ar: "فائت", en: "Missed", fr: "Manque" },
   submissions: { ar: "تسليمات", en: "Submissions", fr: "Soumissions" },
+  totalSubmissions: { ar: "إجمالي التسليمات", en: "Total Submissions", fr: "Total des soumissions" },
+  pendingSubmissions: { ar: "تسليمات قيد الانتظار", en: "Pending Submissions", fr: "Soumissions en attente" },
   notSubmitted: { ar: "لم يتم التسليم", en: "Not Submitted", fr: "Non soumis" },
   pendingGrade: { ar: "في انتظار التصحيح", en: "Pending Grade", fr: "En attente de note" },
   averageMark: { ar: "المعدل", en: "Average Mark", fr: "Moyenne" },
   totalHomeworks: { ar: "إجمالي الواجبات", en: "Total Homeworks", fr: "Total devoirs" },
   submissionRate: { ar: "معدل التسليم", en: "Submission Rate", fr: "Taux de soumission" },
+  schoolHomeworkOverview: { ar: "عرض جميع الواجبات والتسليمات على مستوى المؤسسة", en: "View all school homeworks and submissions", fr: "Voir tous les devoirs et soumissions de l'ecole" },
+  filters: { ar: "الفلاتر", en: "Filters", fr: "Filtres" },
+  allTeachers: { ar: "كل الأساتذة", en: "All Teachers", fr: "Tous les enseignants" },
   submittedAwaitingGrade: { ar: "تم التسليم - في انتظار التصحيح", en: "Submitted – awaiting grade", fr: "Soumis – en attente de note" },
   confirmDelete: { ar: "هل أنت متأكد من الحذف؟", en: "Are you sure you want to delete this item?", fr: "Êtes-vous sûr de vouloir supprimer cet élément ?" },
   saving: { ar: "جارٍ الحفظ...", en: "Saving...", fr: "Enregistrement..." },
+  addSubmission: { ar: "إضافة تسليم", en: "Add Submission", fr: "Ajouter une soumission" },
+  editSubmission: { ar: "تعديل التسليم", en: "Edit Submission", fr: "Modifier la soumission" },
 };
 
 export function getTranslation(key: string, language: string): string {

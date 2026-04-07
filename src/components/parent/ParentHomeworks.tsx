@@ -10,6 +10,7 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  User,
 } from "lucide-react";
 import { StudentHomework, StudentHomeworkGroup } from "../../models/Homework";
 import { homework_client } from "../../services/http_api/homework/homework_client";
@@ -18,9 +19,12 @@ import { getTranslation } from "../../utils/translations";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 
 function submissionStatus(hw: StudentHomework) {
+  if (hw.submission_status) {
+    return hw.submission_status;
+  }
   const overdue = new Date(hw.last_submission_date) < new Date();
   if (hw.submission) {
-    if (hw.submission.is_graded) return "graded";
+    if (hw.submission.mark !== null) return "graded";
     return "submitted";
   }
   if (overdue) return "missed";
@@ -91,6 +95,30 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
               <Clock className="h-3 w-3" />
               {getTranslation("deadline", language)}: {hw.last_submission_date}
             </span>
+            <span className="flex items-center gap-1">
+              <User className="h-3 w-3" />
+              {hw.teacher_name}
+            </span>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            {hw.submission?.mark !== null && hw.submission ? (
+              <span className="rounded-full bg-green-100 px-2 py-1 font-medium text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                {getTranslation("mark", language)}: {hw.submission.mark} / {hw.max_mark}
+              </span>
+            ) : hw.submission ? (
+              <span className="rounded-full bg-blue-100 px-2 py-1 font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                {getTranslation("submittedAwaitingGrade", language)}
+              </span>
+            ) : (
+              <span className="rounded-full bg-gray-100 px-2 py-1 font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                {getTranslation("notSubmitted", language)}
+              </span>
+            )}
+            {hw.submission?.remarks && (
+              <span className="rounded-full bg-primary-100 px-2 py-1 font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                {getTranslation("teacherNote", language)}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -116,6 +144,12 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
             </p>
           )}
 
+          {/* Class group + module info */}
+          <div className="flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400">
+            <span>{hw.class_group_name}</span>
+            {hw.module_name && <span>· {hw.module_name}</span>}
+          </div>
+
           {hw.attachment && (
             <a
               href={`${SERVER_BASE_URL}${hw.attachment}`}
@@ -134,8 +168,19 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
             </p>
           )}
 
-          {/* Grade info */}
-          {hw.submission?.is_graded && (
+          {!hw.submission && (
+            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                {getTranslation("notSubmitted", language)}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {getTranslation("homeworksTab", language)} - {getTranslation("teacher", language)}: {hw.teacher_name}
+              </p>
+            </div>
+          )}
+
+          {/* Submission result */}
+          {hw.submission && hw.submission.mark !== null && (
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 flex flex-wrap gap-4 items-center">
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -145,6 +190,16 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
                   {hw.submission.mark} / {hw.max_mark}
                 </p>
               </div>
+              {hw.submission.teacher_name && (
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {getTranslation("teacher", language)}
+                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {hw.submission.teacher_name}
+                  </p>
+                </div>
+              )}
               {hw.submission.remarks && (
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -158,13 +213,13 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
             </div>
           )}
 
-          {hw.submission && !hw.submission.is_graded && (
+          {hw.submission && hw.submission.mark === null && (
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
               <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                 {getTranslation("submittedAwaitingGrade", language)}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {new Date(hw.submission.submitted_at).toLocaleDateString()}
+                {new Date(hw.submission.created_at).toLocaleDateString()}
               </p>
             </div>
           )}
@@ -261,6 +316,12 @@ const ParentHomeworks: React.FC = () => {
                     textColor: "text-green-700 dark:text-green-400",
                   },
                   {
+                    label: getTranslation("graded", language),
+                    value: currentGroup.stats.graded,
+                    color: "bg-blue-100 dark:bg-blue-900/30",
+                    textColor: "text-blue-700 dark:text-blue-400",
+                  },
+                  {
                     label: getTranslation("notSubmitted", language),
                     value: currentGroup.stats.not_submitted,
                     color: "bg-red-100 dark:bg-red-900/30",
@@ -276,13 +337,8 @@ const ParentHomeworks: React.FC = () => {
                     textColor: "text-blue-700 dark:text-blue-400",
                   },
                 ].map((s, i) => (
-                  <div
-                    key={i}
-                    className={`${s.color} rounded-xl p-4 text-center`}
-                  >
-                    <p
-                      className={`text-2xl font-bold ${s.textColor}`}
-                    >
+                  <div key={i} className={`${s.color} rounded-xl p-4 text-center`}>
+                    <p className={`text-2xl font-bold ${s.textColor}`}>
                       {s.value}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -292,7 +348,7 @@ const ParentHomeworks: React.FC = () => {
                 ))}
               </div>
 
-              {/* Performance bar */}
+              {/* Submission rate bar */}
               {currentGroup.stats.total > 0 && (
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                   <div className="flex items-center justify-between mb-2">
@@ -302,9 +358,7 @@ const ParentHomeworks: React.FC = () => {
                     </span>
                     <span className="text-sm font-bold text-gray-900 dark:text-white">
                       {Math.round(
-                        (currentGroup.stats.submitted /
-                          currentGroup.stats.total) *
-                          100
+                        (currentGroup.stats.submitted / currentGroup.stats.total) * 100
                       )}
                       %
                     </span>
@@ -314,9 +368,7 @@ const ParentHomeworks: React.FC = () => {
                       className="bg-primary-500 h-2.5 rounded-full transition-all"
                       style={{
                         width: `${Math.round(
-                          (currentGroup.stats.submitted /
-                            currentGroup.stats.total) *
-                            100
+                          (currentGroup.stats.submitted / currentGroup.stats.total) * 100
                         )}%`,
                       }}
                     />

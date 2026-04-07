@@ -172,7 +172,11 @@ async function logout(csrfToken: string) {
       credentials: "include",
     });
 
-    const data = await response.json();
+    const data =
+      response.status !== 204 &&
+      response.headers.get("content-length") !== "0"
+        ? await response.json().catch(() => null)
+        : null;
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };

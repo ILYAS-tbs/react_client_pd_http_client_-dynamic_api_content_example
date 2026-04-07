@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Calendar, Edit, Trash2, Plus, Search, Clock, Eye } from "lucide-react";
 import { ExamScheduleManagementProps } from "../../types";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
@@ -6,6 +6,7 @@ import { PostExamSchedule } from "../../services/http_api/payloads_types/school_
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 interface Exam {
   id: string;
@@ -88,7 +89,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
     }))
   );
 
-  const [newExamForm, setNewExamForm] = useState({
+  const createExamForm = () => ({
     module_name: "",
     date: "",
     time: "",
@@ -96,6 +97,9 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
     class_group_name: "",
     room: "",
     school_id: school_id,
+  });
+  const [newExamForm, setNewExamForm] = useState({
+    ...createExamForm(),
   });
   const handleNewExamFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -112,6 +116,32 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
   const [selectedClass, setSelectedClass] = useState("all");
 
   const { language } = useLanguage()
+
+  const resetExamForm = useCallback(() => {
+    setNewExamForm(createExamForm());
+    setEditingExam(null);
+  }, [school_id]);
+
+  const populateExamForm = useCallback((exam: Exam) => {
+    setNewExamForm({
+      module_name: exam.subject ?? "",
+      date: exam.date ?? "",
+      time: exam.time ?? "",
+      duration: Number(exam.duration ?? 0),
+      class_group_name: exam.className ?? "",
+      room: exam.room ?? "",
+      school_id: school_id,
+    });
+  }, [school_id]);
+
+  const { formKey: examModalFormKey } = useModalFormReset({
+    isOpen: showAddModal,
+    mode: editingExam ? "edit" : "add",
+    selectedItem: editingExam,
+    selectedKey: editingExam?.id ?? null,
+    resetForm: resetExamForm,
+    populateForm: populateExamForm,
+  });
 
   // const handleAddExam = () => {
   //   if (
@@ -215,6 +245,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
     }
     // refresh exams :
     RefetchExams();
+    resetExamForm();
     setShowAddModal(false);
   };
 
@@ -440,6 +471,7 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
             </h3>
 
             <form
+              key={examModalFormKey}
               className="space-y-4"
               onSubmit={editingExam ? handlePatchExam : handlePostExam}
             >
@@ -528,9 +560,10 @@ const ExamScheduleManagement: React.FC<ExamScheduleManagementProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowAddModal(false);
-                    setEditingExam(null);
+                    resetExamForm();
                   }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >

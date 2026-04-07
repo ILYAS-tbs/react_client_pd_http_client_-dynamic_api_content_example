@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Upload,
   FileText,
@@ -16,6 +16,7 @@ import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { handleDownload } from "../../lib/download_script";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { useModalFormReset } from "../../hooks/useModalFormReset";
 
 const ResourceManager: React.FC<ResourceManagerProps> = ({
   modules_class_groups,
@@ -173,6 +174,20 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
   const [selectedClassGroups, setSelectedClassGroups] = useState<string[]>([]);
 
+  const resetUploadForm = useCallback(() => {
+    setTitle("");
+    setDescription("");
+    setUploadFile(null);
+    setUploadError("");
+    setSelectedClassGroups([]);
+  }, []);
+
+  const { formKey: uploadFormKey } = useModalFormReset({
+    isOpen: showUploadModal,
+    mode: "add",
+    resetForm: resetUploadForm,
+  });
+
   function showError(error_text: string) {
     setUploadError(error_text);
     setTimeout(() => {
@@ -230,6 +245,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       showError(String(post_upload_res?.error || "Unknown error"))
       return;
     }
+    resetUploadForm();
     setShowUploadModal(false);
     // Refresh data
     const new_uploads_res =
@@ -394,7 +410,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
               {getTranslation('uploadNewMaterial', language)}
             </h3>
 
-            <form className="space-y-4" onSubmit={handleUploadSubmit}>
+            <form key={uploadFormKey} className="space-y-4" onSubmit={handleUploadSubmit}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {getTranslation('materialTitle', language)}
@@ -430,7 +446,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                 <select
                   id="class_groups"
                   multiple
-                  // value={selectedClassGroups} // state: array of selected ids
+                  value={selectedClassGroups}
                   onChange={(e) =>
                     setSelectedClassGroups(
                       Array.from(e.target.selectedOptions, (opt) => opt.value)
@@ -503,7 +519,11 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
-                  onClick={() => setShowUploadModal(false)}
+                  type="button"
+                  onClick={() => {
+                    setShowUploadModal(false);
+                    resetUploadForm();
+                  }}
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   {getTranslation('cancel', language)}

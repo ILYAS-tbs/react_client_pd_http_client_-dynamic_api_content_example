@@ -11,29 +11,32 @@ import {
   X,
   Download,
   BookOpen,
+  UserCheck,
 } from "lucide-react";
 import { Homework, HomeworkSubmission, HomeworkStats } from "../../models/Homework";
 import { homework_client } from "../../services/http_api/homework/homework_client";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
+import { Student } from "../../models/Student";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 
 interface TeacherHomeworksProps {
   modules_class_groups: TeacherModuleClassGroup[];
+  students: Student[];
 }
 
 const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
   modules_class_groups,
+  students,
 }) => {
   const { language } = useLanguage();
 
   const [homeworks, setHomeworks] = useState<Homework[]>([]);
   const [loading, setLoading] = useState(false);
-
   const [selectedClassGroup, setSelectedClassGroup] = useState<string>("");
 
-  // Create/Edit modal
+  // ── Create/Edit homework modal ────────────────────────────────────────────
   const [showModal, setShowModal] = useState(false);
   const [editingHomework, setEditingHW] = useState<Homework | null>(null);
   const [formData, setFormData] = useState({
@@ -49,16 +52,19 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Submissions modal
+  // ── Submissions management modal ──────────────────────────────────────────
   const [viewingHomework, setViewingHomework] = useState<Homework | null>(null);
   const [submissions, setSubmissions] = useState<HomeworkSubmission[]>([]);
   const [stats, setStats] = useState<HomeworkStats | null>(null);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
-  const [gradingSubmission, setGradingSubmission] = useState<HomeworkSubmission | null>(null);
-  const [gradeForm, setGradeForm] = useState({ mark: "", remarks: "" });
-  const [gradingSaving, setGradingSaving] = useState(false);
 
-  // Unique class-groups from teacher's assignments
+  // Add/Edit submission inline form
+  const [editingSubmission, setEditingSubmission] = useState<HomeworkSubmission | null>(null);
+  const [addingSubmission, setAddingSubmission] = useState(false);
+  const [subForm, setSubForm] = useState({ student: "", mark: "", remarks: "" });
+  const [subSaving, setSubSaving] = useState(false);
+
+  // ── Derived lists ──────────────────────────────────────────────────────────
   const uniqueClassGroups = Array.from(
     new Map(
       modules_class_groups.map((m) => [
@@ -75,6 +81,19 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
         m.class_group.class_group_id === selectedClassGroup
     )
     .map((m) => m.module);
+
+  // Students in the currently-viewed homework's class group (for dropdown)
+  const studentsForHomework = viewingHomework
+    ? students.filter(
+        (s) => s.class_group?.class_group_id === viewingHomework.class_group
+      )
+    : [];
+
+  // Students that have NOT yet been submitted for this homework
+  const submittedStudentIds = new Set(submissions.map((s) => s.student));
+  const unsubmittedStudents = studentsForHomework.filter(
+    (s) => !submittedStudentIds.has(s.student_id)
+  );
 
   useEffect(() => {
     if (uniqueClassGroups.length > 0 && !selectedClassGroup) {
@@ -98,6 +117,7 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
     setLoading(false);
   }
 
+  // ── Homework CRUD helpers ─────────────────────────────────────────────────
   function openCreate() {
     setEditingHW(null);
     setFormData({
@@ -162,9 +182,12 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
     if (res.ok) fetchHomeworks();
   }
 
+  // ── Submissions helpers ────────────────────────────────────────────────────
   async function openSubmissions(hw: Homework) {
     setViewingHomework(hw);
     setLoadingSubmissions(true);
+    setAddingSubmission(false);
+    setEditingSubmission(null);
     const [subsRes, statsRes] = await Promise.all([
       homework_client.getHomeworkSubmissions(hw.id),
       homework_client.getHomeworkStats(hw.id),
@@ -174,22 +197,75 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
     setLoadingSubmissions(false);
   }
 
-  async function handleGrade(e: React.FormEvent) {
+  function openAddSubmission() {
+    setEditingSubmission(null);
+    setSubForm({
+      student: unsubmittedStudents[0]?.student_id ?? "",
+      mark: "",
+      remarks: "",
+    });
+    setAddingSubmission(true);
+  }
+
+  function openEditSubmission(sub: HomeworkSubmission) {
+    setAddingSubmission(false);
+    setEditingSubmission(sub);
+    setSubForm({
+      student: sub.student,
+      mark: sub.mark?.toString() ?? "",
+      remarks: sub.remarks ?? "",
+    });
+  }
+
+  async function handleSubSave(e: React.FormEvent) {
     e.preventDefault();
-    if (!viewingHomework || !gradingSubmission) return;
-    setGradingSaving(true);
-    const res = await homework_client.gradeSubmission(
-      viewingHomework.id,
-      gradingSubmission.id,
-      { mark: Number(gradeForm.mark), remarks: gradeForm.remarks }
-    );
-    if (res.ok) {
-      setSubmissions((prev) =>
-        prev.map((s) => (s.id === res.data.id ? res.data : s))
+    if (!viewingHomework) return;
+    setSubSaving(true);
+
+    const payload = {
+      student: subForm.student,
+      mark: subForm.mark !== "" ? Number(subForm.mark) : null,
+      remarks: subForm.remarks,
+    };
+
+    let res;
+    if (editingSubmission) {
+      res = await homework_client.updateSubmission(
+        viewingHomework.id,
+        editingSubmission.id,
+        { mark: payload.mark, remarks: payload.remarks }
       );
-      setGradingSubmission(null);
+    } else {
+      res = await homework_client.createSubmission(viewingHomework.id, payload);
     }
-    setGradingSaving(false);
+
+    if (res.ok) {
+      // Refresh submissions list and stats
+      const [subsRes, statsRes] = await Promise.all([
+        homework_client.getHomeworkSubmissions(viewingHomework.id),
+        homework_client.getHomeworkStats(viewingHomework.id),
+      ]);
+      if (subsRes.ok) setSubmissions(subsRes.data);
+      if (statsRes.ok) setStats(statsRes.data);
+      // Update submissions_count on the homework card
+      fetchHomeworks();
+      setAddingSubmission(false);
+      setEditingSubmission(null);
+    }
+    setSubSaving(false);
+  }
+
+  async function handleSubDelete(sub: HomeworkSubmission) {
+    if (!viewingHomework) return;
+    if (!confirm(getTranslation("confirmDelete", language) || "Confirm delete?"))
+      return;
+    const res = await homework_client.deleteSubmission(viewingHomework.id, sub.id);
+    if (res.ok) {
+      setSubmissions((prev) => prev.filter((s) => s.id !== sub.id));
+      const statsRes = await homework_client.getHomeworkStats(viewingHomework.id);
+      if (statsRes.ok) setStats(statsRes.data);
+      fetchHomeworks();
+    }
   }
 
   const isOverdue = (hw: Homework) =>
@@ -345,7 +421,7 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
         </div>
       )}
 
-      {/* ── Create/Edit Modal ────────────────────────────────── */}
+      {/* ── Create/Edit Homework Modal ────────────────────────────────────── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
@@ -543,23 +619,26 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
         </div>
       )}
 
-      {/* ── Submissions Modal ─────────────────────────────────── */}
+      {/* ── Submissions Modal ─────────────────────────────────────────────── */}
       {viewingHomework && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <div>
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                   {viewingHomework.title}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {getTranslation("submissionsOverview", language)}
+                  {viewingHomework.class_group_name}
+                  {viewingHomework.module_name && ` · ${viewingHomework.module_name}`}
                 </p>
               </div>
               <button
                 onClick={() => {
                   setViewingHomework(null);
-                  setGradingSubmission(null);
+                  setAddingSubmission(false);
+                  setEditingSubmission(null);
                 }}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
@@ -598,10 +677,7 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
                         color: "bg-blue-100 dark:bg-blue-900/30",
                       },
                     ].map((s, i) => (
-                      <div
-                        key={i}
-                        className={`${s.color} rounded-xl p-3 text-center`}
-                      >
+                      <div key={i} className={`${s.color} rounded-xl p-3 text-center`}>
                         <p className="text-xl font-bold text-gray-900 dark:text-white">
                           {s.value}
                         </p>
@@ -611,6 +687,112 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
                       </div>
                     ))}
                   </div>
+                )}
+
+                {/* Add submission button */}
+                {unsubmittedStudents.length > 0 && !addingSubmission && !editingSubmission && (
+                  <button
+                    onClick={openAddSubmission}
+                    className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <UserCheck className="h-4 w-4" />
+                    {getTranslation("addSubmission", language)}
+                  </button>
+                )}
+
+                {/* Add / Edit submission form */}
+                {(addingSubmission || editingSubmission) && (
+                  <form
+                    onSubmit={handleSubSave}
+                    className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-600"
+                  >
+                    <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
+                      {editingSubmission
+                        ? getTranslation("editSubmission", language)
+                        : getTranslation("addSubmission", language)}
+                    </h3>
+
+                    {/* Student selector — only when creating */}
+                    {addingSubmission && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          {getTranslation("student", language)}
+                        </label>
+                        <select
+                          value={subForm.student}
+                          onChange={(e) =>
+                            setSubForm({ ...subForm, student: e.target.value })
+                          }
+                          required
+                          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="">--</option>
+                          {unsubmittedStudents.map((s) => (
+                            <option key={s.student_id} value={s.student_id}>
+                              {s.full_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {editingSubmission && (
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {editingSubmission.student_name}
+                      </p>
+                    )}
+
+                    <div className="flex gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          {getTranslation("mark", language)} / {viewingHomework.max_mark}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max={viewingHomework.max_mark}
+                          step="0.5"
+                          value={subForm.mark}
+                          onChange={(e) =>
+                            setSubForm({ ...subForm, mark: e.target.value })
+                          }
+                          className="w-24 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          {getTranslation("remarks", language)}
+                        </label>
+                        <input
+                          type="text"
+                          value={subForm.remarks}
+                          onChange={(e) =>
+                            setSubForm({ ...subForm, remarks: e.target.value })
+                          }
+                          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddingSubmission(false);
+                          setEditingSubmission(null);
+                        }}
+                        className="px-3 py-1.5 text-xs border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {getTranslation("cancel", language)}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={subSaving}
+                        className="px-4 py-1.5 text-xs bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {subSaving ? getTranslation("saving", language) : getTranslation("save", language)}
+                      </button>
+                    </div>
+                  </form>
                 )}
 
                 {/* Submissions list */}
@@ -626,123 +808,42 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
                         className="rounded-xl border border-gray-200 dark:border-gray-700 p-4"
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <div>
+                          <div className="flex-1">
                             <p className="font-semibold text-gray-900 dark:text-white text-sm">
                               {sub.student_name}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                              {new Date(sub.submitted_at).toLocaleDateString()}
+                              {new Date(sub.created_at).toLocaleDateString()}
                             </p>
-                            {sub.submission_text && (
-                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
-                                {sub.submission_text}
+                            {sub.mark !== null && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                                <span className="text-sm font-semibold text-green-700 dark:text-green-400">
+                                  {sub.mark} / {viewingHomework.max_mark}
+                                </span>
+                              </div>
+                            )}
+                            {sub.remarks && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
+                                {sub.remarks}
                               </p>
                             )}
-                            {sub.submission_file && (
-                              <a
-                                href={`${SERVER_BASE_URL}${sub.submission_file}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 text-xs text-primary-500 hover:underline mt-1"
-                              >
-                                <Download className="h-3 w-3" />
-                                {getTranslation("downloadSubmission", language)}
-                              </a>
-                            )}
                           </div>
-                          <div className="text-right shrink-0">
-                            {sub.is_graded ? (
-                              <span className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-sm font-semibold">
-                                <CheckCircle className="h-4 w-4" />
-                                {sub.mark} / {viewingHomework.max_mark}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-amber-500">
-                                {getTranslation("pendingGrade", language)}
-                              </span>
-                            )}
-                            <div className="mt-2">
-                              <button
-                                onClick={() => {
-                                  setGradingSubmission(sub);
-                                  setGradeForm({
-                                    mark: sub.mark?.toString() ?? "",
-                                    remarks: sub.remarks ?? "",
-                                  });
-                                }}
-                                className="text-xs bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 px-2 py-1 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors"
-                              >
-                                {getTranslation("grade", language)}
-                              </button>
-                            </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => openEditSubmission(sub)}
+                              className="p-1.5 text-gray-400 hover:text-primary-500 transition-colors"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleSubDelete(sub)}
+                              className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
-
-                        {/* Inline grade form */}
-                        {gradingSubmission?.id === sub.id && (
-                          <form
-                            onSubmit={handleGrade}
-                            className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-wrap gap-3 items-end"
-                          >
-                            <div>
-                              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                {getTranslation("mark", language)} / {viewingHomework.max_mark}
-                              </label>
-                              <input
-                                type="number"
-                                min="0"
-                                max={viewingHomework.max_mark}
-                                step="0.5"
-                                value={gradeForm.mark}
-                                onChange={(e) =>
-                                  setGradeForm({ ...gradeForm, mark: e.target.value })
-                                }
-                                required
-                                className="w-20 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                {getTranslation("remarks", language)}
-                              </label>
-                              <input
-                                type="text"
-                                value={gradeForm.remarks}
-                                onChange={(e) =>
-                                  setGradeForm({
-                                    ...gradeForm,
-                                    remarks: e.target.value,
-                                  })
-                                }
-                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                type="submit"
-                                disabled={gradingSaving}
-                                className="px-3 py-1.5 text-xs bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors disabled:opacity-50"
-                              >
-                                {gradingSaving
-                                  ? "..."
-                                  : getTranslation("save", language)}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setGradingSubmission(null)}
-                                className="px-3 py-1.5 text-xs border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                              >
-                                {getTranslation("cancel", language)}
-                              </button>
-                            </div>
-                          </form>
-                        )}
-
-                        {sub.remarks && sub.is_graded && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
-                            {getTranslation("teacherNote", language)}: {sub.remarks}
-                          </p>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -757,3 +858,4 @@ const TeacherHomeworks: React.FC<TeacherHomeworksProps> = ({
 };
 
 export default TeacherHomeworks;
+
