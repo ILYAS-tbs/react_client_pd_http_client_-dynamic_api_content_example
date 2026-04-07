@@ -291,10 +291,10 @@ const SchoolDashboard: React.FC = () => {
   console.log('📊 SchoolDashboard rendering with language:', language);
 
   const stats = [
-    { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500" },
-    { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-primary-400" },
-    { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-primary-500" },
-    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-primary-400" },
+    { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500", tab: "users" },
+    { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-primary-400", tab: "users" },
+    { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-primary-500", tab: "levels" },
+    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-primary-400", tab: "reports" },
   ]
 
 
@@ -324,7 +324,8 @@ const SchoolDashboard: React.FC = () => {
               {stats.map((stat, index) => (
                 <div
                   key={index}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+                  onClick={() => stat.tab && setActiveTab(stat.tab)}
+                  className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-transform duration-150${stat.tab ? " cursor-pointer hover:scale-105 hover:shadow-xl hover:border-primary-400 dark:hover:border-primary-500" : ""}`}
                 >
                   <div className="flex items-center justify-between">
                     <div>

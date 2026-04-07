@@ -10,6 +10,7 @@ import {
   Star,
   LayoutGrid,
   ClipboardList,
+  BookOpen,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import ChildrenOverview from "../../components/parent/ChildrenOverview";
@@ -17,7 +18,7 @@ import GradeReports from "../../components/parent/GradeReports";
 import AbsenceManager from "../../components/parent/AbsenceManager";
 import ScheduleManagement from "../../components/parent/ScheduleManagement";
 import ActivitiesView from "../../components/parent/ActivitiesManagement";
-import ParentScheduleTable from "../../components/parent/HomeworksManagement.tsx";
+import ParentHomeworks from "../../components/parent/ParentHomeworks.tsx";
 import ResourceLibrary from "../../components/parent/ResourceLibrary";
 import ParentChat from "../../components/shared/ParentChat";
 import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
@@ -367,10 +368,10 @@ const ParentDashboard: React.FC = () => {
       overallAverage === null
         ? "needs_improvement"
         : overallAverage < 10
-        ? "weak"
-        : overallAverage < 15
-        ? "good"
-        : "excellent";
+          ? "weak"
+          : overallAverage < 15
+            ? "good"
+            : "excellent";
 
     return {
       evaluations,
@@ -382,7 +383,7 @@ const ParentDashboard: React.FC = () => {
     };
   };
 
-  
+
 
   const tabs = [
     {
@@ -395,7 +396,12 @@ const ParentDashboard: React.FC = () => {
       label: getTranslation("myChildren", language),
       icon: UserIcon,
     },
-      {
+    {
+      id: "homework",
+      label: getTranslation("homeworksTab", language),
+      icon: BookOpen,
+    },
+    {
       id: "timetable",
       label: getTranslation("timetable", language),
       icon: LayoutGrid,
@@ -422,11 +428,7 @@ const ParentDashboard: React.FC = () => {
     //   icon: AlertTriangle,
     // },
 
-    // {
-    //   id: "homework",
-    //   label: getTranslation("homeworks", language),
-    //   icon: BookOpen,
-    // },
+
     {
       id: "calendar",
       label: getTranslation("digitalLibrary", language),
@@ -489,7 +491,7 @@ const ParentDashboard: React.FC = () => {
         );
 
       case "homework":
-        return <ParentScheduleTable />;
+        return <ParentHomeworks />;
       case "calendar":
         return <ResourceLibrary uploads={uploads} />;
       case "events":
@@ -544,33 +546,33 @@ const ParentDashboard: React.FC = () => {
                       summary.performanceLevel === "excellent"
                         ? getTranslation("excellent", language)
                         : summary.performanceLevel === "good"
-                        ? getTranslation("veryGood", language)
-                        : getTranslation("poorPerformance", language);
+                          ? getTranslation("veryGood", language)
+                          : getTranslation("poorPerformance", language);
 
                     const stateStyles =
                       summary.performanceLevel === "excellent"
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
                         : summary.performanceLevel === "good"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
-                        : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200";
+                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200";
 
                     const markBackgroundColor =
                       overallMark === null
                         ? "bg-gray-100 dark:bg-gray-700"
                         : overallMark < 10
-                        ? "bg-red-100 dark:bg-red-900/30"
-                        : overallMark < 15
-                        ? "bg-amber-100 dark:bg-amber-900/30"
-                        : "bg-emerald-100 dark:bg-emerald-900/30";
+                          ? "bg-red-100 dark:bg-red-900/30"
+                          : overallMark < 15
+                            ? "bg-amber-100 dark:bg-amber-900/30"
+                            : "bg-emerald-100 dark:bg-emerald-900/30";
 
                     const markTextColor =
                       overallMark === null
                         ? "text-gray-700 dark:text-gray-300"
                         : overallMark < 10
-                        ? "text-red-700 dark:text-red-300"
-                        : overallMark < 15
-                        ? "text-amber-700 dark:text-amber-300"
-                        : "text-emerald-700 dark:text-emerald-300";
+                          ? "text-red-700 dark:text-red-300"
+                          : overallMark < 15
+                            ? "text-amber-700 dark:text-amber-300"
+                            : "text-emerald-700 dark:text-emerald-300";
 
                     return (
                       <div
@@ -674,11 +676,10 @@ const ParentDashboard: React.FC = () => {
                 <div
                   key={index}
                   onClick={() => stat.tab && setActiveTab(stat.tab)}
-                  className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-transform duration-150${
-                    stat.tab
+                  className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-transform duration-150${stat.tab
                       ? " cursor-pointer hover:scale-105 hover:shadow-xl hover:border-primary-400 dark:hover:border-primary-500"
                       : ""
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -717,10 +718,10 @@ const ParentDashboard: React.FC = () => {
                       >
                         <div
                           className={`p-2 rounded-lg ${update.type === "grade"
-                              ? "bg-primary-100 dark:bg-primary-900"
-                              : update.type === "message"
-                                ? "bg-primary-100 dark:bg-primary-900/20"
-                                : "bg-orange-100 dark:bg-orange-900/20"
+                            ? "bg-primary-100 dark:bg-primary-900"
+                            : update.type === "message"
+                              ? "bg-primary-100 dark:bg-primary-900/20"
+                              : "bg-orange-100 dark:bg-orange-900/20"
                             }`}
                         >
                           {update.type === "grade" ? (

@@ -9,6 +9,7 @@ import {
   Upload,
   Edit,
   FileX2,
+  ClipboardList,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import MonthylEvaluation from "../../components/teacher/MonthylEvaluation";
@@ -29,6 +30,7 @@ import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
 import ScheduleViewer from "../../components/teacher/ScheduleViewer";
+import TeacherHomeworks from "../../components/teacher/TeacherHomeworks";
 import { Parent } from "../../models/Parent";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
@@ -195,15 +197,16 @@ const TeacherDashboard: React.FC = () => {
   }
 
   const stats = [
-    { title: getTranslation('myStudents', language), value: students.length || "0", icon: Users, color: "bg-primary-500" },
-    { title: getTranslation('Classes', language), value: modules_class_groups.length || "0", icon: BookOpen, color: "bg-primary-400" },
-    { title: getTranslation('newMessages', language), value: newMessages.length || "0", icon: MessageCircle, color: "bg-primary-500" },
-    { title: getTranslation('uploadedMaterials', language), value: teacher_uploads.length || "0", icon: Upload, color: "bg-primary-400" },
+    { title: getTranslation('myStudents', language), value: students.length || "0", icon: Users, color: "bg-primary-500", tab: "classes" },
+    { title: getTranslation('Classes', language), value: modules_class_groups.length || "0", icon: BookOpen, color: "bg-primary-400", tab: "classes" },
+    { title: getTranslation('newMessages', language), value: newMessages.length || "0", icon: MessageCircle, color: "bg-primary-500", tab: "chat" },
+    { title: getTranslation('uploadedMaterials', language), value: teacher_uploads.length || "0", icon: Upload, color: "bg-primary-400", tab: "resources" },
   ];
 
   const tabs = [
     { id: "overview", label: getTranslation('overview', language), icon: TrendingUp },
     { id: "classes", label: getTranslation('myClasses', language), icon: Users },
+    { id: "homeworks", label: getTranslation('homeworksTab', language), icon: ClipboardList },
     { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
     { id: "schedule", label: getTranslation('classSchedule', language), icon: Calendar },
 
@@ -266,6 +269,12 @@ const TeacherDashboard: React.FC = () => {
             setStudentsGrades={setStudentsGrades}
             RefetchGrades={RefetchGrades}
             students={students}
+          />
+        );
+      case "homeworks":
+        return (
+          <TeacherHomeworks
+            modules_class_groups={modules_class_groups}
           />
         );
       case "resources":
@@ -378,7 +387,8 @@ const TeacherDashboard: React.FC = () => {
               {stats.map((stat, index) => (
                 <div
                   key={index}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+                  onClick={() => stat.tab && setActiveTab(stat.tab)}
+                  className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 transition-transform duration-150${stat.tab ? " cursor-pointer hover:scale-105 hover:shadow-xl hover:border-primary-400 dark:hover:border-primary-500" : ""}`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
