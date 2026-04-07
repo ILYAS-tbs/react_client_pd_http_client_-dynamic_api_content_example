@@ -51,6 +51,7 @@ const URLS = {
   get_current_school_monthly_evaluations: `${BASE_URL}/student/monthly-evaluations/`,
 
   create_or_update_TeacherModuleClassGroup: `${BASE_URL}/teacher/create_or_update_TeacherModuleClassGroup/`,
+  delete_TeacherModuleClassGroup: `${BASE_URL}/teacher/teacher-module-class-group/`,
 
   post_event: `${BASE_URL}/school/events/`,
   patch_event: `${BASE_URL}/school/events/`,
@@ -641,6 +642,24 @@ async function create_or_update_TeacherModuleClassGroup(
   }
 }
 
+//! Delete a TeacherModuleClassGroup assignment:
+async function delete_TeacherModuleClassGroup(id: number, csrfToken: string) {
+  const DELETE_URL = URLS.delete_TeacherModuleClassGroup + id + "/";
+  try {
+    const response = await fetch(DELETE_URL, {
+      method: "DELETE",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = response.status !== 204 ? await response.json() : null;
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 // ─── Schedule API ──────────────────────────────────────────────────────────
 async function get_current_school_schedules() {
   try {
@@ -737,6 +756,7 @@ export const school_dashboard_client = {
 
   create_or_update_TeacherModuleClassGroup:
     create_or_update_TeacherModuleClassGroup,
+  delete_TeacherModuleClassGroup: delete_TeacherModuleClassGroup,
 
   patch_absence_report: patch_absence_report,
 

@@ -7,6 +7,8 @@ import {
   UserCheck,
   EyeOff,
   FileUp,
+  BookOpen,
+  X,
 } from "lucide-react";
 import { TeacherManagementProps } from "../../types";
 
@@ -194,10 +196,6 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const loopThroughClassGroups = (teacher: Teacher) => {
     let exist: boolean = false;
 
-    teacher.modulesGradeOverviewAndClassGroups?.[0]?.module.module_name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
     if (!teacher.modulesAndClassGroups) {
       return;
     }
@@ -238,9 +236,14 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [years_of_experience_update, set_years_of_experience_update] =
     useState("0");
   const [weekly_schedule, setWeeklySchedue] = useState<File | null>(null)
-  const [modules_id, setModuleID] = useState<string>("");
-  const [class_group_id, setClassGrpID] = useState<string>("");
-  const [editModalError, setEditModalError] = useState("");
+
+  // Assignment Management Modal state
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assign_teacher_id, set_assign_teacher_id] = useState<number>(-1);
+  const [assign_teacher_name, set_assign_teacher_name] = useState<string>("");
+  const [new_assign_classgrp, set_new_assign_classgrp] = useState<string>("");
+  const [new_assign_module, set_new_assign_module] = useState<string>("");
+  const [assignModalError, setAssignModalError] = useState<string>("");
 
   const handleEditSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -278,55 +281,16 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
     console.log(Object.fromEntries(formData.entries()));
 
-    // basic validations
-    if (!class_group_id) {
-      showEditModalError("يرجى تحديد  الصف");
-      return;
-    }
-    if (!modules_id) {
-      showEditModalError("يرجى اختيار المادة");
-      return;
-    }
-
-    //? API CALL 01 : updating teacher fields
+    //? API CALL : updating teacher fields
     const latest_csrf = getCSRFToken()!;
     const res = await school_dashboard_client.update_teacher(
       last_chosen_teacher_id,
       formData,
       latest_csrf
     );
-
     if (res.ok) {
-      console.log(res);
-
-      //? API CALL 02 : Creating a relation between  teacher-classGrp-module
-
-      const teacherModuleClass_payload: PostPutTeacherModuleClassGrpPayload = {
-        teacher_id: String(last_chosen_teacher_id),
-        class_group_id: class_group_id,
-        module_id: modules_id,
-      };
-      const latest_csrf = getCSRFToken()!;
-
-      console.log("teacherModuleClass_payload : ");
-      console.log(teacherModuleClass_payload);
-
-      const teacherModuleClass_res =
-        await school_dashboard_client.create_or_update_TeacherModuleClassGroup(
-          teacherModuleClass_payload,
-          latest_csrf
-        );
-      if (teacherModuleClass_res.ok) {
-        console.info("TeacherManagement.tsx : teacherModuleClass_res OK!");
-        // reset
-        setShowEditModel(false);
-        setClassGrpID("");
-        setModuleID("");
-      }
-
-      // Refresh Data if successful update :
+      setShowEditModel(false);
       RefetchData();
-      // empty form data
       resetUpdateForm();
     }
   };
@@ -336,18 +300,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
     set_phone_number_update("");
     set_years_of_experience_update("0");
   };
-  const showEditModalError = (error: string) => {
-    setEditModalError(error);
-    setTimeout(() => {
-      setEditModalError("");
-    }, 7000);
-  };
   //! Activate teacher :
   const handleActivateTeacher = async (id: number, activate: boolean) => {
-    // selected teacher to perform various checks
-    // const selected_teacher = teacherList.find(
-    //   (t) => t.user.id === last_chosen_teacher_id
-    // );
     const latest_csrf = getCSRFToken()!;
     const formData = new FormData();
     formData.append("status", activate ? "active" : "pending");
@@ -356,9 +310,40 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
       formData,
       latest_csrf
     );
-    // Sync data with the server
     if (patch_res.ok) {
       RefetchData();
+    }
+  };
+
+  //! Assignment Management:
+  const handleAddAssignment = async () => {
+    if (!new_assign_classgrp || !new_assign_module) {
+      setAssignModalError("يرجى تحديد الصف والمادة");
+      setTimeout(() => setAssignModalError(""), 5000);
+      return;
+    }
+    const payload: PostPutTeacherModuleClassGrpPayload = {
+      teacher_id: String(assign_teacher_id),
+      class_group_id: new_assign_classgrp,
+      module_id: new_assign_module,
+    };
+    const csrf = getCSRFToken()!;
+    const res = await school_dashboard_client.create_or_update_TeacherModuleClassGroup(payload, csrf);
+    if (res.ok) {
+      set_new_assign_classgrp("");
+      set_new_assign_module("");
+      await RefetchData();
+    } else {
+      setAssignModalError("حدث خطأ أثناء إضافة التسجيل");
+      setTimeout(() => setAssignModalError(""), 5000);
+    }
+  };
+
+  const handleRemoveAssignment = async (assignmentId: number) => {
+    const csrf = getCSRFToken()!;
+    const res = await school_dashboard_client.delete_TeacherModuleClassGroup(assignmentId, csrf);
+    if (res.ok) {
+      await RefetchData();
     }
   };
   return (
@@ -480,42 +465,48 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
             <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700 gap-2">
               <div className="flex items-center space-x-2 rtl:space-x-reverse min-w-0">
-                {/* hide teacher removed for now  */}
-                {/* <button className="text-primary-500 hover:bg-primary-300">
-                  <Eye className="h-4 w-4" />
-                </button> */}
-
                 <button
                   onClick={() => {
                     setShowEditModel(true);
                     set_last_chosen_teacher_id(teacher.user.id);
                   }}
-                  className="text-primary-600 hover:bg-primary-300"
+                  className="text-primary-600 hover:bg-primary-300 p-1 rounded"
+                  title="تعديل بيانات المعلم"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
-                {/* Delete teacher removed for now  */}
-                {/* <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                  <Trash2 className="h-4 w-4" />
-                </button> */}
               </div>
 
-              <div className="activation-buttons flex gap-2">
+              <div className="activation-buttons flex items-center gap-2 flex-wrap">
+                {/* Manage Assignments button */}
                 <button
-                  onClick={() => handleActivateTeacher(teacher.user.id, true)}
-                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${teacher.status === "نشط"
-                    ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
-                    : "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 hover:bg-primary-800"
-                    }`}
+                  onClick={() => {
+                    set_assign_teacher_id(teacher.user.id);
+                    set_assign_teacher_name(teacher.full_name);
+                    setShowAssignModal(true);
+                  }}
+                  className="p-1.5 rounded-lg text-primary-600 hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
+                  title="إدارة الحصص والمواد"
                 >
-                  {teacher.status === "نشط" ? getTranslation('suspend', language) : getTranslation('activate', language)}
+                  <BookOpen className="h-4 w-4" />
                 </button>
-
+                {/* Toggle activate / deactivate */}
                 <button
-                  onClick={() => handleActivateTeacher(teacher.user.id, false)}
-                  className={`px-3 mx-1 py-1 text-xs font-medium rounded-lg transition-colors bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800`}
+                  onClick={() =>
+                    handleActivateTeacher(
+                      teacher.user.id,
+                      teacher.status !== "active" && teacher.status !== "نشط"
+                    )
+                  }
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                    teacher.status === "active" || teacher.status === "نشط"
+                      ? "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800"
+                      : "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 hover:bg-primary-200 dark:hover:bg-primary-800"
+                  }`}
                 >
-                  {getTranslation('suspend', language)}
+                  {teacher.status === "active" || teacher.status === "نشط"
+                    ? getTranslation("suspend", language)
+                    : getTranslation("activate", language)}
                 </button>
               </div>
             </div>
@@ -737,45 +728,6 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 />
               </div>
 
-              {/* will be changed - additional data on the update*/}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الصف
-                </label>
-                <select
-                  name="class_group_id"
-                  value={class_group_id}
-                  onChange={(e) => setClassGrpID(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value={""}>اختر الفصل</option>
-                  {class_groups_list.map((cls) => (
-                    <option key={cls.class_group_id} value={cls.class_group_id}>
-                      {cls.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  المادة
-                </label>
-                <select
-                  name="modules_id"
-                  value={modules_id}
-                  onChange={(e) => setModuleID(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value={""}>اختر المادة</option>
-                  {subjects.map((subject) => (
-                    <option key={subject.module_id} value={subject.module_id}>
-                      {subject.module_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               {/* <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   البريد الإلكتروني
@@ -857,15 +809,9 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </div> */}
 
               {/* Modal Error */}
-              {editModalError && (
-                <h1 className=" text-red-600 text-sm">{editModalError}</h1>
-              )}
-
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
                 <button
                   onClick={() => {
-                    setClassGrpID("");
-                    setModuleID("");
                     setShowEditModel(false);
                     resetUpdateForm();
                   }}
@@ -884,6 +830,111 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
           </div>
         </div>
       )}
+
+      {/* Manage Assignments Modal */}
+      {showAssignModal && (() => {
+        const assign_teacher = teacherList.find(t => t.user.id === assign_teacher_id);
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-5">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  إدارة الحصص — {assign_teacher_name}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowAssignModal(false);
+                    set_new_assign_classgrp("");
+                    set_new_assign_module("");
+                    setAssignModalError("");
+                  }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Current Assignments */}
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  الحصص الحالية:
+                </h4>
+                {assign_teacher?.modulesAndClassGroups?.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {assign_teacher.modulesAndClassGroups.map((asgn) => (
+                      <span
+                        key={asgn.id}
+                        className="flex items-center gap-1.5 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 text-xs font-medium px-3 py-1.5 rounded-full"
+                      >
+                        {asgn.module.module_name} — {asgn.class_group.name}
+                        <button
+                          onClick={() => handleRemoveAssignment(asgn.id)}
+                          className="text-primary-500 hover:text-red-500 transition-colors"
+                          title="حذف"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 dark:text-gray-500">لا توجد حصص مُسندة حالياً.</p>
+                )}
+              </div>
+
+              <hr className="border-gray-200 dark:border-gray-700 mb-5" />
+
+              {/* Add New Assignment */}
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                إضافة حصة جديدة:
+              </h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">الصف</label>
+                  <select
+                    value={new_assign_classgrp}
+                    onChange={(e) => set_new_assign_classgrp(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">اختر الفصل</option>
+                    {class_groups_list.map((cls) => (
+                      <option key={cls.class_group_id} value={cls.class_group_id}>
+                        {cls.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">المادة</label>
+                  <select
+                    value={new_assign_module}
+                    onChange={(e) => set_new_assign_module(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">اختر المادة</option>
+                    {subjects.map((subj) => (
+                      <option key={subj.module_id} value={subj.module_id}>
+                        {subj.module_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {assignModalError && (
+                  <p className="text-red-500 text-xs">{assignModalError}</p>
+                )}
+                <button
+                  onClick={handleAddAssignment}
+                  className="w-full py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  إضافة الحصة
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

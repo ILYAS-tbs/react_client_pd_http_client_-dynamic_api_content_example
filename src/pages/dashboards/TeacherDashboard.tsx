@@ -33,6 +33,9 @@ import ScheduleViewer from "../../components/teacher/ScheduleViewer";
 import TeacherHomeworks from "../../components/teacher/TeacherHomeworks";
 import { Parent } from "../../models/Parent";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { getTranslation } from "../../utils/translations";
 import { Message } from "../../models/chat_system/Message";
 import { timeAgoArabic } from "../../lib/timeAgoArabic";
@@ -41,6 +44,8 @@ import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   //! Translation 
   const { language } = useLanguage()
@@ -78,6 +83,8 @@ const TeacherDashboard: React.FC = () => {
   */
 
 
+  const [isDeactivated, setIsDeactivated] = useState(false);
+
   //! Fetching Data From The Server
   const [teacher, setTeacher] = useState<Teacher | null>(null)
   const [students, setStudents] = useState<Student[]>([]);
@@ -95,8 +102,17 @@ const TeacherDashboard: React.FC = () => {
 
   const [newMessages, setNewMessages] = useState<Message[]>([]);
 
+  const handleDeactivated = async () => {
+    setIsDeactivated(true);
+    await logout();
+  };
+
   const get_teacher_by_id = async () => {
     const res = await teacher_dashboard_client.get_teacher_by_id(teacher_id);
+    if (res.status === 401 || res.status === 403) {
+      handleDeactivated();
+      return;
+    }
     if (res.ok) {
       const new_teacher: Teacher = res.data;
       setTeacher(new_teacher);
@@ -176,6 +192,28 @@ const TeacherDashboard: React.FC = () => {
       setParentsList(new_parents_list);
     }
   };
+  // Poll every 30s – if the school deactivated this teacher the session is
+  // destroyed server-side, so the next check returns 401 and we show the
+  // deactivation screen instead of silently failing.
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch(`${SERVER_BASE_URL}/user-auth/get_role`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (res.status === 401 || res.status === 403) {
+          handleDeactivated();
+        }
+      } catch {
+        // network error – ignore, don't kick the user out
+      }
+    };
+
+    const intervalId = setInterval(checkSession, 30_000);
+    return () => clearInterval(intervalId);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     get_teacher_by_id();
     get_current_teacher_students();
@@ -523,6 +561,38 @@ const TeacherDashboard: React.FC = () => {
         );
     }
   };
+
+  if (isDeactivated) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-6" dir="rtl">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-10 max-w-md w-full text-center border border-red-200 dark:border-red-800">
+          {/* Icon */}
+          <div className="mx-auto mb-6 w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+            <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            تم تعطيل حسابك
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+            قامت المدرسة بتعطيل حسابك مؤقتاً.
+          </p>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+            يرجى التواصل مع إدارة المدرسة لإعادة تفعيل حسابك والدخول مجدداً.
+          </p>
+
+          <button
+            onClick={() => navigate("/")}
+            className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition-colors"
+          >
+            العودة إلى صفحة تسجيل الدخول
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout

@@ -545,33 +545,33 @@ const ParentDashboard: React.FC = () => {
             </div>
 
             {/* ════ STUDENTS GENERAL INFORMATION - MAIN FOCUS ════ */}
-            <div className="rounded-3xl border-2 border-primary-200 dark:border-primary-800/60 bg-gradient-to-br from-primary-50/30 via-white to-primary-50/20 dark:from-primary-950/20 dark:via-gray-800 dark:to-primary-950/10 shadow-2xl p-8 lg:p-10 ring-1 ring-primary-100 dark:ring-primary-900/40">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="rounded-2xl sm:rounded-3xl border-2 border-primary-200 dark:border-primary-800/60 bg-gradient-to-br from-primary-50/30 via-white to-primary-50/20 dark:from-primary-950/20 dark:via-gray-800 dark:to-primary-950/10 shadow-2xl p-4 sm:p-6 lg:p-8 xl:p-10 ring-1 ring-primary-100 dark:ring-primary-900/40">
+              <div className="flex flex-col gap-4 sm:gap-6">
                 <div>
-                  <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white mb-1 sm:mb-2">
                     {getTranslation("studentsGeneralInformation", language)}
                   </h1>
-                  <p className="text-base text-gray-600 dark:text-gray-300">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
                     {getTranslation("monthlyEvaluationForParents", language)}
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 dark:bg-emerald-900/40 px-4 py-2 text-sm font-bold text-emerald-700 dark:text-emerald-200">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 dark:bg-emerald-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-200">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     {getTranslation("excellent", language)}
                   </div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 dark:bg-amber-900/40 px-4 py-2 text-sm font-bold text-amber-700 dark:text-amber-200">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 dark:bg-amber-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-200">
                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                     {getTranslation("veryGood", language)}
                   </div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-red-100 dark:bg-red-900/40 px-4 py-2 text-sm font-bold text-red-700 dark:text-red-200">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-red-100 dark:bg-red-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-red-700 dark:text-red-200">
                     <span className="w-2 h-2 rounded-full bg-red-500"></span>
                     {getTranslation("poorPerformance", language)}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+              <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-7">
                 {isLoadingStudents || isLoadingMonthlyEvaluations ? (
                   <div className="col-span-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 animate-pulse">
                     <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4" />
@@ -622,51 +622,51 @@ const ParentDashboard: React.FC = () => {
                     return (
                       <div
                         key={index}
-                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 p-7 transition-all duration-300 transform hover:scale-105"
+                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 p-4 sm:p-5 lg:p-7 transition-all duration-300 md:transform md:hover:scale-105"
                       >
                         {/* Header with student info and performance badge */}
-                        <div className="flex items-start justify-between gap-3 mb-5">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/40 dark:to-primary-800/40 p-3 rounded-full">
-                              <UserIcon className="h-6 w-6 text-primary-600 dark:text-primary-300" />
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4 sm:mb-5 min-w-0">
+                          <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                            <div className="bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/40 dark:to-primary-800/40 p-2 sm:p-3 rounded-full flex-shrink-0">
+                              <UserIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 dark:text-primary-300" />
                             </div>
-                            <div className="flex-1">
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
                                 {child.full_name}
                               </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                                 {child.class_group?.name}
                               </p>
                             </div>
                           </div>
-                          <span className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap ${stateStyles}`}>
+                          <span className={`inline-flex max-w-full self-start sm:max-w-[9rem] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold text-center leading-tight whitespace-normal break-words ${stateStyles}`}>
                             {stateLabel}
                           </span>
                         </div>
 
                         {/* Overall Mark - Prominent Display */}
-                        <div className={`rounded-xl p-5 mb-5 border-2 border-gray-200 dark:border-gray-700 ${markBackgroundColor}`}>
+                        <div className={`rounded-xl p-3 sm:p-4 lg:p-5 mb-4 sm:mb-5 border-2 border-gray-200 dark:border-gray-700 ${markBackgroundColor}`}>
                           <p className={`text-xs font-semibold uppercase tracking-wider ${markTextColor} mb-2`}>
                             {getTranslation("overallPerformance", language)}
                           </p>
-                          <div className="flex items-baseline gap-2">
-                            <p className={`text-4xl font-black ${markTextColor}`}>
+                          <div className="flex items-baseline gap-1 sm:gap-2">
+                            <p className={`text-2xl sm:text-3xl lg:text-4xl font-black ${markTextColor}`}>
                               {overallMark !== null ? overallMark.toFixed(1) : "—"}
                             </p>
-                            <p className={`text-lg font-bold ${markTextColor}`}>/20</p>
+                            <p className={`text-sm sm:text-base lg:text-lg font-bold ${markTextColor}`}>/20</p>
                           </div>
                         </div>
 
                         {/* Stats Grid - Participation & Homework */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5">
                           {/* Participation */}
-                          <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-cyan-100/50 dark:from-cyan-900/20 dark:to-cyan-800/20 p-4 border border-cyan-200 dark:border-cyan-700/50 hover:shadow-md transition-shadow duration-200">
+                          <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-cyan-100/50 dark:from-cyan-900/20 dark:to-cyan-800/20 p-3 sm:p-4 border border-cyan-200 dark:border-cyan-700/50 hover:shadow-md transition-shadow duration-200">
                             <div className="flex items-center justify-between mb-2">
                               <p className="text-xs font-bold text-cyan-800 dark:text-cyan-300 uppercase tracking-wider">
                                 {getTranslation("participationMark", language)}
                               </p>
                             </div>
-                            <p className="text-3xl font-black text-cyan-700 dark:text-cyan-300">
+                            <p className="text-2xl sm:text-3xl font-black text-cyan-700 dark:text-cyan-300">
                               {summary.participationAverage !== null
                                 ? summary.participationAverage.toFixed(1)
                                 : "—"}
@@ -674,13 +674,13 @@ const ParentDashboard: React.FC = () => {
                             <p className="text-xs text-cyan-600 dark:text-cyan-300/70 mt-1">/20</p>
                           </div>
                           {/* Homework */}
-                          <div className="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/20 p-4 border border-orange-200 dark:border-orange-700/50 hover:shadow-md transition-shadow duration-200">
+                          <div className="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/20 p-3 sm:p-4 border border-orange-200 dark:border-orange-700/50 hover:shadow-md transition-shadow duration-200">
                             <div className="flex items-center justify-between mb-2">
                               <p className="text-xs font-bold text-orange-800 dark:text-orange-300 uppercase tracking-wider">
                                 {getTranslation("homeworksMark", language)}
                               </p>
                             </div>
-                            <p className="text-3xl font-black text-orange-700 dark:text-orange-300">
+                            <p className="text-2xl sm:text-3xl font-black text-orange-700 dark:text-orange-300">
                               {summary.homeworkAverage !== null
                                 ? summary.homeworkAverage.toFixed(1)
                                 : "—"}
@@ -690,37 +690,37 @@ const ParentDashboard: React.FC = () => {
                         </div>
 
                         {/* Remarque, Absences & Academic Performance Section */}
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {/* Remarque - Prominent Section */}
-                          <div className="rounded-lg bg-gradient-to-r from-primary-50/80 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/20 p-4 border-2 border-primary-200 dark:border-primary-700/50 hover:border-primary-300 dark:hover:border-primary-600 transition-colors duration-200">
-                            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <div className="rounded-lg bg-gradient-to-r from-primary-50/80 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/20 p-3 sm:p-4 border-2 border-primary-200 dark:border-primary-700/50 hover:border-primary-300 dark:hover:border-primary-600 transition-colors duration-200">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
                               <p className="text-xs font-bold text-primary-800 dark:text-primary-300 uppercase tracking-wider">
                                 {getTranslation("evaluationRemark", language)}
                               </p>
                               {summary.latestRemarkMonth && (
-                                <span className="text-xs font-medium text-primary-600 dark:text-primary-400">
+                                <span className="text-xs font-medium text-primary-600 dark:text-primary-400 whitespace-nowrap">
                                   {formatEvaluationMonth(summary.latestRemarkMonth)}
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm leading-relaxed text-primary-900 dark:text-primary-100 font-medium whitespace-pre-wrap break-words mb-3">
+                            <p className="text-xs sm:text-sm leading-relaxed text-primary-900 dark:text-primary-100 font-medium break-words mb-2 sm:mb-3">
                               {summary.latestRemark ? summary.latestRemark : <span className="text-gray-500 dark:text-gray-400 italic">—</span>}
                             </p>
                             {(summary.latestRemarkModule || summary.latestRemarkClassGroup || summary.latestRemarkTeacher) && (
-                              <div className="flex flex-wrap gap-2 pt-2 border-t border-primary-200 dark:border-primary-700/40">
+                              <div className="flex flex-wrap gap-1 sm:gap-2 pt-2 sm:pt-3 border-t border-primary-200 dark:border-primary-700/40">
                                 {summary.latestRemarkModule && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/40 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:text-primary-300">
-                                    📚 {summary.latestRemarkModule}
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 sm:px-2.5 py-0.5 sm:py-1 text-xs font-semibold text-primary-700 dark:text-primary-300 break-words">
+                                    📚 <span className="truncate">{summary.latestRemarkModule}</span>
                                   </span>
                                 )}
                                 {summary.latestRemarkClassGroup && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/40 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:text-primary-300">
-                                    🏫 {summary.latestRemarkClassGroup}
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 sm:px-2.5 py-0.5 sm:py-1 text-xs font-semibold text-primary-700 dark:text-primary-300 break-words">
+                                    🏫 <span className="truncate">{summary.latestRemarkClassGroup}</span>
                                   </span>
                                 )}
                                 {summary.latestRemarkTeacher && (
-                                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/40 px-2.5 py-1 text-xs font-semibold text-primary-700 dark:text-primary-300">
-                                    👤 {summary.latestRemarkTeacher}
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 sm:px-2.5 py-0.5 sm:py-1 text-xs font-semibold text-primary-700 dark:text-primary-300 break-words">
+                                    👤 <span className="truncate">{summary.latestRemarkTeacher}</span>
                                   </span>
                                 )}
                               </div>
@@ -728,34 +728,34 @@ const ParentDashboard: React.FC = () => {
                           </div>
 
                           {/* Absences & Academic Performance - Grid */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                             {/* Absences */}
-                            <div className="rounded-lg bg-gradient-to-br from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-800/20 p-4 border border-red-200 dark:border-red-700/50 hover:shadow-md transition-shadow duration-200">
-                              <p className="text-xs font-bold text-red-800 dark:text-red-300 uppercase tracking-wider mb-3 block">
+                            <div className="rounded-lg bg-gradient-to-br from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-800/20 p-3 sm:p-4 border border-red-200 dark:border-red-700/50 hover:shadow-md transition-shadow duration-200">
+                              <p className="text-xs font-bold text-red-800 dark:text-red-300 uppercase tracking-wider mb-2 sm:mb-3 block">
                                 {getTranslation("absences", language)}
                               </p>
-                              <div className="flex items-end gap-2">
-                                <span className="text-4xl font-black text-red-700 dark:text-red-300">
+                              <div className="flex items-end gap-1 sm:gap-2">
+                                <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-red-700 dark:text-red-300">
                                   {one_student_absences(child) || "0"}
                                 </span>
-                                <span className="text-sm font-semibold text-red-600 dark:text-red-300/70 mb-1">
+                                <span className="text-xs sm:text-sm font-semibold text-red-600 dark:text-red-300/70 mb-1">
                                   {getTranslation("day", language) || "day"}
                                 </span>
                               </div>
                             </div>
 
                             {/* Academic Performance - Participation Mark */}
-                            <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/20 p-4 border border-emerald-200 dark:border-emerald-700/50 hover:shadow-md transition-shadow duration-200">
-                              <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider mb-3 block">
+                            <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/20 p-3 sm:p-4 border border-emerald-200 dark:border-emerald-700/50 hover:shadow-md transition-shadow duration-200">
+                              <p className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider mb-2 sm:mb-3 block">
                                 {getTranslation("monthlyEvaluation", language)}
                               </p>
-                              <div className="flex items-end gap-2">
-                                <span className="text-4xl font-black text-emerald-700 dark:text-emerald-300">
+                              <div className="flex items-end gap-1 sm:gap-2">
+                                <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-emerald-700 dark:text-emerald-300">
                                   {summary.participationAverage !== null
                                     ? summary.participationAverage.toFixed(1)
                                     : "—"}
                                 </span>
-                                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-300/70 mb-1">
+                                <span className="text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-300/70 mb-1">
                                   /20
                                 </span>
                               </div>
@@ -770,12 +770,12 @@ const ParentDashboard: React.FC = () => {
             </div>
 
             {/* Recent Updates */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                   {getTranslation("latestUpdates", language)}
                 </h3>
-                <div className="h-64 overflow-y-scroll space-y-4">
+                <div className="h-56 sm:h-64 overflow-y-scroll space-y-3 sm:space-y-4">
                   {notifications
                     .map((not) => ({
                       type: not.type,
@@ -785,10 +785,10 @@ const ParentDashboard: React.FC = () => {
                     .map((update, index) => (
                       <div
                         key={index}
-                        className="flex items-start space-x-3 rtl:space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                        className="flex items-start space-x-2 sm:space-x-3 rtl:space-x-reverse p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                       >
                         <div
-                          className={`p-2 rounded-lg ${update.type === "grade"
+                          className={`p-2 rounded-lg flex-shrink-0 ${update.type === "grade"
                             ? "bg-primary-100 dark:bg-primary-900"
                             : update.type === "message"
                               ? "bg-primary-100 dark:bg-primary-900/20"
@@ -803,12 +803,12 @@ const ParentDashboard: React.FC = () => {
                             <GraduationCap className="h-4 w-4 text-orange-600" />
                           )}
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white break-words">
                             {update.message}
                           </p>
                           <div className="flex items-center justify-end mt-1">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                               {update.time}
                             </span>
                           </div>

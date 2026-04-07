@@ -21,6 +21,7 @@ export interface Teacher {
 }
 
 export interface ModulesAndClassGroup {
+  id: number;
   teacher: number;
   module: Module;
   class_group: ClassGroup;
