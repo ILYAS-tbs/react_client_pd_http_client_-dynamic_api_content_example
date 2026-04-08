@@ -1,4 +1,5 @@
 import {
+  BatchPatchMonthlyEvaluationPayload,
   PatchMonthlyEvaluationPayload,
   PatchStudentPayload,
   PostMonthlyEvaluationPayload,
@@ -6,8 +7,10 @@ import {
   PostBehaviourReportPayload,
   PostMarkPayload,
   PostStudentGradesPayload,
+  TeacherMonthlyEvaluationFilters,
 } from "../payloads_types/teacher_client_payload_types";
 import { TeacherDashboardStats } from "../../../models/TeacherDashboardStats";
+import { TeacherMonthlyEvaluationGridResponse } from "../../../models/MonthlyEvaluation";
 import { SERVER_BASE_URL } from "../server_constants";
 
 const BASE_URL = SERVER_BASE_URL;
@@ -156,6 +159,30 @@ async function get_student_monthly_evaluations(studentId: string) {
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
+  }
+}
+
+async function get_filtered_monthly_evaluations(
+  filters: TeacherMonthlyEvaluationFilters
+) {
+  const params = new URLSearchParams({
+    class_group_id: filters.class_group_id,
+    module_id: filters.module_id,
+    month: filters.month,
+  });
+
+  try {
+    const response = await fetch(`${URLS.get_monthly_evaluations}?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data: TeacherMonthlyEvaluationGridResponse = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
 async function get_current_teacher_uploads() {
@@ -405,6 +432,28 @@ async function patch_monthly_evaluation(
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
+  }
+}
+
+async function batch_patch_monthly_evaluations(
+  payload: BatchPatchMonthlyEvaluationPayload,
+  csrfToken: string
+) {
+  const PATCH_URL = `${URLS.get_monthly_evaluations}batch/`;
+  try {
+    const response = await fetch(PATCH_URL, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
 
@@ -672,6 +721,7 @@ export const teacher_dashboard_client = {
   current_teacher_students_grades: current_teacher_students_grades,
   get_monthly_evaluations: get_monthly_evaluations,
   get_student_monthly_evaluations: get_student_monthly_evaluations,
+  get_filtered_monthly_evaluations: get_filtered_monthly_evaluations,
 
   patch_student: patch_student,
   mark_student_absent_today: mark_student_absent_today,
@@ -684,6 +734,7 @@ export const teacher_dashboard_client = {
   post_grades: post_grades,
   post_monthly_evaluation: post_monthly_evaluation,
   patch_monthly_evaluation: patch_monthly_evaluation,
+  batch_patch_monthly_evaluations: batch_patch_monthly_evaluations,
   delete_monthly_evaluation: delete_monthly_evaluation,
   patch_grades: patch_grades,
   calculate_average: calculate_average,

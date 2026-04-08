@@ -2179,6 +2179,16 @@ export const translations: Translations = {
     en: "A monthly record for classroom participation, homework, and teacher remarks without affecting averages.",
     fr: "Un relevé mensuel de la participation en classe, des devoirs et des remarques de l'enseignant sans impact sur les moyennes.",
   },
+  monthlyEvaluationSpreadsheetDescription: {
+    ar: "إدخال سريع على شكل جدول عمودي مع حفظ مستقل للمشاركة والواجبات والملاحظات.",
+    en: "Fast spreadsheet-style entry with separate saves for participation, homework, and remarks.",
+    fr: "Saisie rapide de type feuille de calcul avec sauvegarde séparée pour la participation, les devoirs et les remarques.",
+  },
+  monthlyEvaluationFilterHint: {
+    ar: "اختر القسم والشهر والمادة لتحميل جميع الطلاب دفعة واحدة ثم ابدأ الإدخال العمودي السريع.",
+    en: "Choose class, month, and module to load every student at once, then grade vertically.",
+    fr: "Choisissez la classe, le mois et la matière pour charger tous les élèves en une fois, puis saisissez verticalement.",
+  },
   participationMark: {
     ar: "علامة المشاركة الصفية",
     en: "Class Participation Mark",
@@ -2294,20 +2304,40 @@ export const translations: Translations = {
     en: "Class Participation",
     fr: "Participation en classe",
   },
+  monthlyEvaluationParticipationHint: {
+    ar: "أدخل علامات المشاركة بسرعة سطراً بعد سطر ثم احفظ هذا القسم فقط.",
+    en: "Enter participation marks row by row, then save only this section.",
+    fr: "Saisissez les notes de participation ligne par ligne, puis enregistrez uniquement cette section.",
+  },
   homeworkMarksSectionTitle: {
     ar: "علامات الواجبات",
     en: "Homework Marks",
     fr: "Notes des devoirs",
+  },
+  monthlyEvaluationHomeworkHint: {
+    ar: "خصص هذا الجدول لعلامات الواجبات دون التأثير على المشاركة أو الملاحظات.",
+    en: "Use this table for homework marks without touching participation or remarks.",
+    fr: "Utilisez ce tableau pour les notes des devoirs sans modifier la participation ni les remarques.",
   },
   remarksAndNotes: {
     ar: "الملاحظات والتعليقات",
     en: "Remarks & Notes",
     fr: "Remarques et notes",
   },
+  monthlyEvaluationRemarksHint: {
+    ar: "أضف ملاحظات قصيرة لكل طالب مع حفظ مستقل لهذا القسم.",
+    en: "Add short remarks per student with an independent save for this section.",
+    fr: "Ajoutez des remarques courtes par élève avec une sauvegarde indépendante pour cette section.",
+  },
   module: {
     ar: "المادة",
     en: "Module",
     fr: "Module",
+  },
+  monthlyEvaluationSelectModule: {
+    ar: "اختر المادة",
+    en: "Select module",
+    fr: "Sélectionnez la matière",
   },
   evaluationTitle: {
     ar: "عنوان التقييم",
@@ -2369,6 +2399,11 @@ export const translations: Translations = {
     en: "No class or module assignments are linked to this teacher account yet, so monthly evaluations cannot be added right now.",
     fr: "Aucune classe ni aucun module n'est encore lié à ce compte enseignant, donc les évaluations mensuelles ne peuvent pas être ajoutées pour le moment.",
   },
+  monthlyEvaluationAssignmentsHint: {
+    ar: "اربط الأستاذ بقسم ومادة أولاً حتى يظهر جدول التقييم الشهري لهذا الاختيار.",
+    en: "Assign this teacher to a class and module first so the monthly evaluation grid can load.",
+    fr: "Affectez d'abord cet enseignant à une classe et à une matière afin que la grille d'évaluation mensuelle puisse se charger.",
+  },
   noModulesForSelectedClass: {
     ar: "لا توجد مادة مرتبطة بالقسم المحدد لهذا الأستاذ.",
     en: "No module is assigned to the selected class for this teacher.",
@@ -2378,6 +2413,76 @@ export const translations: Translations = {
     ar: "اختر المادة أولاً لتفعيل إضافة أو تحديث التقييم.",
     en: "Select a module first to enable adding or updating the evaluation.",
     fr: "Sélectionnez d'abord un module pour activer l'ajout ou la mise à jour de l'évaluation.",
+  },
+  monthlyEvaluationSelectFilters: {
+    ar: "حدد الفلاتر المطلوبة أولاً",
+    en: "Select the required filters first",
+    fr: "Sélectionnez d'abord les filtres requis",
+  },
+  monthlyEvaluationSelectFiltersHint: {
+    ar: "لن يتم تحميل أي بيانات حتى تختار القسم والشهر والمادة.",
+    en: "No data is loaded until class, month, and module are all selected.",
+    fr: "Aucune donnée n'est chargée tant que la classe, le mois et la matière ne sont pas tous sélectionnés.",
+  },
+  monthlyEvaluationLoadRetryHint: {
+    ar: "تحقق من الفلاتر أو أعد المحاولة بعد قليل.",
+    en: "Check the filters or try again in a moment.",
+    fr: "Vérifiez les filtres ou réessayez dans un instant.",
+  },
+  monthlyEvaluationNoStudentsForFilters: {
+    ar: "لا يوجد طلاب لهذا الاختيار",
+    en: "No students match this selection",
+    fr: "Aucun élève ne correspond à cette sélection",
+  },
+  monthlyEvaluationNoStudentsForFiltersHint: {
+    ar: "غيّر القسم أو المادة أو الشهر لعرض صفوف أخرى.",
+    en: "Change the class, module, or month to load another student list.",
+    fr: "Modifiez la classe, la matière ou le mois pour charger une autre liste d'élèves.",
+  },
+  monthlyEvaluationUnsavedRows: {
+    ar: "صفوف غير محفوظة",
+    en: "unsaved rows",
+    fr: "lignes non enregistrées",
+  },
+  monthlyEvaluationKeyboardHint: {
+    ar: "Enter أو السهمان للأعلى والأسفل للتنقل السريع",
+    en: "Use Enter or Up/Down arrows for fast navigation",
+    fr: "Utilisez Entrée ou les flèches Haut/Bas pour naviguer rapidement",
+  },
+  monthlyEvaluationSaveChanges: {
+    ar: "حفظ التغييرات",
+    en: "Save Changes",
+    fr: "Enregistrer les modifications",
+  },
+  monthlyEvaluationSectionSaved: {
+    ar: "تم حفظ هذا القسم بنجاح.",
+    en: "This section was saved successfully.",
+    fr: "Cette section a été enregistrée avec succès.",
+  },
+  monthlyEvaluationSectionSaveFailed: {
+    ar: "تعذر حفظ هذا القسم. بقيت التغييرات غير المحفوظة كما هي.",
+    en: "Failed to save this section. Unsaved changes were preserved.",
+    fr: "Échec de l'enregistrement de cette section. Les modifications non enregistrées ont été conservées.",
+  },
+  monthlyEvaluationFixErrors: {
+    ar: "أصلح أخطاء الإدخال قبل الحفظ.",
+    en: "Fix validation errors before saving.",
+    fr: "Corrigez les erreurs de validation avant d'enregistrer.",
+  },
+  monthlyEvaluationClassColumn: {
+    ar: "القسم",
+    en: "Class",
+    fr: "Classe",
+  },
+  monthlyEvaluationNumericValueError: {
+    ar: "أدخل قيمة رقمية صحيحة.",
+    en: "Enter a valid numeric value.",
+    fr: "Saisissez une valeur numérique valide.",
+  },
+  monthlyEvaluationMarkRangeError: {
+    ar: "يجب أن تكون العلامة بين 0 و20.",
+    en: "Mark must be between 0 and 20.",
+    fr: "La note doit être comprise entre 0 et 20.",
   },
   uploadedMaterials: {
     ar: "المواد المرفوعة",

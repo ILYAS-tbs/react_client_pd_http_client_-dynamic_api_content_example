@@ -15,6 +15,33 @@ export interface MonthlyEvaluation {
   updated_at: string;
 }
 
+export interface MonthlyEvaluationGridRow {
+  student_id: string;
+  student_name: string;
+  class_group_id: string;
+  class_name: string;
+  module_id: string;
+  module_name: string;
+  evaluation_id: number | null;
+  mark_of_participation_in_class: number | null;
+  homeworks_mark: number | null;
+  remarks: string | null;
+  updated_at: string | null;
+}
+
+export interface TeacherMonthlyEvaluationGridResponse {
+  month: string;
+  class_group: {
+    id: string;
+    name: string;
+  };
+  module: {
+    id: string;
+    name: string;
+  };
+  rows: MonthlyEvaluationGridRow[];
+}
+
 export interface MonthlyEvaluationStudent {
   student_id: string;
   full_name: string;

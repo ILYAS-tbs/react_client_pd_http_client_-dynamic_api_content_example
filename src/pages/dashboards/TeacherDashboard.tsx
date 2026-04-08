@@ -10,7 +10,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
-import MonthylEvaluation from "../../components/teacher/MonthylEvaluation";
+import MonthylEvaluation from "../../components/teacher/MonthylEvaluation.tsx";
 import ClassManagement from "../../components/teacher/ClassManagement";
 import GradeManager from "../../components/teacher/GradeManager";
 import ResourceManager from "../../components/teacher/ResourceManager";
@@ -30,7 +30,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { getTranslation } from "../../utils/translations";
-import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
 import TeacherAttendanceTab from "../../components/teacher/TeacherAttendanceTab";
 import TeacherBehaviourNotesTab from "../../components/teacher/TeacherBehaviourNotesTab";
 
@@ -99,7 +98,6 @@ const TeacherDashboard: React.FC = () => {
   const [teacher_uploads, setTeacherUploads] = useState<TeacherUpload[]>([]);
   const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
-  const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
   const [teacherStats, setTeacherStats] = useState<TeacherDashboardStats>({
     my_classes: 0,
     grades: 0,
@@ -273,10 +271,7 @@ const TeacherDashboard: React.FC = () => {
       case "monthly_evaluation":
         return (
           <MonthylEvaluation
-            students_list={students}
             modules_class_groups={modules_class_groups}
-            monthly_evaluations={monthlyEvaluations}
-            setMonthlyEvaluations={setMonthlyEvaluations}
           />
         );
       case "grades":

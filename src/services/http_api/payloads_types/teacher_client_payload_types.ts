@@ -129,6 +129,23 @@ export interface PatchMonthlyEvaluationPayload {
   remarks?: string | null;
 }
 
+export interface TeacherMonthlyEvaluationFilters {
+  class_group_id: string;
+  module_id: string;
+  month: string;
+}
+
+export interface BatchMonthlyEvaluationUpdate {
+  student_id: string;
+  mark_of_participation_in_class?: number | null;
+  homeworks_mark?: number | null;
+  remarks?: string | null;
+}
+
+export interface BatchPatchMonthlyEvaluationPayload extends TeacherMonthlyEvaluationFilters {
+  updates: BatchMonthlyEvaluationUpdate[];
+}
+
 // Will be "FormData"
 // export interface PostTeacherUploadPayload {
 //   title: string;

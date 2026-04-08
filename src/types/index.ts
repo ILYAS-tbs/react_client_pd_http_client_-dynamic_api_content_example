@@ -149,12 +149,9 @@ export interface ClassManagementProps {
   modules_class_groups: TeacherModuleClassGroup[];
   isLoading?: boolean;
 }
-
+// to
 export interface MonthylEvaluationProps {
-  students_list: Student[];
   modules_class_groups: TeacherModuleClassGroup[];
-  monthly_evaluations: MonthlyEvaluation[];
-  setMonthlyEvaluations: React.Dispatch<React.SetStateAction<MonthlyEvaluation[]>>;
 }
 
 export interface TeacherAbsenceManagerProps {
