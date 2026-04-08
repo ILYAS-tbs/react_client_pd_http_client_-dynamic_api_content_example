@@ -19,7 +19,7 @@ import ActivitiesManagement from "../../components/school/ActivitiesManagement";
 import ExamScheduleManagemen from "../../components/school/ExamScheduleManagemen";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import SchoolHomeworksManagement from "../../components/school/HomeworksManagement";
-import SchoolParentChat from "../../components/shared/SchoolParentChat";
+import SchoolParentChat from "../../components/shared/SchoolParentChat.tsx";
 import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
 import { school_dashboard_client } from "../../services/http_api/school-dashboard/school_dashboard_client";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
@@ -428,8 +428,9 @@ const SchoolDashboard: React.FC = () => {
       case "chat":
         return (
           <SchoolParentChat
-            parents_list={parents}
             school_id={school_id}
+            students={students}
+            classGroups={class_groups}
           />
         );
       case "levels":

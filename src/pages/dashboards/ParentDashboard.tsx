@@ -18,7 +18,7 @@ import ScheduleManagement from "../../components/parent/ScheduleManagement";
 import ActivitiesView from "../../components/parent/ActivitiesManagement";
 import ParentHomeworks from "../../components/parent/ParentHomeworks.tsx";
 import ResourceLibrary from "../../components/parent/ResourceLibrary";
-import ParentChat from "../../components/shared/ParentChat";
+import ParentChat from "../../components/shared/ParentChat.tsx";
 import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
 import SchoolAnnouncements from "../../components/parent/SchoolAnnouncements";
 import { Student } from "../../models/Student.ts";
@@ -457,6 +457,7 @@ const ParentDashboard: React.FC = () => {
             userType="parent"
             teachers_list={teachers_list}
             parent_id={parent_id ?? 0}
+            students={students}
           />
         );
       case "announcements":

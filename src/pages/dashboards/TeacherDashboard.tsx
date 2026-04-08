@@ -19,10 +19,8 @@ import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
 import { TeacherUpload } from "../../models/TeacherUpload";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { User } from "../../contexts/AuthContext";
-import { chat_http_client } from "../../services/chat/chat_http_client";
-import TeacherChat from "../../components/shared/TeacherChat";
+import TeacherChat from "../../components/shared/TeacherChat.tsx";
 import TeacherHomeworks from "../../components/teacher/TeacherHomeworks";
-import { Parent } from "../../models/Parent";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -141,19 +139,6 @@ const TeacherDashboard: React.FC = () => {
       setTeacherUploads(teacher_uploads_list);
     }
   };
-
-  //? Chat system :
-  //? list for all the parents this teacher can chat with
-  const [parents_list, setParentsList] = useState<Parent[]>([]);
-
-  //! API CALL : 1. retrieving the teachers for this parent
-  const get_current_teacher_school_parents = async () => {
-    const res = await chat_http_client.get_current_teacher_school_parents();
-    if (res.ok) {
-      const new_parents_list: Parent[] = res.data;
-      setParentsList(new_parents_list);
-    }
-  };
   // Poll every 30s – if the school deactivated this teacher the session is
   // destroyed server-side, so the next check returns 401 and we show the
   // deactivation screen instead of silently failing.
@@ -181,9 +166,6 @@ const TeacherDashboard: React.FC = () => {
     get_current_teacher_stats();
     get_current_teacher_modules_and_class_groups();
     get_current_teacher_uploads();
-
-    //? chat system :
-    get_current_teacher_school_parents();
   }, []);
 
   const stats = [
@@ -273,8 +255,8 @@ const TeacherDashboard: React.FC = () => {
         return (
           <TeacherChat
             userType="teacher"
-            parents_list={parents_list}
             teacher_id={teacher_id}
+            classGroups={modules_class_groups}
           />
         );
 

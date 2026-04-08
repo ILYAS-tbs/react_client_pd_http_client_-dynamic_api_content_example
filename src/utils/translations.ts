@@ -1988,6 +1988,86 @@ export const translations: Translations = {
     en: "Select a chat to start",
     fr: "Sélectionnez une conversation pour commencer",
   },
+  selectClassGroup: {
+    ar: "اختر القسم",
+    en: "Select class group",
+    fr: "Sélectionner la classe",
+  },
+  selectStudent: {
+    ar: "اختر الطالب",
+    en: "Select student",
+    fr: "Sélectionner l'élève",
+  },
+  allClassGroups: {
+    ar: "كل الأقسام",
+    en: "All class groups",
+    fr: "Toutes les classes",
+  },
+  allStudents: {
+    ar: "كل الطلاب",
+    en: "All students",
+    fr: "Tous les élèves",
+  },
+  noChatsFound: {
+    ar: "لا توجد محادثات",
+    en: "No chats found",
+    fr: "Aucune conversation trouvée",
+  },
+  noChatsMatchFilters: {
+    ar: "لا توجد محادثات تطابق هذه الفلاتر أو البحث.",
+    en: "No chats match the current filters or search.",
+    fr: "Aucune conversation ne correspond aux filtres ou à la recherche.",
+  },
+  chooseClassToViewChats: {
+    ar: "اختر قسماً لعرض المحادثات المرتبطة به.",
+    en: "Select a class group to view its chats.",
+    fr: "Sélectionnez une classe pour afficher ses conversations.",
+  },
+  chooseStudentToViewChats: {
+    ar: "اختر طالباً لعرض المحادثات المرتبطة به.",
+    en: "Select a student to view their chats.",
+    fr: "Sélectionnez un élève pour afficher ses conversations.",
+  },
+  studentLabel: {
+    ar: "الطالب",
+    en: "Student",
+    fr: "Élève",
+  },
+  classGroupLabel: {
+    ar: "القسم",
+    en: "Class Group",
+    fr: "Classe",
+  },
+  moduleLabel: {
+    ar: "المواد",
+    en: "Modules",
+    fr: "Matières",
+  },
+  activeFilters: {
+    ar: "الفلاتر النشطة",
+    en: "Active filters",
+    fr: "Filtres actifs",
+  },
+  loadMore: {
+    ar: "تحميل المزيد",
+    en: "Load more",
+    fr: "Charger plus",
+  },
+  noMessagesYet: {
+    ar: "لا توجد رسائل بعد",
+    en: "No messages yet",
+    fr: "Pas encore de messages",
+  },
+  messagePlaceholder: {
+    ar: "اكتب رسالتك هنا...",
+    en: "Write your message here...",
+    fr: "Écrivez votre message ici...",
+  },
+  searchChatsByParticipantOrStudent: {
+    ar: "ابحث بالاسم أو البريد الإلكتروني أو الطالب...",
+    en: "Search by name, email, or student...",
+    fr: "Rechercher par nom, e-mail ou élève...",
+  },
 
   //? SchoolAnnouncements.tsx :
   holiday: { ar: "إجازة", en: "Holiday", fr: "Vacances" },
@@ -2873,11 +2953,6 @@ export const translations: Translations = {
     ar: "إضافة درجة جديدة",
     en: "Add New Grade",
     fr: "Ajouter une nouvelle note",
-  },
-  selectStudent: {
-    ar: "اختر الطالب",
-    en: "Select Student",
-    fr: "Choisir un élève",
   },
   selectSubject: {
     ar: "اختر المادة",
@@ -3908,7 +3983,6 @@ export const translations: Translations = {
   studentAbsencesTab: { ar: "غيابات الطلاب", en: "Student Absences", fr: "Absences des élèves" },
   studentAbsencesSubtitle: { ar: "تابع الغياب والتبريرات والحذف الإداري من مكان واحد", en: "Review absences, justifications, and manual deletions in one place", fr: "Consultez les absences, justifications et suppressions manuelles au même endroit" },
   bulkApprove: { ar: "موافقة جماعية", en: "Bulk Approve", fr: "Approbation groupée" },
-  allStudents: { ar: "جميع الطلاب", en: "All Students", fr: "Tous les élèves" },
   allModules: { ar: "جميع المواد", en: "All Modules", fr: "Toutes les matières" },
   allStatuses: { ar: "جميع الحالات", en: "All Statuses", fr: "Tous les statuts" },
   refused: { ar: "مرفوض", en: "Refused", fr: "Refusé" },

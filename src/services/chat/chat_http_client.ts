@@ -1,5 +1,6 @@
 import { SERVER_BASE_URL } from "../http_api/server_constants";
 import {
+  ChatListQueryParams,
   GetConvesationMessagesPayload,
   MarkChatMessagedAsRead,
   PrivateConversationIDPayload,
@@ -22,6 +23,22 @@ const URLS = {
 
   get_latest_five_messages:`${SERVER_BASE_URL}/chat/get_latest_five_messages/`
 };
+
+function buildUrlWithQuery(baseUrl: string, params?: ChatListQueryParams) {
+  if (!params) {
+    return baseUrl;
+  }
+
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.set(key, String(value));
+    }
+  });
+
+  const queryString = searchParams.toString();
+  return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+}
 //! used by the parent dashboard/chat
 async function get_current_parent_schools_teachers() {
   try {
@@ -94,9 +111,9 @@ async function get_conversation_messages(
 }
 
 //! CHATS from the teacher dashboard : getting the school's parent's chats
-async function get_current_teacher_parents_chats() {
+async function get_current_teacher_parents_chats(params?: ChatListQueryParams) {
   try {
-    const response = await fetch(URLS.get_current_teacher_parents_chats, {
+    const response = await fetch(buildUrlWithQuery(URLS.get_current_teacher_parents_chats, params), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -110,9 +127,9 @@ async function get_current_teacher_parents_chats() {
   }
 }
 //! CHATS from the Parent dashboard : getting the school's teachers's chats
-async function get_current_parent_teachers_chats() {
+async function get_current_parent_teachers_chats(params?: ChatListQueryParams) {
   try {
-    const response = await fetch(URLS.get_current_parent_teachers_chats, {
+    const response = await fetch(buildUrlWithQuery(URLS.get_current_parent_teachers_chats, params), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -127,9 +144,9 @@ async function get_current_parent_teachers_chats() {
 }
 
 //! CHATS from the School dashboard : getting the school's parents's chats
-async function get_current_school_parents_chats() {
+async function get_current_school_parents_chats(params?: ChatListQueryParams) {
   try {
-    const response = await fetch(URLS.get_current_school_parents_chats, {
+    const response = await fetch(buildUrlWithQuery(URLS.get_current_school_parents_chats, params), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -144,9 +161,9 @@ async function get_current_school_parents_chats() {
 }
 
 //! CHATS from the Parent dashboard : getting the parent's schools' chats
-async function get_current_parent_schools_chats() {
+async function get_current_parent_schools_chats(params?: ChatListQueryParams) {
   try {
-    const response = await fetch(URLS.get_current_parent_schools_chats, {
+    const response = await fetch(buildUrlWithQuery(URLS.get_current_parent_schools_chats, params), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
