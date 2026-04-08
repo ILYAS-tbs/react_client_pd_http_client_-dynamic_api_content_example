@@ -5,7 +5,7 @@ export interface StudentPerformance {
     class_group_name:            string;
     class_group_students_number: number;
     student_rank:                number;
-    /** Overall average across all modules for the semester. Null if no grades yet. */
+    /** Overall average across all modules for the semester using stored teacher-entered averages. */
     s1_overall:                  number | null;
     s2_overall:                  number | null;
     s3_overall:                  number | null;
@@ -16,7 +16,7 @@ export interface ModulesStat {
     module_id:   number;
     module_name: string;
 
-    // Student's semester averages (read directly from StudentGrades, null if not set)
+    // Student's semester averages stored in StudentGrades, null if not set.
     s1_average: number | null;
     s2_average: number | null;
     s3_average: number | null;

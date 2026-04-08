@@ -103,6 +103,23 @@ export interface PatchStudentGradesPayload {
   s3_average?: number | null;
 }
 
+export interface TeacherStudentGradesFilters {
+  class_group_id: string;
+  module_id: string;
+  semester: "s1" | "s2" | "s3";
+}
+
+export interface BatchStudentGradesSectionUpdate {
+  student_id: string;
+  value?: number | null;
+}
+
+export interface BatchPatchStudentGradesSectionPayload
+  extends TeacherStudentGradesFilters {
+  section: "evaluation" | "devoir_1" | "devoir_2" | "exam" | "average";
+  updates: BatchStudentGradesSectionUpdate[];
+}
+
 export interface PostMonthlyEvaluationPayload {
   student_id: string;
   month: string;

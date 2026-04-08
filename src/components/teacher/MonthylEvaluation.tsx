@@ -787,7 +787,7 @@ const SpreadsheetSection: React.FC<SpreadsheetSectionProps> = ({
           <span>{getTranslation("loading", language)}</span>
         </div>
       ) : (
-        <div className="overflow-auto">
+        <div className="max-h-[600px] overflow-auto">
           <table className="min-w-full border-separate border-spacing-0">
             <thead>
               <tr>

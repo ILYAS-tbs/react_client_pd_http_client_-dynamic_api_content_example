@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Calendar,
   CheckCircle2,
-  Download,
   Search,
   Undo2,
 } from "lucide-react";
@@ -30,27 +29,46 @@ interface AssignmentOption {
   moduleName: string;
 }
 
+const UNDO_GRACE_MS = 60 * 1000;
+const TIMEZONE_OFFSET_STEP_MS = 60 * 60 * 1000;
+
 const toDateInputValue = (value = new Date()) => value.toISOString().slice(0, 10);
 
-function exportAttendanceCsv(rows: AttendanceAbsence[]) {
-  const header = ["Student", "Class", "Module", "Date", "Hour", "Status"];
-  const data = rows.map((row) => [
-    row.student.full_name,
-    row.class_group?.name ?? "",
-    row.module?.module_name ?? "",
-    row.date,
-    String(row.hour),
-    row.status,
-  ]);
-  const csv = [header, ...data]
-    .map((cells) => cells.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-    .join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `absence-history-${Date.now()}.csv`;
-  link.click();
-  URL.revokeObjectURL(link.href);
+function parseApiDateTimeToMs(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const hasExplicitTimezone = /(?:Z|[+-]\d{2}:\d{2})$/.test(value);
+  const normalizedValue = hasExplicitTimezone ? value : `${value}Z`;
+  const timestamp = new Date(normalizedValue).getTime();
+
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+function getUndoRemainingMs(absence: AttendanceAbsence, nowMs: number) {
+  const deadlineMs = parseApiDateTimeToMs(absence.undo_deadline);
+  if (deadlineMs === null) {
+    return 0;
+  }
+
+  let remainingMs = deadlineMs - nowMs;
+  const createdAtMs = parseApiDateTimeToMs(absence.created_at);
+
+  if (createdAtMs !== null) {
+    const graceWindowMs = deadlineMs - createdAtMs;
+    if (graceWindowMs > 0 && graceWindowMs <= UNDO_GRACE_MS && remainingMs > graceWindowMs) {
+      while (remainingMs > graceWindowMs) {
+        remainingMs -= TIMEZONE_OFFSET_STEP_MS;
+      }
+    }
+
+    if (graceWindowMs > 0) {
+      remainingMs = Math.min(remainingMs, graceWindowMs);
+    }
+  }
+
+  return Math.max(remainingMs, 0);
 }
 
 const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
@@ -105,18 +123,41 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
     (assignment) => assignment.id === selectedAssignmentId
   );
 
-  const refreshAbsences = async () => {
+  const refreshAbsences = useCallback(async () => {
     setIsLoading(true);
     const res = await attendance_client.listAbsences({ include_deleted: true });
     if (res.ok) {
       setAbsences(res.data);
     }
     setIsLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     void refreshAbsences();
-  }, []);
+
+    const interval = window.setInterval(() => {
+      void refreshAbsences();
+    }, 30000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void refreshAbsences();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      void refreshAbsences();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [refreshAbsences, selectedAssignmentId, selectedDate, selectedHour]);
 
   const currentStudents = useMemo(() => {
     if (!selectedAssignment) return [];
@@ -135,7 +176,8 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
         absence.module?.module_id === selectedAssignment.moduleId &&
         absence.date === selectedDate &&
         absence.hour === selectedHour &&
-        !absence.is_deleted
+        !absence.is_deleted &&
+        absence.status === "absent"
     );
   }, [absences, selectedAssignment, selectedDate, selectedHour]);
 
@@ -152,13 +194,15 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
         return;
       }
 
-      const deadline = new Date(absence.undo_deadline).getTime();
-      if (deadline <= now) {
+      const remainingMs = getUndoRemainingMs(absence, now);
+      if (remainingMs <= 0) {
         return;
       }
 
       const current = byStudentId.get(absence.student.student_id);
-      if (!current || new Date(current.created_at).getTime() < new Date(absence.created_at).getTime()) {
+      const currentCreatedAtMs = parseApiDateTimeToMs(current?.created_at) ?? 0;
+      const absenceCreatedAtMs = parseApiDateTimeToMs(absence.created_at) ?? 0;
+      if (!current || currentCreatedAtMs < absenceCreatedAtMs) {
         byStudentId.set(absence.student.student_id, absence);
       }
     });
@@ -169,26 +213,6 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
   useEffect(() => {
     setDraftAbsentIds(lockedAbsentIds);
   }, [lockedAbsentIds, selectedAssignmentId, selectedDate, selectedHour]);
-
-  const historyRows = useMemo(() => {
-    if (!selectedAssignment) return [];
-    return absences
-      .filter(
-        (absence) =>
-          absence.class_group?.class_group_id === selectedAssignment.classGroupId &&
-          absence.module?.module_id === selectedAssignment.moduleId &&
-          absence.student.full_name.toLowerCase().includes(search.toLowerCase())
-      )
-      .sort((left, right) =>
-        `${right.date}-${right.hour}`.localeCompare(`${left.date}-${left.hour}`)
-      );
-  }, [absences, search, selectedAssignment]);
-
-  const pendingJustifications = useMemo(
-    () =>
-      historyRows.filter((row) => row.justification?.status === "pending").length,
-    [historyRows]
-  );
 
   const absentCount = draftAbsentIds.length;
   const presentCount = Math.max(currentStudents.length - absentCount, 0);
@@ -294,14 +318,6 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => exportAttendanceCsv(historyRows)}
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-primary-300 hover:text-primary-600 dark:border-gray-600 dark:text-gray-200"
-            >
-              <Download className="h-4 w-4" />
-              {getTranslation("exportCsv", language)}
-            </button>
             <div className="inline-flex items-center rounded-xl bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 dark:bg-primary-500/10 dark:text-primary-200">
               {getTranslation("attendanceAutoSaveHint", language)}
             </div>
@@ -362,11 +378,10 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         {[
           [getTranslation("presentRate", language), `${presentPercentage}%`],
           [getTranslation("absentCount", language), String(absentCount)],
-          [getTranslation("pendingJustifications", language), String(pendingJustifications)],
           [getTranslation("students", language), String(currentStudents.length)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -383,6 +398,9 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
             {getTranslation("teacherMarkAbsences", language)}
           </h3>
         </div>
+        <div className="mb-4 rounded-2xl border border-primary-100 bg-primary-50/70 px-4 py-3 text-sm text-primary-800 dark:border-primary-500/20 dark:bg-primary-500/10 dark:text-primary-100">
+          {getTranslation("teacherAttendanceFreshListHint", language)}
+        </div>
         <div className="space-y-3">
           {isLoading ? (
             <p className="text-sm text-gray-500 dark:text-gray-400">{getTranslation("loading", language)}</p>
@@ -394,8 +412,8 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
               const isLocked = lockedAbsentIds.includes(student.student_id);
               const isSavingStudent = savingStudentIds.includes(student.student_id);
               const undoableAbsence = activeUndoAbsencesByStudentId.get(student.student_id);
-              const undoSecondsLeft = undoableAbsence?.undo_deadline
-                ? Math.max(Math.ceil((new Date(undoableAbsence.undo_deadline).getTime() - now) / 1000), 0)
+              const undoSecondsLeft = undoableAbsence
+                ? Math.ceil(getUndoRemainingMs(undoableAbsence, now) / 1000)
                 : 0;
               return (
                 <button
@@ -457,40 +475,6 @@ const TeacherAttendanceTab: React.FC<TeacherAttendanceTabProps> = ({
             {feedback}
           </div>
         ) : null}
-      </div>
-
-      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-          {getTranslation("teacherAbsenceHistory", language)}
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-left text-gray-500 dark:border-gray-700 dark:text-gray-400">
-                <th className="px-3 py-2">{getTranslation("student", language)}</th>
-                <th className="px-3 py-2">{getTranslation("Date", language)}</th>
-                <th className="px-3 py-2">{getTranslation("hour", language)}</th>
-                <th className="px-3 py-2">{getTranslation("status", language)}</th>
-                <th className="px-3 py-2">{getTranslation("justification", language)}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {historyRows.map((row) => (
-                <tr key={row.id} className="border-b border-gray-100 dark:border-gray-800">
-                  <td className="px-3 py-3 text-gray-900 dark:text-white">{row.student.full_name}</td>
-                  <td className="px-3 py-3 text-gray-600 dark:text-gray-300">{row.date}</td>
-                  <td className="px-3 py-3 text-gray-600 dark:text-gray-300">{row.hour}</td>
-                  <td className="px-3 py-3">
-                    <span className={`rounded-full px-2 py-1 text-xs font-bold ${row.status === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200" : row.status === "pending" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" : row.status === "refused" ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200" : "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-200"}`}>
-                      {row.status}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 text-gray-600 dark:text-gray-300">{row.justification?.comment ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </section>
   );

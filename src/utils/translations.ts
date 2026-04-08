@@ -2429,6 +2429,196 @@ export const translations: Translations = {
     en: "Check the filters or try again in a moment.",
     fr: "Vérifiez les filtres ou réessayez dans un instant.",
   },
+  gradesSpreadsheetDescription: {
+    ar: "واجهة إدخال درجات يدوية منظمة حسب القسم والمادة والفصل مع حفظ مستقل لكل قسم.",
+    en: "A manual-entry grade workspace organized by class, module, and semester with independent section saves.",
+    fr: "Un espace de saisie manuelle des notes organise par classe, matiere et semestre avec enregistrement independant par section.",
+  },
+  gradesFilterHint: {
+    ar: "لن يتم تحميل الجداول حتى تختار القسم والمادة والفصل.",
+    en: "Tables stay unloaded until class, module, and semester are selected.",
+    fr: "Les tableaux ne se chargent qu'apres la selection de la classe, de la matiere et du semestre.",
+  },
+  noGradeAssignments: {
+    ar: "لا توجد اقسام او مواد مرتبطة بهذا الاستاذ حاليا، لذلك لا يمكن ادارة الدرجات بعد.",
+    en: "No class or module assignments are linked to this teacher yet, so grade management is unavailable.",
+    fr: "Aucune classe ni matiere n'est encore liee a cet enseignant, donc la gestion des notes est indisponible.",
+  },
+  gradeAssignmentsHint: {
+    ar: "اربط الاستاذ بقسم ومادة اولا حتى يظهر جدول الدرجات لهذا الاختيار.",
+    en: "Assign this teacher to a class and module first so the grade grid can load.",
+    fr: "Affectez d'abord cet enseignant a une classe et une matiere pour charger la grille des notes.",
+  },
+  gradesSelectFilters: {
+    ar: "حدد الفلاتر المطلوبة اولا",
+    en: "Select the required filters first",
+    fr: "Selectionnez d'abord les filtres requis",
+  },
+  gradesSelectFiltersHint: {
+    ar: "لن تظهر قائمة التلاميذ ولا اقسام الدرجات قبل اختيار القسم والمادة والفصل.",
+    en: "The student panel and grade sections stay hidden until class, module, and semester are selected.",
+    fr: "La liste des eleves et les sections de notes restent masquees tant que la classe, la matiere et le semestre ne sont pas selectionnes.",
+  },
+  gradesLoadFailed: {
+    ar: "تعذر تحميل بيانات الدرجات.",
+    en: "Failed to load grade data.",
+    fr: "Echec du chargement des donnees de notes.",
+  },
+  gradesLoadRetryHint: {
+    ar: "تحقق من الفلاتر او اعد المحاولة بعد قليل.",
+    en: "Check the selected filters or try again in a moment.",
+    fr: "Verifiez les filtres selectionnes ou reessayez dans un instant.",
+  },
+  gradesNoStudentsForFilters: {
+    ar: "لا يوجد تلاميذ لهذا الاختيار",
+    en: "No students match this selection",
+    fr: "Aucun eleve ne correspond a cette selection",
+  },
+  gradesNoStudentsForFiltersHint: {
+    ar: "غير القسم او المادة او الفصل لتحميل قائمة اخرى.",
+    en: "Change the class, module, or semester to load another student list.",
+    fr: "Modifiez la classe, la matiere ou le semestre pour charger une autre liste d'eleves.",
+  },
+  gradesNoSearchResults: {
+    ar: "لا توجد نتائج مطابقة للبحث",
+    en: "No students match this search",
+    fr: "Aucun eleve ne correspond a cette recherche",
+  },
+  gradesNoSearchResultsHint: {
+    ar: "غير عبارة البحث لعرض مزيد من التلاميذ داخل القائمة الحالية.",
+    en: "Adjust the search term to reveal more students from the current selection.",
+    fr: "Modifiez le terme de recherche pour afficher plus d'eleves dans la selection actuelle.",
+  },
+  gradesStudentListTitle: {
+    ar: "قائمة التلاميذ",
+    en: "Student List",
+    fr: "Liste des eleves",
+  },
+  gradesStudentListHint: {
+    ar: "ابحث عن التلميذ ثم انقر عليه للتركيز على صفه داخل الجداول.",
+    en: "Search for a student and select them to focus their row inside the grids.",
+    fr: "Recherchez un eleve puis selectionnez-le pour cibler sa ligne dans les grilles.",
+  },
+  gradesSearchPlaceholder: {
+    ar: "ابحث باسم التلميذ...",
+    en: "Search by student name...",
+    fr: "Rechercher par nom d'eleve...",
+  },
+  selectSemesterPlaceholder: {
+    ar: "اختر الفصل",
+    en: "Select Semester",
+    fr: "Selectionner le semestre",
+  },
+  gradesUnsavedRows: {
+    ar: "صفوف غير محفوظة",
+    en: "unsaved rows",
+    fr: "lignes non enregistrees",
+  },
+  gradesKeyboardHint: {
+    ar: "Enter والاسهم للتنقل السريع بين الخلايا",
+    en: "Use Enter and arrow keys for fast cell navigation",
+    fr: "Utilisez Entree et les fleches pour naviguer rapidement entre les cellules",
+  },
+  gradesSaveChanges: {
+    ar: "حفظ القسم",
+    en: "Save Section",
+    fr: "Enregistrer la section",
+  },
+  gradesSectionSaved: {
+    ar: "تم حفظ هذا القسم بنجاح.",
+    en: "This section was saved successfully.",
+    fr: "Cette section a ete enregistree avec succes.",
+  },
+  gradesSectionSaveFailed: {
+    ar: "تعذر حفظ هذا القسم. بقيت التغييرات غير المحفوظة كما هي.",
+    en: "Failed to save this section. Unsaved changes were preserved.",
+    fr: "Echec de l'enregistrement de cette section. Les modifications non enregistrees ont ete conservees.",
+  },
+  gradesFixErrors: {
+    ar: "اصلح اخطاء الادخال قبل الحفظ.",
+    en: "Fix validation errors before saving.",
+    fr: "Corrigez les erreurs de validation avant d'enregistrer.",
+  },
+  gradesNumericValueError: {
+    ar: "ادخل قيمة رقمية صحيحة.",
+    en: "Enter a valid numeric value.",
+    fr: "Saisissez une valeur numerique valide.",
+  },
+  gradesMarkRangeError: {
+    ar: "يجب ان تكون العلامة بين 0 و20.",
+    en: "Mark must be between 0 and 20.",
+    fr: "La note doit etre comprise entre 0 et 20.",
+  },
+  gradeEvaluationSectionTitle: {
+    ar: "التقويم",
+    en: "Evaluation",
+    fr: "Evaluation",
+  },
+  gradeEvaluationSectionHint: {
+    ar: "ادخل علامات التقويم يدويا لكل تلميذ داخل هذا القسم فقط.",
+    en: "Enter evaluation marks manually for each student in this section only.",
+    fr: "Saisissez manuellement les notes d'evaluation pour chaque eleve uniquement dans cette section.",
+  },
+  gradeDevoirOneSectionTitle: {
+    ar: "الفرض 1",
+    en: "Devoir 1",
+    fr: "Devoir 1",
+  },
+  gradeDevoirOneSectionHint: {
+    ar: "هذا القسم يحفظ الفرض الاول فقط دون المساس بباقي الحقول.",
+    en: "This section saves only the first devoir field without touching the others.",
+    fr: "Cette section enregistre uniquement le premier devoir sans modifier les autres champs.",
+  },
+  gradeDevoirTwoSectionTitle: {
+    ar: "الفرض 2",
+    en: "Devoir 2",
+    fr: "Devoir 2",
+  },
+  gradeDevoirTwoSectionHint: {
+    ar: "هذا القسم يحفظ الفرض الثاني فقط دون اعادة حساب اي شيء.",
+    en: "This section saves only the second devoir field with no recalculation.",
+    fr: "Cette section enregistre uniquement le deuxieme devoir sans aucun recalcul.",
+  },
+  gradeExamSectionTitle: {
+    ar: "الامتحان",
+    en: "Exam",
+    fr: "Examen",
+  },
+  gradeExamSectionHint: {
+    ar: "ادخل علامة الامتحان يدويا واحفظ هذا القسم بشكل مستقل.",
+    en: "Enter the exam mark manually and save this section independently.",
+    fr: "Saisissez manuellement la note d'examen et enregistrez cette section de facon independante.",
+  },
+  gradeAverageSectionTitle: {
+    ar: "المعدل",
+    en: "Average",
+    fr: "Moyenne",
+  },
+  gradeAverageSectionHint: {
+    ar: "المعدل لم يعد محسوبا تلقائيا. الاستاذ يدخله ويحفظه يدويا.",
+    en: "Average is no longer calculated automatically. The teacher enters and saves it manually.",
+    fr: "La moyenne n'est plus calculee automatiquement. L'enseignant la saisit et l'enregistre manuellement.",
+  },
+  evaluationMark: {
+    ar: "علامة التقويم",
+    en: "Evaluation Mark",
+    fr: "Note d'evaluation",
+  },
+  devoir1Mark: {
+    ar: "علامة الفرض 1",
+    en: "Devoir 1 Mark",
+    fr: "Note devoir 1",
+  },
+  devoir2Mark: {
+    ar: "علامة الفرض 2",
+    en: "Devoir 2 Mark",
+    fr: "Note devoir 2",
+  },
+  examMark: {
+    ar: "علامة الامتحان",
+    en: "Exam Mark",
+    fr: "Note d'examen",
+  },
   monthlyEvaluationNoStudentsForFilters: {
     ar: "لا يوجد طلاب لهذا الاختيار",
     en: "No students match this selection",
@@ -3704,6 +3894,7 @@ export const translations: Translations = {
   attendanceShortcutHint: { ar: "اضغط A للغياب و P للحضور", en: "Press A for absent and P for present", fr: "Appuyez sur A pour absent et P pour présent" },
   attendanceHistory: { ar: "سجل الحضور", en: "Attendance History", fr: "Historique des présences" },
   attendanceAutoSaveHint: { ar: "يتم حفظ الغياب مباشرة عند التعليم", en: "Absences are saved immediately when marked", fr: "Les absences sont enregistrées immédiatement" },
+  teacherAttendanceFreshListHint: { ar: "هذه الشاشة مخصصة لتسجيل غياب هذه الحصة فقط. أي غياب تمت معالجته من المدرسة أو عبر التبرير يختفي هنا تلقائياً.", en: "This screen is only for marking absences for the current slot. Any absence handled by the school or through justification disappears here automatically.", fr: "Cet écran sert uniquement à marquer les absences du créneau en cours. Toute absence traitée par l'école ou via justification disparaît ici automatiquement." },
   undoAbsence: { ar: "تراجع", en: "Undo", fr: "Annuler" },
   behaviourNotesTab: { ar: "ملاحظات السلوك", en: "Behaviour Notes", fr: "Notes de comportement" },
   autoFromStudent: { ar: "تحديد تلقائي من الطالب", en: "Auto from student", fr: "Auto selon l'élève" },

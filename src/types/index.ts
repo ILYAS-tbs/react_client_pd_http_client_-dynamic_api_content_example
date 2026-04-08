@@ -10,14 +10,10 @@ import { Student } from "../models/Student";
 import { Teacher } from "../models/Teacher";
 import { TeacherAbsence } from "../models/TeacherAbsence";
 import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
-
-import { TeacherModuleClassGrp } from "../models/TeacherModuleClassGrp";
-import { StudentGrade } from "../models/StudentGrade";
 import { TeacherUpload } from "../models/TeacherUpload";
 import { StudentPerformance } from "../models/StudentPerformance";
 import { ParentStudentEvent } from "../models/ParentStudentEvent";
 import { Module } from "../models/Module";
-import { MonthlyEvaluation } from "../models/MonthlyEvaluation";
 
 export type Language = "ar" | "en" | "fr";
 
@@ -164,14 +160,7 @@ export interface TeacherAbsenceManagerProps {
 }
 
 export interface GradeManagerProps {
-  students: Student[];
-  modules: TeacherModuleClassGrp[];
   modules_class_groups: TeacherModuleClassGroup[];
-  students_grades: StudentGrade[];
-  setStudentsGrades: React.Dispatch<React.SetStateAction<StudentGrade[]>>;
-  teacher_id: number;
-  //? Re-Sync with the server functions:
-  RefetchGrades: () => void;
 }
 
 export interface ResourceManagerProps {

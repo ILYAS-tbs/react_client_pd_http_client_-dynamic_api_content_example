@@ -56,6 +56,42 @@ export interface Student {
   trimester_grade: number;
 }
 
+export type GradeGridSectionKey =
+  | "evaluation"
+  | "devoir_1"
+  | "devoir_2"
+  | "exam"
+  | "average";
+
+export interface StudentGradeGridRow {
+  grade_record_id: number;
+  student_id: string;
+  student_name: string;
+  class_group_id: string;
+  class_name: string;
+  module_id: string;
+  module_name: string;
+  semester: "s1" | "s2" | "s3";
+  evaluation_mark: number | null;
+  devoir1_mark: number | null;
+  devoir2_mark: number | null;
+  exam_mark: number | null;
+  average_mark: number | null;
+}
+
+export interface TeacherStudentGradesGridResponse {
+  class_group: {
+    id: string;
+    name: string;
+  };
+  module: {
+    id: string;
+    name: string;
+  };
+  semester: "s1" | "s2" | "s3";
+  rows: StudentGradeGridRow[];
+}
+
 // Converts JSON strings to/from your types
 export class StudentGradeConvert {
   public static toStudentGrade(json: string): StudentGrade {

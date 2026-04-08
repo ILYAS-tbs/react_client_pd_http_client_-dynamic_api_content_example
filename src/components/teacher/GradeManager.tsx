@@ -1,1788 +1,1148 @@
-import React, { useEffect, useState } from "react";
-import { Plus, Edit, X, Download } from "lucide-react";
-import { GradeManagerProps } from "../../types";
-import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
-import { StudentGrade } from "../../models/StudentGrade";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  PatchStudentGradesPayload,
-  PostStudentGradesPayload,
+  AlertCircle,
+  ClipboardCheck,
+  FileText,
+  Filter,
+  Loader2,
+  Save,
+  Search,
+  Users,
+} from "lucide-react";
+import { GradeManagerProps } from "../../types";
+import {
+  GradeGridSectionKey,
+  StudentGradeGridRow,
+  TeacherStudentGradesGridResponse,
+} from "../../models/StudentGrade";
+import {
+  BatchStudentGradesSectionUpdate,
+  TeacherStudentGradesFilters,
 } from "../../services/http_api/payloads_types/teacher_client_payload_types";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
-import GradingFormulaBuilder, { 
-  calculateAverageFromFormula, 
-  fetchGradingFormula 
-} from "./GradingFormulaBuilder";
+import { useNotifications } from "../../contexts/NotificationContext";
 
-const GradeManager: React.FC<GradeManagerProps> = ({
-  students,
-  modules,
-  modules_class_groups,
-  students_grades,
-  teacher_id,
-  RefetchGrades,
-}) => {
-  //! Translations :
+type SectionKey = GradeGridSectionKey;
+
+type GradeFilterState = {
+  class_group_id: string;
+  module_id: string;
+  semester: "" | "s1" | "s2" | "s3";
+};
+
+type SectionDraftState = Record<SectionKey, Record<string, string>>;
+type SectionErrorState = Record<SectionKey, Record<string, string>>;
+type SectionSavingState = Record<SectionKey, boolean>;
+type SectionFeedbackState = Record<
+  SectionKey,
+  { tone: "success" | "error"; message: string } | null
+>;
+
+type SectionConfig = {
+  key: SectionKey;
+  titleKey: string;
+  subtitleKey: string;
+  inputLabelKey: string;
+  field: keyof Pick<
+    StudentGradeGridRow,
+    "evaluation_mark" | "devoir1_mark" | "devoir2_mark" | "exam_mark" | "average_mark"
+  >;
+  icon: React.ComponentType<{ className?: string }>;
+  accentClasses: {
+    icon: string;
+    badge: string;
+    row: string;
+    focus: string;
+    button: string;
+    selected: string;
+  };
+};
+
+type SpreadsheetSectionProps = {
+  config: SectionConfig;
+  rows: StudentGradeGridRow[];
+  loading: boolean;
+  language: string;
+  dirtyIds: Set<string>;
+  values: Record<string, string>;
+  errors: Record<string, string>;
+  feedback: { tone: "success" | "error"; message: string } | null;
+  saving: boolean;
+  activeStudentId: string;
+  onValueChange: (section: SectionKey, studentId: string, value: string) => void;
+  onKeyDown: (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    section: SectionKey,
+    rowIndex: number,
+    studentId: string
+  ) => void;
+  onSave: (section: SectionKey) => void;
+  onStudentFocus: (studentId: string) => void;
+};
+
+const createEmptySectionDraftState = (): SectionDraftState => ({
+  evaluation: {},
+  devoir_1: {},
+  devoir_2: {},
+  exam: {},
+  average: {},
+});
+
+const createEmptySectionErrorState = (): SectionErrorState => ({
+  evaluation: {},
+  devoir_1: {},
+  devoir_2: {},
+  exam: {},
+  average: {},
+});
+
+const createEmptySectionSavingState = (): SectionSavingState => ({
+  evaluation: false,
+  devoir_1: false,
+  devoir_2: false,
+  exam: false,
+  average: false,
+});
+
+const createEmptySectionFeedbackState = (): SectionFeedbackState => ({
+  evaluation: null,
+  devoir_1: null,
+  devoir_2: null,
+  exam: null,
+  average: null,
+});
+
+const SECTION_CONFIGS: SectionConfig[] = [
+  {
+    key: "evaluation",
+    titleKey: "gradeEvaluationSectionTitle",
+    subtitleKey: "gradeEvaluationSectionHint",
+    inputLabelKey: "evaluationMark",
+    field: "evaluation_mark",
+    icon: ClipboardCheck,
+    accentClasses: {
+      icon: "bg-sky-100 text-sky-700",
+      badge: "bg-sky-50 text-sky-700",
+      row: "bg-sky-50/70",
+      focus: "focus:ring-sky-500",
+      button: "bg-sky-600 hover:bg-sky-700 disabled:bg-sky-300",
+      selected: "ring-sky-300 bg-sky-50/80",
+    },
+  },
+  {
+    key: "devoir_1",
+    titleKey: "gradeDevoirOneSectionTitle",
+    subtitleKey: "gradeDevoirOneSectionHint",
+    inputLabelKey: "devoir1Mark",
+    field: "devoir1_mark",
+    icon: FileText,
+    accentClasses: {
+      icon: "bg-amber-100 text-amber-700",
+      badge: "bg-amber-50 text-amber-700",
+      row: "bg-amber-50/70",
+      focus: "focus:ring-amber-500",
+      button: "bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300",
+      selected: "ring-amber-300 bg-amber-50/80",
+    },
+  },
+  {
+    key: "devoir_2",
+    titleKey: "gradeDevoirTwoSectionTitle",
+    subtitleKey: "gradeDevoirTwoSectionHint",
+    inputLabelKey: "devoir2Mark",
+    field: "devoir2_mark",
+    icon: FileText,
+    accentClasses: {
+      icon: "bg-rose-100 text-rose-700",
+      badge: "bg-rose-50 text-rose-700",
+      row: "bg-rose-50/70",
+      focus: "focus:ring-rose-500",
+      button: "bg-rose-600 hover:bg-rose-700 disabled:bg-rose-300",
+      selected: "ring-rose-300 bg-rose-50/80",
+    },
+  },
+  {
+    key: "exam",
+    titleKey: "gradeExamSectionTitle",
+    subtitleKey: "gradeExamSectionHint",
+    inputLabelKey: "examMark",
+    field: "exam_mark",
+    icon: FileText,
+    accentClasses: {
+      icon: "bg-violet-100 text-violet-700",
+      badge: "bg-violet-50 text-violet-700",
+      row: "bg-violet-50/70",
+      focus: "focus:ring-violet-500",
+      button: "bg-violet-600 hover:bg-violet-700 disabled:bg-violet-300",
+      selected: "ring-violet-300 bg-violet-50/80",
+    },
+  },
+  {
+    key: "average",
+    titleKey: "gradeAverageSectionTitle",
+    subtitleKey: "gradeAverageSectionHint",
+    inputLabelKey: "averageMark",
+    field: "average_mark",
+    icon: ClipboardCheck,
+    accentClasses: {
+      icon: "bg-emerald-100 text-emerald-700",
+      badge: "bg-emerald-50 text-emerald-700",
+      row: "bg-emerald-50/70",
+      focus: "focus:ring-emerald-500",
+      button: "bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300",
+      selected: "ring-emerald-300 bg-emerald-50/80",
+    },
+  },
+];
+
+const GradeManager: React.FC<GradeManagerProps> = ({ modules_class_groups }) => {
   const { language } = useLanguage();
-  const [selectedClass, setSelectedClass] = useState(
-    modules_class_groups?.[0]?.class_group.class_group_id
-  );
-  const [selectedModule, setSelectedModule] = useState(
-    modules?.[0]?.module.module_id ?? ""
-  );
-  // ✅ ADDED SEMESTER STATE
-  const [selectedSemester, setSelectedSemester] = useState<"s1" | "s2" | "s3">("s1");
-  
-  // ✅ ADDED FORMULA STATE
-  const [currentFormula, setCurrentFormula] = useState<Record<string, number> | null>(null);
-  
-  const [appliedModuleFilter, setAppliedModuleFilter] = useState("");
-  const [gradeSystem, setGradeSystem] = useState("20");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newGrade, setNewGrade] = useState({
-    studentId: "",
-    assessmentType: "",
-    score: "",
-    date: "",
-    note: "",
-    module: "",
+  const { addNotification } = useNotifications();
+  const [filters, setFilters] = useState<GradeFilterState>({
+    class_group_id: "",
+    module_id: "",
+    semester: "",
   });
+  const [gridData, setGridData] = useState<TeacherStudentGradesGridResponse | null>(null);
+  const [rows, setRows] = useState<StudentGradeGridRow[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
+  const [activeStudentId, setActiveStudentId] = useState("");
+  const [drafts, setDrafts] = useState<SectionDraftState>(
+    createEmptySectionDraftState()
+  );
+  const [errors, setErrors] = useState<SectionErrorState>(
+    createEmptySectionErrorState()
+  );
+  const [saving, setSaving] = useState<SectionSavingState>(
+    createEmptySectionSavingState()
+  );
+  const [feedback, setFeedback] = useState<SectionFeedbackState>(
+    createEmptySectionFeedbackState()
+  );
 
-  //! Filtering Grades For each module
-  const unique_modules = [...new Set(modules.map((m) => m.module.module_id))];
-
-  // ✅ LOAD FORMULA WHEN MODULE/CLASS/SEMESTER CHANGES
-  useEffect(() => {
-    if (selectedModule && selectedClass && selectedSemester) {
-      const loadFormula = async () => {
-        const formula = await fetchGradingFormula(
-          selectedModule,
-          selectedClass,
-          selectedSemester
-        );
-        setCurrentFormula(formula);
-      };
-      loadFormula();
-    }
-  }, [selectedModule, selectedClass, selectedSemester]);
-
-  // helper function
-  function mapStudentGrade(grade: StudentGrade) {
-    return {
-      id: grade.student.student_id,
-      studentName: grade.student.full_name,
-      grades: {
-        // -------- Semester 1 --------
-        "تقويم الفصل الأول": {
-          score: grade.s1_evaluation,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "فرض الفصل الأول 1": {
-          score: grade.s1_devoir_1,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "فرض الفصل الأول 2": {
-          score: grade.s1_devoir_2,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "واجبات الفصل الأول": {
-          score: grade.s1_homeworks,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "الاختبارات القصيرة - الفصل الأول": {
-          score: grade.s1_tests,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "امتحان الفصل الأول": {
-          score: grade.s1_exam,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "معدل الفصل الأول": {
-          score: grade.s1_average,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        // -------- Semester 2 --------
-        "تقويم الفصل الثاني": {
-          score: grade.s2_evaluation,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "فرض الفصل الثاني 1": {
-          score: grade.s2_devoir_1,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "فرض الفصل الثاني 2": {
-          score: grade.s2_devoir_2,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "واجبات الفصل الثاني": {
-          score: grade.s2_homeworks,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "الاختبارات القصيرة - الفصل الثاني": {
-          score: grade.s2_tests,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "امتحان الفصل الثاني": {
-          score: grade.s2_exam,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "معدل الفصل الثاني": {
-          score: grade.s2_average,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        // -------- Semester 3 --------
-        "تقويم الفصل الثالث": {
-          score: grade.s3_evaluation,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "فرض الفصل الثالث 1": {
-          score: grade.s3_devoir_1,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "فرض الفصل الثالث 2": {
-          score: grade.s3_devoir_2,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "واجبات الفصل الثالث": {
-          score: grade.s3_homeworks,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "الاختبارات القصيرة - الفصل الثالث": {
-          score: grade.s3_tests,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "امتحان الفصل الثالث": {
-          score: grade.s3_exam,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-        "معدل الفصل الثالث": {
-          score: grade.s3_average,
-          max: 20,
-          date: "",
-          note: "",
-          module: "",
-        },
-      },
-      average: Number(grade.s1_average) || 0,
-    };
-  }
-
-  const initial_students_grades = students_grades.map(mapStudentGrade);
-  const [grades, setGrades] = useState(initial_students_grades);
-
-  //? SYNC WITH THE SERVER
-  useEffect(() => {
-    const mappedGrades = students_grades.map(mapStudentGrade);
-    setGrades(mappedGrades);
-  }, [students_grades]);
-
-  const gradeKeys = [
-    // -------- Semester 1 --------
-    "تقويم الفصل الأول",
-    "فرض الفصل الأول 1",
-    "فرض الفصل الأول 2",
-    "واجبات الفصل الأول",
-    "الاختبارات القصيرة - الفصل الأول",
-    "امتحان الفصل الأول",
-    "معدل الفصل الأول",
-    // -------- Semester 2 --------
-    "تقويم الفصل الثاني",
-    "فرض الفصل الثاني 1",
-    "فرض الفصل الثاني 2",
-    "واجبات الفصل الثاني",
-    "الاختبارات القصيرة - الفصل الثاني",
-    "امتحان الفصل الثاني",
-    "معدل الفصل الثاني",
-    // -------- Semester 3 --------
-    "تقويم الفصل الثالث",
-    "فرض الفصل الثالث 1",
-    "فرض الفصل الثالث 2",
-    "واجبات الفصل الثالث",
-    "الاختبارات القصيرة - الفصل الثالث",
-    "امتحان الفصل الثالث",
-    "معدل الفصل الثالث",
-  ] as const;
-
-  const classes = [
-    ...new Set(
-      modules_class_groups.map(
-        (moduleAndClassGroup: TeacherModuleClassGroup) =>
-          moduleAndClassGroup.class_group.class_group_id
-      )
-    ),
-  ];
-
-  const filteredGrades = students_grades
-    .filter(
-      (student_grade) =>
-        student_grade.module === selectedModule &&
-        student_grade.class_group.class_group_id === selectedClass
-    )
-    .map(mapStudentGrade);
-
-  const handleApplyFilter = () => {
-    setAppliedModuleFilter(selectedModule);
-  };
-
-  const handleClearFilter = () => {
-    setSelectedModule("");
-    setAppliedModuleFilter("");
-  };
-
-  //! Post Mark
-  const [gradeSemester, setGradeSemester] = useState("s1");
-  const [postStudentGradeForm, setPostStudentGradeForm] =
-    useState<PostStudentGradesPayload>({
-      student_id: "",
-      teacher_id: teacher_id,
-      module_id: "",
-      class_group_id: "",
-      // -------- Semester 1 --------
-      s1_devoir_1: 0,
-      s1_devoir_2: 0,
-      s1_tests: 0,
-      s1_homeworks: 0,
-      s1_evaluation: 0,
-      s1_exam: 0,
-      s1_average: 0,
-      // -------- Semester 2 --------
-      s2_devoir_1: 0,
-      s2_devoir_2: 0,
-      s2_tests: 0,
-      s2_homeworks: 0,
-      s2_evaluation: 0,
-      s2_exam: 0,
-      s2_average: 0,
-      // -------- Semester 3 --------
-      s3_devoir_1: 0,
-      s3_devoir_2: 0,
-      s3_tests: 0,
-      s3_homeworks: 0,
-      s3_evaluation: 0,
-      s3_exam: 0,
-      s3_average: 0,
+  const classOptions = useMemo(() => {
+    const uniqueClasses = new Map<string, { value: string; label: string }>();
+    modules_class_groups.forEach((assignment) => {
+      const classGroupId = assignment.class_group.class_group_id;
+      if (!uniqueClasses.has(classGroupId)) {
+        uniqueClasses.set(classGroupId, {
+          value: classGroupId,
+          label: assignment.class_group.name,
+        });
+      }
     });
 
-  // ✅ HELPER: Calculate and set average based on formula
-  const calculateAndSetAverage = (formData: PostStudentGradesPayload, semester: string) => {
-    if (!currentFormula) return formData;
-
-    const semesterPrefix = semester as 's1' | 's2' | 's3';
-    
-    // Map form fields to formula keys
-    const gradesMapToFormula: Record<string, number> = {
-      evaluation: formData[`${semesterPrefix}_evaluation`] || 0,
-      devoir_1: formData[`${semesterPrefix}_devoir_1`] || 0,
-      devoir_2: formData[`${semesterPrefix}_devoir_2`] || 0,
-      homeworks: formData[`${semesterPrefix}_homeworks`] || 0,
-      tests: formData[`${semesterPrefix}_tests`] || 0,
-      exam: formData[`${semesterPrefix}_exam`] || 0,
-    };
-
-    // Calculate the average using the formula
-    const calculatedAverage = calculateAverageFromFormula(gradesMapToFormula, currentFormula);
-
-    // Update the average field in the form
-    return {
-      ...formData,
-      [`${semesterPrefix}_average`]: calculatedAverage,
-    };
-  };
-
-  const handleStudentGradeFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const updatedForm = {
-      ...postStudentGradeForm,
-      [e.target.name]: e.target.value,
-    };
-    
-    // ✅ AUTO-CALCULATE AVERAGE BASED ON CURRENT SEMESTER
-    const formWithCalculatedAverage = calculateAndSetAverage(updatedForm, gradeSemester);
-    setPostStudentGradeForm(formWithCalculatedAverage);
-  };
-
-  //! POST STUDENT  GRADE
-  const handlePostStudentGrade = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("handlePostStudentGrade payload :");
-    
-    // ✅ RECALCULATE AVERAGE BEFORE SENDING
-    const finalFormData = calculateAndSetAverage(postStudentGradeForm, gradeSemester);
-    
-    console.log(finalFormData);
-    //! API CALL
-    const latest_csrf = getCSRFToken()!;
-    const post_studentGrade_payload: PostStudentGradesPayload = {
-      student_id: finalFormData.student_id,
-      module_id: finalFormData.module_id ?? "",
-      teacher_id: finalFormData.teacher_id ?? 0,
-      class_group_id: selectedClass ?? "",
-      // -------- Semester 1 --------
-      s1_devoir_1: finalFormData.s1_devoir_1 ?? null,
-      s1_devoir_2: finalFormData.s1_devoir_2 ?? null,
-      s1_tests: finalFormData.s1_tests ?? null,
-      s1_homeworks: finalFormData.s1_homeworks ?? null,
-      s1_evaluation: finalFormData.s1_evaluation ?? null,
-      s1_exam: finalFormData.s1_exam ?? null,
-      s1_average: finalFormData.s1_average ?? null,
-      // -------- Semester 2 --------
-      s2_devoir_1: finalFormData.s2_devoir_1 ?? null,
-      s2_devoir_2: finalFormData.s2_devoir_2 ?? null,
-      s2_tests: finalFormData.s2_tests ?? null,
-      s2_homeworks: finalFormData.s2_homeworks ?? null,
-      s2_evaluation: finalFormData.s2_evaluation ?? null,
-      s2_exam: finalFormData.s2_exam ?? null,
-      s2_average: finalFormData.s2_average ?? null,
-      // -------- Semester 3 --------
-      s3_devoir_1: finalFormData.s3_devoir_1 ?? null,
-      s3_devoir_2: finalFormData.s3_devoir_2 ?? null,
-      s3_tests: finalFormData.s3_tests ?? null,
-      s3_homeworks: finalFormData.s3_homeworks ?? null,
-      s3_evaluation: finalFormData.s3_evaluation ?? null,
-      s3_exam: finalFormData.s3_exam ?? null,
-      s3_average: finalFormData.s3_average ?? null,
-    };
-    const post_studentGrade_res = await teacher_dashboard_client.post_grades(
-      post_studentGrade_payload,
-      latest_csrf
+    return Array.from(uniqueClasses.values()).sort((left, right) =>
+      left.label.localeCompare(right.label)
     );
-    if (post_studentGrade_res.ok) {
-      console.log("post_studentGrade_res OK");
-      RefetchGrades();
-      setShowAddModal(false);
-      // ✅ RESET FORM AFTER SUCCESS
-      setPostStudentGradeForm({
-        student_id: "",
-        teacher_id: teacher_id,
-        module_id: "",
-        class_group_id: "",
-        s1_devoir_1: 0,
-        s1_devoir_2: 0,
-        s1_tests: 0,
-        s1_homeworks: 0,
-        s1_evaluation: 0,
-        s1_exam: 0,
-        s1_average: 0,
-        s2_devoir_1: 0,
-        s2_devoir_2: 0,
-        s2_tests: 0,
-        s2_homeworks: 0,
-        s2_evaluation: 0,
-        s2_exam: 0,
-        s2_average: 0,
-        s3_devoir_1: 0,
-        s3_devoir_2: 0,
-        s3_tests: 0,
-        s3_homeworks: 0,
-        s3_evaluation: 0,
-        s3_exam: 0,
-        s3_average: 0,
+  }, [modules_class_groups]);
+
+  const moduleOptions = useMemo(() => {
+    if (!filters.class_group_id) {
+      return [];
+    }
+
+    const uniqueModules = new Map<string, { value: string; label: string }>();
+    modules_class_groups
+      .filter((assignment) => assignment.class_group.class_group_id === filters.class_group_id)
+      .forEach((assignment) => {
+        const moduleId = assignment.module.module_id;
+        if (!uniqueModules.has(moduleId)) {
+          uniqueModules.set(moduleId, {
+            value: moduleId,
+            label: assignment.module.module_name,
+          });
+        }
+      });
+
+    return Array.from(uniqueModules.values()).sort((left, right) =>
+      left.label.localeCompare(right.label)
+    );
+  }, [filters.class_group_id, modules_class_groups]);
+
+  const semesterOptions = useMemo(
+    () => [
+      { value: "s1", label: getTranslation("firstSemester", language) },
+      { value: "s2", label: getTranslation("secondSemester", language) },
+      { value: "s3", label: getTranslation("thirdSemester", language) },
+    ],
+    [language]
+  );
+
+  const allRequiredFiltersSelected = Boolean(
+    filters.class_group_id && filters.module_id && filters.semester
+  );
+
+  useEffect(() => {
+    if (!filters.class_group_id) {
+      if (filters.module_id) {
+        setFilters((previous) => ({ ...previous, module_id: "" }));
+      }
+      return;
+    }
+
+    const hasSelectedModule = moduleOptions.some(
+      (option) => option.value === filters.module_id
+    );
+    if (!hasSelectedModule) {
+      setFilters((previous) => ({
+        ...previous,
+        module_id: moduleOptions[0]?.value ?? "",
+      }));
+    }
+  }, [filters.class_group_id, filters.module_id, moduleOptions]);
+
+  useEffect(() => {
+    if (!allRequiredFiltersSelected) {
+      setGridData(null);
+      setRows([]);
+      setLoadError("");
+      setStudentSearch("");
+      setActiveStudentId("");
+      setDrafts(createEmptySectionDraftState());
+      setErrors(createEmptySectionErrorState());
+      setFeedback(createEmptySectionFeedbackState());
+      return;
+    }
+
+    const requestFilters: TeacherStudentGradesFilters = {
+      class_group_id: filters.class_group_id,
+      module_id: filters.module_id,
+      semester: filters.semester as "s1" | "s2" | "s3",
+    };
+    let cancelled = false;
+
+    const loadRows = async () => {
+      setLoading(true);
+      setLoadError("");
+
+      const response = await teacher_dashboard_client.get_grade_grid(requestFilters);
+      if (cancelled) {
+        return;
+      }
+
+      if (response.ok) {
+        const nextGridData = response.data as TeacherStudentGradesGridResponse;
+        setGridData(nextGridData);
+        setRows(nextGridData.rows ?? []);
+        setActiveStudentId(nextGridData.rows[0]?.student_id ?? "");
+        setDrafts(createEmptySectionDraftState());
+        setErrors(createEmptySectionErrorState());
+        setFeedback(createEmptySectionFeedbackState());
+      } else {
+        setGridData(null);
+        setRows([]);
+        setActiveStudentId("");
+        setLoadError(getTranslation("gradesLoadFailed", language));
+      }
+
+      setLoading(false);
+    };
+
+    void loadRows();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [allRequiredFiltersSelected, filters, language]);
+
+  const visibleRows = useMemo(() => {
+    const normalizedSearch = studentSearch.trim().toLowerCase();
+    if (!normalizedSearch) {
+      return rows;
+    }
+
+    return rows.filter((row) => {
+      const searchableValue = `${row.student_name} ${row.class_name}`.toLowerCase();
+      return searchableValue.includes(normalizedSearch);
+    });
+  }, [rows, studentSearch]);
+
+  useEffect(() => {
+    if (!visibleRows.length) {
+      return;
+    }
+
+    const hasActiveVisibleStudent = visibleRows.some(
+      (row) => row.student_id === activeStudentId
+    );
+    if (!hasActiveVisibleStudent) {
+      setActiveStudentId(visibleRows[0]?.student_id ?? "");
+    }
+  }, [activeStudentId, visibleRows]);
+
+  const dirtyIdsBySection = useMemo(() => {
+    return SECTION_CONFIGS.reduce<Record<SectionKey, Set<string>>>(
+      (accumulator, config) => {
+        const dirtyIds = new Set<string>();
+        Object.entries(drafts[config.key]).forEach(([studentId, value]) => {
+          const row = rows.find((item) => item.student_id === studentId);
+          if (!row) {
+            return;
+          }
+
+          const normalizedDraft = normalizeDraftValue(value);
+          const normalizedBase = normalizeRowValue(row, config.field);
+          if (normalizedDraft !== normalizedBase) {
+            dirtyIds.add(studentId);
+          }
+        });
+
+        accumulator[config.key] = dirtyIds;
+        return accumulator;
+      },
+      {
+        evaluation: new Set<string>(),
+        devoir_1: new Set<string>(),
+        devoir_2: new Set<string>(),
+        exam: new Set<string>(),
+        average: new Set<string>(),
+      }
+    );
+  }, [drafts, rows]);
+
+  const hasAssignments = classOptions.length > 0;
+  const showEmptySelectionState = !allRequiredFiltersSelected && hasAssignments;
+  const showNoStudentState =
+    allRequiredFiltersSelected && !loading && !loadError && rows.length === 0;
+  const showNoSearchResultState =
+    allRequiredFiltersSelected && !loading && !loadError && rows.length > 0 && visibleRows.length === 0;
+
+  const activeSummary = useMemo(() => {
+    if (!gridData) {
+      return null;
+    }
+
+    const semesterLabel = semesterOptions.find(
+      (option) => option.value === gridData.semester
+    )?.label;
+
+    return [gridData.class_group.name, gridData.module.name, semesterLabel].filter(Boolean);
+  }, [gridData, semesterOptions]);
+
+  const updateFilter = (key: keyof GradeFilterState, value: string) => {
+    setFilters((previous) => ({
+      ...previous,
+      [key]: value,
+    }));
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      class_group_id: "",
+      module_id: "",
+      semester: "",
+    });
+  };
+
+  const setSectionFeedback = (
+    section: SectionKey,
+    nextValue: { tone: "success" | "error"; message: string } | null
+  ) => {
+    setFeedback((previous) => ({
+      ...previous,
+      [section]: nextValue,
+    }));
+  };
+
+  const focusGridCell = (section: SectionKey, studentId: string) => {
+    const cell = document.querySelector<HTMLInputElement>(
+      `[data-grid-section="${section}"][data-student-id="${studentId}"]`
+    );
+    if (cell) {
+      cell.focus();
+      cell.select();
+    }
+  };
+
+  const handleStudentSelection = (studentId: string) => {
+    setActiveStudentId(studentId);
+    window.requestAnimationFrame(() => {
+      focusGridCell("evaluation", studentId);
+    });
+  };
+
+  const handleSectionValueChange = (
+    section: SectionKey,
+    studentId: string,
+    value: string
+  ) => {
+    const config = SECTION_CONFIGS.find((item) => item.key === section);
+    const row = rows.find((item) => item.student_id === studentId);
+    if (!config || !row) {
+      return;
+    }
+
+    const nextError = validateDraftValue(value, language);
+    const normalizedValue = normalizeDraftValue(value);
+    const normalizedBase = normalizeRowValue(row, config.field);
+    const shouldPersistDraft = normalizedValue !== normalizedBase;
+
+    setDrafts((previous) => {
+      const nextSection = { ...previous[section] };
+      if (shouldPersistDraft) {
+        nextSection[studentId] = value;
+      } else {
+        delete nextSection[studentId];
+      }
+
+      return {
+        ...previous,
+        [section]: nextSection,
+      };
+    });
+
+    setErrors((previous) => {
+      const nextSection = { ...previous[section] };
+      if (nextError) {
+        nextSection[studentId] = nextError;
+      } else {
+        delete nextSection[studentId];
+      }
+
+      return {
+        ...previous,
+        [section]: nextSection,
+      };
+    });
+
+    if (feedback[section]) {
+      setSectionFeedback(section, null);
+    }
+  };
+
+  const handleCellKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    section: SectionKey,
+    rowIndex: number,
+    studentId: string
+  ) => {
+    const allowedKeys = ["Enter", "ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"];
+    if (!allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      const currentSectionIndex = SECTION_CONFIGS.findIndex(
+        (config) => config.key === section
+      );
+      const offset = event.key === "ArrowRight" ? 1 : -1;
+      const nextSection = SECTION_CONFIGS[currentSectionIndex + offset]?.key;
+      if (nextSection) {
+        focusGridCell(nextSection, studentId);
+      }
+      return;
+    }
+
+    const direction = event.key === "ArrowUp" ? -1 : 1;
+    const nextIndex = rowIndex + direction;
+    const nextCell = document.querySelector<HTMLInputElement>(
+      `[data-grid-section="${section}"][data-grid-row="${nextIndex}"]`
+    );
+    if (nextCell) {
+      nextCell.focus();
+      nextCell.select();
+    }
+  };
+
+  const handleSectionSave = async (section: SectionKey) => {
+    if (!allRequiredFiltersSelected) {
+      return;
+    }
+
+    if (Object.keys(errors[section]).length > 0) {
+      setSectionFeedback(section, {
+        tone: "error",
+        message: getTranslation("gradesFixErrors", language),
+      });
+      return;
+    }
+
+    const updates: BatchStudentGradesSectionUpdate[] = Array.from(
+      dirtyIdsBySection[section]
+    ).map((studentId) => ({
+      student_id: studentId,
+      value: normalizeDraftValue(drafts[section][studentId] ?? "") as number | null,
+    }));
+
+    if (!updates.length) {
+      return;
+    }
+
+    const csrfToken = getCSRFToken() ?? "";
+    setSaving((previous) => ({ ...previous, [section]: true }));
+    setSectionFeedback(section, null);
+
+    const response = await teacher_dashboard_client.batch_patch_student_grades_section(
+      {
+        class_group_id: filters.class_group_id,
+        module_id: filters.module_id,
+        semester: filters.semester as "s1" | "s2" | "s3",
+        section,
+        updates,
+      },
+      csrfToken
+    );
+
+    if (response.ok) {
+      const updatedRows = ((response.data as { updated_rows?: StudentGradeGridRow[] })
+        ?.updated_rows ?? []) as StudentGradeGridRow[];
+      const updatesByStudentId = new Map(
+        updatedRows.map((row) => [row.student_id, row])
+      );
+
+      setRows((previous) =>
+        previous.map((row) => updatesByStudentId.get(row.student_id) ?? row)
+      );
+      setDrafts((previous) => ({
+        ...previous,
+        [section]: {},
+      }));
+      setErrors((previous) => ({
+        ...previous,
+        [section]: {},
+      }));
+
+      const successMessage = getTranslation("gradesSectionSaved", language);
+      const config = SECTION_CONFIGS.find((item) => item.key === section);
+      setSectionFeedback(section, {
+        tone: "success",
+        message: successMessage,
+      });
+      addNotification({
+        id: "",
+        title: config ? getTranslation(config.titleKey, language) : getTranslation("marks", language),
+        message: successMessage,
+        type: "success",
+        timestamp: new Date().toISOString(),
+        read: false,
+      });
+    } else {
+      const errorMessage = getTranslation("gradesSectionSaveFailed", language);
+      const config = SECTION_CONFIGS.find((item) => item.key === section);
+      setSectionFeedback(section, {
+        tone: "error",
+        message: errorMessage,
+      });
+      addNotification({
+        id: "",
+        title: config ? getTranslation(config.titleKey, language) : getTranslation("marks", language),
+        message: errorMessage,
+        type: "error",
+        timestamp: new Date().toISOString(),
+        read: false,
       });
     }
-  };
 
-  //! PATCH : Edit Marks & Student Average ::
-  const [showEditMarksModal, setShowEditMarksModal] = useState(false);
-  const [last_selected_student, setLastSelectedStudent] = useState("");
-  const [patchStudentGradeForm, setPatchStudentGradeForm] =
-    useState<PatchStudentGradesPayload>({
-      // -------- Semester 1 --------
-      s1_devoir_1: undefined,
-      s1_devoir_2: undefined,
-      s1_tests: undefined,
-      s1_homeworks: undefined,
-      s1_evaluation: undefined,
-      s1_exam: undefined,
-      s1_average: undefined,
-      // -------- Semester 2 --------
-      s2_devoir_1: undefined,
-      s2_devoir_2: undefined,
-      s2_tests: undefined,
-      s2_homeworks: undefined,
-      s2_evaluation: undefined,
-      s2_exam: undefined,
-      s2_average: undefined,
-      // -------- Semester 3 --------
-      s3_devoir_1: undefined,
-      s3_devoir_2: undefined,
-      s3_tests: undefined,
-      s3_homeworks: undefined,
-      s3_evaluation: undefined,
-      s3_exam: undefined,
-      s3_average: undefined,
-    });
-
-  function resetPatchStudentGradeForm() {
-    setPatchStudentGradeForm({
-      s1_devoir_1: undefined,
-      s1_devoir_2: undefined,
-      s1_tests: undefined,
-      s1_homeworks: undefined,
-      s1_exam: undefined,
-      s1_average: undefined,
-      s2_devoir_1: undefined,
-      s2_devoir_2: undefined,
-      s2_tests: undefined,
-      s2_homeworks: undefined,
-      s2_exam: undefined,
-      s2_average: undefined,
-      s3_devoir_1: undefined,
-      s3_devoir_2: undefined,
-      s3_tests: undefined,
-      s3_homeworks: undefined,
-      s3_exam: undefined,
-      s3_average: undefined,
-      s3_evaluation: undefined,
-      s1_evaluation: undefined,
-    });
-  }
-
-  const handleStudentGradePatchFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const updatedForm = {
-      ...patchStudentGradeForm,
-      [e.target.name]: e.target.value,
-    };
-    
-    // ✅ AUTO-CALCULATE AVERAGE BASED ON CURRENT SEMESTER FOR PATCH
-    const semesterPrefix = gradeSemester as 's1' | 's2' | 's3';
-    
-    const gradesMapToFormula: Record<string, number> = {
-      evaluation: updatedForm[`${semesterPrefix}_evaluation`] || 0,
-      devoir_1: updatedForm[`${semesterPrefix}_devoir_1`] || 0,
-      devoir_2: updatedForm[`${semesterPrefix}_devoir_2`] || 0,
-      homeworks: updatedForm[`${semesterPrefix}_homeworks`] || 0,
-      tests: updatedForm[`${semesterPrefix}_tests`] || 0,
-      exam: updatedForm[`${semesterPrefix}_exam`] || 0,
-    };
-    
-    if (currentFormula) {
-      const calculatedAverage = calculateAverageFromFormula(gradesMapToFormula, currentFormula);
-      updatedForm[`${semesterPrefix}_average`] = calculatedAverage;
-    }
-    
-    setPatchStudentGradeForm(updatedForm);
-  };
-
-  //! API CALL
-  const handlePatchStudentGrade = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // ✅ RECALCULATE AVERAGE BEFORE SENDING (PATCH)
-    let finalPatchForm = { ...patchStudentGradeForm };
-    const semesterPrefix = gradeSemester as 's1' | 's2' | 's3';
-    
-    const gradesMapToFormula: Record<string, number> = {
-      evaluation: finalPatchForm[`${semesterPrefix}_evaluation`] || 0,
-      devoir_1: finalPatchForm[`${semesterPrefix}_devoir_1`] || 0,
-      devoir_2: finalPatchForm[`${semesterPrefix}_devoir_2`] || 0,
-      homeworks: finalPatchForm[`${semesterPrefix}_homeworks`] || 0,
-      tests: finalPatchForm[`${semesterPrefix}_tests`] || 0,
-      exam: finalPatchForm[`${semesterPrefix}_exam`] || 0,
-    };
-    
-    if (currentFormula) {
-      const calculatedAverage = calculateAverageFromFormula(gradesMapToFormula, currentFormula);
-      finalPatchForm = {
-        ...finalPatchForm,
-        [`${semesterPrefix}_average`]: calculatedAverage,
-      };
-    }
-    
-    console.log("handlePatchStudentGrade payload:");
-    console.log(finalPatchForm);
-    const latest_csrf = getCSRFToken()!;
-    const last_selected_student_grades_id =
-      students_grades.find(
-        (grade) =>
-          grade.student.student_id === last_selected_student &&
-          grade.module === selectedModule
-      )?.id ?? -1;
-
-    const patch_grade_payload: PatchStudentGradesPayload = {
-      // -------- Semester 1 --------
-      s1_devoir_1: finalPatchForm.s1_devoir_1,
-      s1_devoir_2: finalPatchForm.s1_devoir_2,
-      s1_tests: finalPatchForm.s1_tests,
-      s1_homeworks: finalPatchForm.s1_homeworks,
-      s1_evaluation: finalPatchForm.s1_evaluation,
-      s1_exam: finalPatchForm.s1_exam,
-      s1_average: finalPatchForm.s1_average,
-      // -------- Semester 2 --------
-      s2_devoir_1: finalPatchForm.s2_devoir_1,
-      s2_devoir_2: finalPatchForm.s2_devoir_2,
-      s2_tests: finalPatchForm.s2_tests,
-      s2_homeworks: finalPatchForm.s2_homeworks,
-      s2_evaluation: finalPatchForm.s2_evaluation,
-      s2_exam: finalPatchForm.s2_exam,
-      s2_average: finalPatchForm.s2_average,
-      // -------- Semester 3 --------
-      s3_devoir_1: finalPatchForm.s3_devoir_1,
-      s3_devoir_2: finalPatchForm.s3_devoir_2,
-      s3_tests: finalPatchForm.s3_tests,
-      s3_homeworks: finalPatchForm.s3_homeworks,
-      s3_evaluation: finalPatchForm.s3_evaluation,
-      s3_exam: finalPatchForm.s3_exam,
-      s3_average: finalPatchForm.s3_average,
-    };
-    const patch_grades_res = await teacher_dashboard_client.patch_grades(
-      last_selected_student_grades_id,
-      patch_grade_payload,
-      latest_csrf
-    );
-    if (patch_grades_res.ok) {
-      console.log("patch_grades_res OK");
-      RefetchGrades();
-      setShowEditMarksModal(false);
-    }
-  };
-
-  //! RECALCULATE ALL AVERAGES
-  const recalculateAllAverages = async () => {
-    try {
-      // ✅ UPDATED: Directly refresh grades after recalculation
-      // The formula was already recalculated by the backend endpoint in GradingFormulaBuilder
-      // Now we just need to fetch the updated data to show the new averages
-      console.log("Refreshing student grades with updated averages...");
-      RefetchGrades();
-    } catch (error) {
-      console.error("Error refreshing grades:", error);
-    }
+    setSaving((previous) => ({ ...previous, [section]: false }));
   };
 
   return (
-    <div className="space-y-6" dir="rtl">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation("gradesManagement", language)}
-        </h2>
-        <div className="flex items-center space-x-4 rtl:space-x-reverse">
-          <button className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors">
-            <Download className="h-4 w-4" />
-            <span>{getTranslation("export", language)}</span>
-          </button>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            <span>{getTranslation("addGrade", language)}</span>
-          </button>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <section className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div className="border-b border-gray-200 px-6 py-5 dark:border-gray-700">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl bg-primary-100 p-3 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200">
+                  <ClipboardCheck className="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {getTranslation("marks", language)}
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {getTranslation("gradesSpreadsheetDescription", language)}
+                  </p>
+                </div>
+              </div>
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-        <div className="grid md:grid-cols-5 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation("class", language)}
-            </label>
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              {classes.map((cls) => {
-                return (
-                  <option key={cls} value={cls}>
-                    {
-                      modules_class_groups.find(
-                        (modules_class_groups) =>
-                          modules_class_groups.class_group.class_group_id ===
-                          cls
-                      )?.class_group.name ?? ""
-                    }
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation("Subject", language)}
-            </label>
-            <select
-              value={selectedModule}
-              onChange={(e) => setSelectedModule(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              {unique_modules.map((module) => (
-                <option key={module} value={module}>
-                  {
-                    modules.find((m) => m.module.module_id === module)?.module
-                      .module_name ?? ""
-                  }
-                </option>
-              ))}
-            </select>
-          </div>
-          {/* ✅ SEMESTER SELECT */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {getTranslation("semester", language)}
-            </label>
-            <select
-              value={selectedSemester}
-              onChange={(e) =>
-                setSelectedSemester(e.target.value as "s1" | "s2" | "s3")
-              }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="s1">
-                {getTranslation("firstSemester", language)}
-              </option>
-              <option value="s2">
-                {getTranslation("secondSemester", language)}
-              </option>
-              <option value="s3">
-                {getTranslation("thirdSemester", language)}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
+              <div className="inline-flex flex-wrap items-center gap-2 rounded-2xl bg-gray-50 px-3 py-2 text-xs text-gray-600 dark:bg-gray-900/40 dark:text-gray-300">
+                <Filter className="h-4 w-4" />
+                <span>{getTranslation("gradesFilterHint", language)}</span>
+              </div>
 
-      {/* Formula Builder - Now with semester prop */}
-      {selectedModule && selectedClass && (
-        <div className="mt-6">
-          <GradingFormulaBuilder
-            moduleId={selectedModule}
-            classGroupId={selectedClass}
-            semester={selectedSemester}
-            onSave={() => recalculateAllAverages()}
-          />
-        </div>
-      )}
-
-      {/* Grades Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("marks", language)}{" "}
-            {
-              modules_class_groups.find(
-                (module_class_group) =>
-                  module_class_group.class_group.class_group_id ==
-                  selectedClass
-              )?.class_group.name ?? ""
-            }{" "}
-            -{" "}
-            {
-              modules.find((m) => m.module.module_id === selectedModule)?.module
-                .module_name ?? " "
-            }
-            {appliedModuleFilter && ` - ${appliedModuleFilter}`}
-          </h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("student", language)}
-                </th>
-                {/* First semester */}
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("firstSemesterAssessment", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("firstSemesterExam1", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("firstSemesterExam2", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("firstSemesterHomework", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاختبارات القصيرة' : 'Short Tests'}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("firstSemesterAverage", language)}
-                </th>
-                {/* Second semester */}
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("secondSemesterAssessment", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("secondSemesterExam1", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("secondSemesterExam2", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("secondSemesterHomework", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاختبارات القصيرة' : 'Short Tests'}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("secondSemesterAverage", language)}
-                </th>
-                {/* Third semester */}
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("thirdSemesterAssessment", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("thirdSemesterExam1", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("thirdSemesterExam2", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("thirdSemesterHomework", language)}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاختبارات القصيرة' : 'Short Tests'}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("thirdSemesterAverage", language)}
-                </th>
-                {/* Actions */}
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("actions", language)}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredGrades.map((student) => (
-                <tr
-                  key={student.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {student.studentName}
-                    </div>
-                  </td>
-                  {gradeKeys.map((key) =>
-                    key === "معدل الفصل الأول" ||
-                    key === "معدل الفصل الثاني" ||
-                    key === "معدل الفصل الثالث" ? (
-                      <td
-                        key={key}
-                        className="px-6 py-4 whitespace-nowrap text-center"
-                      >
-                        <span
-                          className={`text-sm font-bold ${(
-                            student.grades[key]!.score ?? 0
-                          ) >= 16
-                            ? "text-primary-600"
-                            : (student.grades[key]!.score ?? 0) >= 12
-                            ? "text-primary-600"
-                            : (student.grades[key]!.score ?? 0) >= 10
-                            ? "text-yellow-600"
-                            : "text-red-600"
-                          }`}
-                        >
-                          {student.grades[key]!.score ?? "-"}/{gradeSystem}
-                        </span>
-                      </td>
-                    ) : (
-                      <td
-                        key={key}
-                        className="px-6 py-4 whitespace-nowrap text-center"
-                      >
-                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {student.grades[key]?.score ?? "-"} / {gradeSystem}
-                        </div>
-                        <div className="text-xs text-gray-600 dark:text-gray-400">
-                          {student.grades[key]?.note
-                            ? `${
-                                student.grades[key]!.note.substring(0, 20)
-                              }${
-                                student.grades[key]!.note.length > 20
-                                  ? "..."
-                                  : ""
-                              }`
-                            : "-"}
-                          {student.grades[key]?.module
-                            ? ` (${student.grades[key]!.module})`
-                            : ""}
-                        </div>
-                      </td>
-                    )
-                  )}
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <button
-                      onClick={() =>
-                        setNewGrade({
-                          studentId: student.id.toString(),
-                          assessmentType: "",
-                          score: "",
-                          date: "",
-                          note: "",
-                          module: "",
-                        })
-                      }
-                      className="text-primary-600 hover:bg-primary-300 mx-1"
+              {activeSummary?.length ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  {activeSummary.map((summaryItem) => (
+                    <span
+                      key={summaryItem}
+                      className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
                     >
-                      <Edit
-                        onClick={() => {
-                          setLastSelectedStudent(student.id);
-                          setShowEditMarksModal(true);
-                        }}
-                        className="h-4 w-4"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                      {summaryItem}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
 
-      {/* Add Grade Modal */}
-      {showAddModal && (
-        <div className="!mt-0 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="h-5/6 overflow-y-auto  bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <form onSubmit={handlePostStudentGrade}>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation("addNewGrade", language)}
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("student", language)}
-                  </label>
-                  <select
-                    name="student_id"
-                    value={postStudentGradeForm.student_id}
-                    onChange={(e) => {
-                      setNewGrade({ ...newGrade, studentId: e.target.value });
-                      handleStudentGradeFormChange(e);
-                    }}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="">
-                      {getTranslation("selectStudent", language)}
-                    </option>
-                    {students.map((s) => (
-                      <option key={s.student_id} value={s.student_id}>
-                        {s.full_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("Subject", language)}
-                  </label>
-                  <select
-                    name="module_id"
-                    value={postStudentGradeForm.module_id}
-                    onChange={(e) => {
-                      setNewGrade({ ...newGrade, studentId: e.target.value });
-                      handleStudentGradeFormChange(e);
-                    }}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="">
-                      {getTranslation("selectSubject", language)}
-                    </option>
-                    {unique_modules.map((module_id) => (
-                      <option key={module_id} value={module_id}>
-                        {
-                          modules.find(
-                            (m) => m.module.module_id == module_id
-                          )?.module.module_name ?? ""
-                        }
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation("semester", language)}
-                </label>
-                <select
-                  name="semester"
-                  value={gradeSemester}
-                  onChange={(e) => {
-                    setGradeSemester(e.target.value);
-                    handleStudentGradeFormChange(e);
-                  }}
-                  className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            <div className="grid w-full gap-3 md:grid-cols-4 lg:max-w-4xl">
+              <FilterSelect
+                label={getTranslation("classesFilter", language)}
+                value={filters.class_group_id}
+                onChange={(value) => updateFilter("class_group_id", value)}
+                options={classOptions}
+                placeholder={getTranslation("selectClassPlaceholder", language)}
+              />
+              <FilterSelect
+                label={getTranslation("module", language)}
+                value={filters.module_id}
+                onChange={(value) => updateFilter("module_id", value)}
+                options={moduleOptions}
+                placeholder={getTranslation("monthlyEvaluationSelectModule", language)}
+                disabled={!filters.class_group_id || moduleOptions.length === 0}
+              />
+              <FilterSelect
+                label={getTranslation("semester", language)}
+                value={filters.semester}
+                onChange={(value) => updateFilter("semester", value)}
+                options={semesterOptions}
+                placeholder={getTranslation("selectSemesterPlaceholder", language)}
+              />
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="h-11 w-full rounded-2xl border border-gray-300 px-4 text-sm font-semibold text-gray-700 transition hover:border-primary-300 hover:text-primary-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-primary-500 dark:hover:text-primary-200"
                 >
-                  <option key={"s1"} value={"s1"}>
-                    {getTranslation("firstSemester", language)}
-                  </option>
-                  <option key={"s2"} value={"s2"}>
-                    {getTranslation("secondSemester", language)}
-                  </option>
-                  <option key={"s3"} value={"s3"}>
-                    {getTranslation("thirdSemester", language)}
-                  </option>
-                </select>
+                  {getTranslation("clearFilters", language)}
+                </button>
               </div>
-              {gradeSemester === "s1" ? (
-                <div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterAssessment", language)}
-                    </label>
-                    <input
-                      name="s1_evaluation"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s1_evaluation ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterExam1", language)}
-                    </label>
-                    <input
-                      name="s1_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s1_devoir_1 ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterExam2", language)}
-                    </label>
-                    <input
-                      name="s1_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s1_devoir_2 ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterHomework", language)}
-                    </label>
-                    <input
-                      name="s1_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s1_homeworks ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الاختبارات القصيرة' : 'Quizzes & Unit Tests'}
-                    </label>
-                    <input
-                      name="s1_tests"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s1_tests ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                    </label>
-                    <input
-                      name="s1_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s1_exam ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterAverage", language)} ✨ {language === 'ar' ? 'محسوب تلقائياً' : 'Auto-calculated'}
-                    </label>
-                    <div className="w-full px-3 py-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white font-semibold flex items-center justify-center">
-                      {(postStudentGradeForm.s1_average ?? 0).toFixed(2)} / {gradeSystem}
-                    </div>
-                  </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-5">
+          {!hasAssignments ? (
+            <StateCard
+              tone="muted"
+              title={getTranslation("noGradeAssignments", language)}
+              description={getTranslation("gradeAssignmentsHint", language)}
+            />
+          ) : null}
+
+          {showEmptySelectionState ? (
+            <StateCard
+              tone="muted"
+              title={getTranslation("gradesSelectFilters", language)}
+              description={getTranslation("gradesSelectFiltersHint", language)}
+            />
+          ) : null}
+
+          {loadError ? (
+            <StateCard
+              tone="error"
+              title={loadError}
+              description={getTranslation("gradesLoadRetryHint", language)}
+            />
+          ) : null}
+
+          {showNoStudentState ? (
+            <StateCard
+              tone="muted"
+              title={getTranslation("gradesNoStudentsForFilters", language)}
+              description={getTranslation("gradesNoStudentsForFiltersHint", language)}
+            />
+          ) : null}
+
+          {showNoSearchResultState ? (
+            <StateCard
+              tone="muted"
+              title={getTranslation("gradesNoSearchResults", language)}
+              description={getTranslation("gradesNoSearchResultsHint", language)}
+            />
+          ) : null}
+        </div>
+      </section>
+
+      {allRequiredFiltersSelected && !loadError && (loading || rows.length > 0) ? (
+        <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
+          <section className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl bg-primary-100 p-3 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200">
+                  <Users className="h-5 w-5" />
                 </div>
-              ) : gradeSemester === "s2" ? (
                 <div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterAssessment", language)}
-                    </label>
-                    <input
-                      name="s2_evaluation"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s2_evaluation ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterExam1", language)}
-                    </label>
-                    <input
-                      name="s2_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s2_devoir_1 ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterExam2", language)}
-                    </label>
-                    {/* ✅ FIXED: was s1_devoir_2 */}
-                    <input
-                      name="s2_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s2_devoir_2 ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterHomework", language)}
-                    </label>
-                    <input
-                      name="s2_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s2_homeworks ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الاختبارات القصيرة' : 'Quizzes & Unit Tests'}
-                    </label>
-                    <input
-                      name="s2_tests"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s2_tests ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                    </label>
-                    <input
-                      name="s2_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s2_exam ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterAverage", language)} ✨ {language === 'ar' ? 'محسوب تلقائياً' : 'Auto-calculated'}
-                    </label>
-                    <div className="w-full px-3 py-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white font-semibold flex items-center justify-center">
-                      {(postStudentGradeForm.s2_average ?? 0).toFixed(2)} / {gradeSystem}
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    {getTranslation("gradesStudentListTitle", language)}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {getTranslation("gradesStudentListHint", language)}
+                  </p>
+                </div>
+              </div>
+              <div className="relative mt-4">
+                <Search className="pointer-events-none absolute inset-y-0 left-4 my-auto h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={studentSearch}
+                  onChange={(event) => setStudentSearch(event.target.value)}
+                  placeholder={getTranslation("gradesSearchPlaceholder", language)}
+                  className="h-11 w-full rounded-2xl border border-gray-300 bg-white pl-11 pr-4 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-400 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              <span>{getTranslation("studentName", language)}</span>
+              <span>{visibleRows.length}/{rows.length}</span>
+            </div>
+
+            <div className="max-h-[540px] overflow-auto px-3 py-3">
+              {loading ? (
+                <div className="flex items-center justify-center gap-3 px-4 py-10 text-gray-500 dark:text-gray-400">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>{getTranslation("loading", language)}</span>
                 </div>
               ) : (
-                <div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterAssessment", language)}
-                    </label>
-                    <input
-                      name="s3_evaluation"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s3_evaluation ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterExam1", language)}
-                    </label>
-                    <input
-                      name="s3_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s3_devoir_1 ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterExam2", language)}
-                    </label>
-                    <input
-                      name="s3_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s3_devoir_2 ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterHomework", language)}
-                    </label>
-                    <input
-                      name="s3_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s3_homeworks ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الاختبارات القصيرة' : 'Quizzes & Unit Tests'}
-                    </label>
-                    <input
-                      name="s3_tests"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s3_tests ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                    </label>
-                    <input
-                      name="s3_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={postStudentGradeForm.s3_exam ?? 0}
-                      onChange={handleStudentGradeFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterAverage", language)} ✨ {language === 'ar' ? 'محسوب تلقائياً' : 'Auto-calculated'}
-                    </label>
-                    <div className="w-full px-3 py-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white font-semibold flex items-center justify-center">
-                      {(postStudentGradeForm.s3_average ?? 0).toFixed(2)} / {gradeSystem}
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  {visibleRows.map((row) => {
+                    const isActive = row.student_id === activeStudentId;
+                    return (
+                      <button
+                        key={row.student_id}
+                        type="button"
+                        onClick={() => handleStudentSelection(row.student_id)}
+                        className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                          isActive
+                            ? "border-primary-300 bg-primary-50 shadow-sm dark:border-primary-500 dark:bg-primary-900/20"
+                            : "border-gray-200 bg-gray-50 hover:border-primary-200 hover:bg-white dark:border-gray-700 dark:bg-gray-900/40 dark:hover:border-primary-700"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {row.student_name}
+                            </p>
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              {row.class_name}
+                            </p>
+                          </div>
+                          <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 shadow-sm dark:bg-gray-800 dark:text-gray-300">
+                            {getFilledValuesCount(row)}/5
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
-              <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
-                <button
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setNewGrade({
-                      studentId: "",
-                      assessmentType: "",
-                      score: "",
-                      date: "",
-                      note: "",
-                      module: "",
-                    });
-                  }}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  {getTranslation("cancel", language)}
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  {getTranslation("save", language)}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+          </section>
 
-      {/* Edit marks & average modal */}
-      {showEditMarksModal && (
-        <div className="!mt-0 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="h-5/6 overflow-y-auto  bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <form onSubmit={handlePatchStudentGrade}>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation("editGrade", language)}
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("student", language)}
-                  </label>
-                  <select
-                    name="student_id"
-                    value={last_selected_student}
-                    onChange={() => {}}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option
-                      key={last_selected_student}
-                      value={last_selected_student}
-                    >
-                      {students.find(
-                        (s) => s.student_id == last_selected_student
-                      )?.full_name ?? ""}
-                    </option>
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {getTranslation("subject", language)}
-                  </label>
-                  <select
-                    name="module_id"
-                    value={patchStudentGradeForm.module_id}
-                    onChange={() => {}}
-                    className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option
-                      key={patchStudentGradeForm.module_id}
-                      value={patchStudentGradeForm.module_id}
-                    >
-                      {
-                        modules_class_groups.find(
-                          (modules_class_groups) =>
-                            modules_class_groups.module.module_id ===
-                            selectedModule
-                        )?.module.module_name ?? ""
-                      }
-                    </option>
-                  </select>
-                </div>
-              </div>
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation("semester", language)}
-                </label>
-                <select
-                  name="semester"
-                  value={gradeSemester}
-                  onChange={(e) => {
-                    setGradeSemester(e.target.value);
-                    handleStudentGradePatchFormChange(e);
-                  }}
-                  className=" w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option key={"s1"} value={"s1"}>
-                    {getTranslation("firstSemester", language)}
-                  </option>
-                  <option key={"s2"} value={"s2"}>
-                    {getTranslation("secondSemester", language)}
-                  </option>
-                  <option key={"s3"} value={"s3"}>
-                    {getTranslation("thirdSemester", language)}
-                  </option>
-                </select>
-              </div>
-              {gradeSemester === "s1" ? (
-                <div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterAssessment", language)}
-                    </label>
-                    <input
-                      name="s1_evaluation"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s1_evaluation ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterExam1", language)}
-                    </label>
-                    <input
-                      name="s1_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s1_devoir_1 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterExam2", language)}
-                    </label>
-                    <input
-                      name="s1_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s1_devoir_2 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterHomework", language)}
-                    </label>
-                    <input
-                      name="s1_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s1_homeworks ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الاختبارات القصيرة' : 'Quizzes & Unit Tests'}
-                    </label>
-                    <input
-                      name="s1_tests"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s1_tests ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                    </label>
-                    <input
-                      name="s1_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s1_exam ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("firstSemesterAverage", language)} ✨ {language === 'ar' ? 'محسوب تلقائياً' : 'Auto-calculated'}
-                    </label>
-                    <div className="w-full px-3 py-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white font-semibold flex items-center justify-center">
-                      {(patchStudentGradeForm.s1_average ?? 0).toFixed(2)} / {gradeSystem}
-                    </div>
-                  </div>
-                </div>
-              ) : gradeSemester === "s2" ? (
-                <div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterAssessment", language)}
-                    </label>
-                    <input
-                      name="s2_evaluation"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s2_evaluation ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterExam1", language)}
-                    </label>
-                    <input
-                      name="s2_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s2_devoir_1 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterExam2", language)}
-                    </label>
-                    <input
-                      name="s2_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s2_devoir_2 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterHomework", language)}
-                    </label>
-                    <input
-                      name="s2_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s2_homeworks ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الاختبارات القصيرة' : 'Quizzes & Unit Tests'}
-                    </label>
-                    <input
-                      name="s2_tests"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s2_tests ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                    </label>
-                    <input
-                      name="s2_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s2_exam ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("secondSemesterAverage", language)} ✨ {language === 'ar' ? 'محسوب تلقائياً' : 'Auto-calculated'}
-                    </label>
-                    <div className="w-full px-3 py-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white font-semibold flex items-center justify-center">
-                      {(patchStudentGradeForm.s2_average ?? 0).toFixed(2)} / {gradeSystem}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterAssessment", language)}
-                    </label>
-                    <input
-                      name="s3_evaluation"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s3_evaluation ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterExam1", language)}
-                    </label>
-                    <input
-                      name="s3_devoir_1"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s3_devoir_1 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterExam2", language)}
-                    </label>
-                    <input
-                      name="s3_devoir_2"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s3_devoir_2 ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterHomework", language)}
-                    </label>
-                    <input
-                      name="s3_homeworks"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s3_homeworks ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الاختبارات القصيرة' : 'Quizzes & Unit Tests'}
-                    </label>
-                    <input
-                      name="s3_tests"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s3_tests ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === 'ar' ? 'الامتحان النهائي' : 'Final Exam'}
-                    </label>
-                    <input
-                      name="s3_exam"
-                      type="number"
-                      min="0"
-                      max={gradeSystem}
-                      step="0.01"
-                      value={patchStudentGradeForm.s3_exam ?? 0}
-                      onChange={handleStudentGradePatchFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {getTranslation("thirdSemesterAverage", language)} ✨ {language === 'ar' ? 'محسوب تلقائياً' : 'Auto-calculated'}
-                    </label>
-                    <div className="w-full px-3 py-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white font-semibold flex items-center justify-center">
-                      {(patchStudentGradeForm.s3_average ?? 0).toFixed(2)} / {gradeSystem}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
-                <button
-                  onClick={() => {
-                    setShowEditMarksModal(false);
-                    resetPatchStudentGradeForm();
-                    setNewGrade({
-                      studentId: "",
-                      assessmentType: "",
-                      score: "",
-                      date: "",
-                      note: "",
-                      module: "",
-                    });
-                  }}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  {getTranslation("cancel", language)}
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  {getTranslation("save", language)}
-                </button>
-              </div>
-            </form>
+          <div className="space-y-6">
+            {SECTION_CONFIGS.map((config) => (
+              <SpreadsheetSection
+                key={config.key}
+                config={config}
+                rows={visibleRows}
+                loading={loading}
+                language={language}
+                dirtyIds={dirtyIdsBySection[config.key]}
+                values={drafts[config.key]}
+                errors={errors[config.key]}
+                feedback={feedback[config.key]}
+                saving={saving[config.key]}
+                activeStudentId={activeStudentId}
+                onValueChange={handleSectionValueChange}
+                onKeyDown={handleCellKeyDown}
+                onSave={handleSectionSave}
+                onStudentFocus={setActiveStudentId}
+              />
+            ))}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
+
+const SpreadsheetSection: React.FC<SpreadsheetSectionProps> = ({
+  config,
+  rows,
+  loading,
+  language,
+  dirtyIds,
+  values,
+  errors,
+  feedback,
+  saving,
+  activeStudentId,
+  onValueChange,
+  onKeyDown,
+  onSave,
+  onStudentFocus,
+}) => {
+  const Icon = config.icon;
+  const disableSave = dirtyIds.size === 0 || Object.keys(errors).length > 0 || saving;
+
+  return (
+    <section className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div className="border-b border-gray-200 px-6 py-5 dark:border-gray-700">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className={`rounded-2xl p-3 ${config.accentClasses.icon}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {getTranslation(config.titleKey, language)}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {getTranslation(config.subtitleKey, language)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className={`rounded-full px-3 py-1 font-semibold ${config.accentClasses.badge}`}>
+                {dirtyIds.size} {getTranslation("gradesUnsavedRows", language)}
+              </span>
+              <span className="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-600 dark:bg-gray-900/40 dark:text-gray-300">
+                {getTranslation("gradesKeyboardHint", language)}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-stretch gap-3 lg:items-end">
+            <button
+              type="button"
+              onClick={() => onSave(config.key)}
+              disabled={disableSave}
+              className={`inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition ${config.accentClasses.button}`}
+            >
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              <span>{getTranslation("gradesSaveChanges", language)}</span>
+            </button>
+
+            {feedback ? (
+              <p
+                className={`text-sm ${
+                  feedback.tone === "success"
+                    ? "text-emerald-600 dark:text-emerald-300"
+                    : "text-rose-600 dark:text-rose-300"
+                }`}
+              >
+                {feedback.message}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center gap-3 px-6 py-16 text-gray-500 dark:text-gray-400">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>{getTranslation("loading", language)}</span>
+        </div>
+      ) : (
+        <div className="max-h-[420px] overflow-auto">
+          <table className="min-w-full border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <th className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                  {getTranslation("studentName", language)}
+                </th>
+                <th className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                  {getTranslation("monthlyEvaluationClassColumn", language)}
+                </th>
+                <th className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                  {getTranslation(config.inputLabelKey, language)}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, rowIndex) => {
+                const dirty = dirtyIds.has(row.student_id);
+                const value = values[row.student_id] ?? getInputValue(row, config.field);
+                const error = errors[row.student_id];
+                const isActive = row.student_id === activeStudentId;
+
+                return (
+                  <tr
+                    key={`${config.key}-${row.student_id}`}
+                    className={dirty ? config.accentClasses.row : ""}
+                  >
+                    <td
+                      className={`border-b border-gray-100 px-4 py-3 align-top text-sm font-semibold text-gray-900 dark:border-gray-700 dark:text-white ${
+                        isActive ? config.accentClasses.selected : ""
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{row.student_name}</span>
+                        {dirty ? <span className="inline-flex h-2.5 w-2.5 rounded-full bg-amber-400" /> : null}
+                      </div>
+                    </td>
+                    <td
+                      className={`border-b border-gray-100 px-4 py-3 align-top text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300 ${
+                        isActive ? config.accentClasses.selected : ""
+                      }`}
+                    >
+                      {row.class_name}
+                    </td>
+                    <td className="border-b border-gray-100 px-4 py-3 align-top dark:border-gray-700">
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.01"
+                        min="0"
+                        max="20"
+                        value={value}
+                        onChange={(event) =>
+                          onValueChange(config.key, row.student_id, event.target.value)
+                        }
+                        onKeyDown={(event) =>
+                          onKeyDown(event, config.key, rowIndex, row.student_id)
+                        }
+                        onFocus={() => onStudentFocus(row.student_id)}
+                        data-grid-section={config.key}
+                        data-grid-row={rowIndex}
+                        data-student-id={row.student_id}
+                        placeholder="0 - 20"
+                        className={`w-full rounded-2xl border px-3 py-2.5 text-sm text-gray-900 outline-none transition dark:bg-gray-900 dark:text-white ${
+                          error
+                            ? "border-rose-300 focus:ring-rose-500 dark:border-rose-500"
+                            : `border-gray-300 dark:border-gray-600 ${config.accentClasses.focus}`
+                        } focus:ring-2`}
+                      />
+                      {error ? (
+                        <p className="mt-1 text-xs text-rose-600 dark:text-rose-300">{error}</p>
+                      ) : null}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+};
+
+type FilterSelectProps = {
+  label: string;
+  value: string;
+  placeholder: string;
+  options: Array<{ value: string; label: string }>;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+};
+
+const FilterSelect: React.FC<FilterSelectProps> = ({
+  label,
+  value,
+  placeholder,
+  options,
+  onChange,
+  disabled = false,
+}) => {
+  return (
+    <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+      <span>{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        disabled={disabled}
+        className="h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-400 disabled:cursor-not-allowed disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:disabled:bg-gray-800"
+      >
+        <option value="">{placeholder}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+};
+
+type StateCardProps = {
+  tone: "muted" | "error";
+  title: string;
+  description: string;
+};
+
+const StateCard: React.FC<StateCardProps> = ({ tone, title, description }) => {
+  return (
+    <div
+      className={`rounded-2xl border px-5 py-4 ${
+        tone === "error"
+          ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-900/20 dark:text-rose-200"
+          : "border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-200"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+        <div className="space-y-1">
+          <p className="text-sm font-semibold">{title}</p>
+          <p className="text-sm opacity-90">{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function getInputValue(
+  row: StudentGradeGridRow,
+  field: SectionConfig["field"]
+) {
+  const value = row[field];
+  return value == null ? "" : String(value);
+}
+
+function normalizeDraftValue(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isNaN(parsed) ? trimmed : parsed;
+}
+
+function normalizeRowValue(
+  row: StudentGradeGridRow,
+  field: SectionConfig["field"]
+) {
+  return row[field] ?? null;
+}
+
+function validateDraftValue(value: string, language: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  const parsed = Number(trimmed);
+  if (Number.isNaN(parsed)) {
+    return getTranslation("gradesNumericValueError", language);
+  }
+
+  if (parsed < 0 || parsed > 20) {
+    return getTranslation("gradesMarkRangeError", language);
+  }
+
+  return "";
+}
+
+function getFilledValuesCount(row: StudentGradeGridRow) {
+  return [
+    row.evaluation_mark,
+    row.devoir1_mark,
+    row.devoir2_mark,
+    row.exam_mark,
+    row.average_mark,
+  ].filter((value) => value !== null && value !== undefined).length;
+}
 
 export default GradeManager;

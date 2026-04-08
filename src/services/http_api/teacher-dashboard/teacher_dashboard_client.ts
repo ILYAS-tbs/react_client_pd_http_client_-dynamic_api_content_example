@@ -1,4 +1,5 @@
 import {
+  BatchPatchStudentGradesSectionPayload,
   BatchPatchMonthlyEvaluationPayload,
   PatchMonthlyEvaluationPayload,
   PatchStudentPayload,
@@ -7,10 +8,12 @@ import {
   PostBehaviourReportPayload,
   PostMarkPayload,
   PostStudentGradesPayload,
+  TeacherStudentGradesFilters,
   TeacherMonthlyEvaluationFilters,
 } from "../payloads_types/teacher_client_payload_types";
 import { TeacherDashboardStats } from "../../../models/TeacherDashboardStats";
 import { TeacherMonthlyEvaluationGridResponse } from "../../../models/MonthlyEvaluation";
+import { TeacherStudentGradesGridResponse } from "../../../models/StudentGrade";
 import { SERVER_BASE_URL } from "../server_constants";
 
 const BASE_URL = SERVER_BASE_URL;
@@ -38,6 +41,8 @@ const URLS = {
   post_mark: `${BASE_URL}/teacher/marks/`,
   post_grades: `${BASE_URL}/teacher/student-grades/`,
   patch_grades: `${BASE_URL}/teacher/student-grades/`,
+  get_grade_grid: `${BASE_URL}/teacher/student-grades/grid/`,
+  batch_patch_grade_section: `${BASE_URL}/teacher/student-grades/batch-section/`,
   calculate_average: `${BASE_URL}/teacher/student-grades/`,
   calculate_batch_averages: `${BASE_URL}/teacher/student-grades/calculate_batch_averages/`,
   get_student_averages: `${BASE_URL}/teacher/student-grades/get_student_averages/`,
@@ -126,6 +131,28 @@ async function current_teacher_students_grades() {
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
+  }
+}
+
+async function get_grade_grid(filters: TeacherStudentGradesFilters) {
+  const params = new URLSearchParams({
+    class_group_id: filters.class_group_id,
+    module_id: filters.module_id,
+    semester: filters.semester,
+  });
+
+  try {
+    const response = await fetch(`${URLS.get_grade_grid}?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data: TeacherStudentGradesGridResponse = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
 
@@ -498,6 +525,27 @@ async function patch_grades(
   }
 }
 
+async function batch_patch_student_grades_section(
+  payload: BatchPatchStudentGradesSectionPayload,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.batch_patch_grade_section, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 //! Create  Teacher Upload :
 async function create_teacher_upload(formData: FormData, csrfToken: string) {
   try {
@@ -719,6 +767,7 @@ export const teacher_dashboard_client = {
   get_current_teacher_behaviour_reports: get_current_teacher_behaviour_reports,
   current_teacher_school_modules: current_teacher_school_modules,
   current_teacher_students_grades: current_teacher_students_grades,
+  get_grade_grid: get_grade_grid,
   get_monthly_evaluations: get_monthly_evaluations,
   get_student_monthly_evaluations: get_student_monthly_evaluations,
   get_filtered_monthly_evaluations: get_filtered_monthly_evaluations,
@@ -737,6 +786,7 @@ export const teacher_dashboard_client = {
   batch_patch_monthly_evaluations: batch_patch_monthly_evaluations,
   delete_monthly_evaluation: delete_monthly_evaluation,
   patch_grades: patch_grades,
+  batch_patch_student_grades_section: batch_patch_student_grades_section,
   calculate_average: calculate_average,
   calculate_batch_averages: calculate_batch_averages,
   get_student_averages: get_student_averages,

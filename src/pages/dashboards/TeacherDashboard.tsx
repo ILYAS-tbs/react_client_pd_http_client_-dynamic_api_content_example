@@ -12,15 +12,13 @@ import {
 import DashboardLayout from "../../components/DashboardLayout";
 import MonthylEvaluation from "../../components/teacher/MonthylEvaluation.tsx";
 import ClassManagement from "../../components/teacher/ClassManagement";
-import GradeManager from "../../components/teacher/GradeManager";
+import GradeManager from "../../components/teacher/GradeManager.tsx";
 import ResourceManager from "../../components/teacher/ResourceManager";
 import { Student } from "../../models/Student";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
 import { TeacherUpload } from "../../models/TeacherUpload";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { User } from "../../contexts/AuthContext";
-import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
-import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
 import TeacherHomeworks from "../../components/teacher/TeacherHomeworks";
@@ -96,8 +94,6 @@ const TeacherDashboard: React.FC = () => {
   >([]);
   const [classGroupsLoaded, setClassGroupsLoaded] = useState(false);
   const [teacher_uploads, setTeacherUploads] = useState<TeacherUpload[]>([]);
-  const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
-  const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
   const [teacherStats, setTeacherStats] = useState<TeacherDashboardStats>({
     my_classes: 0,
     grades: 0,
@@ -138,26 +134,11 @@ const TeacherDashboard: React.FC = () => {
     }
     setClassGroupsLoaded(true);
   };
-  const current_teacher_students_grades = async () => {
-    const res =
-      await teacher_dashboard_client.current_teacher_students_grades();
-    if (res.ok) {
-      const grades_list: StudentGrade[] = res.data;
-      setStudentsGrades(grades_list);
-    }
-  };
   const get_current_teacher_uploads = async () => {
     const res = await teacher_dashboard_client.get_current_teacher_uploads();
     if (res.ok) {
       const teacher_uploads_list: TeacherUpload[] = res.data;
       setTeacherUploads(teacher_uploads_list);
-    }
-  };
-  const current_teacher_school_modules = async () => {
-    const res = await teacher_dashboard_client.current_teacher_school_modules();
-    if (res.ok) {
-      const modules_list: TeacherModuleClassGrp[] = res.data;
-      setModules(modules_list);
     }
   };
 
@@ -200,17 +181,10 @@ const TeacherDashboard: React.FC = () => {
     get_current_teacher_stats();
     get_current_teacher_modules_and_class_groups();
     get_current_teacher_uploads();
-    current_teacher_school_modules();
-    current_teacher_students_grades();
 
     //? chat system :
     get_current_teacher_school_parents();
   }, []);
-
-  //? SYNC WITH THE SERVER
-  function RefetchGrades() {
-    current_teacher_students_grades();
-  }
 
   const stats = [
     { title: getTranslation('myClasses', language), value: teacherStats.my_classes || "0", icon: Users, color: "bg-primary-500", tab: "classes" },
@@ -277,13 +251,7 @@ const TeacherDashboard: React.FC = () => {
       case "grades":
         return (
           <GradeManager
-            modules={modules}
             modules_class_groups={modules_class_groups}
-            students_grades={students_grades}
-            teacher_id={teacher_id}
-            setStudentsGrades={setStudentsGrades}
-            RefetchGrades={RefetchGrades}
-            students={students}
           />
         );
       case "homeworks":
