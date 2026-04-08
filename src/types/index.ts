@@ -147,10 +147,7 @@ export interface ClassManagementProps {
   students_list: Student[];
   setStudentsList: React.Dispatch<React.SetStateAction<Student[]>>;
   modules_class_groups: TeacherModuleClassGroup[];
-  setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
-  teacher_id: number;
-  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
-  teacher : Teacher | null
+  isLoading?: boolean;
 }
 
 export interface MonthylEvaluationProps {

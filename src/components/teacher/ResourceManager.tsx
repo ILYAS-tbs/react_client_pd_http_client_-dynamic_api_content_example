@@ -30,6 +30,7 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
 
   const [selectedType, setSelectedType] = useState("all");
+  const [selectedClassGroupId, setSelectedClassGroupId] = useState("all");
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const resourceTypes = [
@@ -124,13 +125,17 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
       size: `${Number(upload.size).toFixed(1)} - ${upload.size_unit}`,
       uploadDate: upload.created_at ? new Date(upload.created_at) : new Date(),
       downloads: 23,
+      classGroupIds: upload.class_groups.map((cls) => cls.class_group_id),
       classes: upload.class_groups.map((cls) => cls.name),
       description: upload.description,
     };
   });
 
   const filteredResources = resources.filter(
-    (resource) => selectedType === "all" || resource.type === selectedType
+    (resource) =>
+      (selectedType === "all" || resource.type === selectedType) &&
+      (selectedClassGroupId === "all" ||
+        resource.classGroupIds.includes(selectedClassGroupId))
   );
 
   const getTypeIcon = (type: string) => {
@@ -222,13 +227,16 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
     }
     formData.append("upload_file", upload_file);
 
-    if (!selectedClassGroups) {
+    if (!selectedClassGroups.length) {
       // error - error ui for later
       showError("الأقسام المستهدفة مطلوبة");
 
       return;
     }
     formData.append("class_groups", JSON.stringify(selectedClassGroups));
+
+    // Monetization - Default price set to 1000 (hidden from UI)
+    formData.append("price", "1000");
 
     console.log("handleUploadSubmit payload:");
     console.log(Object.fromEntries(formData.entries()));
@@ -292,20 +300,44 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
 
       {/* Filter Tabs */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-        <div className="flex flex-wrap gap-2">
-          {resourceTypes.map((type) => (
-            <button
-              key={type.value}
-              onClick={() => setSelectedType(type.value)}
-              className={`flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg transition-colors ${selectedType === type.value
-                ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 border-2 border-primary-500"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {resourceTypes.map((type) => (
+              <button
+                key={type.value}
+                onClick={() => setSelectedType(type.value)}
+                className={`flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-lg transition-colors ${selectedType === type.value
+                  ? "bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 border-2 border-primary-500"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+              >
+                <type.icon className="h-4 w-4" />
+                <span>{type.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="w-full lg:w-64">
+            <label
+              htmlFor="resource-class-filter"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              <type.icon className="h-4 w-4" />
-              <span>{type.label}</span>
-            </button>
-          ))}
+              {getTranslation('classes', language)}
+            </label>
+            <select
+              id="resource-class-filter"
+              value={selectedClassGroupId}
+              onChange={(e) => setSelectedClassGroupId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="all">{getTranslation('allClasses', language)}</option>
+              {uniqueClassGroups.map((cls) => (
+                <option key={cls.class_group_id} value={cls.class_group_id}>
+                  {cls.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -482,6 +514,18 @@ const ResourceManager: React.FC<ResourceManagerProps> = ({
                   placeholder={getTranslation('shortMaterialDescription', language)}
                 />
               </div>
+
+              {/* Monetization - Hidden for now */}
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {getTranslation('price', language)}
+                </label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="0"
+                />
+              </div> */}
 
               <div>
                 {/* Title */}

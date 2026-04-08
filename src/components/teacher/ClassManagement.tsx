@@ -1,532 +1,148 @@
-import React, { useState } from "react";
-import {
-  Users,
-  BookOpen,
-  Calendar,
-  Plus,
-  Eye,
-  Edit,
-  Search,
-} from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { ClassManagementProps } from "../../types";
-import {
-  TeacherModuleClassGroup,
-} from "../../models/TeacherModuleClassGroup";
 import { Student } from "../../models/Student";
-import { getCSRFToken } from "../../lib/get_CSRFToken";
-import {
-  PatchStudentPayload,
-  PostAbsencePayload,
-} from "../../services/http_api/payloads_types/teacher_client_payload_types";
-import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
-
-import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
-import { TeacherAbsence } from "../../models/TeacherAbsence";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import ClassCard from "./ClassCard";
+
+const CLASS_MANAGEMENT_THEME: React.CSSProperties = {
+  "--class-card-border": "var(--primary-200)",
+  "--class-card-header-bg": "var(--primary-50)",
+  "--class-card-icon-bg": "var(--primary-100)",
+  "--class-card-icon-fg": "var(--primary-600)",
+  "--class-card-avatar-bg": "var(--secondary-100)",
+  "--class-card-avatar-fg": "var(--secondary-700)",
+  "--class-card-action-bg": "#fee2e2",
+  "--class-card-action-hover": "#fecaca",
+  "--class-card-action-fg": "#b91c1c",
+} as React.CSSProperties;
 
 const ClassManagement: React.FC<ClassManagementProps> = ({
   students_list,
-  setStudentsList,
   modules_class_groups,
-  setAbsences,
-  teacher_id,
-  setActiveTab,
-  teacher,
+  isLoading = false,
 }) => {
-  //! Translations ::
   const { language } = useLanguage();
+  const [localStudents, setLocalStudents] = useState<Student[]>(students_list);
 
-  const default_first_class =
-    modules_class_groups?.[0]?.class_group.class_group_id;
-  const [selectedClass, setSelectedClass] = useState(default_first_class);
+  useEffect(() => {
+    setLocalStudents(students_list);
+  }, [students_list]);
 
-  const [showAbsenseTakingModal, setShowAbsenseTakingModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredStudents = students_list.filter((student: Student) =>
-    student.full_name.toLocaleLowerCase().includes(searchTerm)
-  );
-  //! Classes Mock Data
-  // const classes = [
-  //   {
-  //     id: "5أ",
-  //     name: "الصف الخامس أ",
-  //     subject: "الرياضيات",
-  //     students: 32,
-  //     schedule: [
-  //       { day: "الأحد", time: "08:00 - 08:45" },
-  //       { day: "الثلاثاء", time: "09:30 - 10:15" },
-  //       { day: "الخميس", time: "08:00 - 08:45" },
-  //     ],
-  //     recentGrades: "16.5/20",
-  //     attendance: "94%",
-  //   },
-  //   {
-  //     id: "4أ",
-  //     name: "الصف الرابع أ",
-  //     subject: "الرياضيات",
-  //     students: 28,
-  //     schedule: [
-  //       { day: "الاثنين", time: "08:45 - 09:30" },
-  //       { day: "الأربعاء", time: "10:15 - 11:00" },
-  //     ],
-  //     recentGrades: "15.8/20",
-  //     attendance: "96%",
-  //   },
-  //   {
-  //     id: "6أ",
-  //     name: "الصف السادس أ",
-  //     subject: "الرياضيات",
-  //     students: 30,
-  //     schedule: [
-  //       { day: "الاثنين", time: "10:15 - 11:00" },
-  //       { day: "الأربعاء", time: "08:00 - 08:45" },
-  //       { day: "الجمعة", time: "08:45 - 09:30" },
-  //     ],
-  //     recentGrades: "17.2/20",
-  //     attendance: "92%",
-  //   },
-  // ];
-  const classes = modules_class_groups.map(
-    (moduleClassGroup: TeacherModuleClassGroup) => {
-      const mapped_class = {
-        id: moduleClassGroup.class_group.class_group_id,
-        name: moduleClassGroup.class_group.name,
-        subject: moduleClassGroup.module.module_name,
-        students: moduleClassGroup.students_count,
-        schedule: moduleClassGroup.class_group.schedule,
-        averageGrade: Number(moduleClassGroup.average_grade).toFixed(1),
-        attendance: "92%",
-      };
-      return mapped_class;
+  const classMap = new Map<
+    string,
+    {
+      classId: string;
+      title: string;
+      students: Student[];
+      studentCount: number;
     }
+  >();
+
+  for (const moduleClassGroup of modules_class_groups) {
+    const classId = moduleClassGroup.class_group.class_group_id;
+    if (!classMap.has(classId)) {
+      classMap.set(classId, {
+        classId,
+        title: moduleClassGroup.class_group.name,
+        students: [],
+        studentCount: 0,
+      });
+    }
+  }
+
+  for (const student of localStudents) {
+    const classId = student.class_group?.class_group_id;
+    const className = student.class_group?.name;
+    if (!classId || !className) {
+      continue;
+    }
+
+    if (!classMap.has(classId)) {
+      classMap.set(classId, {
+        classId,
+        title: className,
+        students: [],
+        studentCount: 0,
+      });
+    }
+
+    const currentClass = classMap.get(classId);
+    if (!currentClass) {
+      continue;
+    }
+
+    currentClass.students.push(student);
+    currentClass.studentCount += 1;
+  }
+
+  const classCards = Array.from(classMap.values()).sort((leftClass, rightClass) =>
+    leftClass.title.localeCompare(rightClass.title)
   );
 
-  // ! Students Mock Data
-  // const students = [
-  //   {
-  //     id: 1,
-  //     name: "أحمد محمد علي",
-  //     lastGrade: "18/20",
-  //     attendance: "95%",
-  //     status: "ممتاز",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "فاطمة حسن",
-  //     lastGrade: "16/20",
-  //     attendance: "98%",
-  //     status: "جيد جداً",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "عمر السعيد",
-  //     lastGrade: "15/20",
-  //     attendance: "92%",
-  //     status: "جيد",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "زينب العلي",
-  //     lastGrade: "19/20",
-  //     attendance: "97%",
-  //     status: "ممتاز",
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "يوسف الأمين",
-  //     lastGrade: "14/20",
-  //     attendance: "89%",
-  //     status: "مقبول",
-  //   },
-  // ];
-  const students = students_list.map((student: Student) => ({
-    id: student.student_id,
-    name: student.full_name,
-    trimester_grade: student.trimester_grade,
-    is_absent: student.is_absent,
-    class_group_id: student.class_group?.class_group_id,
-    status: "مقبول",
-  }));
-
-  const currentClass = classes.find((c) => c.id === selectedClass);
-
-  const handleMarkAbsence = async (student_id: string) => {
-    let latest_csrf = getCSRFToken()!;
-    const student_payload: PatchStudentPayload = {
-      is_absent: true,
-    };
-    //* API CALL 1 : mark student as absent
-    const res = await teacher_dashboard_client.patch_student(
-      student_id,
-      student_payload,
-      latest_csrf
-    );
-
-    if (!res.ok) {
-      return;
-    }
-    //* API CALL 2 : Create an absence in the db
-    const post_absence_payload: PostAbsencePayload = {
-      student_id: student_id,
-      teacher_id: teacher_id,
-    };
-    latest_csrf = getCSRFToken()!;
-    const absence_res = await teacher_dashboard_client.post_absence(
-      post_absence_payload,
-      latest_csrf
-    );
-    if (absence_res.ok) {
-      console.log("Created absence sucessfully");
-    }
-
-    //* API CALL 3 : refresh data :
-    const updated_students_data =
-      await teacher_dashboard_client.get_current_teacher_students();
-
-    if (updated_students_data.ok) {
-      const new_students_list: Student[] = updated_students_data.data;
-      setStudentsList(new_students_list);
-    }
-
-    const updated_absences_res =
-      await shared_endpoints_clinet.absences_for_current_school_or_teacher();
-
-    if (updated_absences_res.ok) {
-      const new_absences_list: TeacherAbsence[] = updated_absences_res.data;
-      setAbsences(new_absences_list);
-    }
-  };
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation("classManagement", language)}
-        </h2>
-        <div className="flex items-center space-x-4 rtl:space-x-reverse">
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            {classes.map((cls) => (
-              <option key={cls.id} value={cls.id}>
-                {cls.name}
-              </option>
-            ))}
-          </select>
+    <section className="space-y-6" style={CLASS_MANAGEMENT_THEME}>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {getTranslation("classManagement", language)}
+          </h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {isLoading
+              ? getTranslation("loadingClasses", language)
+              : `${classCards.length} ${getTranslation("myClasses", language)}`}
+          </p>
         </div>
       </div>
 
-      {/* Class Overview */}
-      {currentClass && (
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
-              <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-lg">
-                <Users className="h-6 w-6 text-primary-500" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {currentClass.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {currentClass.subject}
-                </p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation("studentsCount", language)} :
-                </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {currentClass.students}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation("averageGrades", language)} :
-                </span>
-                <span className="text-sm font-medium text-primary-600">
-                  {currentClass.averageGrade}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation("AttendanceRate", language)} :
-                </span>
-                <span className="text-sm font-medium text-primary-500">
-                  {currentClass.attendance}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
-              <div className="bg-primary-100 dark:bg-primary-900 p-3 rounded-lg">
-                <Calendar className="h-6 w-6 text-primary-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {getTranslation("weeklySchedule", language)}
-              </h3>
-            </div>
-            {/* changed to new pdf overview from table-to-pdf */}
-            {/* <div className="h-64 overflow-y-auto space-y-2">
-              {currentClass.schedule.map((session, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                >
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {session.day}
-                  </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {session.time}
-                  </span>
-                </div>
-              ))}
-            </div> */}
-            {/* PDF Preview */}
-            <div className="h-96 rounded-lg overflow-hidden border dark:border-gray-600">
-              {/* <iframe
-                src={teacher?.weekly_schedule ?? undefined}
-                className="w-full h-full"
-                title="Weekly Schedule PDF"
-              ></iframe> */}
-              {/* <a
-                href={teacher?.weekly_schedule ?? undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-500 underline"
-              >
-                View Weekly Schedule (PDF)
-              </a> */}
-
-              {/* MUST THE FILE SERVERD EXTERNALLY TO WORK - NO LOCAL HOST */}
-              {/* <iframe
-                src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(teacher?.weekly_schedule ?? "")}`}
-                className="w-full h-96"
-              ></iframe> */}
-              {teacher?.weekly_schedule ? (() => {
-                const url = teacher.weekly_schedule;
-                const ext = url.split('.').pop()?.toLowerCase();
-
-                if (ext === 'pdf') {
-                  // PDF preview in iframe
-                  return (
-                    <iframe
-                      src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`}
-                      className="w-full h-96 border rounded-lg"
-                    ></iframe>
-                  );
-                } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) {
-                  // Image preview clickable to open full screen
-                  return (
-                    <a href={url} target="_blank" rel="noopener noreferrer">
-                      <img
-                        src={url}
-                        alt="Schedule"
-                        className="w-full h-96 object-contain cursor-pointer border rounded-lg"
-                      />
-                    </a>
-                  );
-                } else {
-                  return <p>Unsupported file type.</p>;
-                }
-              })() : (
-                <p>No schedule available.</p>
-              )}
-
-
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
-              <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
-                <BookOpen className="h-6 w-6 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {getTranslation("quickActions", language)}
-              </h3>
-            </div>
-            <div className="space-y-2">
-              <button
-                onClick={() => setActiveTab("grades")}
-                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                <span>{getTranslation("addGrade", language)}</span>
-              </button>
-              <button
-                onClick={() => setShowAbsenseTakingModal(true)}
-                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors"
-              >
-                <Edit className="h-4 w-4" />
-                <span>{getTranslation("recordAttendance", language)}</span>
-              </button>
-              <button
-                onClick={() => setActiveTab("absences")}
-                className="w-full flex items-center space-x-2 rtl:space-x-reverse p-2 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors"
-              >
-                <Eye className="h-4 w-4" />
-                <span>{getTranslation("viewReports", language)}</span>
-              </button>
-            </div>
-          </div>
+      {isLoading ? (
+        <div
+          className="grid gap-6"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}
+        >
+          {[0, 1, 2, 3].map((cardIndex) => (
+            <ClassCard
+              key={cardIndex}
+              classId={`loading-${cardIndex}`}
+              title=""
+              studentCount={0}
+              students={[]}
+              isLoading={true}
+            />
+          ))}
+        </div>
+      ) : classCards.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-[var(--class-card-border)] bg-white/80 px-6 py-12 text-center text-sm text-gray-500 shadow-sm dark:bg-gray-800/80 dark:text-gray-400">
+          {getTranslation("noClassesAssigned", language)}
+        </div>
+      ) : (
+        <div
+          className="grid gap-6"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}
+        >
+          {classCards.map((classCard) => (
+            <ClassCard
+              key={classCard.classId}
+              classId={classCard.classId}
+              title={classCard.title}
+              studentCount={classCard.studentCount}
+              students={classCard.students}
+              labels={{
+                studentsLabel: getTranslation("students", language),
+                filterPlaceholder: getTranslation(
+                  "filterStudentsPlaceholder",
+                  language
+                ),
+                emptyState: getTranslation("classHasNoStudentsYet", language),
+                noMatches: getTranslation("noMatchingStudents", language),
+                absentLabel: getTranslation("absent", language),
+                presentLabel: getTranslation("present", language),
+              }}
+            />
+          ))}
         </div>
       )}
-
-      {/* Students List */}
-      <div className="h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("students", language)} {currentClass?.name}
-          </h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("student", language)}
-                </th>
-                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("lastGrade", language)}
-                </th>
-                <th className="ltr:text-left px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {getTranslation("attendanceStatus", language)}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {students.map((student) => (
-                <tr
-                  key={student.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {student.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
-                      {student.trimester_grade ?? 0}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-primary-500 dark:text-primary-400">
-                      {student.is_absent ? getTranslation('absent', language) : getTranslation('present', language)}
-                    </span>
-                  </td>
-                  {/* <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${student.status === "ممتاز"
-                        ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
-                        : student.status === "جيد جداً"
-                          ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
-                          : student.status === "جيد"
-                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                            : "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
-                        }`}
-                    >
-                      {student.status}
-                    </span>
-                  </td> */}
-                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <button className="text-primary-500 hover:bg-primary-300">
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="text-primary-600 hover:bg-primary-300">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td> */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Modal - Quick Actions - Absence Taking */}
-      {showAbsenseTakingModal && (
-        <div className=" fixed inset-0 !mt-0  bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation("recordAbsences", language)}
-            </h3>
-
-            <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder={getTranslation("searchStudents", language)}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-
-            <div className="students_list h-64 overflow-y-auto">
-              {filteredStudents.map((s) => (
-                <div
-                  key={s.student_id}
-                  className=" flex p-2 mt-2 bg-gray-100 justify-between items-center rounded hover:bg-gray-200"
-                >
-                  <span className="text text-gray-600 dark:text-gray-400">
-                    {s.full_name}
-                  </span>
-
-                  {/* status */}
-                  <span
-                    className={`text-sm font-semibold ${s.is_absent
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-primary-600 dark:text-primary-400"
-                      }`}
-                  >
-                    {s.is_absent
-                      ? getTranslation("absent", language)
-                      : getTranslation("present", language)}
-                  </span>
-
-                  {/* actions */}
-                  <div className="action-buttons flex gap-2">
-                    <button
-                      onClick={() => handleMarkAbsence(s.student_id)}
-                      className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors 
-                    bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 
-                    hover:bg-rose-300 dark:hover:bg-rose-800`}
-                    >
-                      {getTranslation("recordAbsences", language)}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center space-x-3 rtl:space-x-reverse mt-6">
-              <button
-                onClick={() => setShowAbsenseTakingModal(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                {getTranslation("close", language)}
-              </button>
-
-              {/* Confirmation for this will be unused for now, since we have to make a copy first then make the call */}
-              {/* <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-                تأكيد
-              </button> */}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </section>
   );
 };
 

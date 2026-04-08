@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
   BookOpen,
-  Calendar,
   Users,
   MessageCircle,
   FileText,
   TrendingUp,
   Upload,
-  Edit,
   FileX2,
   ClipboardList,
 } from "lucide-react";
@@ -20,16 +18,11 @@ import { Student } from "../../models/Student";
 import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
 import { TeacherUpload } from "../../models/TeacherUpload";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
-import TeacherAbsenceManager from "../../components/teacher/TeacherAbsenceManager";
-import { TeacherAbsence } from "../../models/TeacherAbsence";
-import { shared_endpoints_clinet } from "../../services/http_api/shared_endpoints/shared_endpoints_client";
 import { User } from "../../contexts/AuthContext";
-import { BehaviourReport } from "../../models/BehaviorReport";
 import { TeacherModuleClassGrp } from "../../models/TeacherModuleClassGrp";
 import { StudentGrade } from "../../models/StudentGrade";
 import { chat_http_client } from "../../services/chat/chat_http_client";
 import TeacherChat from "../../components/shared/TeacherChat";
-import ScheduleViewer from "../../components/teacher/ScheduleViewer";
 import TeacherHomeworks from "../../components/teacher/TeacherHomeworks";
 import { Parent } from "../../models/Parent";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -37,10 +30,16 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { getTranslation } from "../../utils/translations";
-import { Message } from "../../models/chat_system/Message";
-import { timeAgoArabic } from "../../lib/timeAgoArabic";
-import { Teacher } from "../../models/Teacher";
 import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
+import TeacherAttendanceTab from "../../components/teacher/TeacherAttendanceTab";
+import TeacherBehaviourNotesTab from "../../components/teacher/TeacherBehaviourNotesTab";
+
+interface TeacherDashboardStats {
+  my_classes: number;
+  grades: number;
+  chats: number;
+  teaching_materials: number;
+}
 
 const TeacherDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -91,46 +90,45 @@ const TeacherDashboard: React.FC = () => {
   const [isDeactivated, setIsDeactivated] = useState(false);
 
   //! Fetching Data From The Server
-  const [teacher, setTeacher] = useState<Teacher | null>(null)
   const [students, setStudents] = useState<Student[]>([]);
+  const [studentsLoaded, setStudentsLoaded] = useState(false);
   const [modules_class_groups, setModulesClassGroups] = useState<
     TeacherModuleClassGroup[]
   >([]);
+  const [classGroupsLoaded, setClassGroupsLoaded] = useState(false);
   const [teacher_uploads, setTeacherUploads] = useState<TeacherUpload[]>([]);
-  const [absences, setAbsences] = useState<TeacherAbsence[]>([]);
-  const [behaviour_reports, setBehaviourReports] = useState<BehaviourReport[]>(
-    []
-  );
   const [modules, setModules] = useState<TeacherModuleClassGrp[]>([]);
   const [students_grades, setStudentsGrades] = useState<StudentGrade[]>([]);
   const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
-
-  const [newMessages, setNewMessages] = useState<Message[]>([]);
+  const [teacherStats, setTeacherStats] = useState<TeacherDashboardStats>({
+    my_classes: 0,
+    grades: 0,
+    chats: 0,
+    teaching_materials: 0,
+  });
 
   const handleDeactivated = async () => {
     setIsDeactivated(true);
     await logout();
-  };
-
-  const get_teacher_by_id = async () => {
-    if (!Number.isFinite(teacher_id) || teacher_id <= 0) {
-      return;
-    }
-    const res = await teacher_dashboard_client.get_teacher_by_id(teacher_id);
-    if (res.status === 401 || res.status === 403) {
-      handleDeactivated();
-      return;
-    }
-    if (res.ok) {
-      const new_teacher: Teacher = res.data;
-      setTeacher(new_teacher);
-    }
   };
   const get_current_teacher_students = async () => {
     const res = await teacher_dashboard_client.get_current_teacher_students();
     if (res.ok) {
       const students_list: Student[] = res.data;
       setStudents(students_list);
+    }
+    setStudentsLoaded(true);
+  };
+  const get_current_teacher_stats = async () => {
+    const res = await teacher_dashboard_client.get_current_teacher_stats();
+    if (res.ok) {
+      const stats_data: TeacherDashboardStats = res.data ?? {
+        my_classes: 0,
+        grades: 0,
+        chats: 0,
+        teaching_materials: 0,
+      };
+      setTeacherStats(stats_data);
     }
   };
   const get_current_teacher_modules_and_class_groups = async () => {
@@ -140,6 +138,7 @@ const TeacherDashboard: React.FC = () => {
       const modules_class_groups_list: TeacherModuleClassGroup[] = res.data;
       setModulesClassGroups(modules_class_groups_list);
     }
+    setClassGroupsLoaded(true);
   };
   const current_teacher_students_grades = async () => {
     const res =
@@ -156,22 +155,6 @@ const TeacherDashboard: React.FC = () => {
       setTeacherUploads(teacher_uploads_list);
     }
   };
-  const absences_for_current_school_or_teacher = async () => {
-    const res =
-      await shared_endpoints_clinet.absences_for_current_school_or_teacher();
-    if (res.ok) {
-      const absences_list: TeacherAbsence[] = res.data;
-      setAbsences(absences_list);
-    }
-  };
-  const get_current_teacher_behaviour_reports = async () => {
-    const res =
-      await teacher_dashboard_client.get_current_teacher_behaviour_reports();
-    if (res.ok) {
-      const behaviour_reports_list: BehaviourReport[] = res.data;
-      setBehaviourReports(behaviour_reports_list);
-    }
-  };
   const current_teacher_school_modules = async () => {
     const res = await teacher_dashboard_client.current_teacher_school_modules();
     if (res.ok) {
@@ -179,14 +162,6 @@ const TeacherDashboard: React.FC = () => {
       setModules(modules_list);
     }
   };
-
-  const get_latest_five_messages = async () => {
-    const res = await chat_http_client.get_latest_five_messages()
-    if (res.ok) {
-      const new_messages_list: Message[] = res.data
-      setNewMessages(new_messages_list)
-    }
-  }
 
   //? Chat system :
   //? list for all the parents this teacher can chat with
@@ -220,18 +195,15 @@ const TeacherDashboard: React.FC = () => {
 
     const intervalId = setInterval(checkSession, 30_000);
     return () => clearInterval(intervalId);
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    get_teacher_by_id();
     get_current_teacher_students();
+    get_current_teacher_stats();
     get_current_teacher_modules_and_class_groups();
     get_current_teacher_uploads();
-    absences_for_current_school_or_teacher();
-    get_current_teacher_behaviour_reports();
     current_teacher_school_modules();
     current_teacher_students_grades();
-    get_latest_five_messages()
 
     //? chat system :
     get_current_teacher_school_parents();
@@ -243,26 +215,31 @@ const TeacherDashboard: React.FC = () => {
   }
 
   const stats = [
-    { title: getTranslation('myStudents', language), value: students.length || "0", icon: Users, color: "bg-primary-500", tab: "classes" },
-    { title: getTranslation('Classes', language), value: modules_class_groups.length || "0", icon: BookOpen, color: "bg-primary-400", tab: "classes" },
-    { title: getTranslation('newMessages', language), value: newMessages.length || "0", icon: MessageCircle, color: "bg-primary-500", tab: "chat" },
-    { title: getTranslation('uploadedMaterials', language), value: teacher_uploads.length || "0", icon: Upload, color: "bg-primary-400", tab: "resources" },
+    { title: getTranslation('myClasses', language), value: teacherStats.my_classes || "0", icon: Users, color: "bg-primary-500", tab: "classes" },
+    { title: getTranslation('marks', language), value: teacherStats.grades || "0", icon: FileText, color: "bg-primary-400", tab: "grades" },
+    { title: getTranslation('chats', language), value: teacherStats.chats || "0", icon: MessageCircle, color: "bg-primary-500", tab: "chat" },
+    { title: getTranslation('teachingMaterials', language), value: teacherStats.teaching_materials || "0", icon: Upload, color: "bg-primary-400", tab: "resources" },
   ];
 
   const tabs = [
     { id: "overview", label: getTranslation('overview', language), icon: TrendingUp },
     { id: "classes", label: getTranslation('myClasses', language), icon: Users },
+    {
+      id: "attendance",
+      label: getTranslation('teacherAbsencesTab', language),
+      icon: FileX2,
+    },
     { id: "homeworks", label: getTranslation('homeworksTab', language), icon: ClipboardList },
     { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
-    { id: "schedule", label: getTranslation('classSchedule', language), icon: Calendar },
+    // { id: "schedule", label: getTranslation('classSchedule', language), icon: Calendar },
 
     { id: "grades", label: getTranslation('marks', language), icon: FileText },
     { id: "resources", label: getTranslation('educationalMaterials', language), icon: BookOpen },
     { id: "chat", label: getTranslation('communication_teacher', language), icon: MessageCircle },
     {
-      id: "absences",
-      label: getTranslation('unexcusedAbsencesAndBehaviorReports', language),
-      icon: FileX2,
+      id: "behaviour_notes",
+      label: getTranslation('behaviourNotesTab', language),
+      icon: ClipboardList,
     },
   ];
 
@@ -290,10 +267,7 @@ const TeacherDashboard: React.FC = () => {
             students_list={students}
             setStudentsList={setStudents}
             modules_class_groups={modules_class_groups}
-            setAbsences={setAbsences}
-            teacher_id={teacher_id}
-            setActiveTab={setActiveTab}
-            teacher={teacher}
+            isLoading={!(studentsLoaded && classGroupsLoaded)}
           />
         );
       case "monthly_evaluation":
@@ -341,8 +315,8 @@ const TeacherDashboard: React.FC = () => {
           />
         );
 
-      case "schedule":
-        return <ScheduleViewer modules_class_groups={modules_class_groups} />;
+      // case "schedule":
+      //   return <ScheduleViewer modules_class_groups={modules_class_groups} />;
       //               <th className="border border-gray-200 dark:border-gray-600 px-4 py-2 text-right">
       //                 الوقت
       //               </th>
@@ -415,16 +389,13 @@ const TeacherDashboard: React.FC = () => {
       //       </div>
       //     </div>
       //   );
-      case "absences":
+      case "attendance":
         return (
-          <TeacherAbsenceManager
-            absences={absences}
-            setAbsences={setAbsences}
-            students_list={students}
-            teacher_id={teacher_id}
-            behaviour_reports={behaviour_reports}
-            setBehaviourReports={setBehaviourReports}
-          />
+          <TeacherAttendanceTab students={students} modulesClassGroups={modules_class_groups} />
+        );
+      case "behaviour_notes":
+        return (
+          <TeacherBehaviourNotesTab students={students} modulesClassGroups={modules_class_groups} />
         );
       default:
         return (
@@ -505,8 +476,8 @@ const TeacherDashboard: React.FC = () => {
               </div>
             </div> */}
 
-            {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Quick Actions (hidden) */}
+            {/* <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   {getTranslation('quickActions', language)}
@@ -562,7 +533,7 @@ const TeacherDashboard: React.FC = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
 
 
 

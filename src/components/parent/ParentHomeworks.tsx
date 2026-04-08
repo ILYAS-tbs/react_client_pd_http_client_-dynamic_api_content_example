@@ -1,62 +1,19 @@
 import React, { useEffect, useState } from "react";
 import {
   BookOpen,
-  CheckCircle,
   Clock,
   Download,
   FileText,
-  TrendingUp,
-  XCircle,
-  AlertCircle,
   ChevronDown,
   ChevronUp,
   User,
+  Layers,
 } from "lucide-react";
 import { StudentHomework, StudentHomeworkGroup } from "../../models/Homework";
 import { homework_client } from "../../services/http_api/homework/homework_client";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
-
-function submissionStatus(hw: StudentHomework) {
-  if (hw.submission_status) {
-    return hw.submission_status;
-  }
-  const overdue = new Date(hw.last_submission_date) < new Date();
-  if (hw.submission) {
-    if (hw.submission.mark !== null) return "graded";
-    return "submitted";
-  }
-  if (overdue) return "missed";
-  return "pending";
-}
-
-const statusConfig = {
-  graded: {
-    icon: CheckCircle,
-    className: "text-green-600 dark:text-green-400",
-    bgClass: "bg-green-100 dark:bg-green-900/30",
-    labelKey: "graded",
-  },
-  submitted: {
-    icon: Clock,
-    className: "text-blue-500 dark:text-blue-400",
-    bgClass: "bg-blue-100 dark:bg-blue-900/30",
-    labelKey: "submitted",
-  },
-  missed: {
-    icon: XCircle,
-    className: "text-red-500 dark:text-red-400",
-    bgClass: "bg-red-100 dark:bg-red-900/30",
-    labelKey: "missed",
-  },
-  pending: {
-    icon: AlertCircle,
-    className: "text-amber-500 dark:text-amber-400",
-    bgClass: "bg-amber-100 dark:bg-amber-900/30",
-    labelKey: "pending",
-  },
-};
 
 interface HomeworkCardProps {
   hw: StudentHomework;
@@ -65,9 +22,6 @@ interface HomeworkCardProps {
 
 function HomeworkCard({ hw, language }: HomeworkCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const status = submissionStatus(hw);
-  const cfg = statusConfig[status];
-  const Icon = cfg.icon;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
@@ -93,47 +47,23 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
             </span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
-              {getTranslation("deadline", language)}: {hw.last_submission_date}
+              {getTranslation("dueDate", language)}: {hw.last_submission_date}
             </span>
             <span className="flex items-center gap-1">
               <User className="h-3 w-3" />
               {hw.teacher_name}
             </span>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2 text-xs">
-            {hw.submission?.mark !== null && hw.submission ? (
-              <span className="rounded-full bg-green-100 px-2 py-1 font-medium text-green-700 dark:bg-green-900/30 dark:text-green-300">
-                {getTranslation("mark", language)}: {hw.submission.mark} / {hw.max_mark}
-              </span>
-            ) : hw.submission ? (
-              <span className="rounded-full bg-blue-100 px-2 py-1 font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                {getTranslation("submittedAwaitingGrade", language)}
-              </span>
-            ) : (
-              <span className="rounded-full bg-gray-100 px-2 py-1 font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                {getTranslation("notSubmitted", language)}
-              </span>
-            )}
-            {hw.submission?.remarks && (
-              <span className="rounded-full bg-primary-100 px-2 py-1 font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
-                {getTranslation("teacherNote", language)}
-              </span>
-            )}
+            <span className="flex items-center gap-1">
+              <Layers className="h-3 w-3" />
+              {hw.class_group_name}
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span
-            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${cfg.bgClass} ${cfg.className}`}
-          >
-            <Icon className="h-3 w-3" />
-            {getTranslation(cfg.labelKey, language)}
-          </span>
-          {expanded ? (
-            <ChevronUp className="h-4 w-4 text-gray-400" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-gray-400" />
-          )}
-        </div>
+        {expanded ? (
+          <ChevronUp className="h-4 w-4 shrink-0 text-gray-400" />
+        ) : (
+          <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />
+        )}
       </div>
 
       {expanded && (
@@ -160,68 +90,6 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
               <Download className="h-3 w-3" />
               {getTranslation("downloadAttachment", language)}
             </a>
-          )}
-
-          {hw.remarks && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-              {getTranslation("teacherNote", language)}: {hw.remarks}
-            </p>
-          )}
-
-          {!hw.submission && (
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                {getTranslation("notSubmitted", language)}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {getTranslation("homeworksTab", language)} - {getTranslation("teacher", language)}: {hw.teacher_name}
-              </p>
-            </div>
-          )}
-
-          {/* Submission result */}
-          {hw.submission && hw.submission.mark !== null && (
-            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 flex flex-wrap gap-4 items-center">
-              <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {getTranslation("mark", language)}
-                </p>
-                <p className="text-lg font-bold text-green-700 dark:text-green-400">
-                  {hw.submission.mark} / {hw.max_mark}
-                </p>
-              </div>
-              {hw.submission.teacher_name && (
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {getTranslation("teacher", language)}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    {hw.submission.teacher_name}
-                  </p>
-                </div>
-              )}
-              {hw.submission.remarks && (
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {getTranslation("teacherNote", language)}
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                    {hw.submission.remarks}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {hw.submission && hw.submission.mark === null && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                {getTranslation("submittedAwaitingGrade", language)}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {new Date(hw.submission.created_at).toLocaleDateString()}
-              </p>
-            </div>
           )}
         </div>
       )}
@@ -300,81 +168,11 @@ const ParentHomeworks: React.FC = () => {
 
           {currentGroup && (
             <>
-              {/* Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {[
-                  {
-                    label: getTranslation("totalHomeworks", language),
-                    value: currentGroup.stats.total,
-                    color: "bg-gray-100 dark:bg-gray-700",
-                    textColor: "text-gray-900 dark:text-white",
-                  },
-                  {
-                    label: getTranslation("submitted", language),
-                    value: currentGroup.stats.submitted,
-                    color: "bg-green-100 dark:bg-green-900/30",
-                    textColor: "text-green-700 dark:text-green-400",
-                  },
-                  {
-                    label: getTranslation("graded", language),
-                    value: currentGroup.stats.graded,
-                    color: "bg-blue-100 dark:bg-blue-900/30",
-                    textColor: "text-blue-700 dark:text-blue-400",
-                  },
-                  {
-                    label: getTranslation("notSubmitted", language),
-                    value: currentGroup.stats.not_submitted,
-                    color: "bg-red-100 dark:bg-red-900/30",
-                    textColor: "text-red-700 dark:text-red-400",
-                  },
-                  {
-                    label: getTranslation("averageMark", language),
-                    value:
-                      currentGroup.stats.average_mark !== null
-                        ? currentGroup.stats.average_mark.toFixed(1)
-                        : "—",
-                    color: "bg-blue-100 dark:bg-blue-900/30",
-                    textColor: "text-blue-700 dark:text-blue-400",
-                  },
-                ].map((s, i) => (
-                  <div key={i} className={`${s.color} rounded-xl p-4 text-center`}>
-                    <p className={`text-2xl font-bold ${s.textColor}`}>
-                      {s.value}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      {s.label}
-                    </p>
-                  </div>
-                ))}
+              <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {getTranslation("totalHomeworks", language)}: {currentGroup.homeworks.length}
+                </p>
               </div>
-
-              {/* Submission rate bar */}
-              {currentGroup.stats.total > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-primary-500" />
-                      {getTranslation("submissionRate", language)}
-                    </span>
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">
-                      {Math.round(
-                        (currentGroup.stats.submitted / currentGroup.stats.total) * 100
-                      )}
-                      %
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                    <div
-                      className="bg-primary-500 h-2.5 rounded-full transition-all"
-                      style={{
-                        width: `${Math.round(
-                          (currentGroup.stats.submitted / currentGroup.stats.total) * 100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* Homework list */}
               <div className="space-y-3">

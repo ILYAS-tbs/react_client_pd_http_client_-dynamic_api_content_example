@@ -1,8 +1,6 @@
 import { SERVER_BASE_URL } from "../server_constants";
 import {
   Homework,
-  HomeworkSubmission,
-  HomeworkStats,
   StudentHomeworkGroup,
 } from "../../../models/Homework";
 
@@ -74,72 +72,6 @@ export async function deleteHomework(id: string): Promise<ApiResult<void>> {
   });
 }
 
-// ─── Teacher: Submission management ──────────────────────────────────────────
-
-export async function getHomeworkSubmissions(
-  homeworkId: string
-): Promise<ApiResult<HomeworkSubmission[]>> {
-  return apiFetch<HomeworkSubmission[]>(
-    `${HW_BASE}/homeworks/${homeworkId}/submissions/`
-  );
-}
-
-export async function createSubmission(
-  homeworkId: string,
-  payload: { student: string; mark?: number | null; remarks?: string }
-): Promise<ApiResult<HomeworkSubmission>> {
-  return apiFetch<HomeworkSubmission>(
-    `${HW_BASE}/homeworks/${homeworkId}/submissions/`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken") ?? "",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
-}
-
-export async function updateSubmission(
-  homeworkId: string,
-  submissionId: string,
-  payload: { mark?: number | null; remarks?: string }
-): Promise<ApiResult<HomeworkSubmission>> {
-  return apiFetch<HomeworkSubmission>(
-    `${HW_BASE}/homeworks/${homeworkId}/submissions/${submissionId}/`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCookie("csrftoken") ?? "",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
-}
-
-export async function deleteSubmission(
-  homeworkId: string,
-  submissionId: string
-): Promise<ApiResult<void>> {
-  return apiFetch<void>(
-    `${HW_BASE}/homeworks/${homeworkId}/submissions/${submissionId}/`,
-    {
-      method: "DELETE",
-      headers: { "X-CSRFToken": getCookie("csrftoken") ?? "" },
-    }
-  );
-}
-
-export async function getHomeworkStats(
-  homeworkId: string
-): Promise<ApiResult<HomeworkStats>> {
-  return apiFetch<HomeworkStats>(
-    `${HW_BASE}/homeworks/${homeworkId}/stats/`
-  );
-}
-
 // ─── Parent endpoints ─────────────────────────────────────────────────────────
 
 export async function getParentHomeworksByStudent(): Promise<
@@ -172,11 +104,6 @@ export const homework_client = {
   createHomework,
   updateHomework,
   deleteHomework,
-  getHomeworkSubmissions,
-  createSubmission,
-  updateSubmission,
-  deleteSubmission,
-  getHomeworkStats,
   getParentHomeworksByStudent,
   getSchoolHomeworks,
 };

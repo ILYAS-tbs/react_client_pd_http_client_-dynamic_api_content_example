@@ -7,12 +7,14 @@ import {
   PostMarkPayload,
   PostStudentGradesPayload,
 } from "../payloads_types/teacher_client_payload_types";
+import { TeacherDashboardStats } from "../../../models/TeacherDashboardStats";
 import { SERVER_BASE_URL } from "../server_constants";
 
 const BASE_URL = SERVER_BASE_URL;
 const URLS = {
   get_teacher_by_id:`${BASE_URL}/teacher/teachers/`,
   get_current_teacher_students: `${BASE_URL}/teacher/teachers/get_current_teacher_students/`,
+  get_current_teacher_stats: `${BASE_URL}/teacher/teachers/get_current_teacher_stats/`,
   get_current_teacher_modules_and_class_groups: `${BASE_URL}/teacher/teachers/get_current_teacher_modules_and_class_groups/`,
   get_current_teacher_uploads: `${BASE_URL}/teacher/teachers/get_current_teacher_uploads/`,
   get_current_teacher_behaviour_reports: `${BASE_URL}/teacher/teachers/get_current_teacher_behaviour_reports/`,
@@ -73,6 +75,23 @@ async function get_current_teacher_students() {
     return { ok: false, error: error };
   }
 }
+
+async function get_current_teacher_stats() {
+  try {
+    const response = await fetch(URLS.get_current_teacher_stats, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data: TeacherDashboardStats = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 async function get_current_teacher_modules_and_class_groups() {
   try {
     const response = await fetch(
@@ -229,6 +248,30 @@ async function post_absence(payload: PostAbsencePayload, csrf_token: string) {
   } catch (error) {
     return { ok: false, error: error };
   }
+}
+
+async function mark_student_absent_today(
+  studentId: string,
+  teacherId: number,
+  csrfToken: string
+) {
+  const patchResult = await patch_student(
+    studentId,
+    { is_absent: true },
+    csrfToken
+  );
+
+  if (!patchResult.ok) {
+    return patchResult;
+  }
+
+  return post_absence(
+    {
+      student_id: studentId,
+      teacher_id: teacherId,
+    },
+    csrfToken
+  );
 }
 
 //! Create Behaviour Report :
@@ -620,6 +663,7 @@ async function get_current_teacher_schedules() {
 export const teacher_dashboard_client = {
   get_teacher_by_id:get_teacher_by_id,
   get_current_teacher_students: get_current_teacher_students,
+  get_current_teacher_stats: get_current_teacher_stats,
   get_current_teacher_modules_and_class_groups:
     get_current_teacher_modules_and_class_groups,
   get_current_teacher_uploads: get_current_teacher_uploads,
@@ -630,6 +674,7 @@ export const teacher_dashboard_client = {
   get_student_monthly_evaluations: get_student_monthly_evaluations,
 
   patch_student: patch_student,
+  mark_student_absent_today: mark_student_absent_today,
 
   post_absence: post_absence,
 

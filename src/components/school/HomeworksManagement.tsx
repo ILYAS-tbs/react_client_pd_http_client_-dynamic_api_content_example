@@ -4,12 +4,10 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
-  FileText,
   Filter,
   GraduationCap,
   Layers,
-  User,
-  UserCheck,
+  Download,
 } from "lucide-react";
 import { Homework } from "../../models/Homework";
 import { Teacher } from "../../models/Teacher";
@@ -17,6 +15,7 @@ import { ClassGroup } from "../../models/ClassGroups";
 import { homework_client } from "../../services/http_api/homework/homework_client";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 
 interface SchoolHomeworksManagementProps {
   teachers: Teacher[];
@@ -50,20 +49,14 @@ const SchoolHomeworksManagement: React.FC<SchoolHomeworksManagementProps> = ({
   }, [selectedTeacher, selectedClassGroup]);
 
   const summary = useMemo(() => {
-    const totalSubmissions = homeworks.reduce(
-      (sum, homework) => sum + homework.submissions.length,
-      0
-    );
-    const gradedSubmissions = homeworks.reduce(
-      (sum, homework) =>
-        sum + homework.submissions.filter((submission) => submission.mark !== null).length,
-      0
-    );
+    const teacherCount = new Set(homeworks.map((homework) => homework.teacher_name)).size;
+    const classCount = new Set(homeworks.map((homework) => homework.class_group_name)).size;
+    const attachmentCount = homeworks.filter((homework) => Boolean(homework.attachment)).length;
     return {
       totalHomeworks: homeworks.length,
-      totalSubmissions,
-      pendingSubmissions: totalSubmissions - gradedSubmissions,
-      gradedSubmissions,
+      teacherCount,
+      classCount,
+      attachmentCount,
     };
   }, [homeworks]);
 
@@ -90,21 +83,21 @@ const SchoolHomeworksManagement: React.FC<SchoolHomeworksManagementProps> = ({
             color: "bg-primary-500",
           },
           {
-            label: getTranslation("totalSubmissions", language),
-            value: summary.totalSubmissions,
-            icon: FileText,
+            label: getTranslation("Teachers", language),
+            value: summary.teacherCount,
+            icon: GraduationCap,
             color: "bg-emerald-500",
           },
           {
-            label: getTranslation("graded", language),
-            value: summary.gradedSubmissions,
-            icon: UserCheck,
+            label: getTranslation("Classes", language),
+            value: summary.classCount,
+            icon: Layers,
             color: "bg-blue-500",
           },
           {
-            label: getTranslation("pendingSubmissions", language),
-            value: summary.pendingSubmissions,
-            icon: Clock,
+            label: getTranslation("attachment", language),
+            value: summary.attachmentCount,
+            icon: Download,
             color: "bg-amber-500",
           },
         ].map((item) => (
@@ -212,23 +205,15 @@ const SchoolHomeworksManagement: React.FC<SchoolHomeworksManagementProps> = ({
                         </span>
                         <span className="inline-flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          {homework.last_submission_date}
+                          {getTranslation("dueDate", language)}: {homework.last_submission_date}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 self-start lg:self-center">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        <span className="font-semibold text-gray-900 dark:text-white">
-                          {homework.submissions_count}
-                        </span>{" "}
-                        {getTranslation("submissions", language)}
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-gray-400" />
-                      )}
-                    </div>
+                    {isExpanded ? (
+                      <ChevronUp className="h-5 w-5 self-start text-gray-400 lg:self-center" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 self-start text-gray-400 lg:self-center" />
+                    )}
                   </div>
                 </button>
 
@@ -240,57 +225,17 @@ const SchoolHomeworksManagement: React.FC<SchoolHomeworksManagementProps> = ({
                       </p>
                     )}
 
-                    {homework.remarks && (
-                      <p className="text-sm italic text-gray-500 dark:text-gray-400">
-                        {getTranslation("teacherNote", language)}: {homework.remarks}
-                      </p>
+                    {homework.attachment && (
+                      <a
+                        href={`${SERVER_BASE_URL}${homework.attachment}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-300 dark:hover:bg-primary-900/30"
+                      >
+                        <Download className="h-4 w-4" />
+                        {getTranslation("downloadAttachment", language)}
+                      </a>
                     )}
-
-                    <div className="grid grid-cols-1 gap-3">
-                      {homework.submissions.length === 0 ? (
-                        <div className="rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                          {getTranslation("noSubmissionsYet", language)}
-                        </div>
-                      ) : (
-                        homework.submissions.map((submission) => (
-                          <div
-                            key={submission.id}
-                            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-3"
-                          >
-                            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                              <div className="space-y-1">
-                                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-900 dark:text-white">
-                                  <span className="inline-flex items-center gap-1 font-medium">
-                                    <User className="h-4 w-4 text-primary-500" />
-                                    {submission.student_name}
-                                  </span>
-                                  {submission.teacher_name && (
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                      {getTranslation("teacher", language)}: {submission.teacher_name}
-                                    </span>
-                                  )}
-                                </div>
-                                {submission.remarks && (
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {submission.remarks}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="text-sm md:text-right">
-                                <p className="font-semibold text-gray-900 dark:text-white">
-                                  {submission.mark !== null
-                                    ? `${submission.mark} / ${homework.max_mark}`
-                                    : getTranslation("submitted", language)}
-                                </p>
-                                <p className="text-gray-500 dark:text-gray-400">
-                                  {new Date(submission.created_at).toLocaleDateString()}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
                   </div>
                 )}
               </div>

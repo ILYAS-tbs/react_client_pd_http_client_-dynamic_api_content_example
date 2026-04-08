@@ -16,9 +16,7 @@ import StudentManagement from "../../components/school/StudentManagement";
 import ScheduleManagement from "../../components/school/ScheduleManagement";
 import ParentManagement from "../../components/school/ParentManagement";
 import ActivitiesManagement from "../../components/school/ActivitiesManagement";
-import BehaviorReports from "../../components/school/BehaviorReports";
 import ExamScheduleManagemen from "../../components/school/ExamScheduleManagemen";
-import AbsenceReviews from "../../components/school/AbsenceReviews";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import SchoolHomeworksManagement from "../../components/school/HomeworksManagement";
 import SchoolParentChat from "../../components/shared/SchoolParentChat";
@@ -28,8 +26,6 @@ import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
 import { Student } from "../../models/Student";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { Event, EventJson } from "../../models/Event";
-import { AbsenceReport } from "../../models/AbsenceReports";
-import { BehaviourReport } from "../../models/BehaviorReport";
 import { Teacher } from "../../models/Teacher";
 import { ExamSchedule } from "../../models/ExamSchedule";
 import { SchoolStat } from "../../models/SchoolStat";
@@ -42,6 +38,8 @@ import { useNotifications } from "../../contexts/NotificationContext";
 
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
+import SchoolAttendanceTab from "../../components/school/SchoolAttendanceTab";
+import SchoolBehaviourReportsTab from "../../components/school/SchoolBehaviourReportsTab";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -81,10 +79,6 @@ const SchoolDashboard: React.FC = () => {
   const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
   const [parents, setParents] = useState<Parent[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const [absence_reports, setAbsenceReports] = useState<AbsenceReport[]>([]);
-  const [behaviour_reports, setBehaviourReports] = useState<BehaviourReport[]>(
-    []
-  );
   const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
   const [, setSchoolStat] = useState<SchoolStat | null>(null);
   const [modules, SetModules] = useState<Module[]>([]);
@@ -132,16 +126,6 @@ const SchoolDashboard: React.FC = () => {
       setEvents(events_list);
     }
   };
-  const get_current_school_absence_reports = async () => {
-    const res =
-      await school_dashboard_client.get_current_school_absence_reports();
-    if (res.ok) {
-      const absence_reports: AbsenceReport[] = res.data;
-      console.log("absense_reporst list :");
-      console.log(absence_reports);
-      setAbsenceReports(absence_reports);
-    }
-  };
   const get_current_school_exam_schedules = async () => {
     const res =
       await school_dashboard_client.get_current_school_exam_schedules();
@@ -149,14 +133,6 @@ const SchoolDashboard: React.FC = () => {
     if (res.ok) {
       const exam_schedules_list: ExamSchedule[] = res.data;
       setExamSchedules(exam_schedules_list);
-    }
-  };
-  const get_current_school_behaviour_reports = async () => {
-    const res =
-      await school_dashboard_client.get_current_school_behaviour_reports();
-    if (res.ok) {
-      const behaviour_reports_list: BehaviourReport[] = res.data;
-      setBehaviourReports(behaviour_reports_list);
     }
   };
   const get_current_school_monthly_evaluations = async () => {
@@ -190,8 +166,6 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_class_groups();
     get_current_school_parents();
     get_current_school_events();
-    get_current_school_absence_reports();
-    get_current_school_behaviour_reports();
     get_current_school_monthly_evaluations();
     get_current_school_exam_schedules();
     get_current_school_stats();
@@ -213,9 +187,6 @@ const SchoolDashboard: React.FC = () => {
   }
   function RefetchExams() {
     get_current_school_exam_schedules();
-  }
-  function RefetchReports() {
-    get_current_school_absence_reports();
   }
   function RefetchEvents() {
     get_current_school_events();
@@ -300,7 +271,7 @@ const SchoolDashboard: React.FC = () => {
     { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500", tab: "users" },
     { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-primary-400", tab: "users" },
     { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-primary-500", tab: "levels" },
-    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-primary-400", tab: "reports" },
+    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-primary-400", tab: "student_absences" },
   ]
 
 
@@ -313,7 +284,8 @@ const SchoolDashboard: React.FC = () => {
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
     { id: "evaluations", label: getTranslation("monthlyEvaluation", language), icon: ClipboardList },
-    { id: "reports", label: getTranslation('Reports', language), icon: BarChart2 },
+    { id: "student_absences", label: getTranslation('studentAbsencesTab', language), icon: BarChart2 },
+    { id: "behaviour_reports", label: getTranslation('behaviourReportsTab', language), icon: FileText },
     // { id: "grades", label: getTranslation("GradeOverview", language), icon: FileText },
     { id: "activities", label: getTranslation('Activities', language), icon: Star },
   ];
@@ -485,18 +457,23 @@ const SchoolDashboard: React.FC = () => {
             RefetchExams={RefetchExams}
           />
         );
-      case "reports":
+      case "student_absences":
         return (
-          <div className="space-y-6">
-            <AbsenceReviews
-              absence_reports_list={absence_reports}
-              RefetchReports={RefetchReports}
-            />
-            <BehaviorReports
-              behaviour_reports_list={behaviour_reports}
-              students_list={students}
-            />
-          </div>
+          <SchoolAttendanceTab
+            students={students}
+            classGroups={class_groups}
+            teachers={teachers}
+            modules={modules}
+          />
+        );
+      case "behaviour_reports":
+        return (
+          <SchoolBehaviourReportsTab
+            students={students}
+            classGroups={class_groups}
+            teachers={teachers}
+            modules={modules}
+          />
         );
       case "evaluations":
         return (

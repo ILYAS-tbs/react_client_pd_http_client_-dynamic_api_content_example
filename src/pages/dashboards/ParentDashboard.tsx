@@ -14,8 +14,6 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import ChildrenOverview from "../../components/parent/ChildrenOverview";
-import GradeReports from "../../components/parent/GradeReports";
-import AbsenceManager from "../../components/parent/AbsenceManager";
 import ScheduleManagement from "../../components/parent/ScheduleManagement";
 import ActivitiesView from "../../components/parent/ActivitiesManagement";
 import ParentHomeworks from "../../components/parent/ParentHomeworks.tsx";
@@ -24,8 +22,6 @@ import ParentChat from "../../components/shared/ParentChat";
 import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
 import SchoolAnnouncements from "../../components/parent/SchoolAnnouncements";
 import { Student } from "../../models/Student.ts";
-import { AbsenceReport } from "../../models/AbsenceReports.ts";
-import { BehaviourReport } from "../../models/BehaviorReport.ts";
 import { TeacherUpload } from "../../models/TeacherUpload.ts";
 import { parent_dashboard_client } from "../../services/http_api/parent-dashboard/parent_dashboard_client.ts";
 import { ParentAbsence } from "../../models/ParentAbsence.ts";
@@ -40,6 +36,8 @@ import { getTranslation } from "../../utils/translations.ts";
 import { useLanguage } from "../../contexts/LanguageContext.tsx";
 import { useNotifications } from "../../contexts/NotificationContext.tsx";
 import { timeAgoArabic } from "../../lib/timeAgoArabic.ts";
+import ParentAttendanceTab from "../../components/parent/ParentAttendanceTab";
+import ParentBehaviourReportsTab from "../../components/parent/ParentBehaviourReportsTab";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -74,10 +72,6 @@ const ParentDashboard: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
 
-  const [absence_reports, setAbsenceReports] = useState<AbsenceReport[]>([]);
-  const [behaviour_reports, setBehabiourReports] = useState<BehaviourReport[]>(
-    []
-  );
   const [uploads, setUploads] = useState<TeacherUpload[]>([]);
 
   const [parent_absences, setParentAbsences] = useState<ParentAbsence[]>([]);
@@ -105,36 +99,6 @@ const ParentDashboard: React.FC = () => {
       console.error("Error fetching students:", error);
     } finally {
       setIsLoadingStudents(false);
-    }
-  };
-
-  const get_current_parent_absence_reports = async () => {
-    try {
-      const res =
-        await parent_dashboard_client.get_current_parent_absence_reports();
-      if (res.ok) {
-        const new_absence_reports_list: AbsenceReport[] = res.data;
-        setAbsenceReports(new_absence_reports_list);
-      } else {
-        console.error("Failed to fetch absence reports:", res);
-      }
-    } catch (error) {
-      console.error("Error fetching absence reports:", error);
-    }
-  };
-
-  const get_current_parent_behaviour_reports = async () => {
-    try {
-      const res =
-        await parent_dashboard_client.get_current_parent_behaviour_reports();
-      if (res.ok) {
-        const new_behaviour_reports_list: BehaviourReport[] = res.data;
-        setBehabiourReports(new_behaviour_reports_list);
-      } else {
-        console.error("Failed to fetch behaviour reports:", res);
-      }
-    } catch (error) {
-      console.error("Error fetching behaviour reports:", error);
     }
   };
   const get_current_parent_monthly_evaluations = async () => {
@@ -253,8 +217,6 @@ const ParentDashboard: React.FC = () => {
 
   useEffect(() => {
     get_current_parent_students();
-    get_current_parent_absence_reports();
-    get_current_parent_behaviour_reports();
     get_current_parent_all_students_uploads();
     current_parent_students_absences();
     get_current_parent_students_performances();
@@ -297,7 +259,7 @@ const ParentDashboard: React.FC = () => {
   };
   const stats = [
     { title: getTranslation("myChildren", language), value: students.length || "0", icon: UserIcon, color: "bg-primary-500", tab: "children" },
-    { title: getTranslation("totalAbsences", language), value: total_absences() || "0", icon: Calendar, color: "bg-primary-400", tab: "absences" },
+    { title: getTranslation("totalAbsences", language), value: total_absences() || "0", icon: Calendar, color: "bg-primary-400", tab: "kid_absences" },
     { title: getTranslation("newMessages", language), value: notifications.length || "0", icon: MessageCircle, color: "bg-primary-500", tab: "chat" },
     { title: getTranslation("notifications", language), value: notifications.length || "0", icon: AlertTriangle, color: "bg-primary-400", tab: null },
   ];
@@ -430,9 +392,14 @@ const ParentDashboard: React.FC = () => {
       icon: ClipboardList,
     },
     {
-      id: "absences",
-      label: getTranslation("absencesAndReports", language),
+      id: "kid_absences",
+      label: getTranslation("myKidsAbsencesTab", language),
       icon: Calendar,
+    },
+    {
+      id: "behaviour_reports",
+      label: getTranslation("behaviourReportsTab", language),
+      icon: FileText,
     },
     {
       id: "chat",
@@ -478,16 +445,12 @@ const ParentDashboard: React.FC = () => {
         return (
           <MonthlyEvaluationSection evaluations={monthlyEvaluations} />
         );
-      case "absences":
+      case "kid_absences":
         return (
-          <AbsenceManager
-            students={students}
-            absence_reports={absence_reports}
-            setAbsenceReports={setAbsenceReports}
-            behaviour_reports={behaviour_reports}
-            setBehabiourReports={setBehabiourReports}
-          />
+          <ParentAttendanceTab students={students} />
         );
+      case "behaviour_reports":
+        return <ParentBehaviourReportsTab students={students} />;
       case "chat":
         return (
           <ParentChat
