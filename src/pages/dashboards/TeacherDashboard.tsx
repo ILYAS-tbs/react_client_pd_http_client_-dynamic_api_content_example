@@ -15,7 +15,10 @@ import ClassManagement from "../../components/teacher/ClassManagement";
 import GradeManager from "../../components/teacher/GradeManager.tsx";
 import ResourceManager from "../../components/teacher/ResourceManager";
 import { Student } from "../../models/Student";
-import { TeacherModuleClassGroup } from "../../models/TeacherModuleClassGroup";
+import {
+  sanitizeTeacherModuleClassGroups,
+  TeacherModuleClassGroup,
+} from "../../models/TeacherModuleClassGroup";
 import { TeacherUpload } from "../../models/TeacherUpload";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { User } from "../../contexts/AuthContext";
@@ -127,7 +130,8 @@ const TeacherDashboard: React.FC = () => {
     const res =
       await teacher_dashboard_client.get_current_teacher_modules_and_class_groups();
     if (res.ok) {
-      const modules_class_groups_list: TeacherModuleClassGroup[] = res.data;
+      const modules_class_groups_list: TeacherModuleClassGroup[] =
+        sanitizeTeacherModuleClassGroups(res.data);
       setModulesClassGroups(modules_class_groups_list);
     }
     setClassGroupsLoaded(true);

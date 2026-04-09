@@ -12,8 +12,10 @@ import { MonthylEvaluationProps } from "../../types";
 import {
   MonthlyEvaluation,
   MonthlyEvaluationGridRow,
+  sanitizeTeacherMonthlyEvaluationGridResponse,
   TeacherMonthlyEvaluationGridResponse,
 } from "../../models/MonthlyEvaluation";
+import { sanitizeTeacherModuleClassGroups } from "../../models/TeacherModuleClassGroup";
 import {
   BatchMonthlyEvaluationUpdate,
   TeacherMonthlyEvaluationFilters,
@@ -188,9 +190,14 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
     return "en-US";
   }, [language]);
 
+  const assignments = useMemo(
+    () => sanitizeTeacherModuleClassGroups(modules_class_groups),
+    [modules_class_groups]
+  );
+
   const classOptions = useMemo(() => {
     const uniqueClasses = new Map<string, { value: string; label: string }>();
-    modules_class_groups.forEach((assignment) => {
+    assignments.forEach((assignment) => {
       const classGroupId = assignment.class_group.class_group_id;
       if (!uniqueClasses.has(classGroupId)) {
         uniqueClasses.set(classGroupId, {
@@ -203,7 +210,7 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
     return Array.from(uniqueClasses.values()).sort((left, right) =>
       left.label.localeCompare(right.label)
     );
-  }, [modules_class_groups]);
+  }, [assignments]);
 
   const moduleOptions = useMemo(() => {
     if (!filters.class_group_id) {
@@ -211,7 +218,7 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
     }
 
     const uniqueModules = new Map<string, { value: string; label: string }>();
-    modules_class_groups
+    assignments
       .filter((assignment) => assignment.class_group.class_group_id === filters.class_group_id)
       .forEach((assignment) => {
         const moduleId = assignment.module.module_id;
@@ -226,7 +233,7 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
     return Array.from(uniqueModules.values()).sort((left, right) =>
       left.label.localeCompare(right.label)
     );
-  }, [filters.class_group_id, modules_class_groups]);
+  }, [assignments, filters.class_group_id]);
 
   const monthOptions = useMemo(() => {
     return Array.from({ length: 18 }, (_, index) => {
@@ -297,12 +304,19 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
       }
 
       if (response.ok) {
-        const nextGridData = response.data as TeacherMonthlyEvaluationGridResponse;
-        setGridData(nextGridData);
-        setRows(nextGridData.rows ?? []);
-        setDrafts(createEmptySectionDraftState());
-        setErrors(createEmptySectionErrorState());
-        setFeedback(createEmptySectionFeedbackState());
+        const nextGridData = sanitizeTeacherMonthlyEvaluationGridResponse(response.data);
+
+        if (nextGridData) {
+          setGridData(nextGridData);
+          setRows(nextGridData.rows ?? []);
+          setDrafts(createEmptySectionDraftState());
+          setErrors(createEmptySectionErrorState());
+          setFeedback(createEmptySectionFeedbackState());
+        } else {
+          setGridData(null);
+          setRows([]);
+          setLoadError(getTranslation("evaluationLoadFailed", language));
+        }
       } else {
         setGridData(null);
         setRows([]);
@@ -359,7 +373,11 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
       return null;
     }
 
-    return [gridData.class_group.name, gridData.module.name, selectedMonthLabel].filter(Boolean);
+    return [
+      gridData.class_group?.name?.trim() ?? "",
+      gridData.module?.name?.trim() ?? "",
+      selectedMonthLabel,
+    ].filter(Boolean);
   }, [gridData, selectedMonthLabel]);
 
   const updateFilter = (
@@ -510,9 +528,13 @@ const MonthylEvaluation: React.FC<MonthylEvaluationProps> = ({
     if (response.ok) {
       const updatedRecords = ((response.data as { updated_records?: MonthlyEvaluation[] })
         ?.updated_records ?? []) as MonthlyEvaluation[];
-      const updatesByStudentId = new Map(
-        updatedRecords.map((record) => [record.student.student_id, record])
-      );
+      const updatesByStudentId = new Map<string, MonthlyEvaluation>();
+      updatedRecords.forEach((record) => {
+        const studentId = record.student?.student_id;
+        if (studentId) {
+          updatesByStudentId.set(studentId, record);
+        }
+      });
 
       setRows((previous) =>
         previous.map((row) => {
