@@ -98,13 +98,20 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
 }
 
 interface ParentHomeworksProps {
+  students: Array<{ student_id: string; full_name: string }>;
   selectedStudentId?: string | null;
+  onSelectedStudentChange: (studentId: string) => void;
 }
 
-const ParentHomeworks: React.FC<ParentHomeworksProps> = ({ selectedStudentId }) => {
+const ParentHomeworks: React.FC<ParentHomeworksProps> = ({
+  students,
+  selectedStudentId,
+  onSelectedStudentChange,
+}) => {
   const { language } = useLanguage();
   const [groups, setGroups] = useState<StudentHomeworkGroup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedModuleId, setSelectedModuleId] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -115,7 +122,10 @@ const ParentHomeworks: React.FC<ParentHomeworksProps> = ({ selectedStudentId }) 
       }
 
       setLoading(true);
-      const res = await homework_client.getParentHomeworksByStudent(selectedStudentId);
+      const res = await homework_client.getParentHomeworksByStudent(
+        selectedStudentId,
+        selectedModuleId || undefined
+      );
       if (res.ok) {
         setGroups(res.data);
       } else {
@@ -124,9 +134,28 @@ const ParentHomeworks: React.FC<ParentHomeworksProps> = ({ selectedStudentId }) 
       setLoading(false);
     }
     void load();
-  }, [selectedStudentId]);
+  }, [selectedModuleId, selectedStudentId]);
 
   const currentGroup = useMemo(() => groups[0], [groups]);
+  const availableModules = useMemo(() => {
+    const moduleMap = new Map<string, string>();
+    groups.forEach((group) => {
+      group.homeworks.forEach((homework) => {
+        if (homework.module && homework.module_name) {
+          moduleMap.set(String(homework.module), homework.module_name);
+        }
+      });
+    });
+    return Array.from(moduleMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [groups]);
+
+  useEffect(() => {
+    if (!selectedModuleId) return;
+    const exists = availableModules.some((module) => module.id === selectedModuleId);
+    if (!exists) {
+      setSelectedModuleId("");
+    }
+  }, [availableModules, selectedModuleId]);
 
   return (
     <div className="space-y-6">
@@ -136,6 +165,43 @@ const ParentHomeworks: React.FC<ParentHomeworksProps> = ({ selectedStudentId }) 
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           {getTranslation("homeworksTab", language)}
         </h2>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {getTranslation("selectStudent", language)}
+          </label>
+          <select
+            value={selectedStudentId ?? ""}
+            onChange={(event) => onSelectedStudentChange(event.target.value)}
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          >
+            {students.map((student) => (
+              <option key={student.student_id} value={student.student_id}>
+                {student.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+          <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {getTranslation("module", language)}
+          </label>
+          <select
+            value={selectedModuleId}
+            onChange={(event) => setSelectedModuleId(event.target.value)}
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">{getTranslation("allModules", language)}</option>
+            {availableModules.map((module) => (
+              <option key={module.id} value={module.id}>
+                {module.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading ? (

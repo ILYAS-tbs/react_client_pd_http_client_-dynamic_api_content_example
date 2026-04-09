@@ -11,6 +11,10 @@ import { ParentStudentEvent } from "../../../models/ParentStudentEvent";
 import { ExamSchedule } from "../../../models/ExamSchedule";
 import { ParentWeeklyMeal } from "../../../models/WeeklyMeal";
 import { ParentReadOnlyGradesResponse } from "../../../models/StudentGrade";
+import {
+  ParentDashboardStats,
+  ParentStudentSummary,
+} from "../../../models/ParentDashboard";
 
 type ApiOk<T> = { ok: true; status: number; data: T };
 type ApiError = { ok: false; error: unknown };
@@ -32,6 +36,8 @@ const URLS = {
   get_current_parent_schedules: `${BASE_URL}/parent/parents/get_current_parent_schedules/`,
   get_current_parent_exam_schedules: `${BASE_URL}/parent/parents/get_current_parent_exam_schedules/`,
   get_current_parent_weekly_meals: `${BASE_URL}/parent/weekly-meals/`,
+  get_parent_dashboard_stats: `${BASE_URL}/parent/parents/dashboard_stats/`,
+  get_parent_students_summary: `${BASE_URL}/parent/parents/students_summary/`,
 };
 
 function withStudentId(url: string, studentId?: string | null): string {
@@ -267,6 +273,34 @@ async function get_current_parent_weekly_meals(): Promise<ApiResult<ParentWeekly
   }
 }
 
+async function get_parent_dashboard_stats(studentId: string): Promise<ApiResult<ParentDashboardStats>> {
+  try {
+    const response = await fetch(withStudentId(URLS.get_parent_dashboard_stats, studentId), {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: ParentDashboardStats = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function get_parent_students_summary(): Promise<ApiResult<ParentStudentSummary[]>> {
+  try {
+    const response = await fetch(URLS.get_parent_students_summary, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: ParentStudentSummary[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 export const parent_dashboard_client = {
   get_current_parent_students: get_current_parent_students,
   get_current_parent_absence_reports: get_current_parent_absence_reports,
@@ -286,4 +320,6 @@ export const parent_dashboard_client = {
   get_current_parent_schedules: get_current_parent_schedules,
   get_current_parent_exam_schedules: get_current_parent_exam_schedules,
   get_current_parent_weekly_meals: get_current_parent_weekly_meals,
+  get_parent_dashboard_stats: get_parent_dashboard_stats,
+  get_parent_students_summary: get_parent_students_summary,
 };

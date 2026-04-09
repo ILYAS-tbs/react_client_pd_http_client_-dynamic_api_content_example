@@ -129,7 +129,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           {getTranslation('schoolEvents', language)}
         </h2>
-        <div className="flex space-x-2 rtl:space-x-reverse">
+        {/* <div className="flex space-x-2 rtl:space-x-reverse">
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -147,7 +147,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
             <Calendar className="h-5 w-5" />
             <span>{viewCalendar ? getTranslation('ViewSchedule', language) : getTranslation('viewCalendar', language)}</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Filters */}

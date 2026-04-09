@@ -392,12 +392,12 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                 <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('parent', language)}
                 </th>
-                <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                {/* <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('grade', language)}
                 </th>
                 <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('absences', language)}
-                </th>
+                </th> */}
                 <th className="px-6 py-3 text-right ltr:text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {getTranslation('actions', language)}
                 </th>
@@ -427,7 +427,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                       {student.parent?.full_name}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
                       {student.trimester_grade}
                     </span>
@@ -436,7 +436,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({
                     <span className="text-sm font-semibold text-primary-500 dark:text-primary-400">
                       {student.attendance}
                     </span>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       {/* hide student : disable for now  */}

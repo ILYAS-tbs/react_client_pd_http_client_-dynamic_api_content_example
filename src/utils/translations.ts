@@ -1715,6 +1715,11 @@ export const translations: Translations = {
     en: "New Messages",
     fr: "Nouveaux Messages",
   },
+  messages: {
+    ar: "الرسائل",
+    en: "Messages",
+    fr: "Messages",
+  },
   notifications: { ar: "إشعارات", en: "Notifications", fr: "Notifications" },
 
   overview: { ar: "نظرة عامة", en: "Overview", fr: "Aperçu" },
@@ -1778,6 +1783,7 @@ export const translations: Translations = {
   excellent: { ar: "ممتاز", en: "Excellent", fr: "Excellent" },
   veryGood: { ar: "جيد جداً", en: "Very Good", fr: "Très Bien" },
   good: { ar: "جيد", en: "Good", fr: "Bien" },
+  weak: { ar: "ضعيف", en: "Weak", fr: "Faible" },
   poorPerformance: {
     ar: "أداء ضعيف",
     en: "Poor Performance",

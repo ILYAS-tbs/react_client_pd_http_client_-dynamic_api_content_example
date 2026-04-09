@@ -229,9 +229,9 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   <p className="text-gray-600 dark:text-gray-400">
                     {currentChild.school}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {/* <p className="text-sm text-gray-500 dark:text-gray-400">
                     {getTranslation("age", language)}: {currentChild.age} {getTranslation("years", language)}
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>
