@@ -1,21 +1,21 @@
-export interface ExamSchedule {
-  exam_schedule_id: string;
-  module_name: string;
-  class_group_name: string;
-  date: Date;
-  time: string;
-  duration: number;
-  school: string;
-  room: string;
+export interface ExamScheduleClassGroupInfo {
+  class_group_id: string;
+  name: string;
+  school: number;
+  academic_year: string | null;
+  teacher_list?: string | null;
 }
 
-// Converts JSON strings to/from your types
-export class ExamScheduleConvert {
-  public static toExamSchedule(json: string): ExamSchedule {
-    return JSON.parse(json);
-  }
-
-  public static examScheduleToJson(value: ExamSchedule): string {
-    return JSON.stringify(value);
-  }
+export interface ExamSchedule {
+  class_group_id: string;
+  class_group_name: string;
+  class_group_info: ExamScheduleClassGroupInfo;
+  exam_schedule_id: string | null;
+  pdf_file: string | null;
+  view_url: string | null;
+  download_url: string | null;
+  uploaded_by: number | null;
+  uploaded_at: string | null;
+  updated_at: string | null;
+  has_pdf: boolean;
 }

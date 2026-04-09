@@ -14,10 +14,11 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import ChildrenOverview from "../../components/parent/ChildrenOverview";
-import GradeReports from "../../components/parent/GradeReports";
 import ScheduleManagement from "../../components/parent/ScheduleManagement";
 import ActivitiesView from "../../components/parent/ActivitiesManagement";
 import ParentHomeworks from "../../components/parent/ParentHomeworks.tsx";
+import ParentExamScheduleManagement from "../../components/parent/ParentExamScheduleManagement";
+import ParentWeeklyMealsManagement from "../../components/parent/ParentWeeklyMealsManagement";
 import ResourceLibrary from "../../components/parent/ResourceLibrary";
 import ParentChat from "../../components/shared/ParentChat.tsx";
 import MonthlyEvaluationSection from "../../components/shared/MonthlyEvaluationSection";
@@ -38,6 +39,7 @@ import { useNotifications } from "../../contexts/NotificationContext.tsx";
 import { timeAgoArabic } from "../../lib/timeAgoArabic.ts";
 import ParentAttendanceTab from "../../components/parent/ParentAttendanceTab";
 import ParentBehaviourReportsTab from "../../components/parent/ParentBehaviourReportsTab";
+import ParentGradesTab from "../../components/parent/ParentGradesTab";
 
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -410,7 +412,17 @@ const ParentDashboard: React.FC = () => {
       label: getTranslation("timetable", language),
       icon: LayoutGrid,
     },
-    { id: "grades", label: getTranslation("gradeReports", language), icon: FileText },
+    {
+      id: "exam_schedule",
+      label: getTranslation("ExamSchedule", language),
+      icon: FileText,
+    },
+    {
+      id: "weekly_menu",
+      label: getTranslation("weeklyMenu", language),
+      icon: FileText,
+    },
+    { id: "grades", label: getTranslation("gradesOfMyKids", language), icon: FileText },
     {
       id: "evaluations",
       label: getTranslation("monthlyEvaluation", language),
@@ -460,10 +472,7 @@ const ParentDashboard: React.FC = () => {
       case "grades":
         return (
           <div className="space-y-6">
-            <GradeReports
-              students={selectedStudents}
-              studentPerformances={studentPerformances}
-            />
+            <ParentGradesTab selectedStudent={selectedStudent} />
           </div>
         );
       case "evaluations":
@@ -495,6 +504,10 @@ const ParentDashboard: React.FC = () => {
             selectedStudentId={selectedStudentId}
           />
         );
+      case "exam_schedule":
+        return <ParentExamScheduleManagement students={students} />;
+      case "weekly_menu":
+        return <ParentWeeklyMealsManagement students={students} />;
 
       case "homework":
         return <ParentHomeworks selectedStudentId={selectedStudentId} />;

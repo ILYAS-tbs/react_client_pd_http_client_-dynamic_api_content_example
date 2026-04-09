@@ -7,10 +7,10 @@ import {
   PatchEventPayload,
   PostPutClassGroupPayload as PostClassGroupPayload,
   PostEventPayload,
-  PostExamSchedule,
   PostPutTeacherModuleClassGrpPayload,
   PostStudentPayload,
 } from "../payloads_types/school_client_payload_types";
+import { SchoolReadOnlyGradesResponse } from "../../../models/StudentGrade";
 import { SERVER_BASE_URL } from "../server_constants";
 
 const BASE_URL = SERVER_BASE_URL;
@@ -20,8 +20,8 @@ const URLS = {
   get_current_school_class_groups: `${BASE_URL}/school/schools/get_current_school_class_groups`,
   get_current_school_parents: `${BASE_URL}/school/schools/get_current_school_parents`,
   get_current_school_events: `${BASE_URL}/school/schools/get_current_school_events/`,
-  get_current_school_exam_schedules: `${BASE_URL}/school/schools/get_current_school_exam_schedules/`,
   get_current_school_stats: `${BASE_URL}/school/schools/get_current_school_stats/`,
+  get_current_school_grade_sections: `${BASE_URL}/school/schools/get_current_school_grade_sections/`,
   get_modules: `${BASE_URL}/school/modules/`,
 
   patch_teacher: `${BASE_URL}/teacher/teachers/`,
@@ -34,9 +34,6 @@ const URLS = {
   post_student: `${BASE_URL}/student/students/`,
   put_student: `${BASE_URL}/student/students/`,
   delete_student: `${BASE_URL}/student/students/`,
-
-  post_exam_schedule: `${BASE_URL}/school/exam-schedules/`,
-  delete_exam_schedule: `${BASE_URL}/school/exam-schedules/`,
 
   find_parent_by_email: `${BASE_URL}/school/schools/find_parent_by_email/`,
   search_parents: `${BASE_URL}/school/schools/search_parents/`,
@@ -60,6 +57,8 @@ const URLS = {
   // Schedules
   get_current_school_schedules: `${BASE_URL}/school/schedules/get_current_school_schedules/`,
   schedules_base: `${BASE_URL}/school/schedules/`,
+  exam_schedules_base: `${BASE_URL}/school/exam-schedules/`,
+  weekly_meals_base: `${BASE_URL}/school/weekly-meals/`,
 };
 async function get_current_school_students() {
   try {
@@ -120,7 +119,7 @@ async function get_current_school_parents() {
 
 async function get_current_school_exam_schedules() {
   try {
-    const response = await fetch(URLS.get_current_school_exam_schedules, {
+    const response = await fetch(URLS.exam_schedules_base, {
       method: "GET",
       credentials: "include", // ensures cookies like sessionid are sent
     });
@@ -143,6 +142,33 @@ async function get_current_school_stats() {
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
+  }
+}
+
+async function get_current_school_grade_sections(filters: {
+  class_group_id: string;
+  module_id: string;
+  semester: "s1" | "s2" | "s3";
+}) {
+  const params = new URLSearchParams({
+    class_group_id: filters.class_group_id,
+    module_id: filters.module_id,
+    semester: filters.semester,
+  });
+
+  try {
+    const response = await fetch(
+      `${URLS.get_current_school_grade_sections}?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+
+    const data: SchoolReadOnlyGradesResponse = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
 
@@ -322,20 +348,19 @@ async function delete_student(id: string, csrfToken: string) {
     return { ok: false, error: error };
   }
 }
-//! Post Exam schedule
-async function post_exam_schedule(
-  payload: PostExamSchedule,
+async function upload_exam_schedule(
+  classGroupId: string,
+  formData: FormData,
   csrfToken: string
 ) {
   try {
-    const response = await fetch(URLS.post_exam_schedule, {
+    const response = await fetch(URLS.exam_schedules_base + classGroupId + "/", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
       },
       credentials: "include",
-      body: JSON.stringify(payload),
+      body: formData,
     });
     const data = await response.json();
     return { ok: response.ok, status: response.status, data: data };
@@ -343,21 +368,70 @@ async function post_exam_schedule(
     return { ok: false, error: error };
   }
 }
-async function delete_exam_schedule(id: string, csrfToken: string) {
+async function delete_exam_schedule(classGroupId: string, csrfToken: string) {
   try {
-    const DELETE_URL = URLS.delete_exam_schedule + id + "/";
+    const DELETE_URL = URLS.exam_schedules_base + classGroupId + "/";
     const response = await fetch(DELETE_URL, {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
       },
       credentials: "include",
     });
-    const data = await response.json();
+    const data = response.status !== 204 ? await response.json() : null;
     return { ok: response.ok, status: response.status, data: data };
   } catch (error) {
     return { ok: false, error: error };
+  }
+}
+
+async function get_current_school_weekly_meal(schoolId: number) {
+  try {
+    const response = await fetch(URLS.weekly_meals_base + schoolId + "/", {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function upload_weekly_meal(
+  schoolId: number,
+  formData: FormData,
+  csrfToken: string
+) {
+  try {
+    const response = await fetch(URLS.weekly_meals_base + schoolId + "/", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: formData,
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function delete_weekly_meal(schoolId: number, csrfToken: string) {
+  try {
+    const response = await fetch(URLS.weekly_meals_base + schoolId + "/", {
+      method: "DELETE",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = response.status !== 204 ? await response.json() : null;
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
   }
 }
 
@@ -727,6 +801,7 @@ export const school_dashboard_client = {
   get_current_school_events: get_current_school_events,
   get_current_school_exam_schedules: get_current_school_exam_schedules,
   get_current_school_stats: get_current_school_stats,
+  get_current_school_grade_sections: get_current_school_grade_sections,
   get_modules: get_modules,
 
   update_teacher: update_teacher,
@@ -740,8 +815,11 @@ export const school_dashboard_client = {
   put_student: put_student,
   delete_student: delete_student,
 
-  post_exam_schedule: post_exam_schedule,
+  upload_exam_schedule: upload_exam_schedule,
   delete_exam_schedule: delete_exam_schedule,
+  get_current_school_weekly_meal: get_current_school_weekly_meal,
+  upload_weekly_meal: upload_weekly_meal,
+  delete_weekly_meal: delete_weekly_meal,
 
   find_parent_by_email: find_parent_by_email,
   search_parents: search_parents,

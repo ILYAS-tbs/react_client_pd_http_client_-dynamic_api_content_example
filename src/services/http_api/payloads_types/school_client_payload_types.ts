@@ -107,16 +107,6 @@ export interface PostPutTeacherModuleClassGrpPayload {
   module_id: string;
 }
 
-export interface PostExamSchedule {
-  school_id: number;
-  module_name: string;
-  class_group_name: string;
-  date: string;
-  time: string;
-  duration: number;
-  room: string;
-}
-
 export interface PatchAbsenceReportPayload {
   absence_date?: string;
   more_details?: string;

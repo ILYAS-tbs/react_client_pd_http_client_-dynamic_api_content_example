@@ -8,6 +8,9 @@ import { MonthlyEvaluation } from "../../../models/MonthlyEvaluation";
 import { TeacherUpload } from "../../../models/TeacherUpload";
 import { ParentAbsence } from "../../../models/ParentAbsence";
 import { ParentStudentEvent } from "../../../models/ParentStudentEvent";
+import { ExamSchedule } from "../../../models/ExamSchedule";
+import { ParentWeeklyMeal } from "../../../models/WeeklyMeal";
+import { ParentReadOnlyGradesResponse } from "../../../models/StudentGrade";
 
 type ApiOk<T> = { ok: true; status: number; data: T };
 type ApiError = { ok: false; error: unknown };
@@ -22,10 +25,13 @@ const URLS = {
   get_current_parent_all_students_uploads: `${BASE_URL}/parent/parents/get_current_parent_all_students_uploads/`,
   current_parent_students_absences: `${BASE_URL}/parent/parents/current_parent_students_absences/`,
   get_current_parent_students_performances: `${BASE_URL}/parent/parents/get_current_parent_students_performances/`,
+  get_current_parent_grade_sections: `${BASE_URL}/parent/parents/get_current_parent_grade_sections/`,
   get_parent_class_groups: `${BASE_URL}/parent/parents/get_parent_class_groups/`,
   post_absence_report: `${BASE_URL}/school/absence-reports/`,
   parent_students_events: `${BASE_URL}/parent/parents/parent_students_events/`,
   get_current_parent_schedules: `${BASE_URL}/parent/parents/get_current_parent_schedules/`,
+  get_current_parent_exam_schedules: `${BASE_URL}/parent/parents/get_current_parent_exam_schedules/`,
+  get_current_parent_weekly_meals: `${BASE_URL}/parent/weekly-meals/`,
 };
 
 function withStudentId(url: string, studentId?: string | null): string {
@@ -130,6 +136,35 @@ async function get_current_parent_students_performances(studentId: string): Prom
     return { ok: false, error };
   }
 }
+
+async function get_current_parent_grade_sections(
+  studentId: string,
+  semester: "s1" | "s2" | "s3",
+  moduleId?: string
+): Promise<ApiResult<ParentReadOnlyGradesResponse>> {
+  try {
+    const params = new URLSearchParams({
+      student_id: studentId,
+      semester,
+    });
+    if (moduleId) {
+      params.set("module_id", moduleId);
+    }
+
+    const response = await fetch(
+      `${URLS.get_current_parent_grade_sections}?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+    const data: ParentReadOnlyGradesResponse = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
 async function parent_students_events(studentId: string): Promise<ApiResult<ParentStudentEvent[]>> {
   try {
     const response = await fetch(withStudentId(URLS.parent_students_events, studentId), {
@@ -204,6 +239,34 @@ async function get_current_parent_schedules(studentId: string): Promise<ApiResul
   }
 }
 
+async function get_current_parent_exam_schedules(): Promise<ApiResult<ExamSchedule[]>> {
+  try {
+    const response = await fetch(URLS.get_current_parent_exam_schedules, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: ExamSchedule[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function get_current_parent_weekly_meals(): Promise<ApiResult<ParentWeeklyMeal[]>> {
+  try {
+    const response = await fetch(URLS.get_current_parent_weekly_meals, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: ParentWeeklyMeal[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 export const parent_dashboard_client = {
   get_current_parent_students: get_current_parent_students,
   get_current_parent_absence_reports: get_current_parent_absence_reports,
@@ -217,7 +280,10 @@ export const parent_dashboard_client = {
 
   get_current_parent_students_performances:
     get_current_parent_students_performances,
+  get_current_parent_grade_sections: get_current_parent_grade_sections,
 
   post_absence_report: post_absence_report,
   get_current_parent_schedules: get_current_parent_schedules,
+  get_current_parent_exam_schedules: get_current_parent_exam_schedules,
+  get_current_parent_weekly_meals: get_current_parent_weekly_meals,
 };

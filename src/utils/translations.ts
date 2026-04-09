@@ -1005,7 +1005,7 @@ export const translations: Translations = {
     fr: "Gestion des classes",
   },
   ScheduleManagement: {
-    ar: "جداول توقيت",
+    ar: "ادارة جداول التوقيت",
     en: "Time Schedules",
     fr: "Emplois du temps",
   },
@@ -1013,6 +1013,16 @@ export const translations: Translations = {
     ar: "رزنامة الامتحانات",
     en: "Exam Schedule",
     fr: "Calendrier des examens",
+  },
+  weeklyMeals: {
+    ar: "الوجبات الأسبوعية",
+    en: "Weekly Meals",
+    fr: "Repas hebdomadaires",
+  },
+  weeklyMenu: {
+    ar: "القائمة الأسبوعية",
+    en: "Weekly Menu",
+    fr: "Menu hebdomadaire",
   },
   Reports: { ar: "تقارير", en: "Reports", fr: "Rapports" },
   GradeOverview: {
@@ -1094,6 +1104,11 @@ export const translations: Translations = {
     ar: "تحديث",
     en: "Update",
     fr: "Mettre à jour",
+  },
+  continue: {
+    ar: "متابعة",
+    en: "Continue",
+    fr: "Continuer",
   },
   trimesterGrade: {
     ar: "معدل الفصل الدراسي",
@@ -1318,7 +1333,7 @@ export const translations: Translations = {
     fr: "Rechercher une classe...",
   },
   classSchedule: {
-    ar: "جدول الفصول",
+    ar: "ادارة جداول التوقيت",
     en: "Class Schedule",
     fr: "Emploi du temps des classes",
   },
@@ -1328,6 +1343,61 @@ export const translations: Translations = {
     fr: "Emploi du temps des cours",
   },
   //?: ExamScheduleManagemen::
+  examSchedulePdf: {
+    ar: "ملف جدول الامتحانات",
+    en: "Exam Schedule PDF",
+    fr: "PDF du calendrier des examens",
+  },
+  uploadExamSchedule: {
+    ar: "رفع جدول الامتحانات",
+    en: "Upload Exam Schedule",
+    fr: "Téléverser le calendrier des examens",
+  },
+  updateExamSchedule: {
+    ar: "تحديث جدول الامتحانات",
+    en: "Update Exam Schedule",
+    fr: "Mettre à jour le calendrier des examens",
+  },
+  viewCurrentExamSchedule: {
+    ar: "عرض جدول الامتحانات الحالي",
+    en: "View Current Exam Schedule",
+    fr: "Voir le calendrier actuel des examens",
+  },
+  noExamSchedulesAvailable: {
+    ar: "لا توجد جداول امتحانات متاحة حالياً",
+    en: "No exam schedules available right now",
+    fr: "Aucun calendrier d'examens disponible pour le moment",
+  },
+  weeklyMealsProgram: {
+    ar: "برنامج الوجبات الأسبوعية",
+    en: "Weekly Meals Program",
+    fr: "Programme des repas hebdomadaires",
+  },
+  uploadWeeklyMeals: {
+    ar: "رفع برنامج الوجبات الأسبوعية",
+    en: "Upload Weekly Meals",
+    fr: "Téléverser les repas hebdomadaires",
+  },
+  updateWeeklyMeals: {
+    ar: "تحديث برنامج الوجبات الأسبوعية",
+    en: "Update Weekly Meals",
+    fr: "Mettre à jour les repas hebdomadaires",
+  },
+  viewCurrentWeeklyMeals: {
+    ar: "عرض برنامج الوجبات الحالي",
+    en: "View Current Weekly Meals",
+    fr: "Voir le programme actuel des repas",
+  },
+  noWeeklyMealsAvailable: {
+    ar: "لا يوجد برنامج وجبات أسبوعية متاح حالياً",
+    en: "No weekly meals available right now",
+    fr: "Aucun programme de repas hebdomadaires disponible pour le moment",
+  },
+  pdfOnlyError: {
+    ar: "يسمح فقط برفع ملفات PDF",
+    en: "Only PDF files are allowed",
+    fr: "Seuls les fichiers PDF sont autorisés",
+  },
   examCalendar: {
     ar: "رزنامة الامتحانات",
     en: "Exam Calendar",
@@ -2514,10 +2584,30 @@ export const translations: Translations = {
     en: "A manual-entry grade workspace organized by class, module, and semester with independent section saves.",
     fr: "Un espace de saisie manuelle des notes organise par classe, matiere et semestre avec enregistrement independant par section.",
   },
+  schoolGradesReadOnlyDescription: {
+    ar: "عرض للدرجات بصيغة الجداول حسب القسم والمادة والفصل دون أي تعديل.",
+    en: "A read-only grade workspace organized by class, module, and semester.",
+    fr: "Un espace de consultation des notes organise par classe, matiere et semestre, sans modification.",
+  },
+  parentGradesReadOnlyDescription: {
+    ar: "عرض درجات أطفالك حسب التلميذ والمادة والفصل بصيغة جداول واضحة للقراءة فقط.",
+    en: "A read-only view of your children's grades organized by student, module, and semester.",
+    fr: "Une vue en lecture seule des notes de vos enfants, organisee par eleve, matiere et semestre.",
+  },
   gradesFilterHint: {
     ar: "لن يتم تحميل الجداول حتى تختار القسم والمادة والفصل.",
     en: "Tables stay unloaded until class, module, and semester are selected.",
     fr: "Les tableaux ne se chargent qu'apres la selection de la classe, de la matiere et du semestre.",
+  },
+  gradesReadOnlyFilterHint: {
+    ar: "يتغير عرض الجداول مباشرة عند تعديل القسم أو المادة أو الفصل.",
+    en: "Tables update as soon as class, module, or semester changes.",
+    fr: "Les tableaux se mettent a jour des que la classe, la matiere ou le semestre change.",
+  },
+  parentGradesFilterHint: {
+    ar: "يتم جلب درجات الطفل المحدد فقط، ويمكنك تضييق العرض بالمادة والفصل.",
+    en: "Only the selected child is shown, with optional module and semester filters.",
+    fr: "Seul l'enfant selectionne est affiche, avec des filtres optionnels par matiere et semestre.",
   },
   noGradeAssignments: {
     ar: "لا توجد اقسام او مواد مرتبطة بهذا الاستاذ حاليا، لذلك لا يمكن ادارة الدرجات بعد.",
@@ -2548,6 +2638,36 @@ export const translations: Translations = {
     ar: "تحقق من الفلاتر او اعد المحاولة بعد قليل.",
     en: "Check the selected filters or try again in a moment.",
     fr: "Verifiez les filtres selectionnes ou reessayez dans un instant.",
+  },
+  gradesNoDataForSelection: {
+    ar: "لا توجد درجات لهذا الاختيار بعد",
+    en: "No grades found for this selection yet",
+    fr: "Aucune note disponible pour cette selection pour le moment",
+  },
+  gradesNoDataForSelectionHint: {
+    ar: "جرّب تغيير المادة أو الفصل، أو انتظر حتى يتم إدخال العلامات من طرف الأستاذ.",
+    en: "Try another module or semester, or wait until the teacher enters the marks.",
+    fr: "Essayez une autre matiere ou un autre semestre, ou attendez que l'enseignant saisisse les notes.",
+  },
+  gradesReadOnlySectionHint: {
+    ar: "قراءة مباشرة للقيم كما أدخلها الأستاذ دون حسابات أو تعديل.",
+    en: "Read-only values shown exactly as entered by the teacher.",
+    fr: "Valeurs en lecture seule affichees exactement comme saisies par l'enseignant.",
+  },
+  gradesOfMyKids: {
+    ar: "درجات أطفالي",
+    en: "Grades of My Kids",
+    fr: "Notes de Mes Enfants",
+  },
+  parentGradesSelectStudent: {
+    ar: "اختر طفلاً لعرض درجاته",
+    en: "Select a child to view grades",
+    fr: "Selectionnez un enfant pour voir ses notes",
+  },
+  parentGradesSelectStudentHint: {
+    ar: "استخدم أزرار اختيار الطفل أعلى لوحة التحكم لعرض درجات التلميذ المطلوب.",
+    en: "Use the student selector at the top of the dashboard to load one child's grades.",
+    fr: "Utilisez le selecteur d'eleve en haut du tableau de bord pour charger les notes d'un enfant.",
   },
   gradesNoStudentsForFilters: {
     ar: "لا يوجد تلاميذ لهذا الاختيار",
@@ -4054,7 +4174,7 @@ export const translations: Translations = {
     en: "days",
     fr: "jours",
   },
-  attendance: {
+  attendanceLabel: {
     ar: "الحضور",
     en: "Attendance",
     fr: "Présence",

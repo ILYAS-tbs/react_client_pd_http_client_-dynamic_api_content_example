@@ -3,7 +3,6 @@ import { AbsenceReport } from "../models/AbsenceReports";
 import { BehaviourReport } from "../models/BehaviorReport";
 import { ClassGroup } from "../models/ClassGroups";
 import { Event } from "../models/Event";
-import { ExamSchedule } from "../models/ExamSchedule";
 import { Parent } from "../models/ParenAndStudent";
 import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
@@ -124,12 +123,11 @@ export interface BehaviorReportsProps {
 }
 
 export interface ExamScheduleManagementProps {
-  exam_schedules: ExamSchedule[];
-  setExamSchedules: React.Dispatch<React.SetStateAction<ExamSchedule[]>>;
-  school_id: number;
-  class_groups: ClassGroup[];
-  //? Re-Sync with the server functions:
-  RefetchExams: () => void;
+  class_groups_list: ClassGroup[];
+}
+
+export interface WeeklyMealsManagementProps {
+  schoolId: number;
 }
 
 export interface GradeOverviewProps {
@@ -200,6 +198,14 @@ export interface ResourceLibraryProps {
 export interface ScheduleManagementParentProps {
   students: Student[];
   selectedStudentId?: string | null;
+}
+
+export interface ParentExamScheduleManagementProps {
+  students: Student[];
+}
+
+export interface ParentWeeklyMealsManagementProps {
+  students: Student[];
 }
 
 export interface ScheduleViewerProps {

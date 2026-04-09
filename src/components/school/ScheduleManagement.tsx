@@ -95,7 +95,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {getTranslation("schedulesManagement", language)}
+          {getTranslation("classSchedule", language)}
         </h2>
       </div>
 
@@ -137,12 +137,6 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                     {getTranslation("className", language)}
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation("uploadStatus", language)}
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                    {getTranslation("lessonSchedule", language)}
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
                     {getTranslation("actions", language)}
                   </th>
                 </tr>
@@ -150,6 +144,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
               <tbody>
                 {filteredClassGroups.map((cg: ClassGroup) => {
                   const schedule = scheduleByClassGroup[cg.class_group_id];
+                  const hasFile = !!schedule?.schedule_file;
                   return (
                     <tr
                       key={cg.class_group_id}
@@ -158,48 +153,53 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                       <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
                         {cg.name}
                       </td>
-                      <td className="px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700">
-                        {schedule?.schedule_file ? (
-                          <span className="inline-flex items-center gap-1 text-primary-600 dark:text-primary-400 font-medium">
-                            <FileText className="h-4 w-4" />
-                            {getTranslation("uploaded", language)}
-                          </span>
-                        ) : (
-                          <span className="text-red-500">
-                            {getTranslation("notUploaded", language)}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                        {schedule?.schedule_file ? (
-                          <a
-                            href={getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)!}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-primary-500 hover:text-primary-700 underline text-sm"
-                          >
-                            <Eye className="h-4 w-4" />
-                            {cg.name}.pdf
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
-                      </td>
                       <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
+                          {/* Upload Button */}
                           <button
                             onClick={() => openUploadModal(cg)}
-                            className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200"
+                            className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 transition-colors"
                             title={getTranslation("upload", language)}
                           >
                             <Upload className="h-5 w-5" />
                           </button>
-                          {schedule && (
+
+                          {/* Download Button */}
+                          {hasFile ? (
+                            <a
+                              href={getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 transition-colors"
+                              title={getTranslation("download", language) || "Download"}
+                            >
+                              <Eye className="h-5 w-5" />
+                            </a>
+                          ) : (
+                            <button
+                              disabled
+                              className="text-gray-400 dark:text-gray-600 cursor-not-allowed"
+                              title={getTranslation("download", language) || "Download"}
+                            >
+                              <Eye className="h-5 w-5" />
+                            </button>
+                          )}
+
+                          {/* Delete Button */}
+                          {hasFile ? (
                             <button
                               onClick={() =>
                                 handleDelete(schedule.schedule_id)
                               }
-                              className="text-red-600 hover:text-red-800 dark:text-red-400"
+                              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                              title={getTranslation("delete", language)}
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          ) : (
+                            <button
+                              disabled
+                              className="text-gray-400 dark:text-gray-600 cursor-not-allowed"
                               title={getTranslation("delete", language)}
                             >
                               <Trash2 className="h-5 w-5" />

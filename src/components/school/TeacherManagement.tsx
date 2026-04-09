@@ -930,7 +930,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
 
               {/* Add New Assignment */}
               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                إضافة حصة جديدة:
+                {getTranslation('continue', language)}:
               </h4>
               <div className="space-y-3">
                 <div>
@@ -971,7 +971,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                   className="w-full py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
-                  إضافة الحصة
+                 {getTranslation('continue', language)}
                 </button>
               </div>
             </div>

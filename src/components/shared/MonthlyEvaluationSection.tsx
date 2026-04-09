@@ -12,8 +12,15 @@ import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 
+interface MonthlyEvaluationFilterOption {
+  id: string;
+  name: string;
+}
+
 interface MonthlyEvaluationSectionProps {
   evaluations: MonthlyEvaluation[];
+  classOptions?: MonthlyEvaluationFilterOption[];
+  moduleOptions?: MonthlyEvaluationFilterOption[];
 }
 
 function formatMonth(yearMonth: string, locale: string) {
@@ -27,24 +34,52 @@ function formatMonth(yearMonth: string, locale: string) {
 
 const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
   evaluations,
+  classOptions,
+  moduleOptions,
 }) => {
   const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
+  const [classFilter, setClassFilter] = useState("");
   const [moduleFilter, setModuleFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
 
   const locale =
     language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "ar-DZ";
 
+  const uniqueClasses = useMemo(() => {
+    const map = new Map<string, string>();
+
+    classOptions?.forEach((classOption) => {
+      if (classOption.id) {
+        map.set(classOption.id, classOption.name);
+      }
+    });
+
+    evaluations.forEach((e) => {
+      if (e.class_group?.class_group_id) {
+        map.set(e.class_group.class_group_id, e.class_group.name);
+      }
+    });
+
+    return [...map.entries()].map(([id, name]) => ({ id, name }));
+  }, [classOptions, evaluations]);
+
   const uniqueModules = useMemo(() => {
     const map = new Map<string, string>();
+
+    moduleOptions?.forEach((moduleOption) => {
+      if (moduleOption.id) {
+        map.set(moduleOption.id, moduleOption.name);
+      }
+    });
+
     evaluations.forEach((e) => {
       if (e.module?.module_id) {
         map.set(e.module.module_id, e.module.module_name);
       }
     });
     return [...map.entries()].map(([id, name]) => ({ id, name }));
-  }, [evaluations]);
+  }, [evaluations, moduleOptions]);
 
   const uniqueMonths = useMemo(() => {
     const set = new Set<string>();
@@ -55,6 +90,9 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
   const filteredEvaluations = useMemo(() => {
     const q = searchTerm.trim().toLocaleLowerCase();
     return evaluations.filter((e) => {
+      if (classFilter && e.class_group?.class_group_id !== classFilter) {
+        return false;
+      }
       if (moduleFilter && e.module?.module_id !== moduleFilter)
         return false;
       if (monthFilter && !e.month.startsWith(monthFilter)) return false;
@@ -69,7 +107,7 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
         .toLocaleLowerCase()
         .includes(q);
     });
-  }, [evaluations, searchTerm, moduleFilter, monthFilter]);
+  }, [evaluations, searchTerm, classFilter, moduleFilter, monthFilter]);
 
   const withParticipation = useMemo(
     () =>
@@ -121,9 +159,25 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
           </div>
         </div>
 
-        {(uniqueModules.length > 0 || uniqueMonths.length > 0) && (
+        {(uniqueClasses.length > 0 || uniqueModules.length > 0 || uniqueMonths.length > 0) && (
           <div className="flex flex-wrap gap-3 items-center mt-4">
             <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
+            {uniqueClasses.length > 0 && (
+              <select
+                value={classFilter}
+                onChange={(e) => setClassFilter(e.target.value)}
+                className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">
+                  {getTranslation("allClasses", language)}
+                </option>
+                {uniqueClasses.map((classGroup) => (
+                  <option key={classGroup.id} value={classGroup.id}>
+                    {classGroup.name}
+                  </option>
+                ))}
+              </select>
+            )}
             {uniqueModules.length > 0 && (
               <select
                 value={moduleFilter}
@@ -156,9 +210,10 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
                 ))}
               </select>
             )}
-            {(moduleFilter || monthFilter) && (
+            {(classFilter || moduleFilter || monthFilter) && (
               <button
                 onClick={() => {
+                  setClassFilter("");
                   setModuleFilter("");
                   setMonthFilter("");
                 }}

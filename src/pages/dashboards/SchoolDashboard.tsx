@@ -17,6 +17,7 @@ import ScheduleManagement from "../../components/school/ScheduleManagement";
 import ParentManagement from "../../components/school/ParentManagement";
 import ActivitiesManagement from "../../components/school/ActivitiesManagement";
 import ExamScheduleManagemen from "../../components/school/ExamScheduleManagemen";
+import WeeklyMealsManagement from "../../components/school/WeeklyMealsManagement";
 import ClassesManagement from "../../components/school/ClassesManagement";
 import SchoolHomeworksManagement from "../../components/school/HomeworksManagement";
 import SchoolParentChat from "../../components/shared/SchoolParentChat.tsx";
@@ -27,19 +28,17 @@ import { Student } from "../../models/Student";
 import { Parent, ParentJson } from "../../models/ParenAndStudent";
 import { Event, EventJson } from "../../models/Event";
 import { Teacher } from "../../models/Teacher";
-import { ExamSchedule } from "../../models/ExamSchedule";
 import { SchoolStat } from "../../models/SchoolStat";
 import TeacherManagement from "../../components/school/TeacherManagement";
 import { Module } from "../../models/Module";
 import { MonthlyEvaluation } from "../../models/MonthlyEvaluation";
 import { User } from "../../contexts/AuthContext";
-import { timeAgoArabic } from "../../lib/timeAgoArabic";
-import { useNotifications } from "../../contexts/NotificationContext";
 
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
 import SchoolAttendanceTab from "../../components/school/SchoolAttendanceTab";
 import SchoolBehaviourReportsTab from "../../components/school/SchoolBehaviourReportsTab";
+import SchoolGradesTab from "../../components/school/SchoolGradesTab";
 
 const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -79,7 +78,6 @@ const SchoolDashboard: React.FC = () => {
   const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
   const [parents, setParents] = useState<Parent[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const [exam_schedules, setExamSchedules] = useState<ExamSchedule[]>([]);
   const [, setSchoolStat] = useState<SchoolStat | null>(null);
   const [modules, SetModules] = useState<Module[]>([]);
   const [monthlyEvaluations, setMonthlyEvaluations] = useState<MonthlyEvaluation[]>([]);
@@ -126,15 +124,6 @@ const SchoolDashboard: React.FC = () => {
       setEvents(events_list);
     }
   };
-  const get_current_school_exam_schedules = async () => {
-    const res =
-      await school_dashboard_client.get_current_school_exam_schedules();
-
-    if (res.ok) {
-      const exam_schedules_list: ExamSchedule[] = res.data;
-      setExamSchedules(exam_schedules_list);
-    }
-  };
   const get_current_school_monthly_evaluations = async () => {
     const res = await school_dashboard_client.get_current_school_monthly_evaluations();
     if (res.ok) {
@@ -167,7 +156,6 @@ const SchoolDashboard: React.FC = () => {
     get_current_school_parents();
     get_current_school_events();
     get_current_school_monthly_evaluations();
-    get_current_school_exam_schedules();
     get_current_school_stats();
     get_modules();
 
@@ -184,9 +172,6 @@ const SchoolDashboard: React.FC = () => {
   //! Passed Down function to refetch & Sync with the server :
   function RefetchStudents() {
     get_current_school_students();
-  }
-  function RefetchExams() {
-    get_current_school_exam_schedules();
   }
   function RefetchEvents() {
     get_current_school_events();
@@ -213,27 +198,6 @@ const SchoolDashboard: React.FC = () => {
                     },
                   ].map
   */
-
-  const { notifications_data } = useNotifications()
-
-  const [actions, setActions] = useState(
-    notifications_data?.map((not) => ({
-      action: not.title,
-      name: not.message,
-      time: timeAgoArabic(not.created_at),
-    }))
-  );
-
-  useEffect(() => {
-    setActions(
-      notifications_data?.map((not) => ({
-        key: not.id,
-        action: not.title,
-        name: not.message,
-        time: timeAgoArabic(not.created_at),
-      }))
-    );
-  }, [notifications_data]);
 
   // const stats = [
   //   {
@@ -267,6 +231,16 @@ const SchoolDashboard: React.FC = () => {
 
   console.log('📊 SchoolDashboard rendering with language:', language);
 
+  const monthlyEvaluationClassOptions = class_groups.map((classGroup) => ({
+    id: classGroup.class_group_id,
+    name: classGroup.name,
+  }));
+
+  const monthlyEvaluationModuleOptions = modules.map((module) => ({
+    id: module.module_id,
+    name: module.module_name,
+  }));
+
   const stats = [
     { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500", tab: "users" },
     { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-primary-400", tab: "users" },
@@ -283,10 +257,11 @@ const SchoolDashboard: React.FC = () => {
     { id: "chat", label: getTranslation("chat", language), icon: MessageCircle },
     { id: "schedules", label: getTranslation("ScheduleManagement", language), icon: Calendar },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
+    { id: "weekly_meals", label: getTranslation("weeklyMeals", language), icon: FileText },
+    { id: "grades", label: getTranslation("marks", language), icon: FileText },
     { id: "evaluations", label: getTranslation("monthlyEvaluation", language), icon: ClipboardList },
     { id: "student_absences", label: getTranslation('studentAbsencesTab', language), icon: BarChart2 },
     { id: "behaviour_reports", label: getTranslation('behaviourReportsTab', language), icon: FileText },
-    // { id: "grades", label: getTranslation("GradeOverview", language), icon: FileText },
     { id: "activities", label: getTranslation('Activities', language), icon: Star },
   ];
 
@@ -323,74 +298,8 @@ const SchoolDashboard: React.FC = () => {
               ))}
             </div>
 
-            {/* Recent Activity */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className=" h-64 overflow-y-scroll bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  {getTranslation("recentActivity", language)}
-                </h3>
-                <div className="space-y-4">
-                  {actions?.map((activity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {activity.action}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {activity.name}
-                        </p>
-                      </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {activity.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  {getTranslation('monthlyStats', language)}
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      طلاب جدد
-                    </span>
-                    <span className="text-sm font-semibold text-primary-600">
-                      +12
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      معدل الحضور
-                    </span>
-                    <span className="text-sm font-semibold text-primary-500">
-                      94.2%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      الإعلانات المنشورة
-                    </span>
-                    <span className="text-sm font-semibold text-purple-600">
-                      8
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      طلبات الغياب المراجعة
-                    </span>
-                    <span className="text-sm font-semibold text-orange-600">
-                      23
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Recent Activity (removed) */}
+            {/* latest stas (removed) */}
           </div>
         );
       case "users":
@@ -450,14 +359,11 @@ const SchoolDashboard: React.FC = () => {
       case "exams":
         return (
           <ExamScheduleManagemen
-            exam_schedules={exam_schedules}
-            setExamSchedules={setExamSchedules}
-            school_id={school_id}
-            class_groups={class_groups}
-            //? Re-Sync with the server functions:
-            RefetchExams={RefetchExams}
+            class_groups_list={class_groups}
           />
         );
+      case "weekly_meals":
+        return <WeeklyMealsManagement schoolId={school_id} />;
       case "student_absences":
         return (
           <SchoolAttendanceTab
@@ -478,16 +384,14 @@ const SchoolDashboard: React.FC = () => {
         );
       case "evaluations":
         return (
-          <MonthlyEvaluationSection evaluations={monthlyEvaluations} />
+          <MonthlyEvaluationSection
+            evaluations={monthlyEvaluations}
+            classOptions={monthlyEvaluationClassOptions}
+            moduleOptions={monthlyEvaluationModuleOptions}
+          />
         );
-      // case "grades":
-      //   return (
-      //     <GradeOverview
-      //       school_stat={school_stat}
-      //       setSchoolStat={setSchoolStat}
-      //       class_groups={class_groups}
-      //     />
-      //   );
+      case "grades":
+        return <SchoolGradesTab classGroups={class_groups} modules={modules} />;
       case "activities":
         return (
           <ActivitiesManagement

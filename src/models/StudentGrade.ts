@@ -92,6 +92,60 @@ export interface TeacherStudentGradesGridResponse {
   rows: StudentGradeGridRow[];
 }
 
+export type ReadOnlyGradeSectionKey =
+  | "evaluation"
+  | "devoir_1"
+  | "devoir_2"
+  | "exam";
+
+export interface ReadOnlyGradeSectionRow {
+  grade_record_id: number | null;
+  student_id: string;
+  student_name: string;
+  class_group_id: string;
+  class_name: string;
+  module_id: string;
+  module_name: string;
+  teacher_name: string | null;
+  semester: "s1" | "s2" | "s3";
+  mark: number | null;
+}
+
+export type ReadOnlyGradeSections = Record<
+  ReadOnlyGradeSectionKey,
+  ReadOnlyGradeSectionRow[]
+>;
+
+export interface SchoolReadOnlyGradesResponse {
+  class_group: {
+    id: string;
+    name: string;
+  };
+  module: {
+    id: string;
+    name: string;
+  };
+  semester: "s1" | "s2" | "s3";
+  sections: ReadOnlyGradeSections;
+}
+
+export interface ParentReadOnlyGradesResponse {
+  student: {
+    id: string;
+    name: string;
+  };
+  module: {
+    id: string;
+    name: string;
+  } | null;
+  available_modules: Array<{
+    id: string;
+    name: string;
+  }>;
+  semester: "s1" | "s2" | "s3";
+  sections: ReadOnlyGradeSections;
+}
+
 // Converts JSON strings to/from your types
 export class StudentGradeConvert {
   public static toStudentGrade(json: string): StudentGrade {

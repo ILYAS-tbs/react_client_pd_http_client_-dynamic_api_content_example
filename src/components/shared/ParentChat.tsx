@@ -20,6 +20,65 @@ interface ParentChatProps {
   selectedStudentId?: string | null;
 }
 
+function getTimestampValue(value?: string | null) {
+  if (!value) {
+    return 0;
+  }
+
+  const parsed = new Date(value).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function mergeParentChatsByParticipant(items: ContextualChatListItem[]) {
+  const merged = new Map<
+    number,
+    ContextualChatListItem & { __studentNames: string[]; __moduleNames: string[] }
+  >();
+
+  items.forEach((item) => {
+    const existing = merged.get(item.participant_user_id);
+    if (!existing) {
+      merged.set(item.participant_user_id, {
+        ...item,
+        __studentNames: item.student_name ? [item.student_name] : [],
+        __moduleNames: [...item.module_names],
+      });
+      return;
+    }
+
+    const nextTimestamp = getTimestampValue(item.timestamp ?? item.last_message?.timestamp ?? null);
+    const currentTimestamp = getTimestampValue(
+      existing.timestamp ?? existing.last_message?.timestamp ?? null
+    );
+    const nextStudentNames = Array.from(new Set([...existing.__studentNames, item.student_name]));
+    const nextModuleNames = Array.from(new Set([...existing.__moduleNames, ...item.module_names]));
+
+    if (nextTimestamp > currentTimestamp) {
+      merged.set(item.participant_user_id, {
+        ...existing,
+        ...item,
+        unread: existing.unread + item.unread,
+        student_name: nextStudentNames.join(", "),
+        module_names: nextModuleNames,
+        __studentNames: nextStudentNames,
+        __moduleNames: nextModuleNames,
+      });
+      return;
+    }
+
+    merged.set(item.participant_user_id, {
+      ...existing,
+      unread: existing.unread + item.unread,
+      student_name: nextStudentNames.join(", "),
+      module_names: nextModuleNames,
+      __studentNames: nextStudentNames,
+      __moduleNames: nextModuleNames,
+    });
+  });
+
+  return Array.from(merged.values()).map(({ __studentNames, __moduleNames, ...item }) => item);
+}
+
 function mergeChatPages(
   current: ContextualChatListItem[],
   incoming: ContextualChatListItem[],
@@ -116,6 +175,11 @@ const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students, selectedSt
     (option) => option.value === selectedStudentId
   )?.label;
 
+  const visibleItems = useMemo(
+    () => mergeParentChatsByParticipant(chatResponse.results),
+    [chatResponse.results]
+  );
+
   return (
     <ContextualChatWorkspace
       title={chatType === "teachers" ? getTranslation("teachers", language) : getTranslation("schools", language)}
@@ -154,7 +218,7 @@ const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students, selectedSt
           </div>
         </div>
       }
-      items={chatResponse.results}
+      items={visibleItems}
       isListLoading={isLoading}
       hasMore={chatResponse.page < chatResponse.total_pages}
       onLoadMore={() => setPage((prev) => prev + 1)}
