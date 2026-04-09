@@ -1,5 +1,6 @@
 import {
   SignupPayload,
+  RegisterWithRolePayload,
   RegisterSchoolPayload,
   LoginPayload,
   RegisterParentPayload,
@@ -21,6 +22,7 @@ const URLS = {
   REGISTER_PARENT: `${SERVER_BASE_URL}/parent/register-parent/`,
   REGISTER_TEACHER: `${SERVER_BASE_URL}/teacher/register-teacher/`,
 
+  REGISTER_WITH_ROLE: `${SERVER_BASE_URL}/user-auth/register-with-role/`,
   DeleteSession:`${SERVER_BASE_URL}/user-auth/delete-session/`
 };
 async function handleDeleteSession() {
@@ -260,8 +262,34 @@ async function register_Teacher(
     return { ok: false, error: error };
   }
 }
+async function register_with_role(
+  payload: RegisterWithRolePayload,
+  csrfToken: string
+) {
+  if (!csrfToken) {
+    throw new Error("CSRF Token is empty or null");
+  }
+  try {
+    const response = await fetch(URLS.REGISTER_WITH_ROLE, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data: data };
+  } catch (error) {
+    return { ok: false, error: error };
+  }
+}
+
 export const auth_http_client = {
   signup: signup,
+  register_with_role: register_with_role,
   verify_email:verify_email,
   verify_email_resend:verify_email_resend,
   teacher_signup: teacher_signup,

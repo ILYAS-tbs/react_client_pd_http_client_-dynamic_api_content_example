@@ -937,6 +937,31 @@ export const translations: Translations = {
     en: "Wrong email?",
     fr: "Mauvais email ?",
   },
+  emailNotVerified: {
+    ar: "لم يتم التحقق من بريدك الإلكتروني بعد. يُرجى التحقق للوصول إلى حسابك.",
+    en: "Your email is not verified yet. Please verify to access your account.",
+    fr: "Votre email n'est pas encore vérifié. Veuillez vérifier pour accéder à votre compte.",
+  },
+  verifyNow: {
+    ar: "تحقق الآن",
+    en: "Verify Now",
+    fr: "Vérifier maintenant",
+  },
+  otpSentToEmail: {
+    ar: "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+    en: "A verification code has been sent to your email",
+    fr: "Un code de vérification a été envoyé à votre email",
+  },
+  emailVerifiedLoginSuccess: {
+    ar: "تم التحقق من البريد الإلكتروني! جاري تسجيل الدخول...",
+    en: "Email verified! Logging in...",
+    fr: "Email vérifié ! Connexion en cours...",
+  },
+  backToLogin: {
+    ar: "العودة إلى تسجيل الدخول",
+    en: "Back to login",
+    fr: "Retour à la connexion",
+  },
   //?: My translations :
 
   //! SchoolDashboard :

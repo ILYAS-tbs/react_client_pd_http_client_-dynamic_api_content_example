@@ -9,7 +9,7 @@ import { auth_http_client } from "../services/http_api/auth/auth_http_client";
 import { getCSRFToken } from "../lib/get_CSRFToken";
 import {
   LoginPayload,
-  SignupPayload,
+  RegisterWithRolePayload,
 } from "../services/http_api/payloads_types/school_client_payload_types";
 import { BackendUser } from "../models/BackendUser";
 import { SERVER_BASE_URL } from "../services/http_api/server_constants";
@@ -46,7 +46,8 @@ interface LoginResponse {
   ok: boolean;
   status: number | undefined;
   user?: User;
-  error?: any
+  error?: any;
+  emailNotVerified?: boolean;
 }
 
 interface AuthContextType {
@@ -121,6 +122,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     if (!result.ok) {
       console.log("RESPONSE NOT OK");
+      // Detect allauth 401 with verify_email flow (unverified email)
+      const flows = result.data?.data?.flows;
+      if (
+        result.status === 401 &&
+        Array.isArray(flows) &&
+        flows.some((f: any) => f.id === "verify_email" && f.is_pending)
+      ) {
+        return { ok: false, status: 401, emailNotVerified: true };
+      }
       return { ok: false, status: result.status, error: result.error };
     }
     console.log("Login Succeful");
@@ -211,83 +221,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   ): Promise<boolean> => {
     setIsLoading(true);
 
-    // Mock registration
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Atomic signup: User + Role created in a single backend call
+    const isSchool = userData.role === "school";
 
-
-
-    // Real registry :
-    const user_payload: SignupPayload = {
+    const payload: RegisterWithRolePayload = {
       email: userData.email,
-      phone: userData.phone ?? "",
-      username: userData.email,
       password: userData.password,
+      username: userData.email,
+      role: isSchool ? "school" : "parent",
+      // School-specific fields
+      ...(isSchool
+        ? {
+            school_name: userData.name,
+            phone_number: userData.phone ?? "",
+            school_level: userData.school_level ?? "primary",
+            school_type: userData.schoolType ?? "public",
+            wilaya: userData.wilaya ?? "",
+            commun: userData.commune ?? "",
+          }
+        : {
+            full_name: userData.name,
+            phone_number: userData.phone ?? "",
+          }),
     };
 
-    //? call01 : userCreation ()
-    // CSRF token
-    let latest_csrf = getCSRFToken()!;
-    await auth_http_client.signup(user_payload, latest_csrf);
+    const latest_csrf = getCSRFToken()!;
+    const result = await auth_http_client.register_with_role(payload, latest_csrf);
 
-    //? call02 School or parent linking with him
-    // CSRF token
-    latest_csrf = getCSRFToken()!;
+    if (!result.ok) {
+      setIsLoading(false);
+      throw new Error(result.data?.error || "Registration failed");
+    }
 
-    //* Migrated to :: state .. from LC
-    //* Migrated to :: "verify email" & store in LC
-    setUserData(userData)
-    // localStorage.setItem("user_data",JSON.stringify(userData))
-    // if (isCreatingSchool) {
-    //   const school_payload: RegisterSchoolPayload = {
-    //     school_name: userData.name,
-    //     email: userData.email,
-    //     phone_number: userData.phone,
-    //     school_level: userData.school_level,
-    //     website: "",
-    //     address: "",
-    //     wilaya: "",
-    //     commun: "",
-    //     school_type: "",
-    //     established_year: 0,
-    //     description: "",
-    //   };
-
-    //   const school_result = await auth_http_client.register_school(
-    //     school_payload,
-    //     latest_csrf
-    //   );
-    // } else {
-    //   const parent_payload: RegisterParentPayload = {
-    //     full_name: userData.email,
-    //     phone_number: userData.phone,
-    //     address: "",
-    //     relationship_to_student: "",
-    //   };
-
-    //   const parent_result = await auth_http_client.register_parent(
-    //     parent_payload,
-    //     latest_csrf
-    //   );
-    // }
-
-
-    //! BETTER TO TAKE THE USER TO LOGIN AFTER THE REGISTER 
-    //! AND NOT DIRECTLY TO THE DASHBOARD
-    //?: CAll03 : getting the use data (ID from the backend)
-    //   const res_session = await get_session()
-    //   const newUser: User = {
-    //   id: res_session.data?.user?.id,
-    //   name: userData.name,
-    //   email: userData.email,
-    //   role: userData.role ??'school' ,
-    //   //   schoolId?: string;
-    //   // schoolType: userData.schoolType,
-    // };
-    // setUser(newUser);
-    // localStorage.setItem(
-    //   "schoolParentOrTeacherManagementUser",
-    //   JSON.stringify(newUser)
-    // );
+    setUserData(userData);
     setIsLoading(false);
     return true;
   };

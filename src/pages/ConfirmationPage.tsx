@@ -129,10 +129,12 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
     try {
       const role = localStorage.getItem("role")
 
+      // Role record is already created during atomic signup.
+      // The old role-creation endpoints below are kept as idempotent fallbacks
+      // in case the atomic signup was not used (backward compat).
       const isCreatingSchool = role === "school"
 
       if (isCreatingSchool) {
-        //* 1.Creatin a School
         const school_payload: RegisterSchoolPayload = {
           school_name: userData?.name ?? "",
           email: userData?.email ?? "",
@@ -148,13 +150,9 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
         };
 
         const latest_csrf = getCSRFToken()!
-
-        const school_result = await auth_http_client.register_school(
-          school_payload,
-          latest_csrf
-        );
+        // Idempotent: if role was already created during atomic signup, this returns 200
+        await auth_http_client.register_school(school_payload, latest_csrf);
       } else {
-        //* 2.Creating A parent
         const parent_payload: RegisterParentPayload = {
           full_name: userData?.name ?? "",
           phone_number: userData?.phone ?? "",
@@ -162,10 +160,8 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           relationship_to_student: "",
         };
         const latest_csrf = getCSRFToken()!
-        const parent_result = await auth_http_client.register_parent(
-          parent_payload,
-          latest_csrf
-        );
+        // Idempotent: if role was already created during atomic signup, this returns 200
+        await auth_http_client.register_parent(parent_payload, latest_csrf);
       }
       //! Navigate to the correct Dashboard
       if (res.ok) {
@@ -187,7 +183,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           if (user_role) {
             setTimeout(() => {
               navigate(`/${user_role}-dashboard`);
-              onClose?.();register_school
+              onClose?.();
             }, 1500);
           }
         }

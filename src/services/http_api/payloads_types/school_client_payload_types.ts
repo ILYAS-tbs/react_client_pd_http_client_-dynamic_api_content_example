@@ -4,6 +4,28 @@ export type SignupPayload = {
   username: string;
   password: string;
 };
+
+export type RegisterWithRolePayload = {
+  email: string;
+  password: string;
+  username?: string;
+  role: "school" | "parent";
+  // School fields
+  school_name?: string;
+  phone_number?: string;
+  school_level?: string;
+  school_type?: string;
+  wilaya?: string;
+  commun?: string;
+  website?: string;
+  address?: string;
+  established_year?: number;
+  description?: string;
+  // Parent fields
+  full_name?: string;
+  relationship_to_student?: string;
+};
+
 export type RegisterSchoolPayload = {
   school_name: string;
   email: string;
