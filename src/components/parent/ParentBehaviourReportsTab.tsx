@@ -8,12 +8,22 @@ import { useLanguage } from "../../contexts/LanguageContext";
 
 interface ParentBehaviourReportsTabProps {
   students: Student[];
+  selectedStudentId?: string | null;
 }
 
-const ParentBehaviourReportsTab: React.FC<ParentBehaviourReportsTabProps> = ({ students }) => {
+const ParentBehaviourReportsTab: React.FC<ParentBehaviourReportsTabProps> = ({ students, selectedStudentId }) => {
   const { language } = useLanguage();
   const [reports, setReports] = useState<BehaviourNote[]>([]);
-  const [filters, setFilters] = useState<BehaviourFilters>({});
+  const [filters, setFilters] = useState<BehaviourFilters>({
+    student: selectedStudentId || undefined,
+  });
+
+  useEffect(() => {
+    setFilters((current) => ({
+      ...current,
+      student: selectedStudentId || undefined,
+    }));
+  }, [selectedStudentId]);
 
   useEffect(() => {
     const load = async () => {
@@ -21,7 +31,7 @@ const ParentBehaviourReportsTab: React.FC<ParentBehaviourReportsTabProps> = ({ s
       if (res.ok) setReports(res.data);
     };
     void load();
-  }, [filters.class, filters.module, filters.student, filters.teacher]);
+  }, [filters]);
 
   const teacherOptions = useMemo(
     () => Array.from(new Map(reports.map((item) => [String(item.teacher.user), item.teacher])).values()),
@@ -44,10 +54,9 @@ const ParentBehaviourReportsTab: React.FC<ParentBehaviourReportsTabProps> = ({ s
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{getTranslation("behaviourReportsTab", language)}</h2>
         </div>
         <div className="grid gap-3 md:grid-cols-4">
-          <select value={filters.student ?? ""} onChange={(event) => setFilters((current) => ({ ...current, student: event.target.value || undefined }))} className="rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900">
-            <option value="">{getTranslation("allChildren", language)}</option>
-            {students.map((student) => <option key={student.student_id} value={student.student_id}>{student.full_name}</option>)}
-          </select>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200">
+            {students[0]?.full_name ?? getTranslation("selectStudent", language)}
+          </div>
           <select value={filters.class ?? ""} onChange={(event) => setFilters((current) => ({ ...current, class: event.target.value || undefined }))} className="rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900">
             <option value="">{getTranslation("allClasses", language)}</option>
             {classOptions.map((group) => <option key={group.class_group_id} value={group.class_group_id}>{group.name}</option>)}

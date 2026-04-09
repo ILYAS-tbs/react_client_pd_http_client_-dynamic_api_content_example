@@ -17,6 +17,7 @@ interface ParentChatProps {
   teachers_list: Teacher[];
   parent_id: number;
   students: Student[];
+  selectedStudentId?: string | null;
 }
 
 function mergeChatPages(
@@ -35,10 +36,9 @@ function mergeChatPages(
   return Array.from(merged.values());
 }
 
-const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students }) => {
+const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students, selectedStudentId }) => {
   const { language } = useLanguage();
   const [chatType, setChatType] = useState<"teachers" | "schools">("teachers");
-  const [selectedStudentId, setSelectedStudentId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebouncedValue(searchTerm, 300);
 
@@ -58,13 +58,6 @@ const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students }) => {
   );
 
   useEffect(() => {
-    const firstStudent = studentOptions[0];
-    if (!selectedStudentId && firstStudent) {
-      setSelectedStudentId(firstStudent.value);
-    }
-  }, [selectedStudentId, studentOptions]);
-
-  useEffect(() => {
     setPage(1);
   }, [chatType, selectedStudentId, debouncedSearch]);
 
@@ -79,7 +72,7 @@ const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students }) => {
     async function loadChats() {
       setIsLoading(true);
       const params = {
-        student_id: selectedStudentId,
+        student_id: selectedStudentId ?? undefined,
         search: debouncedSearch,
         page,
       };
@@ -156,18 +149,9 @@ const ParentChat: React.FC<ParentChatProps> = ({ parent_id, students }) => {
             </button>
           </div>
 
-          <select
-            value={selectedStudentId}
-            onChange={(event) => setSelectedStudentId(event.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">{getTranslation("selectStudent", language)}</option>
-            {studentOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+            {selectedStudentLabel || getTranslation("selectStudent", language)}
+          </div>
         </div>
       }
       items={chatResponse.results}

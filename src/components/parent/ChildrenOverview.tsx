@@ -194,29 +194,11 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header and Child Selector */}
+      {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           {getTranslation("childrenOverview", language)}
         </h2>
-        {students.length > 0 && (
-          <div className="flex items-center space-x-4 rtl:space-x-reverse">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {getTranslation("selectChild", language)}:
-            </span>
-            <select
-              value={selectedChild}
-              onChange={(e) => setSelectedChild(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              {children.map((child) => (
-                <option key={child.id} value={child.id}>
-                  {child.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
       </div>
 
       {students.length === 0 ? (
@@ -225,219 +207,76 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
         </div>
       ) : currentChild ? (
         <>
-          {/* Child Profile Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-6 rtl:space-x-reverse">
-              <div className="bg-primary-100 dark:bg-primary-900/20 p-4 rounded-full">
-                <User className="h-8 w-8 text-primary-500" />
+          {/* Enhanced Profile Card */}
+          <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-2xl shadow-xl p-8 border border-primary-200 dark:border-primary-700">
+            <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8 rtl:md:space-x-reverse">
+              {/* Avatar Section */}
+              <div className="flex-shrink-0">
+                <div className="bg-gradient-to-br from-primary-400 to-primary-600 p-6 rounded-full shadow-lg">
+                  <User className="h-12 w-12 text-white" />
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+
+              {/* Student Info Section */}
+              <div className="flex-1 text-center md:text-start">
+                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
                   {currentChild.name}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {currentChild.class} - {currentChild.school}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {getTranslation("mainTeacher", language)} :{" "}
-                  {currentChild.teacher}
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary-600">
-                  {currentChild.overallGrade}/20
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation("overallGrade", language)}
+                <div className="space-y-2">
+                  <p className="text-lg text-gray-700 dark:text-gray-300 font-semibold">
+                    {currentChild.class}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {currentChild.school}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {getTranslation("age", language)}: {currentChild.age} {getTranslation("years", language)}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Absences Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-7 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-3">
                     {getTranslation("TotalAbsences", language)}
                   </p>
-                  <p className="text-2xl font-bold text-primary-500">
+                  <p className="text-4xl font-bold text-primary-600 dark:text-primary-400">
                     {currentChild.attendance}
                   </p>
-                </div>
-                <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-lg">
-                  <Calendar className="h-6 w-6 text-primary-500" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {getTranslation("behavior", language)}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    {getTranslation("days", language)}
                   </p>
-
-                  {currentChild.behavior == "excellent" ? (
-                    <p className="text-2xl font-bold text-primary-600">
-                      {mapBehaviour(currentChild.behavior)}
-                    </p>
-                  ) : currentChild.behavior == "very_good" ? (
-                    <p className="text-2xl font-bold text-primary-600">
-                      {mapBehaviour(currentChild.behavior)}
-                    </p>
-                  ) : (
-                    <p className="text-2xl font-bold text-red-600">
-                      {currentChild.behavior &&
-                        mapBehaviour(currentChild.behavior)}
-                    </p>
-                  )}
                 </div>
-
-                {/* acedemic performance  */}
-                {currentChild.behavior == "excellent" ? (
-                  <div className="bg-primary-100 dark:bg-primary-900 p-3 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-primary-600" />
-                  </div>
-                ) : currentChild.behavior == "very_good" ? (
-                  <div className="bg-primary-100 dark:bg-primary-900 p-3 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-primary-600" />
-                  </div>
-                ) : (
-                  <div className="bg-red-100 dark:bg-red-900 p-3 rounded-lg">
-                    <TrendingDown className="h-6 w-6 text-red-600" />
-                  </div>
-                )}
+                <div className="bg-primary-100 dark:bg-primary-900/30 p-4 rounded-lg">
+                  <Calendar className="h-8 w-8 text-primary-500" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
+            {/* Subjects Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-7 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-3">
                     {getTranslation("numberOfSubjects", language)}
                   </p>
-                  <p className="text-2xl font-bold text-purple-600">
-                    {currentChild.subjects?.length}
+                  <p className="text-4xl font-bold text-purple-600 dark:text-purple-400">
+                    {currentChild.subjects?.length || 0}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    {getTranslation("subjects", language)}
                   </p>
                 </div>
-                <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
-                  <BookOpen className="h-6 w-6 text-purple-600" />
+                <div className="bg-purple-100 dark:bg-purple-900/30 p-4 rounded-lg">
+                  <BookOpen className="h-8 w-8 text-purple-500" />
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Subjects and Recent Activities */}
-          <div className="min-h-80 grid md:grid-cols-2 gap-6">
-            {/* Subjects Performance */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation("subjectPerformance", language)}
-              </h3>
-              <div className="space-y-4">
-                {currentChild.subjects?.map((subject, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-white">
-                        {subject.name}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {subject.teacher}
-                      </p>
-                      {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-                        آخر تحديث: {subject.lastUpdate}
-                      </p> */}
-                    </div>
-                    <div className="text-center">
-                      <div
-                        className={`text-lg font-bold ${getGradeColor(
-                          subject.grade
-                        )}`}
-                      >
-                        {subject.grade}/20
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Activities */}
-            {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {getTranslation("recentActivities", language)}
-              </h3>
-              <div className="space-y-4">
-                {currentChild.recentActivities.map((activity, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start space-x-3 rtl:space-x-reverse p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                  >
-                    <div className="p-2 rounded-lg bg-white dark:bg-gray-600">
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {activity.subject && `${activity.subject}: `}
-                          {activity.description}
-                        </p>
-                        {activity.grade && (
-                          <span className="text-sm font-semibold text-primary-600">
-                            {activity.grade}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {activity.date}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div> */}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation("quickActions", language)}
-            </h3>
-            <div className="grid md:grid-cols-4 gap-4">
-              <button
-                onClick={() => setActiveTab("grades")}
-                className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
-              >
-                <BookOpen className="h-5 w-5" />
-                <span className="text-sm font-medium">{getTranslation("viewGrades", language)}</span>
-              </button>
-              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-800 transition-colors">
-                <Calendar className="h-5 w-5" />
-                <span className="text-sm font-medium">{getTranslation('attendanceRecord',language)}</span>
-              </button> */}
-              <button
-                onClick={() => setActiveTab("absences")}
-                className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors"
-              >
-                <AlertTriangle className="h-5 w-5" />
-                <span className="text-sm font-medium">
-                  {getTranslation("justifyAbsence", language)}
-                </span>
-              </button>
-              <button
-                onClick={() => setActiveTab("chat")}
-                className="flex items-center space-x-2 rtl:space-x-reverse p-3 bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-800 transition-colors"
-              >
-                <User className="h-5 w-5" />
-                <span className="text-sm font-medium">
-                  {getTranslation("contactTeacher", language)}
-                </span>
-              </button>
             </div>
           </div>
         </>

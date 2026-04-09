@@ -30,17 +30,17 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
 }) => {
   const { language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
-  const [classGroupFilter, setClassGroupFilter] = useState("");
+  const [moduleFilter, setModuleFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
 
   const locale =
     language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "ar-DZ";
 
-  const uniqueClassGroups = useMemo(() => {
+  const uniqueModules = useMemo(() => {
     const map = new Map<string, string>();
     evaluations.forEach((e) => {
-      if (e.class_group?.class_group_id) {
-        map.set(e.class_group.class_group_id, e.class_group.name);
+      if (e.module?.module_id) {
+        map.set(e.module.module_id, e.module.module_name);
       }
     });
     return [...map.entries()].map(([id, name]) => ({ id, name }));
@@ -55,10 +55,7 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
   const filteredEvaluations = useMemo(() => {
     const q = searchTerm.trim().toLocaleLowerCase();
     return evaluations.filter((e) => {
-      if (
-        classGroupFilter &&
-        e.class_group?.class_group_id !== classGroupFilter
-      )
+      if (moduleFilter && e.module?.module_id !== moduleFilter)
         return false;
       if (monthFilter && !e.month.startsWith(monthFilter)) return false;
       if (!q) return true;
@@ -72,7 +69,7 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
         .toLocaleLowerCase()
         .includes(q);
     });
-  }, [evaluations, searchTerm, classGroupFilter, monthFilter]);
+  }, [evaluations, searchTerm, moduleFilter, monthFilter]);
 
   const withParticipation = useMemo(
     () =>
@@ -124,21 +121,21 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
           </div>
         </div>
 
-        {(uniqueClassGroups.length > 0 || uniqueMonths.length > 0) && (
+        {(uniqueModules.length > 0 || uniqueMonths.length > 0) && (
           <div className="flex flex-wrap gap-3 items-center mt-4">
             <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            {uniqueClassGroups.length > 0 && (
+            {uniqueModules.length > 0 && (
               <select
-                value={classGroupFilter}
-                onChange={(e) => setClassGroupFilter(e.target.value)}
+                value={moduleFilter}
+                onChange={(e) => setModuleFilter(e.target.value)}
                 className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">
-                  {getTranslation("allClasses", language)}
+                  {getTranslation("allModules", language)}
                 </option>
-                {uniqueClassGroups.map((cg) => (
-                  <option key={cg.id} value={cg.id}>
-                    {cg.name}
+                {uniqueModules.map((module) => (
+                  <option key={module.id} value={module.id}>
+                    {module.name}
                   </option>
                 ))}
               </select>
@@ -159,10 +156,10 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
                 ))}
               </select>
             )}
-            {(classGroupFilter || monthFilter) && (
+            {(moduleFilter || monthFilter) && (
               <button
                 onClick={() => {
-                  setClassGroupFilter("");
+                  setModuleFilter("");
                   setMonthFilter("");
                 }}
                 className="text-xs text-primary-600 dark:text-primary-400 hover:underline"

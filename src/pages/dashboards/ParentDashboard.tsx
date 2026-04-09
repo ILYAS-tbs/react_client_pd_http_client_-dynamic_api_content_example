@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   User as UserIcon,
   GraduationCap,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import ChildrenOverview from "../../components/parent/ChildrenOverview";
+import GradeReports from "../../components/parent/GradeReports";
 import ScheduleManagement from "../../components/parent/ScheduleManagement";
 import ActivitiesView from "../../components/parent/ActivitiesManagement";
 import ParentHomeworks from "../../components/parent/ParentHomeworks.tsx";
@@ -27,7 +28,6 @@ import { parent_dashboard_client } from "../../services/http_api/parent-dashboar
 import { ParentAbsence } from "../../models/ParentAbsence.ts";
 import { StudentPerformance } from "../../models/StudentPerformance.ts";
 import { ParentStudentEvent } from "../../models/ParentStudentEvent.ts";
-import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups.ts";
 import { chat_http_client } from "../../services/chat/chat_http_client.ts";
 import { Teacher } from "../../models/Teacher.ts";
 import { MonthlyEvaluation } from "../../models/MonthlyEvaluation.ts";
@@ -67,10 +67,11 @@ const ParentDashboard: React.FC = () => {
   })();
 
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
+  const [isLoadingStudentScope, setIsLoadingStudentScope] = useState(false);
 
   // ! Fetch from the API
   const [students, setStudents] = useState<Student[]>([]);
-  const [class_groups, setClassGroups] = useState<ClassGroup[] | []>([]);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
 
   const [uploads, setUploads] = useState<TeacherUpload[]>([]);
 
@@ -85,6 +86,7 @@ const ParentDashboard: React.FC = () => {
   const [parentStudentsEvents, setParentStudentsEvents] = useState<
     ParentStudentEvent[]
   >([]);
+  const studentRequestRef = useRef(0);
 
   const get_current_parent_students = async () => {
     try {
@@ -101,11 +103,12 @@ const ParentDashboard: React.FC = () => {
       setIsLoadingStudents(false);
     }
   };
-  const get_current_parent_monthly_evaluations = async () => {
+  const get_current_parent_monthly_evaluations = async (studentId: string, requestId?: number) => {
     try {
       setIsLoadingMonthlyEvaluations(true);
-      const res = await parent_dashboard_client.get_current_parent_monthly_evaluations();
+      const res = await parent_dashboard_client.get_current_parent_monthly_evaluations(studentId);
       if (res.ok) {
+        if (requestId !== undefined && requestId !== studentRequestRef.current) return;
         const evaluations_list: MonthlyEvaluation[] = res.data;
         setMonthlyEvaluations(evaluations_list);
       } else {
@@ -114,15 +117,18 @@ const ParentDashboard: React.FC = () => {
     } catch (error) {
       console.error("Error fetching monthly evaluations:", error);
     } finally {
-      setIsLoadingMonthlyEvaluations(false);
+      if (requestId === undefined || requestId === studentRequestRef.current) {
+        setIsLoadingMonthlyEvaluations(false);
+      }
     }
   };
 
-  const get_current_parent_all_students_uploads = async () => {
+  const get_current_parent_all_students_uploads = async (studentId: string, requestId?: number) => {
     try {
       const res =
-        await parent_dashboard_client.get_current_parent_all_students_uploads();
+        await parent_dashboard_client.get_current_parent_all_students_uploads(studentId);
       if (res.ok) {
+        if (requestId !== undefined && requestId !== studentRequestRef.current) return;
         const new_uploads_list: TeacherUpload[] = res.data;
         setUploads(new_uploads_list);
       } else {
@@ -133,11 +139,12 @@ const ParentDashboard: React.FC = () => {
     }
   };
 
-  const current_parent_students_absences = async () => {
+  const current_parent_students_absences = async (studentId: string, requestId?: number) => {
     try {
       const res =
-        await parent_dashboard_client.current_parent_students_absences();
+        await parent_dashboard_client.current_parent_students_absences(studentId);
       if (res.ok) {
+        if (requestId !== undefined && requestId !== studentRequestRef.current) return;
         const parent_absences_list: ParentAbsence[] = res.data;
         setParentAbsences(parent_absences_list);
       } else {
@@ -148,11 +155,12 @@ const ParentDashboard: React.FC = () => {
     }
   };
 
-  const get_current_parent_students_performances = async () => {
+  const get_current_parent_students_performances = async (studentId: string, requestId?: number) => {
     try {
       const res =
-        await parent_dashboard_client.get_current_parent_students_performances();
+        await parent_dashboard_client.get_current_parent_students_performances(studentId);
       if (res.ok) {
+        if (requestId !== undefined && requestId !== studentRequestRef.current) return;
         const performances_list: StudentPerformance[] = res.data;
         setStudentPerformances(performances_list);
       } else {
@@ -163,10 +171,11 @@ const ParentDashboard: React.FC = () => {
     }
   };
 
-  const parent_students_events = async () => {
+  const parent_students_events = async (studentId: string, requestId?: number) => {
     try {
-      const res = await parent_dashboard_client.parent_students_events();
+      const res = await parent_dashboard_client.parent_students_events(studentId);
       if (res.ok) {
+        if (requestId !== undefined && requestId !== studentRequestRef.current) return;
         const new_events_list: ParentStudentEvent[] = res.data;
         setParentStudentsEvents(new_events_list);
       } else {
@@ -174,22 +183,6 @@ const ParentDashboard: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching parent student events:", error);
-    }
-  };
-
-  const get_parent_class_groups = async () => {
-    try {
-      const res = await parent_dashboard_client.get_parent_class_groups();
-      if (res.ok && Array.isArray(res.data)) {
-        const class_groups = (res.data as ClassGroupJson[]).map((classGroupJson: ClassGroupJson) =>
-          ClassGroup.formJson(classGroupJson)
-        );
-        setClassGroups(class_groups);
-      } else {
-        console.error("Failed to fetch class groups:", res);
-      }
-    } catch (error) {
-      console.error("Error fetching class groups:", error);
     }
   };
 
@@ -216,29 +209,64 @@ const ParentDashboard: React.FC = () => {
   const { notifications } = useNotifications();
 
   useEffect(() => {
-    get_current_parent_students();
-    get_current_parent_all_students_uploads();
-    current_parent_students_absences();
-    get_current_parent_students_performances();
-    parent_students_events();
-    get_parent_class_groups();
+    void get_current_parent_students();
 
     //? chat
-    get_current_parent_schools_teachers();
+    void get_current_parent_schools_teachers();
 
     //?
   }, []);
 
   useEffect(() => {
-    get_current_parent_monthly_evaluations();
+    if (!students.length) return;
+
+    const selectedStillExists = students.some(
+      (student) => student.student_id === selectedStudentId
+    );
+    if (!selectedStillExists) {
+      setSelectedStudentId(students[0]!.student_id);
+    }
+  }, [students, selectedStudentId]);
+
+  useEffect(() => {
+    if (!selectedStudentId) return;
+
+    let isCancelled = false;
+    const requestId = studentRequestRef.current + 1;
+    studentRequestRef.current = requestId;
+
+    const loadStudentScope = async () => {
+      setIsLoadingStudentScope(true);
+      await Promise.all([
+        get_current_parent_monthly_evaluations(selectedStudentId, requestId),
+        get_current_parent_all_students_uploads(selectedStudentId, requestId),
+        current_parent_students_absences(selectedStudentId, requestId),
+        get_current_parent_students_performances(selectedStudentId, requestId),
+        parent_students_events(selectedStudentId, requestId),
+      ]);
+      if (!isCancelled && requestId === studentRequestRef.current) {
+        setIsLoadingStudentScope(false);
+      }
+    };
+
+    void loadStudentScope();
+
     const intervalId = window.setInterval(() => {
-      get_current_parent_monthly_evaluations();
+      void get_current_parent_monthly_evaluations(selectedStudentId, requestId);
     }, 60000);
 
     return () => {
+      isCancelled = true;
       window.clearInterval(intervalId);
     };
-  }, []);
+  }, [selectedStudentId]);
+
+  const selectedStudent = useMemo(
+    () => students.find((student) => student.student_id === selectedStudentId) ?? null,
+    [selectedStudentId, students]
+  );
+
+  const selectedStudents = selectedStudent ? [selectedStudent] : [];
 
   const one_student_absences = (s: Student) => {
     const parent_absence = parent_absences.find(
@@ -249,13 +277,10 @@ const ParentDashboard: React.FC = () => {
     return total_absences;
   };
   const total_absences = () => {
-    let absences_num = 0;
-
-    parent_absences.forEach((parent_absence) => {
-      absences_num += parent_absence.abscences.length;
-    });
-
-    return absences_num;
+    return parent_absences.reduce(
+      (absences_num, parent_absence) => absences_num + parent_absence.abscences.length,
+      0
+    );
   };
   const stats = [
     { title: getTranslation("myChildren", language), value: students.length || "0", icon: UserIcon, color: "bg-primary-500", tab: "children" },
@@ -385,7 +410,7 @@ const ParentDashboard: React.FC = () => {
       label: getTranslation("timetable", language),
       icon: LayoutGrid,
     },
-    // { id: "grades", label: getTranslation("grade", language), icon: FileText },
+    { id: "grades", label: getTranslation("gradeReports", language), icon: FileText },
     {
       id: "evaluations",
       label: getTranslation("monthlyEvaluation", language),
@@ -426,31 +451,31 @@ const ParentDashboard: React.FC = () => {
       case "children":
         return (
           <ChildrenOverview
-            students={students ?? []}
+            students={selectedStudents}
             one_student_absences={one_student_absences}
             setActiveTab={setActiveTab}
             studentPerformances={studentPerformances}
           />
         );
-      // case "grades":
-      //   return (
-      //     <div className="space-y-6">
-      //       <GradeReports
-      //         students={students}
-      //         studentPerformances={studentPerformances}
-      //       />
-      //     </div>
-      //   );
+      case "grades":
+        return (
+          <div className="space-y-6">
+            <GradeReports
+              students={selectedStudents}
+              studentPerformances={studentPerformances}
+            />
+          </div>
+        );
       case "evaluations":
         return (
           <MonthlyEvaluationSection evaluations={monthlyEvaluations} />
         );
       case "kid_absences":
         return (
-          <ParentAttendanceTab students={students} />
+          <ParentAttendanceTab students={selectedStudents} selectedStudentId={selectedStudentId} />
         );
       case "behaviour_reports":
-        return <ParentBehaviourReportsTab students={students} />;
+        return <ParentBehaviourReportsTab students={selectedStudents} selectedStudentId={selectedStudentId} />;
       case "chat":
         return (
           <ParentChat
@@ -458,6 +483,7 @@ const ParentDashboard: React.FC = () => {
             teachers_list={teachers_list}
             parent_id={parent_id ?? 0}
             students={students}
+            selectedStudentId={selectedStudentId}
           />
         );
       case "announcements":
@@ -465,14 +491,13 @@ const ParentDashboard: React.FC = () => {
       case "timetable":
         return (
           <ScheduleManagement
-            students={students}
-            class_groups_list={class_groups}
-            setClassGroupList={setClassGroups}
+            students={selectedStudents}
+            selectedStudentId={selectedStudentId}
           />
         );
 
       case "homework":
-        return <ParentHomeworks />;
+        return <ParentHomeworks selectedStudentId={selectedStudentId} />;
       case "calendar":
         return <ResourceLibrary uploads={uploads} />;
       case "events":
@@ -536,17 +561,17 @@ const ParentDashboard: React.FC = () => {
               </div>
 
               <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-7">
-                {isLoadingStudents || isLoadingMonthlyEvaluations ? (
+                {isLoadingStudents || isLoadingMonthlyEvaluations || isLoadingStudentScope ? (
                   <div className="col-span-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 animate-pulse">
                     <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4" />
                     <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
                   </div>
-                ) : students.length === 0 ? (
+                ) : selectedStudents.length === 0 ? (
                   <div className="col-span-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
                     {getTranslation("noStudentsFound", language)}
                   </div>
                 ) : (
-                  students.map((child, index) => {
+                  selectedStudents.map((child, index) => {
                     const studentId = String(child.student_id);
                     const summary = buildPerformanceSummary(studentId);
                     const overallMark = summary.overallAverage;
@@ -847,6 +872,45 @@ const ParentDashboard: React.FC = () => {
       activeTab={activeTab}
       onTabChange={setActiveTab}
     >
+      {students.length > 0 && (
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                {getTranslation("selectStudent", language)}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {selectedStudent?.full_name ?? getTranslation("selectStudentPrompt", language)}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:justify-end">
+              {students.map((student) => {
+                const isActive = student.student_id === selectedStudentId;
+                return (
+                  <button
+                    key={student.student_id}
+                    type="button"
+                    onClick={() => setSelectedStudentId(student.student_id)}
+                    className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                      isActive
+                        ? "border-primary-500 bg-primary-500 text-white"
+                        : "border-gray-300 bg-white text-gray-700 hover:border-primary-300 hover:text-primary-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-primary-500 dark:hover:text-primary-300"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    {student.full_name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {isLoadingStudentScope && (
+            <div className="mt-3 h-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
+              <div className="h-full w-1/3 animate-pulse rounded-full bg-primary-500" />
+            </div>
+          )}
+        </div>
+      )}
       {renderContent()}
     </DashboardLayout>
   );

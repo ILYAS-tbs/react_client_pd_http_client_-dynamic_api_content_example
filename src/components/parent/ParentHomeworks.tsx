@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
   Clock,
@@ -97,27 +97,36 @@ function HomeworkCard({ hw, language }: HomeworkCardProps) {
   );
 }
 
-const ParentHomeworks: React.FC = () => {
+interface ParentHomeworksProps {
+  selectedStudentId?: string | null;
+}
+
+const ParentHomeworks: React.FC<ParentHomeworksProps> = ({ selectedStudentId }) => {
   const { language } = useLanguage();
   const [groups, setGroups] = useState<StudentHomeworkGroup[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeStudent, setActiveStudent] = useState<string>("");
 
   useEffect(() => {
     async function load() {
+      if (!selectedStudentId) {
+        setGroups([]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
-      const res = await homework_client.getParentHomeworksByStudent();
+      const res = await homework_client.getParentHomeworksByStudent(selectedStudentId);
       if (res.ok) {
         setGroups(res.data);
-        const firstGroup = res.data[0];
-        if (firstGroup) setActiveStudent(firstGroup.student_id);
+      } else {
+        setGroups([]);
       }
       setLoading(false);
     }
-    load();
-  }, []);
+    void load();
+  }, [selectedStudentId]);
 
-  const currentGroup = groups.find((g) => g.student_id === activeStudent);
+  const currentGroup = useMemo(() => groups[0], [groups]);
 
   return (
     <div className="space-y-6">
@@ -147,25 +156,6 @@ const ParentHomeworks: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* Student tabs */}
-          {groups.length > 1 && (
-            <div className="flex gap-2 flex-wrap">
-              {groups.map((g) => (
-                <button
-                  key={g.student_id}
-                  onClick={() => setActiveStudent(g.student_id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeStudent === g.student_id
-                      ? "bg-primary-500 text-white"
-                      : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  {g.student_name}
-                </button>
-              ))}
-            </div>
-          )}
-
           {currentGroup && (
             <>
               <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">

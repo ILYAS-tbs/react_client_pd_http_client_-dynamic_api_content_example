@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Calendar, Search, Star, Eye } from "lucide-react";
 import { ActivitiesViewProps } from "../../types";
 import { ParentStudentEvent } from "../../models/ParentStudentEvent";
@@ -102,8 +102,9 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
     );
   }
 
-  const [activities] = useState<Activity[]>(
-    mapTpActivities(parentStudentsEvents)
+  const activities = useMemo(
+    () => mapTpActivities(parentStudentsEvents),
+    [parentStudentsEvents]
   );
 
   const [searchTerm, setSearchTerm] = useState("");

@@ -10,6 +10,7 @@ import { getTranslation, getMediaUrl } from "../../utils/translations";
 
 const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
   students,
+  selectedStudentId,
 }) => {
   const { language } = useLanguage();
 
@@ -19,13 +20,18 @@ const ScheduleManagement: React.FC<ScheduleManagementParentProps> = ({
 
   useEffect(() => {
     const fetch = async () => {
+      if (!selectedStudentId) {
+        setSchedules([]);
+        return;
+      }
+
       setLoading(true);
-      const res = await parent_dashboard_client.get_current_parent_schedules();
+      const res = await parent_dashboard_client.get_current_parent_schedules(selectedStudentId);
       if (res.ok) setSchedules(res.data as Schedule[]);
       setLoading(false);
     };
-    fetch();
-  }, []);
+    void fetch();
+  }, [selectedStudentId]);
 
   // Enrich each schedule with the matching child's name
   interface ScheduleRow {

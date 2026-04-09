@@ -4047,6 +4047,18 @@ export const translations: Translations = {
   saving: { ar: "جارٍ الحفظ...", en: "Saving...", fr: "Enregistrement..." },
   addSubmission: { ar: "إضافة تسليم", en: "Add Submission", fr: "Ajouter une soumission" },
   editSubmission: { ar: "تعديل التسليم", en: "Edit Submission", fr: "Modifier la soumission" },
+
+  // Missing keys for ChildrenOverview
+  days: {
+    ar: "أيام",
+    en: "days",
+    fr: "jours",
+  },
+  attendance: {
+    ar: "الحضور",
+    en: "Attendance",
+    fr: "Présence",
+  },
 };
 
 export function getTranslation(key: string, language: string): string {

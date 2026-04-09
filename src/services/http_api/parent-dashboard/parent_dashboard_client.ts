@@ -28,6 +28,12 @@ const URLS = {
   get_current_parent_schedules: `${BASE_URL}/parent/parents/get_current_parent_schedules/`,
 };
 
+function withStudentId(url: string, studentId?: string | null): string {
+  if (!studentId) return url;
+  const params = new URLSearchParams({ student_id: studentId });
+  return `${url}?${params.toString()}`;
+}
+
 async function get_current_parent_students(): Promise<ApiResult<Student[]>> {
   try {
     const response = await fetch(URLS.get_current_parent_students, {
@@ -68,9 +74,9 @@ async function get_current_parent_behaviour_reports(): Promise<ApiResult<Behavio
     return { ok: false, error };
   }
 }
-async function get_current_parent_monthly_evaluations(): Promise<ApiResult<MonthlyEvaluation[]>> {
+async function get_current_parent_monthly_evaluations(studentId: string): Promise<ApiResult<MonthlyEvaluation[]>> {
   try {
-    const response = await fetch(URLS.get_current_parent_monthly_evaluations, {
+    const response = await fetch(withStudentId(URLS.get_current_parent_monthly_evaluations, studentId), {
       method: "GET",
       credentials: "include",
     });
@@ -81,9 +87,9 @@ async function get_current_parent_monthly_evaluations(): Promise<ApiResult<Month
     return { ok: false, error };
   }
 }
-async function get_current_parent_all_students_uploads(): Promise<ApiResult<TeacherUpload[]>> {
+async function get_current_parent_all_students_uploads(studentId: string): Promise<ApiResult<TeacherUpload[]>> {
   try {
-    const response = await fetch(URLS.get_current_parent_all_students_uploads, {
+    const response = await fetch(withStudentId(URLS.get_current_parent_all_students_uploads, studentId), {
       method: "GET",
       credentials: "include",
     });
@@ -94,9 +100,9 @@ async function get_current_parent_all_students_uploads(): Promise<ApiResult<Teac
     return { ok: false, error };
   }
 }
-async function current_parent_students_absences(): Promise<ApiResult<ParentAbsence[]>> {
+async function current_parent_students_absences(studentId: string): Promise<ApiResult<ParentAbsence[]>> {
   try {
-    const response = await fetch(URLS.current_parent_students_absences, {
+    const response = await fetch(withStudentId(URLS.current_parent_students_absences, studentId), {
       method: "GET",
       credentials: "include",
     });
@@ -108,10 +114,10 @@ async function current_parent_students_absences(): Promise<ApiResult<ParentAbsen
   }
 }
 
-async function get_current_parent_students_performances(): Promise<ApiResult<StudentPerformance[]>> {
+async function get_current_parent_students_performances(studentId: string): Promise<ApiResult<StudentPerformance[]>> {
   try {
     const response = await fetch(
-      URLS.get_current_parent_students_performances,
+      withStudentId(URLS.get_current_parent_students_performances, studentId),
       {
         method: "GET",
         credentials: "include",
@@ -124,9 +130,9 @@ async function get_current_parent_students_performances(): Promise<ApiResult<Stu
     return { ok: false, error };
   }
 }
-async function parent_students_events(): Promise<ApiResult<ParentStudentEvent[]>> {
+async function parent_students_events(studentId: string): Promise<ApiResult<ParentStudentEvent[]>> {
   try {
-    const response = await fetch(URLS.parent_students_events, {
+    const response = await fetch(withStudentId(URLS.parent_students_events, studentId), {
       method: "GET",
       credentials: "include",
     });
@@ -184,9 +190,9 @@ async function post_absence_report(
 }
 import { Schedule } from "../../../models/Schedule";
 
-async function get_current_parent_schedules(): Promise<ApiResult<Schedule[]>> {
+async function get_current_parent_schedules(studentId: string): Promise<ApiResult<Schedule[]>> {
   try {
-    const response = await fetch(URLS.get_current_parent_schedules, {
+    const response = await fetch(withStudentId(URLS.get_current_parent_schedules, studentId), {
       method: "GET",
       credentials: "include",
     });

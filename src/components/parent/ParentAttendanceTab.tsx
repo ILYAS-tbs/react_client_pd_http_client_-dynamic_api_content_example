@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Calendar, Download, Upload } from "lucide-react";
 import { Student } from "../../models/Student";
 import { AttendanceAbsence } from "../../models/Attendance";
@@ -9,9 +9,10 @@ import { useLanguage } from "../../contexts/LanguageContext";
 
 interface ParentAttendanceTabProps {
   students: Student[];
+  selectedStudentId?: string | null;
 }
 
-const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students }) => {
+const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, selectedStudentId }) => {
   const { language } = useLanguage();
   const [absences, setAbsences] = useState<AttendanceAbsence[]>([]);
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
@@ -20,14 +21,22 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students }) =
   const [file, setFile] = useState<File | null>(null);
   const [activeSection, setActiveSection] = useState<"absences" | "history">("absences");
 
-  const loadAbsences = async () => {
-    const res = await attendance_client.listAbsences({ include_deleted: true });
+  const loadAbsences = useCallback(async () => {
+    if (!selectedStudentId) {
+      setAbsences([]);
+      return;
+    }
+
+    const res = await attendance_client.listAbsences({
+      include_deleted: true,
+      student: selectedStudentId,
+    });
     if (res.ok) setAbsences(res.data);
-  };
+  }, [selectedStudentId]);
 
   useEffect(() => {
     void loadAbsences();
-  }, []);
+  }, [selectedStudentId]);
 
   const grouped = useMemo(() => {
     return students.map((student) => {

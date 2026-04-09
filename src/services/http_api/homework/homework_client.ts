@@ -74,11 +74,15 @@ export async function deleteHomework(id: string): Promise<ApiResult<void>> {
 
 // ─── Parent endpoints ─────────────────────────────────────────────────────────
 
-export async function getParentHomeworksByStudent(): Promise<
+export async function getParentHomeworksByStudent(studentId?: string): Promise<
   ApiResult<StudentHomeworkGroup[]>
 > {
+  const params = new URLSearchParams();
+  if (studentId) {
+    params.set("student_id", studentId);
+  }
   return apiFetch<StudentHomeworkGroup[]>(
-    `${HW_BASE}/parent-homeworks/by-student/`
+    `${HW_BASE}/parent-homeworks/by-student/${params.toString() ? `?${params.toString()}` : ""}`
   );
 }
 
