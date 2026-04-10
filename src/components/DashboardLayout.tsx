@@ -9,6 +9,7 @@ import { timeAgoArabic } from "../lib/timeAgoArabic";
 import NotificationsDropdown from "./Notifications";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getTranslation } from "../utils/translations";
+import VerificationBanner from "./shared/VerificationBanner";
 
 interface Tab {
   id: string;
@@ -59,6 +60,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     // localStorage.setItem('language', newLang); // ✅ Save to localStorage
     // setIsLanguageMenuOpen(false);
   };
+
+  const isUnverified = user?.is_verified === false;
+
   return (
     <div
       className="min-h-screen bg-gray-50 dark:bg-gray-900"
@@ -136,7 +140,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </div>
       </header>
 
-      <div className="flex pt-16 h-[calc(100vh-64px)] overflow-hidden">
+      {/* Verification banner for unverified users */}
+      {isUnverified && (
+        <div className="fixed top-16 left-0 right-0 z-[45]">
+          <VerificationBanner />
+        </div>
+      )}
+
+      <div className={`flex ${isUnverified ? 'pt-[112px]' : 'pt-16'} h-[calc(100vh-64px)] overflow-hidden`}>
         {/* Sidebar - Desktop */}
         <aside className={`hidden lg:block w-64 bg-white dark:bg-gray-800 border-r rtl:border-r-0 rtl:border-l border-gray-200 dark:border-gray-700 overflow-y-auto`}>
           <div className="p-4 space-y-2">

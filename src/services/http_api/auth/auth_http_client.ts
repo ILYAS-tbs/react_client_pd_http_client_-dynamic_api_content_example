@@ -13,17 +13,20 @@ const URLS = {
   SESSION: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
   ROLE: `${SERVER_BASE_URL}/user-auth/get_role`,
   SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/signup`,
-  VERIFY_EMAIL:`${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/email/verify`,
-  VERIFY_EMAIL_RESEND:`${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/email/verify/resend`,
+  VERIFY_EMAIL:`${SERVER_BASE_URL}/user-auth/verify-otp/`,
+  VERIFY_EMAIL_RESEND:`${SERVER_BASE_URL}/user-auth/resend-otp/`,
   TEACHER_SIGNUP: `${SERVER_BASE_URL}/user-auth/_allauth/app/v1/auth/signup`,
-  LOGIN: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/login`,
+  LOGIN: `${SERVER_BASE_URL}/user-auth/login/`,
   LOGOUT: `${SERVER_BASE_URL}/user-auth/_allauth/browser/v1/auth/session`,
   REGISTER_SCHOOL: `${SERVER_BASE_URL}/school/register-school/`,
   REGISTER_PARENT: `${SERVER_BASE_URL}/parent/register-parent/`,
   REGISTER_TEACHER: `${SERVER_BASE_URL}/teacher/register-teacher/`,
 
   REGISTER_WITH_ROLE: `${SERVER_BASE_URL}/user-auth/register-with-role/`,
-  DeleteSession:`${SERVER_BASE_URL}/user-auth/delete-session/`
+  DeleteSession:`${SERVER_BASE_URL}/user-auth/delete-session/`,
+
+  VERIFICATION_STATUS: `${SERVER_BASE_URL}/user-auth/verification-status/`,
+  RESEND_OTP: `${SERVER_BASE_URL}/user-auth/resend-otp/`,
 };
 async function handleDeleteSession() {
  try {
@@ -287,6 +290,45 @@ async function register_with_role(
   }
 }
 
+async function get_verification_status(): Promise<{
+  ok: boolean;
+  is_verified?: boolean;
+  email?: string;
+  role?: string;
+  error?: unknown;
+}> {
+  try {
+    const response = await fetch(URLS.VERIFICATION_STATUS, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, ...data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function resend_otp(csrfToken: string) {
+  if (!csrfToken) {
+    throw new Error("CSRF Token is empty or null");
+  }
+  try {
+    const response = await fetch(URLS.RESEND_OTP, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 export const auth_http_client = {
   signup: signup,
   register_with_role: register_with_role,
@@ -299,6 +341,8 @@ export const auth_http_client = {
   register_parent: register_parent,
   register_Teacher: register_Teacher,
   get_role: get_role,
+  get_verification_status: get_verification_status,
+  resend_otp: resend_otp,
 
   handleDeleteSession:handleDeleteSession
 };

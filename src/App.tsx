@@ -48,6 +48,10 @@ function App() {
                     path="/confirmation-code"
                     element={<ConfirmationCode />}
                   />
+                  <Route
+                    path="/verify-account"
+                    element={<ConfirmationCode />}
+                  />
 
                   <Route
                     path="/admin"

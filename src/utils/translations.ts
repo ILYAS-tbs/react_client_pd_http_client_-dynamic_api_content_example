@@ -25,6 +25,11 @@ export const translations: Translations = {
     en: "Home",
     fr: "Accueil",
   },
+  verifyYourEmail: {
+    ar: "تحقق من بريدك الإلكتروني",
+    en: "Verify Your Email",
+    fr: "Vérifiez votre email",
+  },
   about: {
     ar: "من نحن",
     en: "About Us",
@@ -35,10 +40,20 @@ export const translations: Translations = {
     en: "Our Services",
     fr: "Nos Services",
   },
+  checkSpamIfNotReceived: {
+    ar: "تحقق من مجلد الرسائل غير المرغوب فيها إذا لم يصلك الرمز.",
+    en: "Check spam if not received.",
+    fr: "Vérifiez les courriers indésirables si vous ne l'avez pas reçu.",
+  },
   pricing: {
     ar: "الأسعار",
     en: "Pricing",
     fr: "Tarifs",
+  },
+  resendAvailableIn: {
+    ar: "إعادة الإرسال متاحة خلال",
+    en: "Resend available in",
+    fr: "Renvoi disponible dans",
   },
   contact: {
     ar: "اتصل بنا",
@@ -49,6 +64,16 @@ export const translations: Translations = {
     ar: "تسجيل الدخول",
     en: "Login",
     fr: "Connexion",
+  },
+  newOtpSent: {
+    ar: "تم إرسال رمز تحقق جديد.",
+    en: "New OTP sent.",
+    fr: "Nouveau code OTP envoyé.",
+  },
+  waitBeforeAnotherOtp: {
+    ar: "يرجى الانتظار قبل طلب رمز تحقق جديد.",
+    en: "Please wait before requesting another OTP.",
+    fr: "Veuillez patienter avant de demander un nouveau code OTP.",
   },
   register: {
     ar: "إنشاء حساب",
@@ -961,6 +986,21 @@ export const translations: Translations = {
     ar: "العودة إلى تسجيل الدخول",
     en: "Back to login",
     fr: "Retour à la connexion",
+  },
+  accountNotVerifiedBanner: {
+    ar: "لم يتم تفعيل حسابك. يُرجى التحقق من بريدك الإلكتروني وإدخال رمز التحقق لتفعيل حسابك.",
+    en: "Your account is not verified. Please check your email and enter the OTP code to activate your account.",
+    fr: "Votre compte n'est pas vérifié. Veuillez vérifier votre email et entrer le code OTP pour activer votre compte.",
+  },
+  accountLockedTitle: {
+    ar: "الحساب غير مُفعّل",
+    en: "Account Not Activated",
+    fr: "Compte non activé",
+  },
+  accountLockedDescription: {
+    ar: "يُرجى تأكيد بريدك الإلكتروني لفتح جميع ميزات المنصة. تحقق من صندوق الوارد للحصول على رمز التحقق.",
+    en: "Please verify your email to unlock all platform features. Check your inbox for the verification code.",
+    fr: "Veuillez vérifier votre email pour débloquer toutes les fonctionnalités de la plateforme. Vérifiez votre boîte de réception pour le code de vérification.",
   },
   //?: My translations :
 

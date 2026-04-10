@@ -30,7 +30,7 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
   const navigate = useNavigate();
-  const { setUserData } = useAuth();
+  const { setUserData, register, logout } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -54,7 +54,6 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
   const [selectedCommune, setSelectedCommune] = useState("");
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
-  const { register } = useAuth();
   const { t, isRTL } = useLanguage();
 
   useEffect(() => {
@@ -109,8 +108,6 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
 
 
 
-  const { logout } = useAuth();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -118,9 +115,9 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
     setSuccess("");
 
     try {
-      logout();
+      await logout();
 
-      const success = await register(
+      const registeredUser = await register(
         {
           ...formData,
           role: formData.role === "school" ? "school" : formData.role,
@@ -129,7 +126,7 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
       );
       localStorage.setItem("role", formData.role)
 
-      if (success) {
+      if (registeredUser) {
         setUserData({
           name: formData.name,
           email: formData.email,
@@ -145,30 +142,14 @@ const Register: React.FC<RegisterProps> = ({ isOpen = true }) => {
         });
 
         setSuccess(t("registrationSuccess") || "Successfully signed up!");
-        navigate("/confirmation-code");
 
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          role: "parent",
-          schoolType: "public",
-          school_level: "",
-          phone: "",
-          wilaya: "",
-          commune: "",
-          numberOfChildren: 1,
-          children: [
-            { fullName: "", dateOfBirth: "", schoolName: "", grade: "" },
-          ],
-        });
-        setSelectedWilaya("");
-        setSelectedCommune("");
+        // register() stored user in localStorage + React state.
+        // Navigate to the dashboard using the role from the returned user.
+        navigate(`/${registeredUser.role}-dashboard`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration failed:", error);
-      setError(t("registrationFailed") || "Registration failed");
+      setError(error?.message || t("registrationFailed") || "Registration failed");
     } finally {
       setIsLoading(false);
     }

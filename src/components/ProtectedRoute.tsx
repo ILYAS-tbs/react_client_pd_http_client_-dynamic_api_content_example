@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth, User } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -23,18 +23,29 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (!user) {
+  // Fallback: if React state hasn't flushed yet, try localStorage.
+  // This covers the edge case after register() where navigate fires
+  // before the batched setUser update is committed.
+  let effectiveUser: User | null = user;
+  if (!effectiveUser) {
+    try {
+      const stored = localStorage.getItem("schoolParentOrTeacherManagementUser");
+      if (stored) effectiveUser = JSON.parse(stored) as User;
+    } catch { /* ignore parse errors */ }
+  }
+
+  if (!effectiveUser) {
     return <Navigate to="/login" replace />;
   }
 
   // If admin access is required, check if user is admin
   if (requireAdmin) {
-    if (!user.is_admin) {
-      return <Navigate to={`/${user.role}-dashboard`} replace />;
+    if (!effectiveUser.is_admin) {
+      return <Navigate to={`/${effectiveUser.role}-dashboard`} replace />;
     }
-  } else if (allowedRoles && !allowedRoles.includes(user.role)) {
+  } else if (allowedRoles && !allowedRoles.includes(effectiveUser.role)) {
     // If role-based access, check role
-    const path = `/${user.role}-dashboard`;
+    const path = `/${effectiveUser.role}-dashboard`;
     return <Navigate to={path} replace />;
   }
 

@@ -11,7 +11,6 @@ import {
   LoginPayload,
   RegisterWithRolePayload,
 } from "../services/http_api/payloads_types/school_client_payload_types";
-import { BackendUser } from "../models/BackendUser";
 import { SERVER_BASE_URL } from "../services/http_api/server_constants";
 
 export interface User {
@@ -22,6 +21,7 @@ export interface User {
   schoolId?: string;
   schoolType?: "public" | "private";
   is_admin?: boolean;
+  is_verified?: boolean;
 }
 export interface UserData {
   commune?: string;
@@ -58,9 +58,10 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<LoginResponse>;
-  register: (userData: any, isCreatingSchool: boolean) => Promise<boolean>;
+  register: (userData: any, isCreatingSchool: boolean) => Promise<User>;
   logout: () => void;
   isLoading: boolean;
+  refreshVerificationStatus: () => Promise<void>;
 
   // just to change the role again after login,
   change_role: (role: "school" | "teacher" | "parent" | "super-admin") => void;
@@ -85,13 +86,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
+    // Hydrate user from localStorage, then verify the session is still valid.
     const savedUser = localStorage.getItem(
       "schoolParentOrTeacherManagementUser"
     );
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsed = JSON.parse(savedUser);
+        setUser(parsed);
       } catch (error) {
         console.error("Failed to parse stored user session", error);
         localStorage.removeItem("schoolParentOrTeacherManagementUser");
@@ -107,10 +109,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   ): Promise<LoginResponse> => {
     setIsLoading(true);
 
-    // Mock authentication - in production, this would be an API call
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    //!1. Real login
     const latest_csrf = getCSRFToken()!;
     const login_payload: LoginPayload = {
       username: email,
@@ -119,71 +117,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
     const result = await auth_http_client.login(login_payload, latest_csrf);
 
-
     if (!result.ok) {
-      console.log("RESPONSE NOT OK");
-      // Detect allauth 401 with verify_email flow (unverified email)
-      const flows = result.data?.data?.flows;
-      if (
-        result.status === 401 &&
-        Array.isArray(flows) &&
-        flows.some((f: any) => f.id === "verify_email" && f.is_pending)
-      ) {
-        return { ok: false, status: 401, emailNotVerified: true };
-      }
-      return { ok: false, status: result.status, error: result.error };
+      setIsLoading(false);
+      return { ok: false, status: result.status, error: result.data?.detail || result.error };
     }
-    console.log("Login Succeful");
-    console.log(result.data);
 
-    const backend_user: BackendUser = result.data;
-    console.log(`backend user${JSON.stringify(backend_user)}`);
-
-    //! API CALL 2 :  Get the user Role
-    const role_data = await auth_http_client.get_role();
-    const role_from_server = role_data.role; // actual role from server
-
-    change_role(role_from_server); // auth context rule
+    // Custom login endpoint returns clean JSON:
+    // { id, email, username, role, is_verified }
+    const loginData = result.data;
 
     // Check if user is an admin
     let is_admin = false;
     try {
       const admin_check = await fetch(
         `${SERVER_BASE_URL}/api/admin/overview/stats/`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
+        { method: "GET", credentials: "include" }
       );
-      // If successful (200-299), user has admin access
       is_admin = admin_check.ok;
-      console.log(`Admin check status: ${admin_check.status}, is_admin: ${is_admin}`);
-    } catch (error) {
-      console.log("No admin access - error:", error);
-      is_admin = false;
-    }
+    } catch { is_admin = false; }
 
     const newUser: User = {
-      id: backend_user?.data.user.id.toString() ?? "-1",
-      name: backend_user.data.user.username,
-      email: backend_user.data.user.email || "NO EMAIL!",
-      role: role_from_server as "school" | "teacher" | "parent" | "super-admin",
-      is_admin: is_admin,
-      // schoolId: role_from_server !== "school" ? "school-1" : undefined,
-      // schoolType: role_from_server === "school" ? "private" : undefined,
+      id: loginData.id?.toString() ?? "-1",
+      name: loginData.username || email,
+      email: loginData.email || email,
+      role: loginData.role as "school" | "teacher" | "parent" | "super-admin",
+      is_admin,
+      is_verified: loginData.is_verified ?? false,
     };
 
-    console.log(`user`);
-    console.log(newUser);
-
-    setUser(newUser);
     localStorage.setItem(
       "schoolParentOrTeacherManagementUser",
       JSON.stringify(newUser)
     );
+    setUser(newUser);
     setIsLoading(false);
 
-    return { ok: result.ok, status: result.status, user: newUser };
+    return { ok: true, status: result.status, user: newUser };
   };
 
   function change_role(role: "school" | "teacher" | "parent" | "super-admin") {
@@ -218,7 +187,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const register = async (
     userData: UserData
-  ): Promise<boolean> => {
+  ): Promise<User> => {
     setIsLoading(true);
 
     // Atomic signup: User + Role created in a single backend call
@@ -253,9 +222,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       throw new Error(result.data?.error || "Registration failed");
     }
 
+    // register_with_role already called auth_login() on the backend,
+    // so we have an active session. Set up frontend user state directly.
+    const role = isSchool ? "school" : "parent";
+    const newUser: User = {
+      id: result.data?.user_id?.toString() ?? "-1",
+      name: userData.name || userData.email,
+      email: userData.email,
+      role: role as "school" | "parent",
+      is_admin: false,
+      is_verified: false,
+    };
+
+    // Persist to localStorage FIRST so ProtectedRoute can hydrate
+    // even if React state hasn't flushed by the time the route renders.
+    localStorage.setItem(
+      "schoolParentOrTeacherManagementUser",
+      JSON.stringify(newUser)
+    );
+    setUser(newUser);
     setUserData(userData);
     setIsLoading(false);
-    return true;
+    return newUser;
   };
 
   const logout = async () => {
@@ -269,9 +257,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     console.log(res);
   };
 
+  const refreshVerificationStatus = async () => {
+    const res = await auth_http_client.get_verification_status();
+    if (res.ok && res.is_verified && user) {
+      const updatedUser = { ...user, is_verified: true };
+      setUser(updatedUser);
+      localStorage.setItem(
+        "schoolParentOrTeacherManagementUser",
+        JSON.stringify(updatedUser)
+      );
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, userData, setUserData, login, register, logout, isLoading, change_role }}
+      value={{ user, userData, setUserData, login, register, logout, isLoading, change_role, refreshVerificationStatus }}
     >
       {children}
     </AuthContext.Provider>

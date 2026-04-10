@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { X, Mail, RefreshCw } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
-import { auth_http_client } from '../services/http_api/auth/auth_http_client';
-import { getCSRFToken } from '../lib/get_CSRFToken';
-import { RegisterParentPayload, RegisterSchoolPayload, VefiryEmailPayload } from '../services/http_api/payloads_types/school_client_payload_types';
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { CheckCircle, Mail, RefreshCw, X } from "lucide-react";
+
+import { useAuth } from "../contexts/AuthContext";
+import { useLanguage } from "../contexts/LanguageContext";
+import { getCSRFToken } from "../lib/get_CSRFToken";
+import { auth_http_client } from "../services/http_api/auth/auth_http_client";
+import { VefiryEmailPayload } from "../services/http_api/payloads_types/school_client_payload_types";
 
 interface ConfirmationCodeProps {
   isOpen?: boolean;
@@ -14,219 +15,173 @@ interface ConfirmationCodeProps {
 }
 
 const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onClose, email }) => {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const { user, refreshVerificationStatus } = useAuth();
+  const { t, isRTL } = useLanguage();
+  const navigate = useNavigate();
+
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState(10); // 10 seconds
-  const [canResend, setCanResend] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [toast, setToast] = useState("");
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [canResend, setCanResend] = useState(true);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const navigate = useNavigate();
-  const { t, language, isRTL } = useLanguage();
+  const currentEmail = email || user?.email || "";
 
-  //! For Login here : 
-  const { login, change_role, logout } = useAuth();
-
-
-  // Timer for resend functionality
   useEffect(() => {
     if (timeLeft > 0) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
+      const timer = window.setTimeout(() => setTimeLeft((current) => current - 1), 1000);
+      return () => window.clearTimeout(timer);
+    }
+
+    if (!canResend) {
       setCanResend(true);
     }
-  }, [timeLeft]);
 
-  // Format time display
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return undefined;
+  }, [timeLeft, canResend]);
+
+  useEffect(() => {
+    if (!toast) {
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setToast(""), 3000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  const startCooldown = (seconds?: number) => {
+    const nextValue = Math.max(0, Number(seconds) || 0);
+    setTimeLeft(nextValue);
+    setCanResend(nextValue === 0);
+  };
+
+  const resetOtpInput = () => {
+    setCode(["", "", "", "", "", ""]);
+    inputRefs.current[0]?.focus();
   };
 
   const handleInputChange = (index: number, value: string) => {
-    if (value.length > 1) return; // Prevent multiple characters
-    if (!/^[0-9]*$/.test(value)) return; // Only allow numbers
+    if (value.length > 1 || !/^[0-9]*$/.test(value)) {
+      return;
+    }
 
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-    setError('');
-    setSuccess('');
+    const nextCode = [...code];
+    nextCode[index] = value;
+    setCode(nextCode);
+    setError("");
+    setSuccess("");
 
-    // Move to next input if value entered
-    if (value && index < 5) {
+    if (value && index < nextCode.length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-submit when all fields are filled
-    if (newCode.every(digit => digit !== '') && value) {
-      setTimeout(() => handleSubmit(newCode.join('')), 100);
+    if (value && nextCode.every((digit) => digit !== "")) {
+      window.setTimeout(() => {
+        void handleSubmit(nextCode.join(""));
+      }, 100);
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    // Move to previous input on backspace if current input is empty
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
+  const handleKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Backspace" && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
-    // Move to next input on arrow right
-    if (e.key === 'ArrowRight' && index < 5) {
+    if (event.key === "ArrowRight" && index < code.length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
-    // Move to previous input on arrow left
-    if (e.key === 'ArrowLeft' && index > 0) {
+    if (event.key === "ArrowLeft" && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (pastedData.length === 6) {
-      const newCode = pastedData.split('');
-      setCode(newCode);
-      setError('');
-      setSuccess('');
-      // Auto-submit pasted code
-      setTimeout(() => handleSubmit(pastedData), 100);
+  const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const pastedValue = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pastedValue.length !== 6) {
+      return;
     }
+
+    setCode(pastedValue.split(""));
+    setError("");
+    setSuccess("");
+    window.setTimeout(() => {
+      void handleSubmit(pastedValue);
+    }, 100);
   };
 
-  const { userData } = useAuth()
-
-  function showError(duration: number, error: string) {
-    setError(error)
-
-    setTimeout(() => {
-      setError("")
-    }, duration);
-  }
-
-  const handleSubmit = async (codeToSubmit?: string) => {
-    const finalCode = codeToSubmit || code.join('');
-
+  const handleSubmit = async (submittedCode?: string) => {
+    const finalCode = submittedCode || code.join("");
     if (finalCode.length !== 6) {
-      setError(t('incompleteCode') || 'يرجى إدخال الرمز المكون من 6 أرقام كاملاً');
+      setError(t("incompleteCode") || "Please enter the complete 6-digit code");
       return;
     }
 
     setIsLoading(true);
-    //! API CALL : Verify Email
-    const csrfToken = getCSRFToken()!
-    const verify_payload: VefiryEmailPayload = {
-      key: finalCode
-    }
-    const res = await auth_http_client.verify_email(verify_payload, csrfToken)
-
-    setError('');
-    setSuccess('');
-
+    setError("");
+    setSuccess("");
 
     try {
-      const role = localStorage.getItem("role")
+      const csrfToken = getCSRFToken()!;
+      const payload: VefiryEmailPayload = { key: finalCode };
+      const response = await auth_http_client.verify_email(payload, csrfToken);
 
-      // Role record is already created during atomic signup.
-      // The old role-creation endpoints below are kept as idempotent fallbacks
-      // in case the atomic signup was not used (backward compat).
-      const isCreatingSchool = role === "school"
-
-      if (isCreatingSchool) {
-        const school_payload: RegisterSchoolPayload = {
-          school_name: userData?.name ?? "",
-          email: userData?.email ?? "",
-          phone_number: userData?.phone ?? "",
-          school_level: userData?.school_level ?? "",
-          website: "",
-          address: "",
-          wilaya: userData?.wilaya ?? "",
-          commun: userData?.commune ?? "",
-          school_type: userData?.schoolType ?? "public",
-          established_year: 0,
-          description: "",
-        };
-
-        const latest_csrf = getCSRFToken()!
-        // Idempotent: if role was already created during atomic signup, this returns 200
-        await auth_http_client.register_school(school_payload, latest_csrf);
-      } else {
-        const parent_payload: RegisterParentPayload = {
-          full_name: userData?.name ?? "",
-          phone_number: userData?.phone ?? "",
-          address: "",
-          relationship_to_student: "",
-        };
-        const latest_csrf = getCSRFToken()!
-        // Idempotent: if role was already created during atomic signup, this returns 200
-        await auth_http_client.register_parent(parent_payload, latest_csrf);
-      }
-      //! Navigate to the correct Dashboard
-      if (res.ok) {
-        //? Case Of Valid Key-Code 
-        setSuccess(t('emailConfirmed') || 'تم تأكيد البريد الإلكتروني بنجاح!');
-
-        //! Login FLOW (repeated) from (login.tsx)
-        //* Call 00 : logout first - removing the session_id if it was there from signup
-        const logout_res = logout()
-
-        //* call 01 - authenticate user
-        const success_result = await login(userData?.email ?? "", userData?.password ?? "", role ?? "");
-        const user_role = success_result?.user?.role ?? role;
-
-        if (!success_result.ok) {
-          showError(5000, "البريد الإلكتروني أو كلمة المرور غير صحيحة")
-        }
-        if (success_result) {
-          if (user_role) {
-            setTimeout(() => {
-              navigate(`/${user_role}-dashboard`);
-              onClose?.();
-            }, 1500);
-          }
-        }
-
-
+      if (!response.ok) {
+        setError(response.data?.detail || t("invalidCode") || "Invalid or expired code. Please try again.");
+        resetOtpInput();
+        return;
       }
 
-    } catch (error) {
-      console.error('Confirmation failed:', error);
-      setError(t('invalidCode') || 'رمز غير صحيح أو منتهي الصلاحية. يرجى المحاولة مرة أخرى.');
-      // Clear the code on error
-      setCode(['', '', '', '', '', '']);
-      inputRefs.current[0]?.focus();
+      setSuccess(t("emailConfirmed") || "Email confirmed successfully!");
+      await refreshVerificationStatus();
+      window.setTimeout(() => {
+        if (user?.role) {
+          navigate(`/${user.role}-dashboard`);
+        } else {
+          navigate("/login");
+        }
+        onClose?.();
+      }, 1200);
+    } catch {
+      setError(t("invalidCode") || "Invalid or expired code. Please try again.");
+      resetOtpInput();
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResendCode = async () => {
-    if (!canResend || isResending) return;
-
-    //! API CALL (Resend code):
-    const latest_csrf = getCSRFToken()!
-    const res = auth_http_client.verify_email_resend(latest_csrf);
-
-    setTimeLeft(10);
+    if (!canResend || isResending) {
+      return;
+    }
 
     setIsResending(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
-      if (success) {
-        setSuccess(t('codeResent') || 'تم إرسال رمز تأكيد جديد إلى بريدك الإلكتروني');
-        setTimeLeft(300); // Reset timer
-        setCanResend(false);
-        // Clear current code
-        setCode(['', '', '', '', '', '']);
-        inputRefs.current[0]?.focus();
+      const csrfToken = getCSRFToken()!;
+      const response = await auth_http_client.resend_otp(csrfToken);
+
+      if (response.ok) {
+        setSuccess(t("codeResent") || "A new confirmation code has been sent to your email");
+        setToast(t("newOtpSent") || "New OTP sent.");
+        startCooldown(response.data?.cooldown);
+        resetOtpInput();
+        return;
       }
-    } catch (error) {
-      console.error('Resend failed:', error);
-      setError(t('resendFailed') || 'فشل إرسال الرمز. يرجى المحاولة مرة أخرى.');
+
+      if (response.status === 429) {
+        setError(response.data?.detail || t("waitBeforeAnotherOtp") || "Please wait before requesting another OTP.");
+        startCooldown(response.data?.cooldown_remaining);
+        return;
+      }
+
+      setError(response.data?.detail || t("resendFailed") || "Failed to resend code. Please try again.");
+    } catch {
+      setError(t("resendFailed") || "Failed to resend code. Please try again.");
     } finally {
       setIsResending(false);
     }
@@ -235,7 +190,14 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <>
+      {toast && (
+        <div className="fixed top-5 right-5 z-[10000] rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-lg">
+          {toast}
+        </div>
+      )}
+
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -246,7 +208,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
             />
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                {t('confirmEmail') || 'تأكيد البريد الإلكتروني'}
+                {t('verifyYourEmail') || 'Verify Your Email'}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t('confirmEmailSlogan') || 'تحقق من حسابك'}
@@ -291,7 +253,10 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
                 {t('confirmationCodeSent') || 'لقد أرسلنا رمز تأكيد مكون من 6 أرقام إلى'}
               </p>
               <p className="text-sm font-medium text-primary-500">
-                {email || 'عنوان بريدك الإلكتروني'}
+                {currentEmail || 'عنوان بريدك الإلكتروني'}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('checkSpamIfNotReceived') || 'Check spam if not received.'}
               </p>
             </div>
           </div>
@@ -324,11 +289,13 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
           <div className="text-center space-y-3">
             {!canResend ? (
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('resendCodeIn') || 'إعادة إرسال الرمز خلال'} {formatTime(timeLeft)}
+                {t('resendAvailableIn') || 'Resend available in'} {timeLeft}s
               </p>
             ) : (
               <button
-                onClick={handleResendCode}
+                onClick={() => {
+                  void handleResendCode();
+                }}
                 disabled={isResending}
                 className="text-sm text-primary-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1 rtl:space-x-reverse mx-auto"
               >
@@ -345,7 +312,9 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
 
           {/* Manual Submit Button (for accessibility) */}
           <button
-            onClick={() => handleSubmit()}
+            onClick={() => {
+              void handleSubmit();
+            }}
             disabled={isLoading || code.some(digit => digit === '')}
             className={`w-full py-3 px-4 bg-primary-500 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'text-right' : 'text-left'}`}
           >
@@ -372,6 +341,7 @@ const ConfirmationCode: React.FC<ConfirmationCodeProps> = ({ isOpen = true, onCl
         </div>
       </div>
     </div>
+    </>
   );
 };
 
