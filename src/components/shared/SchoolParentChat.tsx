@@ -18,65 +18,6 @@ interface SchoolParentChatProps {
   classGroups: ClassGroup[];
 }
 
-function getTimestampValue(value?: string | null) {
-  if (!value) {
-    return 0;
-  }
-
-  const parsed = new Date(value).getTime();
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function mergeSchoolChatsByParent(items: ContextualChatListItem[]) {
-  const merged = new Map<
-    number,
-    ContextualChatListItem & { __studentNames: string[]; __moduleNames: string[] }
-  >();
-
-  items.forEach((item) => {
-    const existing = merged.get(item.participant_user_id);
-    if (!existing) {
-      merged.set(item.participant_user_id, {
-        ...item,
-        __studentNames: item.student_name ? [item.student_name] : [],
-        __moduleNames: [...item.module_names],
-      });
-      return;
-    }
-
-    const nextTimestamp = getTimestampValue(item.timestamp ?? item.last_message?.timestamp ?? null);
-    const currentTimestamp = getTimestampValue(
-      existing.timestamp ?? existing.last_message?.timestamp ?? null
-    );
-    const nextStudentNames = Array.from(new Set([...existing.__studentNames, item.student_name]));
-    const nextModuleNames = Array.from(new Set([...existing.__moduleNames, ...item.module_names]));
-
-    if (nextTimestamp > currentTimestamp) {
-      merged.set(item.participant_user_id, {
-        ...existing,
-        ...item,
-        unread: existing.unread + item.unread,
-        student_name: nextStudentNames.join(", "),
-        module_names: nextModuleNames,
-        __studentNames: nextStudentNames,
-        __moduleNames: nextModuleNames,
-      });
-      return;
-    }
-
-    merged.set(item.participant_user_id, {
-      ...existing,
-      unread: existing.unread + item.unread,
-      student_name: nextStudentNames.join(", "),
-      module_names: nextModuleNames,
-      __studentNames: nextStudentNames,
-      __moduleNames: nextModuleNames,
-    });
-  });
-
-  return Array.from(merged.values()).map(({ __studentNames, __moduleNames, ...item }) => item);
-}
-
 function mergeChatPages(
   current: ContextualChatListItem[],
   incoming: ContextualChatListItem[],
@@ -183,11 +124,6 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
     filteredStudents.find((student) => student.student_id === selectedStudentId)?.full_name,
   ].filter(Boolean);
 
-  const visibleItems = useMemo(
-    () => mergeSchoolChatsByParent(chatResponse.results),
-    [chatResponse.results]
-  );
-
   return (
     <ContextualChatWorkspace
       title={getTranslation("parents", language)}
@@ -236,7 +172,7 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
           ) : null}
         </div>
       }
-      items={visibleItems}
+      items={chatResponse.results}
       isListLoading={isLoading}
       hasMore={chatResponse.page < chatResponse.total_pages}
       onLoadMore={() => setPage((prev) => prev + 1)}

@@ -131,6 +131,17 @@ const ContextualChatWorkspace: React.FC<ContextualChatWorkspaceProps> = ({
   );
 
   useEffect(() => {
+    if (!selectedChatKey || selectedChat) {
+      return;
+    }
+
+    setSelectedChatKey(null);
+    setConversationId("");
+    setConversationMessages([]);
+    setIsThreadLoading(false);
+  }, [selectedChat, selectedChatKey]);
+
+  useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 

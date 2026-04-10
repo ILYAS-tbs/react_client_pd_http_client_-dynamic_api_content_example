@@ -425,36 +425,48 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
             className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700 max-w-full min-w-0 w-full transition-transform hover:scale-[1.025] overflow-hidden"
             style={{ maxWidth: '370px', margin: '0 auto', wordBreak: 'break-word' }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3 rtl:space-x-reverse min-w-0">
-                {/* Teacher Profile pic if it exists */}
-                {teacher.profile_picture ? (
-                  <img
-                    src={`${SERVER_BASE_URL}${teacher.profile_picture}`}
-                    alt=""
-                    className="rounded-full bg-cover w-[64px] h-[64px] border-2 border-primary-400 object-cover"
-                  />
-                ) : (
-                  <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full">
-                    <UserCheck className="h-6 w-6 text-primary-500" />
-                  </div>
-                )}
-
-                <div className="min-w-0">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate max-w-[180px]">
-                    {teacher.full_name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[180px]">
-                    {teacher.modulesAndClassGroups?.[0]?.module.module_name}
-                  </p>
+            {/* Header with profile and name */}
+            <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4">
+              {/* Teacher Profile pic if it exists */}
+              {teacher.profile_picture ? (
+                <img
+                  src={`${SERVER_BASE_URL}${teacher.profile_picture}`}
+                  alt=""
+                  className="rounded-full bg-cover w-[64px] h-[64px] border-2 border-primary-400 object-cover flex-shrink-0"
+                />
+              ) : (
+                <div className="bg-primary-100 dark:bg-primary-900/20 p-3 rounded-full flex-shrink-0">
+                  {/* <UserCheck className="h-6 w-6 text-primary-500" /> */}
                 </div>
+              )}
+
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">
+                  {teacher.full_name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  {teacher.modulesAndClassGroups?.[0]?.module.module_name}
+                </p>
               </div>
+            </div>
+
+            {/* Email section */}
+            <div className="mb-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+              <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide block mb-1">
+                {getTranslation('email', language)}
+              </span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white break-all block">
+                {teacher.user.email}
+              </span>
+            </div>
+
+            {/* Status badge */}
+            <div className="mb-4">
               <span
-                className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${teacher.status === "نشط" || teacher.status === "active"
+                className={`inline-block px-3 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap w-full text-center ${teacher.status === "نشط" || teacher.status === "active"
                   ? "bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200"
                   : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                   }`}
-                style={{ minWidth: '70px', textAlign: 'center' }}
               >
                 {teacher.status === "نشط" || teacher.status === "active"
                   ? getTranslation('active', language)
@@ -462,7 +474,7 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
               </span>
             </div>
 
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2 mb-4 border-t border-gray-200 dark:border-gray-700 pt-4">
               <div className="flex justify-between items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation('classCount', language)}:
@@ -490,16 +502,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {getTranslation('phoneNumber', language)}:
                 </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px]">
+                <span className="text-sm font-medium text-gray-900 dark:text-white break-all">
                   {teacher.phone_number}
-                </span>
-              </div>
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {getTranslation('email', language)}:
-                </span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white text-left truncate max-w-[150px]">
-                  {teacher.user.email}
                 </span>
               </div>
             </div>
