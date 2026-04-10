@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
   Eye,
   Lock,
   Unlock,
+  Building2,
+  Users,
+  GraduationCap,
+  ShieldCheck,
 } from "lucide-react";
-import { School } from "../../services/http_api/platform-admin/admin_types";
-import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
+import { School, SchoolSummary } from "../../services/http_api/platform-admin/admin_types";
+import { adminApiClient, normalizePaginatedResponse } from "../../services/http_api/platform-admin/admin_api_client";
 import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { StatsGrid } from "./StatsCard";
+import { PaginationControls } from "./PaginationControls";
 
 export const SchoolsManagement: React.FC = () => {
   const { language } = useLanguage();
   const [schools, setSchools] = useState<School[]>([]);
+  const [summary, setSummary] = useState<SchoolSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [totalCount, setTotalCount] = useState(0);
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -62,14 +68,16 @@ export const SchoolsManagement: React.FC = () => {
     if (levelFilter !== "all") filters.school_level = levelFilter;
     if (typeFilter !== "all") filters.school_type = typeFilter;
 
-    const response = await adminApiClient.listSchools(currentPage, 15, filters);
+    const [response, summaryResponse] = await Promise.all([
+      adminApiClient.listSchools(currentPage, pageSize, filters),
+      adminApiClient.getSchoolSummary(filters),
+    ]);
 
-    // Handle both array and paginated object responses
-    const results = Array.isArray(response) ? response : response.results ?? [];
-    const count = Array.isArray(response) ? response.length : response.count ?? 0;
+    const normalized = normalizePaginatedResponse(response);
 
-    setSchools(results);
-    setTotalPages(Math.ceil(count / 15) || 1);
+    setSchools(normalized.results);
+    setTotalCount(normalized.count);
+    setSummary(summaryResponse);
   } catch (err) {
     setError(err instanceof Error ? err.message : "Failed to fetch schools");
   } finally {
@@ -82,7 +90,7 @@ export const SchoolsManagement: React.FC = () => {
 
   useEffect(() => {
     fetchSchools();
-  }, [currentPage, searchTerm, levelFilter, typeFilter]);
+  }, [currentPage, pageSize, searchTerm, levelFilter, typeFilter]);
 
   const handleActivateSchool = async (schoolId: string) => {
     try {
@@ -127,6 +135,13 @@ export const SchoolsManagement: React.FC = () => {
     return colors[level] || colors.middle;
   };
 
+  const stats = [
+    { title: getTranslation("admin.totalSchools", language), value: summary?.total ?? 0, icon: Building2, color: "bg-slate-600", isLoading: loading },
+    { title: getTranslation("admin.active", language), value: summary?.active ?? 0, icon: ShieldCheck, color: "bg-primary-600", isLoading: loading },
+    { title: getTranslation("admin.students", language), value: schools.reduce((sum, school) => sum + (school.total_students ?? 0), 0), icon: Users, color: "bg-blue-600", isLoading: loading },
+    { title: getTranslation("admin.classes", language), value: schools.reduce((sum, school) => sum + (school.total_classes ?? 0), 0), icon: GraduationCap, color: "bg-amber-500", isLoading: loading },
+  ];
+
   return (
     <div className="space-y-6">
       {error && (
@@ -135,6 +150,8 @@ export const SchoolsManagement: React.FC = () => {
       {success && (
         <SuccessAlert message={success} onDismiss={() => setSuccess(null)} />
       )}
+
+      <StatsGrid stats={stats} />
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -298,32 +315,17 @@ export const SchoolsManagement: React.FC = () => {
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <PaginationControls
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setCurrentPage(1);
+                setPageSize(size);
+              }}
+              isLoading={loading}
+            />
           </>
         )}
       </div>

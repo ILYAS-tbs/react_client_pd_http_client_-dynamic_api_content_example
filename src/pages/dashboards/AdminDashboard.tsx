@@ -6,6 +6,7 @@ import {
   MessageSquare,
   CreditCard,
   LayoutGrid,
+  Activity,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -16,6 +17,7 @@ import { SchoolsManagement } from "../../components/AdminDashboard/SchoolsManage
 import { ReportsManagement } from "../../components/AdminDashboard/ReportsManagement";
 import { AnnouncementsManagement } from "../../components/AdminDashboard/AnnouncementsManagement";
 import { MembershipsManagement } from "../../components/AdminDashboard/MembershipsManagement";
+import { ActivityCenter } from "../../components/AdminDashboard/ActivityCenter";
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -29,6 +31,7 @@ const AdminDashboard: React.FC = () => {
     { id: "reports", label: getTranslation("admin.reports", language), icon: FileText },
     { id: "announcements", label: getTranslation("admin.announcements", language), icon: MessageSquare },
     { id: "subscriptions", label: getTranslation("admin.subscriptions", language), icon: CreditCard },
+    { id: "activity", label: getTranslation("admin.activity", language), icon: Activity },
   ];
 
   const renderContent = () => {
@@ -74,6 +77,9 @@ const AdminDashboard: React.FC = () => {
       case "subscriptions":
         return <MembershipsManagement />;
 
+      case "activity":
+        return <ActivityCenter />;
+
       default:
         return <OverviewTab />;
     }
@@ -82,7 +88,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <DashboardLayout
       title={getTranslation("admin.platformAdmin", language)}
-      subtitle="Universal platform management & control center"
+      subtitle={getTranslation("admin.controlCenterSubtitle", language)}
       tabs={tabs}
       activeTab={activeTab}
       onTabChange={setActiveTab}

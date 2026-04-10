@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
   Plus,
   Clock,
   CheckCircle,
+  CreditCard,
+  Hourglass,
+  ShieldCheck,
 } from "lucide-react";
-import { Membership } from "../../services/http_api/platform-admin/admin_types";
-import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
+import { Membership, MembershipSummary } from "../../services/http_api/platform-admin/admin_types";
+import { adminApiClient, normalizePaginatedResponse } from "../../services/http_api/platform-admin/admin_api_client";
 import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { StatsGrid } from "./StatsCard";
+import { PaginationControls } from "./PaginationControls";
 
 export const MembershipsManagement: React.FC = () => {
   const { language } = useLanguage();
@@ -22,9 +25,11 @@ export const MembershipsManagement: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [totalCount, setTotalCount] = useState(0);
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [summary, setSummary] = useState<MembershipSummary | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [extendModal, setExtendModal] = useState<string | null>(null);
@@ -50,18 +55,16 @@ export const MembershipsManagement: React.FC = () => {
         filters.is_active = activeFilter === "active";
       }
 
-      const response = await adminApiClient.listMemberships(
-        currentPage,
-        15,
-        filters
-      );
+      const [response, summaryResponse] = await Promise.all([
+        adminApiClient.listMemberships(currentPage, pageSize, filters),
+        adminApiClient.getMembershipSummary(filters),
+      ]);
 
-      // Handle both array and paginated object responses
-      const results = Array.isArray(response) ? response : response.results ?? [];
-      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+      const normalized = normalizePaginatedResponse(response);
 
-      setMemberships(results);
-      setTotalPages(Math.ceil(count / 15));
+      setMemberships(normalized.results);
+      setTotalCount(normalized.count);
+      setSummary(summaryResponse);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch memberships"
@@ -77,7 +80,7 @@ export const MembershipsManagement: React.FC = () => {
 
   useEffect(() => {
     fetchMemberships();
-  }, [currentPage, searchTerm, typeFilter, activeFilter]);
+  }, [currentPage, pageSize, searchTerm, typeFilter, activeFilter]);
 
   const handleCancelMembership = async (membershipId: string) => {
     try {
@@ -129,13 +132,13 @@ export const MembershipsManagement: React.FC = () => {
 
   const getTypeBadgeColor = (type: string) => {
     const colors: { [key: string]: string } = {
-      FREE: "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400",
-      SUB_200:
+      free: "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400",
+      sub_200:
         "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
-      SUB_500:
+      sub_500:
         "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
     };
-    return colors[type] || colors.FREE;
+    return colors[type] || colors.free;
   };
 
   const isExpiringSoon = (expiryDate: string) => {
@@ -150,6 +153,13 @@ export const MembershipsManagement: React.FC = () => {
     return new Date(expiryDate) < new Date();
   };
 
+  const stats = [
+    { title: getTranslation("admin.subscriptions", language), value: summary?.total ?? 0, icon: CreditCard, color: "bg-slate-600", isLoading: loading },
+    { title: getTranslation("admin.active", language), value: summary?.active ?? 0, icon: ShieldCheck, color: "bg-primary-600", isLoading: loading },
+    { title: getTranslation("admin.expiringSoon", language), value: summary?.expiring_soon ?? 0, icon: Hourglass, color: "bg-amber-500", isLoading: loading },
+    { title: getTranslation("admin.expired", language), value: summary?.expired ?? 0, icon: Clock, color: "bg-rose-600", isLoading: loading },
+  ];
+
   return (
     <div className="space-y-6">
       {error && (
@@ -158,6 +168,8 @@ export const MembershipsManagement: React.FC = () => {
       {success && (
         <SuccessAlert message={success} onDismiss={() => setSuccess(null)} />
       )}
+
+      <StatsGrid stats={stats} />
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -183,9 +195,9 @@ export const MembershipsManagement: React.FC = () => {
               className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
             >
               <option value="all">{getTranslation("admin.allTypes", language)}</option>
-              <option value="FREE">{getTranslation("admin.free", language)}</option>
-              <option value="SUB_200">{getTranslation("admin.sub200", language)}</option>
-              <option value="SUB_500">{getTranslation("admin.sub500", language)}</option>
+              <option value="free">{getTranslation("admin.free", language)}</option>
+              <option value="sub_200">{getTranslation("admin.sub200", language)}</option>
+              <option value="sub_500">{getTranslation("admin.sub500", language)}</option>
             </select>
 
             <select
@@ -319,32 +331,17 @@ export const MembershipsManagement: React.FC = () => {
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <PaginationControls
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setCurrentPage(1);
+                setPageSize(size);
+              }}
+              isLoading={loading}
+            />
           </>
         )}
       </div>

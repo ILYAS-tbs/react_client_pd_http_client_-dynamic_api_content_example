@@ -7,14 +7,20 @@ import {
   FileText,
   MessageSquare,
   CreditCard,
-  AlertCircle,
+  AlertTriangle,
+  ArrowUpRight,
+  ShieldAlert,
+  GraduationCap,
+  Layers3,
+  UserCog,
+  BookOpen,
 } from "lucide-react";
 import { StatsGrid } from "./StatsCard";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
-import { DashboardStats, AdminAuditLog } from "../../services/http_api/platform-admin/admin_types";
-import { ErrorAlert } from "./ui";
+import { OverviewWorkspace } from "../../services/http_api/platform-admin/admin_types";
+import { ErrorAlert, LoadingSpinner, EmptyState } from "./ui";
 
 interface OverviewTabProps {
   onRefresh?: () => void;
@@ -24,33 +30,28 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
-  const [auditLogs, setAuditLogs] = useState<AdminAuditLog[]>([]);
+  const [workspace, setWorkspace] = useState<OverviewWorkspace | null>(null);
 
-  const fetchStats = async () => {
+  const fetchWorkspace = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      const stats = await adminApiClient.getDashboardStats();
-      const logsResponse = await adminApiClient.listAuditLogs(1, 5, {
-        ordering: "-timestamp",
-      });
-      
-      setDashboardStats(stats);
-      setAuditLogs(Array.isArray(logsResponse) ? logsResponse : logsResponse.results || []);
+
+      const response = await adminApiClient.getOverviewWorkspace();
+      setWorkspace(response);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Failed to fetch dashboard statistics";
       setError(errorMsg);
-      console.error("Dashboard stats error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStats();
+    fetchWorkspace();
   }, []);
+
+  const dashboardStats = workspace?.stats;
 
   const stats = [
     {
@@ -78,8 +79,48 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
       isLoading,
     },
     {
+      title: getTranslation("admin.students", language),
+      value: dashboardStats?.academics.students_total.toString() || "0",
+      icon: GraduationCap,
+      color: "bg-emerald-600",
+      trend: { value: 0, direction: "up" as const },
+      isLoading,
+    },
+    {
+      title: getTranslation("admin.classGroups", language),
+      value: dashboardStats?.academics.class_groups_total.toString() || "0",
+      icon: Layers3,
+      color: "bg-indigo-600",
+      trend: { value: 0, direction: "up" as const },
+      isLoading,
+    },
+    {
+      title: getTranslation("admin.platformAdmins", language),
+      value: dashboardStats?.users.admins.toString() || "0",
+      icon: UserCog,
+      color: "bg-rose-600",
+      trend: { value: 0, direction: "up" as const },
+      isLoading,
+    },
+    {
+      title: getTranslation("admin.unattachedUsers", language),
+      value: dashboardStats?.users.unattached_non_admin.toString() || "0",
+      icon: Users,
+      color: "bg-slate-600",
+      trend: { value: 0, direction: "up" as const },
+      isLoading,
+    },
+    {
+      title: getTranslation("admin.activeSubscriptions", language),
+      value: dashboardStats?.memberships.active.toString() || "0",
+      icon: CreditCard,
+      color: "bg-amber-500",
+      trend: { value: 0, direction: "up" as const },
+      isLoading,
+    },
+    {
       title: getTranslation("admin.pendingReports", language),
-      value: dashboardStats?.reports.absence_pending.toString() || "0",
+      value: ((dashboardStats?.reports.absence_pending || 0) + (dashboardStats?.reports.behaviour_pending || 0)).toString(),
       icon: FileText,
       color: "bg-secondary-500",
       trend: { value: 0, direction: "up" as const },
@@ -88,14 +129,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
   ];
 
   const handleRefresh = async () => {
-    await fetchStats();
+    await fetchWorkspace();
     onRefresh?.();
-  };
-
-  const getActivityDescription = (log: AdminAuditLog): string => {
-    const entityName = log.entity_display || log.entity_type;
-    const action = log.action_type.replace(/_/g, " ").toLowerCase();
-    return `${action} ${entityName}`;
   };
 
   // Calculate health based on active vs total
@@ -109,168 +144,239 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ onRefresh }) => {
         <ErrorAlert message={error} onDismiss={() => setError(null)} />
       )}
 
-      {/* Stats Grid */}
-      <StatsGrid stats={stats} />
+      {isLoading && !workspace ? (
+        <LoadingSpinner message={getTranslation("admin.loading", language)} />
+      ) : (
+        <>
+          <StatsGrid stats={stats} />
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Activity Feed */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {getTranslation("admin.recentActivity", language)}
-            </h3>
-            <button
-              onClick={handleRefresh}
-              disabled={isLoading}
-              className="text-primary-500 hover:bg-primary-600 text-sm font-medium disabled:opacity-50"
-            >
-              {isLoading ? getTranslation("admin.loading", language) : getTranslation("admin.refresh", language)}
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {auditLogs.length > 0 ? (
-              auditLogs.map((log) => (
-                <div
-                  key={log.id}
-                  className="flex items-start gap-3 pb-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-                >
-                  <div className="h-2 w-2 rounded-full bg-primary-500 mt-2 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {getActivityDescription(log)}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(log.timestamp).toLocaleString()}
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr,1fr]">
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {getTranslation("admin.recentActivity", language)}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {getTranslation("admin.latestPlatformChanges", language)}
                     </p>
                   </div>
+                  <button
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    className="rounded-lg bg-primary-50 px-3 py-2 text-sm font-medium text-primary-600 hover:bg-primary-100 disabled:opacity-50 dark:bg-primary-900/20 dark:text-primary-400"
+                  >
+                    {isLoading ? getTranslation("admin.loading", language) : getTranslation("admin.refresh", language)}
+                  </button>
                 </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {getTranslation("admin.noActivity", language) || "No recent activity"}
+
+                {workspace?.recent_activity?.length ? (
+                  <div className="space-y-4">
+                    {workspace.recent_activity.map((log) => (
+                      <div key={log.id} className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-b-0 dark:border-gray-700">
+                        <div className="mt-2 h-2 w-2 rounded-full bg-primary-500" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                            {(log.action_display || log.action_type)} {log.entity_display || log.entity_type}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {(log.admin_name || log.admin_username || getTranslation("admin.system", language))} • {new Date(log.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState message={getTranslation("admin.noActivity", language)} />
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                  <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                    {getTranslation("admin.pendingQueue", language)}
+                  </h3>
+                  <div className="space-y-3">
+                    {workspace?.pending_reports?.length ? (
+                      workspace.pending_reports.map((report) => (
+                        <div key={report.id} className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/40">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">{report.student_name}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">{report.school_name}</p>
+                            </div>
+                            <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+                              {report.reason}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <EmptyState message={getTranslation("admin.noReports", language)} />
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                  <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                    {getTranslation("admin.expiringMemberships", language)}
+                  </h3>
+                  <div className="space-y-3">
+                    {workspace?.expiring_memberships?.length ? (
+                      workspace.expiring_memberships.map((membership) => (
+                        <div key={membership.id} className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/40">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="font-medium text-gray-900 dark:text-white">{membership.parent_name}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">{membership.parent_email}</p>
+                            </div>
+                            <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                              {new Date(membership.expiry_date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <EmptyState message={getTranslation("admin.noMemberships", language)} />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                  {getTranslation("admin.alerts", language)}
+                </h3>
+                <div className="space-y-3">
+                  {workspace && Object.entries(workspace.alerts).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 dark:border-gray-700">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-lg bg-rose-50 p-2 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400">
+                          <AlertTriangle className="h-4 w-4" />
+                        </div>
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                          {getTranslation(`admin.alertKey.${key}`, language)}
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                  {getTranslation("admin.latestSchools", language)}
+                </h3>
+                <div className="space-y-3">
+                  {workspace?.latest_schools?.map((school) => (
+                    <div key={school.id} className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/40">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">{school.school_name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {school.total_students} {getTranslation("admin.students", language)} • {school.total_teachers} {getTranslation("admin.teachers", language)}
+                          </p>
+                        </div>
+                        <ArrowUpRight className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                  {getTranslation("admin.recentUsers", language)}
+                </h3>
+                <div className="space-y-3">
+                  {workspace?.recent_users?.length ? (
+                    workspace.recent_users.map((user) => (
+                      <div key={user.id} className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/40">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
+                          </div>
+                          <span className={`rounded-full px-2 py-1 text-xs font-medium ${user.is_admin ? "bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400" : "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400"}`}>
+                            {user.is_admin ? getTranslation("admin.admin", language) : getTranslation("admin.nonAdmin", language)}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <EmptyState message={getTranslation("admin.noUsers", language)} />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {getTranslation("admin.platformHealth", language)}
+                </h4>
+                <ShieldAlert className="h-5 w-5 text-primary-500" />
+              </div>
+              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{healthPercentage}%</p>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {getTranslation("admin.activeUsersRatio", language)}
               </p>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Quick Stats */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {getTranslation("admin.pendingActions", language)}
-          </h3>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg border border-yellow-100 dark:border-yellow-800">
-              <div className="flex items-center gap-3">
-                <FileText className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("admin.pendingReports", language)}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("admin.absenceReportsAwaitingReview", language)}
-                  </p>
-                </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {getTranslation("admin.totalRegistrations", language)}
+                </h4>
+                <TrendingUp className="h-5 w-5 text-blue-500" />
               </div>
-              <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                {dashboardStats?.reports.absence_pending || 0}
-              </span>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                {(dashboardStats?.users.total || 0) + (dashboardStats?.schools.total || 0)}
+              </p>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {getTranslation("admin.schools", language)} + {getTranslation("admin.users", language)}
+              </p>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800">
-              <div className="flex items-center gap-3">
-                <School className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("admin.totalSchools", language)}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("admin.activeSchoolAccounts", language)}
-                  </p>
-                </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {getTranslation("admin.highPriorityAnnouncements", language)}
+                </h4>
+                <MessageSquare className="h-5 w-5 text-rose-500" />
               </div>
-              <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                {dashboardStats?.schools.active || 0}
-              </span>
+              <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">
+                {workspace?.alerts.high_priority_announcements || 0}
+              </p>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {getTranslation("admin.keepCommunicationVisible", language)}
+              </p>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
-              <div className="flex items-center gap-3">
-                <Users className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTranslation("admin.totalUsers", language)}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {getTranslation("admin.activeUserAccounts", language)}
-                  </p>
-                </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {getTranslation("admin.modules", language)}
+                </h4>
+                <BookOpen className="h-5 w-5 text-emerald-500" />
               </div>
-              <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                {dashboardStats?.users.active || 0}
-              </span>
+              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                {dashboardStats?.academics.modules_total || 0}
+              </p>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {getTranslation("admin.studentsWithParents", language)}: {dashboardStats?.academics.students_with_parent || 0}
+              </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Platform Health Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("admin.platformHealth", language)}
-          </h4>
-          <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-              {healthPercentage}%
-            </span>
-            <div className="h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
-              <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
-                ✓
-              </span>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("admin.activeUsersRatio", language) || "Active users ratio"}
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("admin.totalRegistrations", language) || "Total Registrations"}
-          </h4>
-          <div className="flex items-center justify-between">
-            <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-              {((dashboardStats?.users.total || 0) + (dashboardStats?.schools.total || 0))}
-            </span>
-            <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("admin.schools", language)} + {getTranslation("admin.users", language)}
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-            {getTranslation("admin.activeUsers", language)}
-          </h4>
-          <div className="flex items-center justify-between">
-            <span className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-              {(dashboardStats?.users.active || 0).toLocaleString()}
-            </span>
-            <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {getTranslation("admin.currentlyActive", language) || "Currently active"}
-          </p>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

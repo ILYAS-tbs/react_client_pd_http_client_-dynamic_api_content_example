@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
   CheckCircle,
   XCircle,
   Clock,
+  FileClock,
+  ShieldAlert,
+  BadgeCheck,
 } from "lucide-react";
 import {
   AbsenceReport,
   BehaviourReport,
+  ReportSummary,
 } from "../../services/http_api/platform-admin/admin_types";
-import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
+import { adminApiClient, normalizePaginatedResponse } from "../../services/http_api/platform-admin/admin_api_client";
 import { LoadingSpinner, ErrorAlert, SuccessAlert, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { StatsGrid } from "./StatsCard";
+import { PaginationControls } from "./PaginationControls";
 
 interface ReportsManagementProps {
   reportType?: "absence" | "behaviour";
@@ -33,8 +37,10 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [totalCount, setTotalCount] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [approvalModal, setApprovalModal] = useState<{
@@ -58,18 +64,16 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
         filters.status = statusFilter;
       }
 
-      const response = await adminApiClient.listReports(
-        currentPage,
-        15,
-        filters
-      );
+      const [response, summaryResponse] = await Promise.all([
+        adminApiClient.listReports(currentPage, pageSize, filters),
+        adminApiClient.getReportSummary(filters),
+      ]);
 
-      // Handle both array and paginated object responses
-      const results = Array.isArray(response) ? response : response.results ?? [];
-      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+      const normalized = normalizePaginatedResponse(response);
 
-      setReports(results);
-      setTotalPages(Math.ceil(count / 15));
+      setReports(normalized.results);
+      setTotalCount(normalized.count);
+      setSummary(summaryResponse);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch reports");
     } finally {
@@ -83,14 +87,14 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
 
   useEffect(() => {
     fetchReports();
-  }, [currentPage, searchTerm, statusFilter, reportType]);
+  }, [currentPage, pageSize, searchTerm, statusFilter, reportType]);
 
   const handleApproveReport = async (reportId: string) => {
     try {
       setActionLoading(`approve-${reportId}`);
       setError(null);
       await adminApiClient.approveReport(reportId, comments);
-      setSuccess("Report approved successfully");
+      setSuccess(getTranslation("admin.reportApprovedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       fetchReports();
       setApprovalModal(null);
@@ -110,7 +114,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
       setActionLoading(`reject-${reportId}`);
       setError(null);
       await adminApiClient.rejectReport(reportId, comments);
-      setSuccess("Report rejected successfully");
+      setSuccess(getTranslation("admin.reportRejectedSuccessfully", language));
       setTimeout(() => setSuccess(null), 3000);
       fetchReports();
       setApprovalModal(null);
@@ -128,33 +132,44 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
   const getStatusBadgeColor = (status: string) => {
     const colors: { [key: string]: string } = {
       PENDING: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
-      APPROVED:
+      pending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+      accepted:
         "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400",
-      REJECTED:
+      rejected:
         "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+      reviewed: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
     };
-    return colors[status] || colors.PENDING;
+    return colors[status] || colors.pending;
   };
 
   const getStatusText = (status: string) => {
     const statusMap: { [key: string]: string } = {
       PENDING: getTranslation("admin.pending", language),
-      APPROVED: getTranslation("admin.approved", language),
-      REJECTED: getTranslation("admin.rejected", language),
+      pending: getTranslation("admin.pending", language),
+      accepted: getTranslation("admin.approved", language),
+      rejected: getTranslation("admin.rejected", language),
+      reviewed: getTranslation("admin.reviewed", language),
     };
     return statusMap[status] || status;
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "APPROVED":
+      case "accepted":
         return <CheckCircle className="h-4 w-4" />;
-      case "REJECTED":
+      case "rejected":
         return <XCircle className="h-4 w-4" />;
       default:
         return <Clock className="h-4 w-4" />;
     }
   };
+
+  const stats = [
+    { title: getTranslation("admin.totalReports", language), value: summary?.total ?? 0, icon: FileClock, color: "bg-slate-600", isLoading: loading },
+    { title: getTranslation("admin.pending", language), value: summary?.pending ?? 0, icon: ShieldAlert, color: "bg-amber-500", isLoading: loading },
+    { title: getTranslation("admin.approved", language), value: summary?.approved ?? summary?.reviewed ?? 0, icon: BadgeCheck, color: "bg-primary-600", isLoading: loading },
+    { title: getTranslation("admin.rejected", language), value: summary?.rejected ?? 0, icon: XCircle, color: "bg-rose-600", isLoading: loading },
+  ];
 
   return (
     <div className="space-y-6">
@@ -164,6 +179,8 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
       {success && (
         <SuccessAlert message={success} onDismiss={() => setSuccess(null)} />
       )}
+
+      <StatsGrid stats={stats} />
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -190,9 +207,9 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
                 className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm"
               >
                 <option value="all">{getTranslation("admin.allStatus", language)}</option>
-                <option value="PENDING">{getTranslation("admin.pending", language)}</option>
-                <option value="APPROVED">{getTranslation("admin.approved", language)}</option>
-                <option value="REJECTED">{getTranslation("admin.rejected", language)}</option>
+                <option value="pending">{getTranslation("admin.pending", language)}</option>
+                <option value="accepted">{getTranslation("admin.approved", language)}</option>
+                <option value="rejected">{getTranslation("admin.rejected", language)}</option>
               </select>
             )}
           </div>
@@ -302,7 +319,7 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
 
                             {openMenuId === report.id &&
                               isAbsence &&
-                              absenceReport.status === "PENDING" && (
+                              absenceReport.status === "pending" && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
                                   <button
                                     onClick={() =>
@@ -337,32 +354,17 @@ export const ReportsManagement: React.FC<ReportsManagementProps> = ({
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <PaginationControls
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setCurrentPage(1);
+                setPageSize(size);
+              }}
+              isLoading={loading}
+            />
           </>
         )}
       </div>

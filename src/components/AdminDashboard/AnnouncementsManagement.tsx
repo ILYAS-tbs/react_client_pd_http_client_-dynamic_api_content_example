@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
   Plus,
   Send,
   Archive,
   Trash2,
+  MessageSquare,
+  Pin,
+  Megaphone,
 } from "lucide-react";
-import { Announcement, School } from "../../services/http_api/platform-admin/admin_types";
-import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
+import { Announcement, School, AnnouncementSummary } from "../../services/http_api/platform-admin/admin_types";
+import { adminApiClient, normalizePaginatedResponse } from "../../services/http_api/platform-admin/admin_api_client";
 import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { StatsGrid } from "./StatsCard";
+import { PaginationControls } from "./PaginationControls";
 
 export const AnnouncementsManagement: React.FC = () => {
   const { language } = useLanguage();
@@ -23,8 +26,10 @@ export const AnnouncementsManagement: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [totalCount, setTotalCount] = useState(0);
   const [targetFilter, setTargetFilter] = useState<string>("all");
+  const [summary, setSummary] = useState<AnnouncementSummary | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [createModal, setCreateModal] = useState(false);
@@ -50,21 +55,19 @@ export const AnnouncementsManagement: React.FC = () => {
       };
 
       if (targetFilter !== "all") {
-        filters.targetGroup = targetFilter;
+        filters.target_group = targetFilter;
       }
 
-      const response = await adminApiClient.listAnnouncements(
-        currentPage,
-        15,
-        filters
-      );
+      const [response, summaryResponse] = await Promise.all([
+        adminApiClient.listAnnouncements(currentPage, pageSize, filters),
+        adminApiClient.getAnnouncementSummary(filters),
+      ]);
 
-      // Handle both array and paginated object responses
-      const results = Array.isArray(response) ? response : response.results ?? [];
-      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+      const normalized = normalizePaginatedResponse(response);
 
-      setAnnouncements(results);
-      setTotalPages(Math.ceil(count / 15));
+      setAnnouncements(normalized.results);
+      setTotalCount(normalized.count);
+      setSummary(summaryResponse);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch announcements"
@@ -77,7 +80,7 @@ export const AnnouncementsManagement: React.FC = () => {
   const fetchSchools = async () => {
     try {
       const response = await adminApiClient.listSchools(1, 100);
-      const results = Array.isArray(response) ? response : response.results ?? [];
+      const results = normalizePaginatedResponse(response).results;
       setSchools(results);
       if (results.length > 0) {
         setFormData((prev) => ({ ...prev, school: String(results[0].id) }));
@@ -97,7 +100,7 @@ export const AnnouncementsManagement: React.FC = () => {
 
   useEffect(() => {
     fetchAnnouncements();
-  }, [currentPage, searchTerm, targetFilter]);
+  }, [currentPage, pageSize, searchTerm, targetFilter]);
 
   const handleCreateAnnouncement = async () => {
     if (!formData.title || !formData.content) {
@@ -221,6 +224,13 @@ export const AnnouncementsManagement: React.FC = () => {
     return colors[priority] || colors["متوسط"];
   };
 
+  const stats = [
+    { title: getTranslation("admin.announcements", language), value: summary?.total ?? 0, icon: MessageSquare, color: "bg-slate-600", isLoading: loading },
+    { title: getTranslation("admin.published", language), value: summary?.published ?? 0, icon: Megaphone, color: "bg-primary-600", isLoading: loading },
+    { title: getTranslation("admin.pinned", language), value: announcements.filter((item) => item.pinned).length, icon: Pin, color: "bg-blue-600", isLoading: loading },
+    { title: getTranslation("admin.highPriorityAnnouncements", language), value: summary?.high_priority ?? 0, icon: Send, color: "bg-rose-600", isLoading: loading },
+  ];
+
   return (
     <div className="space-y-6">
       {error && (
@@ -229,6 +239,8 @@ export const AnnouncementsManagement: React.FC = () => {
       {success && (
         <SuccessAlert message={success} onDismiss={() => setSuccess(null)} />
       )}
+
+      <StatsGrid stats={stats} />
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -381,32 +393,17 @@ export const AnnouncementsManagement: React.FC = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <PaginationControls
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setCurrentPage(1);
+                setPageSize(size);
+              }}
+              isLoading={loading}
+            />
           </>
         )}
       </div>

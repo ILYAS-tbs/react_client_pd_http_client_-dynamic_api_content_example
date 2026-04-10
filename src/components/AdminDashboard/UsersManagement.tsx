@@ -1,33 +1,40 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  ChevronLeft,
-  ChevronRight,
   MoreVertical,
   Eye,
   Ban,
   CheckCircle,
+  Users,
+  UserCheck,
+  ShieldAlert,
+  UserCog,
 } from "lucide-react";
-import { User } from "../../services/http_api/platform-admin/admin_types";
-import { adminApiClient } from "../../services/http_api/platform-admin/admin_api_client";
+import { User, UserSummary } from "../../services/http_api/platform-admin/admin_types";
+import { adminApiClient, normalizePaginatedResponse } from "../../services/http_api/platform-admin/admin_api_client";
 import { LoadingSpinner, ErrorAlert, SuccessAlert, ConfirmDialog, EmptyState } from "./ui";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { StatsGrid } from "./StatsCard";
+import { PaginationControls } from "./PaginationControls";
 
 export const UsersManagement: React.FC = () => {
   const { language } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
+  const [summary, setSummary] = useState<UserSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [totalCount, setTotalCount] = useState(0);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [detailUser, setDetailUser] = useState<User | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [confirmAction, setConfirmAction] = useState<{ type: "deactivate" | "reactivate"; id: number } | null>(null);
 
   const fetchUsers = async () => {
@@ -48,14 +55,16 @@ export const UsersManagement: React.FC = () => {
         filters.is_active = activeFilter === "active";
       }
 
-      const response = await adminApiClient.listUsers(currentPage, 15, filters);
+      const [response, summaryResponse] = await Promise.all([
+        adminApiClient.listUsers(currentPage, pageSize, filters),
+        adminApiClient.getUserSummary(filters),
+      ]);
 
-      // Handle both array and paginated object responses
-      const results = Array.isArray(response) ? response : response.results ?? [];
-      const count = Array.isArray(response) ? response.length : response.count ?? 0;
+      const normalized = normalizePaginatedResponse(response);
 
-      setUsers(results);
-      setTotalPages(Math.ceil(count / 15));
+      setUsers(normalized.results);
+      setTotalCount(normalized.count);
+      setSummary(summaryResponse);
     } catch (err) {
       setError(err instanceof Error ? err.message : getTranslation("admin.errorMessage", language));
     } finally {
@@ -65,11 +74,12 @@ export const UsersManagement: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
+    setSelectedUsers([]);
   }, [searchTerm, roleFilter, activeFilter]);
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, searchTerm, roleFilter, activeFilter]);
+  }, [currentPage, pageSize, searchTerm, roleFilter, activeFilter]);
 
   const handleDeactivateUser = async (userId: number) => {
     try {
@@ -107,6 +117,47 @@ export const UsersManagement: React.FC = () => {
     }
   };
 
+  const handleBulkAction = async (type: "deactivate" | "reactivate") => {
+    if (selectedUsers.length === 0) {
+      return;
+    }
+
+    try {
+      setActionLoading(type === "deactivate" ? "bulk-deactivate" : "bulk-reactivate");
+      setError(null);
+
+      if (type === "deactivate") {
+        await adminApiClient.bulkDeactivateUsers(selectedUsers);
+        setSuccess(getTranslation("admin.bulkDeactivateSuccess", language));
+      } else {
+        await adminApiClient.bulkReactivateUsers(selectedUsers);
+        setSuccess(getTranslation("admin.bulkReactivateSuccess", language));
+      }
+
+      setSelectedUsers([]);
+      fetchUsers();
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : getTranslation("admin.errorMessage", language));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const toggleSelectedUser = (userId: number) => {
+    setSelectedUsers((current) =>
+      current.includes(userId)
+        ? current.filter((id) => id !== userId)
+        : [...current, userId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedUsers((current) =>
+      current.length === users.length ? [] : users.map((user) => user.id)
+    );
+  };
+
   const getRoleBadgeColor = (role: string) => {
     const colors: { [key: string]: string } = {
       school: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
@@ -119,6 +170,50 @@ export const UsersManagement: React.FC = () => {
     return colors[role] || colors.user;
   };
 
+  const getAdminBadgeColor = (isAdmin?: boolean) => {
+    return isAdmin
+      ? "bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400"
+      : "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400";
+  };
+
+  const stats = [
+    {
+      title: getTranslation("admin.totalUsers", language),
+      value: summary?.total ?? 0,
+      icon: Users,
+      color: "bg-slate-600",
+      isLoading: loading,
+    },
+    {
+      title: getTranslation("admin.activeUsers", language),
+      value: summary?.active ?? 0,
+      icon: UserCheck,
+      color: "bg-primary-600",
+      isLoading: loading,
+    },
+    {
+      title: getTranslation("admin.newThisMonth", language),
+      value: summary?.recent_signups_30d ?? 0,
+      icon: ShieldAlert,
+      color: "bg-blue-600",
+      isLoading: loading,
+    },
+    {
+      title: getTranslation("admin.platformAdmins", language),
+      value: summary?.by_role.admin ?? 0,
+      icon: UserCog,
+      color: "bg-rose-500",
+      isLoading: loading,
+    },
+    {
+      title: getTranslation("admin.unattachedUsers", language),
+      value: summary?.by_role.non_admin_user ?? 0,
+      icon: ShieldAlert,
+      color: "bg-amber-500",
+      isLoading: loading,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {error && (
@@ -128,11 +223,18 @@ export const UsersManagement: React.FC = () => {
         <SuccessAlert message={success} onDismiss={() => setSuccess(null)} />
       )}
 
+      <StatsGrid stats={stats} />
+
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {getTranslation("admin.userManagement", language)}
-          </h3>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {getTranslation("admin.userManagement", language)}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {getTranslation("admin.userManagementDescription", language)}
+            </p>
+          </div>
 
           <div className="flex flex-col md:flex-row gap-3">
             <div className="relative">
@@ -155,7 +257,8 @@ export const UsersManagement: React.FC = () => {
               <option value="school">{getTranslation("admin.schoolAdmin", language)}</option>
               <option value="teacher">{getTranslation("admin.teacher", language)}</option>
               <option value="parent">{getTranslation("admin.parent", language)}</option>
-              <option value="student">{getTranslation("admin.student", language)}</option>
+              <option value="admin">{getTranslation("admin.admin", language)}</option>
+              <option value="user">{getTranslation("admin.user", language)}</option>
             </select>
 
             <select
@@ -170,6 +273,30 @@ export const UsersManagement: React.FC = () => {
           </div>
         </div>
 
+        <div className="mb-4 flex flex-col gap-3 rounded-xl bg-gray-50 p-4 dark:bg-gray-700/40 md:flex-row md:items-center md:justify-between">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {selectedUsers.length > 0
+              ? `${selectedUsers.length} ${getTranslation("admin.selected", language)}`
+              : getTranslation("admin.selectUsersForBulkActions", language)}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleBulkAction("reactivate")}
+              disabled={selectedUsers.length === 0 || actionLoading !== null}
+              className="rounded-lg border border-primary-200 px-3 py-2 text-sm font-medium text-primary-600 hover:bg-primary-50 disabled:opacity-50 dark:border-primary-800 dark:text-primary-400"
+            >
+              {getTranslation("admin.bulkReactivate", language)}
+            </button>
+            <button
+              onClick={() => handleBulkAction("deactivate")}
+              disabled={selectedUsers.length === 0 || actionLoading !== null}
+              className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400"
+            >
+              {getTranslation("admin.bulkDeactivate", language)}
+            </button>
+          </div>
+        </div>
+
         {loading ? (
           <LoadingSpinner message={getTranslation("admin.loadingUsers", language)} />
         ) : (
@@ -181,9 +308,17 @@ export const UsersManagement: React.FC = () => {
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
+                    <th className="pb-3 font-medium">
+                      <input
+                        type="checkbox"
+                        checked={users.length > 0 && selectedUsers.length === users.length}
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     <th className="pb-3 font-medium">{getTranslation("admin.username", language)}</th>
                     <th className="pb-3 font-medium">{getTranslation("admin.email", language)}</th>
                     <th className="pb-3 font-medium">{getTranslation("admin.userType", language)}</th>
+                    <th className="pb-3 font-medium">{getTranslation("admin.adminAccess", language)}</th>
                     <th className="pb-3 font-medium">{getTranslation("admin.status", language)}</th>
                     <th className="pb-3 font-medium">{getTranslation("admin.joined", language)}</th>
                     <th className="pb-3 font-medium text-right">{getTranslation("admin.actions", language)}</th>
@@ -195,6 +330,13 @@ export const UsersManagement: React.FC = () => {
                       key={user.id}
                       className="text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700/50"
                     >
+                      <td className="py-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.includes(user.id)}
+                          onChange={() => toggleSelectedUser(user.id)}
+                        />
+                      </td>
                       <td className="py-4 text-sm font-medium">
                         {(user.first_name && user.last_name ? user.first_name + " " + user.last_name : user.username)}
                       </td>
@@ -209,6 +351,16 @@ export const UsersManagement: React.FC = () => {
                         >
                           {getTranslation(user.role, language)}
                         </span>
+                      </td>
+                      <td className="py-4">
+                        <div className="flex flex-col gap-1">
+                          <span className={`inline-flex w-fit rounded-full px-2 py-1 text-xs font-medium ${getAdminBadgeColor(user.is_admin)}`}>
+                            {user.is_admin ? getTranslation("admin.admin", language) : getTranslation("admin.nonAdmin", language)}
+                          </span>
+                          {user.is_admin && user.admin_role && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{user.admin_role}</span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-4">
                         <span
@@ -278,32 +430,17 @@ export const UsersManagement: React.FC = () => {
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslation("admin.page", language)} {currentPage} {getTranslation("admin.of", language)} {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.max(1, currentPage - 1))
-                  }
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <PaginationControls
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setCurrentPage(1);
+                setPageSize(size);
+              }}
+              isLoading={loading}
+            />
           </>
         )}
       </div>
@@ -334,6 +471,24 @@ export const UsersManagement: React.FC = () => {
                   <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.userType", language)}</dt>
                   <dd className="text-gray-900 dark:text-white font-medium capitalize">{detailUser.role}</dd>
                 </div>
+                <div className="flex justify-between">
+                  <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.adminAccess", language)}</dt>
+                  <dd className={`font-medium ${detailUser.is_admin ? "text-rose-600 dark:text-rose-400" : "text-gray-700 dark:text-gray-300"}`}>
+                    {detailUser.is_admin ? getTranslation("admin.admin", language) : getTranslation("admin.nonAdmin", language)}
+                  </dd>
+                </div>
+                {detailUser.is_admin && detailUser.admin_role && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.adminRole", language)}</dt>
+                    <dd className="text-gray-900 dark:text-white font-medium">{detailUser.admin_role}</dd>
+                  </div>
+                )}
+                {detailUser.role_details?.school && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.schoolName", language)}</dt>
+                    <dd className="text-gray-900 dark:text-white font-medium">{detailUser.role_details.school}</dd>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <dt className="text-gray-500 dark:text-gray-400">{getTranslation("admin.status", language)}</dt>
                   <dd className={`font-medium ${detailUser.is_active ? "text-primary-600 dark:text-primary-400" : "text-red-600 dark:text-red-400"}`}>

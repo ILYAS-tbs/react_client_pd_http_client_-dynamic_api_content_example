@@ -11,6 +11,14 @@ import {
   PaginatedResponse,
   SuccessResponse,
   DashboardStats,
+  AuditLogSummary,
+  SchoolSummary,
+  UserSummary,
+  ReportSummary,
+  AnnouncementSummary,
+  MembershipSummary,
+  OverviewWorkspace,
+  AdminAuditLog,
 } from "./admin_types";
 
 const BASE_URL = `${SERVER_BASE_URL}/api/admin`;
@@ -53,12 +61,50 @@ const URLS = {
   membership_detail: `${BASE_URL}/memberships/{id}/`,
   membership_extend: `${BASE_URL}/memberships/{id}/extend_subscription/`,
   membership_cancel: `${BASE_URL}/memberships/{id}/cancel_subscription/`,
+  membership_summary: `${BASE_URL}/memberships/summary/`,
 
   // Overview
   overview_stats: `${BASE_URL}/overview/stats/`,
+  overview_workspace: `${BASE_URL}/overview/workspace/`,
 
   // Audit Logs
   audit_logs: `${BASE_URL}/audit-logs/`,
+  audit_logs_summary: `${BASE_URL}/audit-logs/summary/`,
+  school_summary: `${BASE_URL}/schools/summary/`,
+  user_summary: `${BASE_URL}/users/summary/`,
+  report_summary: `${BASE_URL}/reports/summary/`,
+  announcement_summary: `${BASE_URL}/announcements/summary/`,
+};
+
+type QueryValue = string | number | boolean | undefined | null;
+
+const buildQuery = (params: Record<string, QueryValue>) => {
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") {
+      return;
+    }
+    query.set(key, String(value));
+  });
+
+  const serialized = query.toString();
+  return serialized ? `?${serialized}` : "";
+};
+
+export const normalizePaginatedResponse = <T>(
+  response: PaginatedResponse<T> | T[]
+): PaginatedResponse<T> => {
+  if (Array.isArray(response)) {
+    return {
+      count: response.length,
+      next: null,
+      previous: null,
+      results: response,
+    };
+  }
+
+  return response;
 };
 
 // Helper function to make authenticated requests
@@ -152,18 +198,16 @@ export const adminApiClient = {
       ordering?: string;
     }
   ): Promise<PaginatedResponse<PlatformAdmin>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.role && { role: filters.role }),
-      ...(filters?.is_active !== undefined && {
-        is_active: filters.is_active.toString(),
-      }),
-      ...(filters?.search && { search: filters.search }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
-
-    return makeRequest(`${URLS.admins}?${params}`);
+    return makeRequest(
+      `${URLS.admins}${buildQuery({
+        page,
+        page_size: pageSize,
+        role: filters?.role,
+        is_active: filters?.is_active,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
   },
 
   async getAdmin(id: string): Promise<PlatformAdmin> {
@@ -211,16 +255,30 @@ export const adminApiClient = {
       ordering?: string;
     }
   ): Promise<PaginatedResponse<School>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.school_level && { school_level: filters.school_level }),
-      ...(filters?.school_type && { school_type: filters.school_type }),
-      ...(filters?.search && { search: filters.search }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
+    return makeRequest(
+      `${URLS.schools}${buildQuery({
+        page,
+        page_size: pageSize,
+        school_level: filters?.school_level,
+        school_type: filters?.school_type,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
 
-    return makeRequest(`${URLS.schools}?${params}`);
+  async getSchoolSummary(filters?: {
+    school_level?: string;
+    school_type?: string;
+    search?: string;
+  }): Promise<SchoolSummary> {
+    return makeRequest(
+      `${URLS.school_summary}${buildQuery({
+        school_level: filters?.school_level,
+        school_type: filters?.school_type,
+        search: filters?.search,
+      })}`
+    );
   },
 
   async getSchool(id: string): Promise<School> {
@@ -257,18 +315,30 @@ export const adminApiClient = {
       ordering?: string;
     }
   ): Promise<PaginatedResponse<User>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.role && { role: filters.role }),
-      ...(filters?.is_active !== undefined && {
-        is_active: filters.is_active.toString(),
-      }),
-      ...(filters?.search && { search: filters.search }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
+    return makeRequest(
+      `${URLS.users}${buildQuery({
+        page,
+        page_size: pageSize,
+        role: filters?.role,
+        is_active: filters?.is_active,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
 
-    return makeRequest(`${URLS.users}?${params}`);
+  async getUserSummary(filters?: {
+    role?: string;
+    is_active?: boolean;
+    search?: string;
+  }): Promise<UserSummary> {
+    return makeRequest(
+      `${URLS.user_summary}${buildQuery({
+        role: filters?.role,
+        is_active: filters?.is_active,
+        search: filters?.search,
+      })}`
+    );
   },
 
   async getUser(id: number): Promise<User> {
@@ -313,17 +383,33 @@ export const adminApiClient = {
       ordering?: string;
     }
   ): Promise<PaginatedResponse<AbsenceReport | BehaviourReport>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.report_type && { report_type: filters.report_type }),
-      ...(filters?.status && { status: filters.status }),
-      ...(filters?.school && { school: filters.school }),
-      ...(filters?.search && { search: filters.search }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
+    return makeRequest(
+      `${URLS.reports}${buildQuery({
+        page,
+        page_size: pageSize,
+        report_type: filters?.report_type,
+        status: filters?.status,
+        school: filters?.school,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
 
-    return makeRequest(`${URLS.reports}?${params}`);
+  async getReportSummary(filters?: {
+    report_type?: "absence" | "behaviour";
+    status?: string;
+    school?: string;
+    search?: string;
+  }): Promise<ReportSummary> {
+    return makeRequest(
+      `${URLS.report_summary}${buildQuery({
+        report_type: filters?.report_type,
+        status: filters?.status,
+        school: filters?.school,
+        search: filters?.search,
+      })}`
+    );
   },
 
   async getReport(
@@ -369,17 +455,33 @@ export const adminApiClient = {
       ordering?: string;
     }
   ): Promise<PaginatedResponse<Announcement>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.category && { category: filters.category }),
-      ...(filters?.target_group && { target_group: filters.target_group }),
-      ...(filters?.pinned !== undefined && { pinned: filters.pinned.toString() }),
-      ...(filters?.search && { search: filters.search }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
+    return makeRequest(
+      `${URLS.announcements}${buildQuery({
+        page,
+        page_size: pageSize,
+        category: filters?.category,
+        target_group: filters?.target_group,
+        pinned: filters?.pinned,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
 
-    return makeRequest(`${URLS.announcements}?${params}`);
+  async getAnnouncementSummary(filters?: {
+    category?: string;
+    target_group?: string;
+    pinned?: boolean;
+    search?: string;
+  }): Promise<AnnouncementSummary> {
+    return makeRequest(
+      `${URLS.announcement_summary}${buildQuery({
+        category: filters?.category,
+        target_group: filters?.target_group,
+        pinned: filters?.pinned,
+        search: filters?.search,
+      })}`
+    );
   },
 
   async getAnnouncement(id: string): Promise<Announcement> {
@@ -433,18 +535,30 @@ export const adminApiClient = {
       ordering?: string;
     }
   ): Promise<PaginatedResponse<Membership>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.type && { type: filters.type }),
-      ...(filters?.is_active !== undefined && {
-        is_active: filters.is_active.toString(),
-      }),
-      ...(filters?.search && { search: filters.search }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
+    return makeRequest(
+      `${URLS.memberships}${buildQuery({
+        page,
+        page_size: pageSize,
+        type: filters?.type,
+        is_active: filters?.is_active,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
 
-    return makeRequest(`${URLS.memberships}?${params}`);
+  async getMembershipSummary(filters?: {
+    type?: string;
+    is_active?: boolean;
+    search?: string;
+  }): Promise<MembershipSummary> {
+    return makeRequest(
+      `${URLS.membership_summary}${buildQuery({
+        type: filters?.type,
+        is_active: filters?.is_active,
+        search: filters?.search,
+      })}`
+    );
   },
 
   async getMembership(id: string): Promise<Membership> {
@@ -477,28 +591,50 @@ export const adminApiClient = {
       action_type?: string;
       entity_type?: string;
       admin?: string;
+      search?: string;
       date_from?: string;
       date_to?: string;
       ordering?: string;
     }
-  ): Promise<PaginatedResponse<any>> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      page_size: pageSize.toString(),
-      ...(filters?.action_type && { action_type: filters.action_type }),
-      ...(filters?.entity_type && { entity_type: filters.entity_type }),
-      ...(filters?.admin && { admin: filters.admin }),
-      ...(filters?.date_from && { date_from: filters.date_from }),
-      ...(filters?.date_to && { date_to: filters.date_to }),
-      ...(filters?.ordering && { ordering: filters.ordering }),
-    });
+  ): Promise<PaginatedResponse<AdminAuditLog>> {
+    return makeRequest(
+      `${URLS.audit_logs}${buildQuery({
+        page,
+        page_size: pageSize,
+        action_type: filters?.action_type,
+        entity_type: filters?.entity_type,
+        admin: filters?.admin,
+        search: filters?.search,
+        date_from: filters?.date_from,
+        date_to: filters?.date_to,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
 
-    return makeRequest(`${URLS.audit_logs}?${params}`);
+  async getAuditLogSummary(filters?: {
+    action_type?: string;
+    entity_type?: string;
+    admin?: string;
+    search?: string;
+  }): Promise<AuditLogSummary> {
+    return makeRequest(
+      `${URLS.audit_logs_summary}${buildQuery({
+        action_type: filters?.action_type,
+        entity_type: filters?.entity_type,
+        admin: filters?.admin,
+        search: filters?.search,
+      })}`
+    );
   },
 
   // ============== DASHBOARD OVERVIEW ==============
   async getDashboardStats(): Promise<DashboardStats> {
     return makeRequest(URLS.overview_stats);
+  },
+
+  async getOverviewWorkspace(): Promise<OverviewWorkspace> {
+    return makeRequest(URLS.overview_workspace);
   },
 };
 
