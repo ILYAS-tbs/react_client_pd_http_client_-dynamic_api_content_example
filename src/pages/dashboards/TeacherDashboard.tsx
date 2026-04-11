@@ -182,23 +182,25 @@ const TeacherDashboard: React.FC = () => {
   const tabs = [
     { id: "overview", label: getTranslation('overview', language), icon: TrendingUp },
     { id: "classes", label: getTranslation('myClasses', language), icon: Users },
+       { id: "homeworks", label: getTranslation('homeworksTab', language), icon: ClipboardList },
+    { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
+    { id: "grades", label: getTranslation('marks', language), icon: FileText },
+
     {
       id: "attendance",
       label: getTranslation('teacherAbsencesTab', language),
       icon: FileX2,
     },
-    { id: "homeworks", label: getTranslation('homeworksTab', language), icon: ClipboardList },
-    { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
-    // { id: "schedule", label: getTranslation('classSchedule', language), icon: Calendar },
-
-    { id: "grades", label: getTranslation('marks', language), icon: FileText },
-    { id: "resources", label: getTranslation('educationalMaterials', language), icon: BookOpen },
-    { id: "chat", label: getTranslation('communication_teacher', language), icon: MessageCircle },
-    {
+       {
       id: "behaviour_notes",
       label: getTranslation('behaviourNotesTab', language),
       icon: ClipboardList,
     },
+    // { id: "schedule", label: getTranslation('classSchedule', language), icon: Calendar },
+    { id: "chat", label: getTranslation('communication_teacher', language), icon: MessageCircle },
+
+    { id: "resources", label: getTranslation('educationalMaterials', language), icon: BookOpen },
+ 
   ];
 
   //! Mapping the Schedule from API to Frontendshape :

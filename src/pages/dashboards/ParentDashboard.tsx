@@ -385,42 +385,48 @@ const ParentDashboard: React.FC = () => {
       label: getTranslation("timetable", language),
       icon: LayoutGrid,
     },
-        {
-      id: "weekly_menu",
-      label: getTranslation("weeklyMenu", language),
-      icon: FileText,
-    },
-    {
+      {
       id: "homework",
       label: getTranslation("homeworksTab", language),
       icon: BookOpen,
     },
-    {
+       {
       id: "evaluations",
       label: getTranslation("monthlyEvaluation", language),
       icon: ClipboardList,
     },
-    { id: "grades", label: getTranslation("gradesOfMyKids", language), icon: FileText },
+        { id: "grades", label: getTranslation("gradesOfMyKids", language), icon: FileText },
     {
       id: "kid_absences",
       label: getTranslation("myKidsAbsencesTab", language),
       icon: Calendar,
     },
-    {
+      {
       id: "behaviour_reports",
       label: getTranslation("behaviourReportsTab", language),
       icon: FileText,
     },
+        {
+      id: "exam_schedule",
+      label: getTranslation("ExamSchedule", language),
+      icon: FileText,
+    },
+      
        {
       id: "chat",
       label: getTranslation("chat", language),
       icon: MessageCircle,
     },
-    {
-      id: "exam_schedule",
-      label: getTranslation("ExamSchedule", language),
+        {
+      id: "weekly_menu",
+      label: getTranslation("weeklyMenu", language),
       icon: FileText,
     },
+  
+ 
+
+
+
 
 
  
