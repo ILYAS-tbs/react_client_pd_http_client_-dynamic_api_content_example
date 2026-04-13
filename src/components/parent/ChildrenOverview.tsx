@@ -240,7 +240,7 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Absences Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-7 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+            {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-7 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-3">
@@ -257,10 +257,10 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   <Calendar className="h-8 w-8 text-primary-500" />
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Subjects Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-7 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+            {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-7 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-3">
@@ -277,7 +277,8 @@ const ChildrenOverview: React.FC<ChildrenOverviewProps> = ({
                   <BookOpen className="h-8 w-8 text-purple-500" />
                 </div>
               </div>
-            </div>
+            </div> */}
+
           </div>
         </>
       ) : null}

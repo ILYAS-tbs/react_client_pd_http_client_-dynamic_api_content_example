@@ -43,7 +43,7 @@ const ParentExamScheduleManagement: React.FC<ParentExamScheduleManagementProps> 
         </h2>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         <div className="relative">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
@@ -54,7 +54,7 @@ const ParentExamScheduleManagement: React.FC<ParentExamScheduleManagementProps> 
             className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-x-auto">
         <div className="p-6">

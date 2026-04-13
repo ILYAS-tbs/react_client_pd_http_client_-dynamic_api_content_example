@@ -1084,11 +1084,11 @@ export const translations: Translations = {
     en: "Weekly Meals",
     fr: "Repas hebdomadaires",
   },
-  weeklyMenu: {
-    ar: "القائمة الأسبوعية",
-    en: "Weekly Menu",
-    fr: "Menu hebdomadaire",
-  },
+weeklyMenu: {
+    ar: "وجبات الأسبوع",
+    en: "Weekly Meals",
+    fr: "Repas hebdomadaires",
+},
   Reports: { ar: "تقارير", en: "Reports", fr: "Rapports" },
   GradeOverview: {
     ar: "المعدل الفصلي",
@@ -2962,11 +2962,11 @@ export const translations: Translations = {
     en: "Teaching Materials",
     fr: "Supports pedagogiques",
   },
-  educationalMaterials: {
-    ar: "المواد التعليمية",
-    en: "Educational Materials",
-    fr: "Matériaux éducatifs",
-  },
+educationalMaterials: {
+    ar: "المكتبة الرقمية",
+    en: "Digital Library",
+    fr: "Bibliothèque numérique",
+},
   communication_teacher: {
     ar: "دردشة",
     en: "Communication",
@@ -4436,6 +4436,25 @@ export const translations: Translations = {
   attendanceTabSubtitle: { ar: "سجل الغياب حسب الحصة والقسم والمادة", en: "Track absences by hour, class, and module", fr: "Suivez les absences par heure, classe et matière" },
   attendanceSaved: { ar: "تم حفظ سجل الحضور", en: "Attendance saved", fr: "Présence enregistrée" },
   attendanceSaveFailed: { ar: "فشل حفظ سجل الحضور", en: "Failed to save attendance", fr: "Échec de l'enregistrement des présences" },
+  addAbsence: { ar: "إضافة غياب", en: "Add Absence", fr: "Ajouter une absence" },
+  editAbsence: { ar: "تعديل الغياب", en: "Edit Absence", fr: "Modifier l'absence" },
+  absenceSaved: { ar: "تم حفظ الغياب", en: "Absence saved", fr: "Absence enregistrée" },
+  absenceUpdated: { ar: "تم تحديث الغياب", en: "Absence updated", fr: "Absence mise à jour" },
+  absenceSaveFailed: { ar: "فشل حفظ الغياب", en: "Failed to save absence", fr: "Échec de l'enregistrement de l'absence" },
+  absenceUpdateFailed: { ar: "فشل تحديث الغياب", en: "Failed to update absence", fr: "Échec de la mise à jour de l'absence" },
+  absenceRemark: { ar: "ملاحظة الغياب", en: "Absence Remark", fr: "Remarque sur l'absence" },
+  absenceRemarkPlaceholder: { ar: "أضف ملاحظة اختيارية حول هذا الغياب...", en: "Add an optional note for this absence...", fr: "Ajoutez une note facultative pour cette absence..." },
+  session: { ar: "الحصة", en: "Session", fr: "Séance" },
+  allSessions: { ar: "جميع الحصص", en: "All Sessions", fr: "Toutes les séances" },
+  session1: { ar: "الحصة الأولى", en: "1st Session", fr: "1re séance" },
+  session2: { ar: "الحصة الثانية", en: "2nd Session", fr: "2e séance" },
+  session3: { ar: "الحصة الثالثة", en: "3rd Session", fr: "3e séance" },
+  session4: { ar: "الحصة الرابعة", en: "4th Session", fr: "4e séance" },
+  session5: { ar: "الحصة الخامسة", en: "5th Session", fr: "5e séance" },
+  session6: { ar: "الحصة السادسة", en: "6th Session", fr: "6e séance" },
+  session7: { ar: "الحصة السابعة", en: "7th Session", fr: "7e séance" },
+  session8: { ar: "الحصة الثامنة", en: "8th Session", fr: "8e séance" },
+  noAbsencesFound: { ar: "لا توجد غيابات مطابقة", en: "No absences found", fr: "Aucune absence trouvée" },
   teacherAbsencesTab: { ar: "الغيابات", en: "Absences", fr: "Absences" },
   teacherAbsencesTabSubtitle: { ar: "إدارة وإضافة الغيابات حسب الحصة والقسم والمادة", en: "Manage and add absences by hour, class, and module", fr: "Gérez et ajoutez les absences par heure, classe et matière" },
   teacherAbsenceSaved: { ar: "تم حفظ الغياب", en: "Absence saved", fr: "Absence enregistrée" },
@@ -4473,7 +4492,10 @@ export const translations: Translations = {
   searchBehaviourReports: { ar: "ابحث في ملاحظات السلوك...", en: "Search behaviour notes...", fr: "Rechercher des notes de comportement..." },
   generalNote: { ar: "ملاحظة عامة", en: "General note", fr: "Note générale" },
   studentAbsencesTab: { ar: "غيابات الطلاب", en: "Student Absences", fr: "Absences des élèves" },
+  absencesViewerTab: { ar: "عرض الغيابات", en: "Absences Viewer", fr: "Consultation des absences" },
+  manageAbsencesTab: { ar: "إدارة الغيابات", en: "Manage Absences", fr: "Gérer les absences" },
   studentAbsencesSubtitle: { ar: "تابع الغياب والتبريرات والحذف الإداري من مكان واحد", en: "Review absences, justifications, and manual deletions in one place", fr: "Consultez les absences, justifications et suppressions manuelles au même endroit" },
+  manageAbsencesSubtitle: { ar: "حدد القسم والتاريخ والحصة ثم سجّل الغياب مباشرة من القائمة", en: "Pick a class, date, and session to mark absences inline from the student list", fr: "Choisissez une classe, une date et une séance pour marquer les absences directement dans la liste" },
   bulkApprove: { ar: "موافقة جماعية", en: "Bulk Approve", fr: "Approbation groupée" },
   allModules: { ar: "جميع المواد", en: "All Modules", fr: "Toutes les matières" },
   allStatuses: { ar: "جميع الحالات", en: "All Statuses", fr: "Tous les statuts" },
@@ -4487,6 +4509,17 @@ export const translations: Translations = {
   justification: { ar: "التبرير", en: "Justification", fr: "Justification" },
   refuse: { ar: "رفض", en: "Refuse", fr: "Refuser" },
   deleteAbsence: { ar: "حذف الغياب", en: "Delete Absence", fr: "Supprimer l'absence" },
+  markAbsent: { ar: "تسجيل غياب", en: "Mark Absent", fr: "Marquer absent" },
+  pendingConfirmation: { ar: "غياب قيد التثبيت", en: "Pending", fr: "En attente" },
+  confirmedAbsent: { ar: "غياب مؤكد", en: "Confirmed", fr: "Confirmé" },
+  undoWindow: { ar: "مهلة التراجع", en: "Undo Window", fr: "Fenêtre d'annulation" },
+  autoTeacherModuleHint: { ar: "إذا لم تحدد الأستاذ أو المادة، سيحاول النظام استنتاجهما تلقائياً من إعدادات القسم.", en: "If teacher or module is left blank, the system will try to infer them from the class assignment setup.", fr: "Si l'enseignant ou la matière restent vides, le système essaiera de les déduire depuis les affectations de la classe." },
+  currentSlotAbsences: { ar: "غيابات هذه الحصة", en: "Current Slot Absences", fr: "Absences de cette séance" },
+  readyToMark: { ar: "جاهز للتسجيل", en: "Ready to mark", fr: "Prêt à marquer" },
+  selectClassGroup: { ar: "اختر القسم", en: "Select Class Group", fr: "Sélectionner la classe" },
+  studentStatus: { ar: "الحالة", en: "Status", fr: "Statut" },
+  quickMarkFailed: { ar: "فشل تسجيل الغياب السريع", en: "Quick mark failed", fr: "Échec du marquage rapide" },
+  undoFailed: { ar: "فشل التراجع عن الغياب", en: "Undo failed", fr: "Échec de l'annulation" },
   reviewNotePrompt: { ar: "أضف ملاحظة المراجعة", en: "Add a review note", fr: "Ajouter une note de révision" },
   deleteAbsenceReasonPrompt: { ar: "ما سبب حذف هذا الغياب؟", en: "Why are you deleting this absence?", fr: "Pourquoi supprimez-vous cette absence ?" },
   manualDeletionReason: { ar: "حذف إداري", en: "Manual deletion", fr: "Suppression manuelle" },
@@ -4560,7 +4593,11 @@ export function getTranslation(key: string, language: string): string {
     let entry = translations;
     for (const k of keys) {
       entry = entry?.[k];
-      if (!entry) return key;
+      if (!entry) {
+        const fallbackKey = keys[keys.length - 1];
+        const fallbackEntry = fallbackKey ? translations[fallbackKey] : undefined;
+        return fallbackEntry?.[language] || fallbackEntry?.ar || key;
+      }
     }
     return entry[language] || entry.ar || key;
   }

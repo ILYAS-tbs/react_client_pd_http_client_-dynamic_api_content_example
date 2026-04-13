@@ -37,6 +37,7 @@ import { User } from "../../contexts/AuthContext";
 import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
 import SchoolAttendanceTab from "../../components/school/SchoolAttendanceTab";
+import SchoolManageAbsencesTab from "../../components/school/SchoolManageAbsencesTab";
 import SchoolBehaviourReportsTab from "../../components/school/SchoolBehaviourReportsTab";
 import SchoolGradesTab from "../../components/school/SchoolGradesTab";
 
@@ -245,7 +246,7 @@ const SchoolDashboard: React.FC = () => {
     { title: getTranslation("TotalStudents", language), value: students.length || "0", icon: Users, color: "bg-primary-500", tab: "users" },
     { title: getTranslation("Teachers", language), value: teachers.length || "0", icon: Users, color: "bg-primary-400", tab: "users" },
     { title: getTranslation("Classes", language), value: class_groups.length || "0", icon: FileText, color: "bg-primary-500", tab: "levels" },
-    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-primary-400", tab: "student_absences" },
+    { title: getTranslation("TotalAbsences", language), value: total_num_of_absences() || "0", icon: BarChart2, color: "bg-primary-400", tab: "student_absences_viewer" },
   ]
 
 
@@ -257,7 +258,8 @@ const SchoolDashboard: React.FC = () => {
     { id: "homeworks", label: getTranslation("homeworksTab", language), icon: BookOpen },
     { id: "evaluations", label: getTranslation("monthlyEvaluation", language), icon: ClipboardList },
     { id: "grades", label: getTranslation("marks", language), icon: FileText },
-    { id: "student_absences", label: getTranslation('studentAbsencesTab', language), icon: BarChart2 },
+    { id: "student_absences_viewer", label: getTranslation('absencesViewerTab', language), icon: BarChart2 },
+    { id: "manage_absences", label: getTranslation('manageAbsencesTab', language), icon: ClipboardList },
     { id: "behaviour_reports", label: getTranslation('behaviourReportsTab', language), icon: FileText },
     { id: "exams", label: getTranslation('ExamSchedule', language), icon: FileText },
     { id: "chat", label: getTranslation("chat", language), icon: MessageCircle },
@@ -364,9 +366,18 @@ const SchoolDashboard: React.FC = () => {
         );
       case "weekly_meals":
         return <WeeklyMealsManagement schoolId={school_id} />;
-      case "student_absences":
+      case "student_absences_viewer":
         return (
           <SchoolAttendanceTab
+            students={students}
+            classGroups={class_groups}
+            teachers={teachers}
+            modules={modules}
+          />
+        );
+      case "manage_absences":
+        return (
+          <SchoolManageAbsencesTab
             students={students}
             classGroups={class_groups}
             teachers={teachers}

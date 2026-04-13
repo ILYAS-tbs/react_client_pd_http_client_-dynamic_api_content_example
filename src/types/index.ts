@@ -7,7 +7,6 @@ import { Parent } from "../models/ParenAndStudent";
 import { SchoolStat } from "../models/SchoolStat";
 import { Student } from "../models/Student";
 import { Teacher } from "../models/Teacher";
-import { TeacherAbsence } from "../models/TeacherAbsence";
 import { TeacherModuleClassGroup } from "../models/TeacherModuleClassGroup";
 import { TeacherUpload } from "../models/TeacherUpload";
 import { StudentPerformance } from "../models/StudentPerformance";
@@ -146,15 +145,6 @@ export interface ClassManagementProps {
 // to
 export interface MonthylEvaluationProps {
   modules_class_groups: TeacherModuleClassGroup[];
-}
-
-export interface TeacherAbsenceManagerProps {
-  absences: TeacherAbsence[];
-  setAbsences: React.Dispatch<React.SetStateAction<TeacherAbsence[]>>;
-  students_list: Student[];
-  teacher_id: number;
-  behaviour_reports: BehaviourReport[];
-  setBehaviourReports: React.Dispatch<React.SetStateAction<BehaviourReport[]>>;
 }
 
 export interface GradeManagerProps {

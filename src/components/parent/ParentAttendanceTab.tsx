@@ -12,6 +12,25 @@ interface ParentAttendanceTabProps {
   selectedStudentId?: string | null;
 }
 
+function getLocalizedSessionLabel(hour: number, language: string) {
+  return getTranslation(`session${hour}` as never, language);
+}
+
+function getLocalizedStatus(status: string, language: string) {
+  switch (status) {
+    case "approved":
+      return getTranslation("approved", language);
+    case "pending":
+      return getTranslation("pending", language);
+    case "refused":
+      return getTranslation("refused", language);
+    case "absent":
+      return getTranslation("absent", language);
+    default:
+      return status;
+  }
+}
+
 const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, selectedStudentId }) => {
   const { language } = useLanguage();
   const [absences, setAbsences] = useState<AttendanceAbsence[]>([]);
@@ -113,6 +132,7 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
                         <tr className="border-b border-gray-200 text-left text-gray-500 dark:border-gray-700 dark:text-gray-400">
                           <th className="px-3 py-2">{getTranslation("Date", language)}</th>
                           <th className="px-3 py-2">{getTranslation("moduleHour", language)}</th>
+                          <th className="px-3 py-2">{getTranslation("teacher", language)}</th>
                           <th className="px-3 py-2">{getTranslation("status", language)}</th>
                           <th className="px-3 py-2">{getTranslation("justification", language)}</th>
                           <th className="px-3 py-2">{getTranslation("actions", language)}</th>
@@ -122,8 +142,9 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
                         {items.map((absence) => (
                           <tr key={absence.id} className="border-b border-gray-100 dark:border-gray-800">
                             <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.date}</td>
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.module?.module_name ?? "—"} / {absence.hour}</td>
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.status}</td>
+                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.module?.module_name ?? "—"} / {getLocalizedSessionLabel(absence.hour, language)}</td>
+                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.teacher.full_name}</td>
+                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{getLocalizedStatus(absence.status, language)}</td>
                             <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.justification?.comment ?? "—"}</td>
                             <td className="px-3 py-3">
                               {!absence.is_deleted && absence.justification?.status !== "pending" && absence.justification?.status !== "approved" ? (
@@ -180,7 +201,8 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
             <form onSubmit={submitJustification} className="space-y-4">
               <div className="rounded-2xl bg-gray-50 p-4 text-sm dark:bg-gray-800">
                 <p className="font-semibold text-gray-900 dark:text-white">{selectedAbsence.student.full_name}</p>
-                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.date} • {selectedAbsence.module?.module_name ?? "—"} / {selectedAbsence.hour}</p>
+                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.date} • {selectedAbsence.module?.module_name ?? "—"} / {getLocalizedSessionLabel(selectedAbsence.hour, language)}</p>
+                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.teacher.full_name}</p>
               </div>
               <label className="block space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 <span>{getTranslation("comment", language)}</span>

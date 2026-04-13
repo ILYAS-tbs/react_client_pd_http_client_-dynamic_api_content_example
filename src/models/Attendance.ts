@@ -45,6 +45,9 @@ export interface AttendanceAbsence {
   class_group?: AttendanceLinkedClassGroup | null;
   date: string;
   hour: number;
+  session: number;
+  session_label?: string | null;
+  remark?: string | null;
   created_at: string;
   deleted_at?: string | null;
   deleted_reason?: string | null;
@@ -58,9 +61,21 @@ export interface AttendanceAbsence {
 export interface MarkAttendancePayload {
   student_id: string;
   module_id: string;
+  teacher_id: number;
   class_group_id?: string;
   date: string;
   hour: number;
+  remark?: string;
+}
+
+export interface QuickMarkAbsencePayload {
+  student_id: string;
+  class_group_id: string;
+  date: string;
+  session: number;
+  module_id?: string;
+  teacher_id?: number;
+  remark?: string;
 }
 
 export interface SubmitJustificationPayload {
@@ -78,8 +93,11 @@ export interface AttendanceFilters {
   student?: string;
   class?: string;
   module?: string;
+  teacher?: string;
+  date?: string;
   date_from?: string;
   date_to?: string;
+  hour?: number;
   status?: string;
   include_deleted?: boolean;
 }

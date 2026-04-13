@@ -2,6 +2,7 @@ import {
   AttendanceAbsence,
   AttendanceFilters,
   MarkAttendancePayload,
+  QuickMarkAbsencePayload,
   ReviewJustificationPayload,
   SubmitJustificationPayload,
 } from "../../../models/Attendance";
@@ -43,7 +44,7 @@ async function listAbsences(
 }
 
 async function markAbsences(
-  absences: MarkAttendancePayload[],
+  absences: MarkAttendancePayload[] | MarkAttendancePayload,
   csrfToken: string
 ): Promise<ApiResponse<AttendanceAbsence[]>> {
   try {
@@ -54,11 +55,11 @@ async function markAbsences(
         "X-CSRFToken": csrfToken,
       },
       credentials: "include",
-      body: JSON.stringify({ absences }),
+      body: JSON.stringify(absences),
     });
     const data = await response.json();
     if (!response.ok) return { ok: false, status: response.status, error: data };
-    return { ok: true, status: response.status, data };
+    return { ok: true, status: response.status, data: Array.isArray(data) ? data : [data] };
   } catch (error) {
     return { ok: false, error };
   }
@@ -89,23 +90,48 @@ async function deleteAbsence(
   }
 }
 
-async function undoAbsence(
+async function updateAbsence(
   absenceId: string,
+  payload: Partial<MarkAttendancePayload>,
   csrfToken: string
-): Promise<ApiResponse<null>> {
+): Promise<ApiResponse<AttendanceAbsence>> {
   try {
-    const response = await fetch(`${BASE_URL}/attendance/absence/${absenceId}/undo/`, {
-      method: "DELETE",
+    const response = await fetch(`${BASE_URL}/attendance/absence/${absenceId}/`, {
+      method: "PATCH",
       headers: {
+        "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
       },
       credentials: "include",
+      body: JSON.stringify(payload),
     });
+    const data = await response.json().catch(() => null);
     if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      return { ok: false, status: response.status, error: errorData };
+      return { ok: false, status: response.status, error: data };
     }
-    return { ok: true, status: response.status, data: null };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+async function quickMarkAbsence(
+  payload: QuickMarkAbsencePayload,
+  csrfToken: string
+): Promise<ApiResponse<AttendanceAbsence>> {
+  try {
+    const response = await fetch(`${BASE_URL}/school/absences/quick-mark/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) return { ok: false, status: response.status, error: data };
+    return { ok: true, status: response.status, data };
   } catch (error) {
     return { ok: false, error };
   }
@@ -166,8 +192,9 @@ async function reviewJustification(
 export const attendance_client = {
   listAbsences,
   markAbsences,
+  quickMarkAbsence,
   deleteAbsence,
-  undoAbsence,
+  updateAbsence,
   submitJustification,
   reviewJustification,
 };

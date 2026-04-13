@@ -4,7 +4,6 @@ import {
   PatchMonthlyEvaluationPayload,
   PatchStudentPayload,
   PostMonthlyEvaluationPayload,
-  PostAbsencePayload,
   PostBehaviourReportPayload,
   PostMarkPayload,
   PostStudentGradesPayload,
@@ -33,8 +32,6 @@ const URLS = {
   save_grading_formula: `${BASE_URL}/teacher/grading-formulas/save_formula/`,
   recalculate_all_averages: `${BASE_URL}/teacher/grading-formulas/recalculate_all_averages/`,
   patch_student: `${BASE_URL}/student/students/`,
-
-  post_absence: `${BASE_URL}/class-group/absences/`,
 
   post_behaviour_report: `${BASE_URL}/school/behaviour-reports/`,
 
@@ -282,50 +279,6 @@ async function patch_student(
   } catch (error) {
     return { ok: false, error: error };
   }
-}
-
-// ! Create absence
-async function post_absence(payload: PostAbsencePayload, csrf_token: string) {
-  try {
-    const response = await fetch(URLS.post_absence, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrf_token,
-      },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-    return { ok: response.ok, status: response.status, data: data };
-  } catch (error) {
-    return { ok: false, error: error };
-  }
-}
-
-async function mark_student_absent_today(
-  studentId: string,
-  teacherId: number,
-  csrfToken: string
-) {
-  const patchResult = await patch_student(
-    studentId,
-    { is_absent: true },
-    csrfToken
-  );
-
-  if (!patchResult.ok) {
-    return patchResult;
-  }
-
-  return post_absence(
-    {
-      student_id: studentId,
-      teacher_id: teacherId,
-    },
-    csrfToken
-  );
 }
 
 //! Create Behaviour Report :
@@ -773,9 +726,6 @@ export const teacher_dashboard_client = {
   get_filtered_monthly_evaluations: get_filtered_monthly_evaluations,
 
   patch_student: patch_student,
-  mark_student_absent_today: mark_student_absent_today,
-
-  post_absence: post_absence,
 
   post_behaviour_report: post_behaviour_report,
 

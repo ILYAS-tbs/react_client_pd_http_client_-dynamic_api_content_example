@@ -6,7 +6,6 @@ import {
   FileText,
   TrendingUp,
   Upload,
-  FileX2,
   ClipboardList,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -29,7 +28,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { getTranslation } from "../../utils/translations";
-import TeacherAttendanceTab from "../../components/teacher/TeacherAttendanceTab";
 import TeacherBehaviourNotesTab from "../../components/teacher/TeacherBehaviourNotesTab";
 
 interface TeacherDashboardStats {
@@ -176,7 +174,7 @@ const TeacherDashboard: React.FC = () => {
     { title: getTranslation('myClasses', language), value: teacherStats.my_classes || "0", icon: Users, color: "bg-primary-500", tab: "classes" },
     { title: getTranslation('marks', language), value: teacherStats.grades || "0", icon: FileText, color: "bg-primary-400", tab: "grades" },
     { title: getTranslation('chats', language), value: teacherStats.chats || "0", icon: MessageCircle, color: "bg-primary-500", tab: "chat" },
-    { title: getTranslation('teachingMaterials', language), value: teacherStats.teaching_materials || "0", icon: Upload, color: "bg-primary-400", tab: "resources" },
+    { title: getTranslation('educationalMaterials', language), value: teacherStats.teaching_materials || "0", icon: Upload, color: "bg-primary-400", tab: "resources" },
   ];
 
   const tabs = [
@@ -185,12 +183,6 @@ const TeacherDashboard: React.FC = () => {
        { id: "homeworks", label: getTranslation('homeworksTab', language), icon: ClipboardList },
     { id: "monthly_evaluation", label: getTranslation('monthlyEvaluation', language), icon: FileText },
     { id: "grades", label: getTranslation('marks', language), icon: FileText },
-
-    {
-      id: "attendance",
-      label: getTranslation('teacherAbsencesTab', language),
-      icon: FileX2,
-    },
        {
       id: "behaviour_notes",
       label: getTranslation('behaviourNotesTab', language),
@@ -340,10 +332,6 @@ const TeacherDashboard: React.FC = () => {
       //       </div>
       //     </div>
       //   );
-      case "attendance":
-        return (
-          <TeacherAttendanceTab students={students} modulesClassGroups={modules_class_groups} />
-        );
       case "behaviour_notes":
         return (
           <TeacherBehaviourNotesTab students={students} modulesClassGroups={modules_class_groups} />

@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Check, Download, Search, Trash2, X } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Check, Download, Search, SquarePen, Trash2, X } from "lucide-react";
 import { AttendanceAbsence, AttendanceFilters } from "../../models/Attendance";
 import { attendance_client } from "../../services/http_api/attendance/attendance_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
@@ -17,16 +17,58 @@ interface SchoolAttendanceTabProps {
   modules: Module[];
 }
 
-function downloadCsv(rows: AttendanceAbsence[]) {
+interface AbsenceFormState {
+  student_id: string;
+  teacher_id: string;
+  module_id: string;
+  class_group_id: string;
+  date: string;
+  hour: number;
+  remark: string;
+}
+
+function createEmptyFormState(date = new Date().toISOString().slice(0, 10)): AbsenceFormState {
+  return {
+    student_id: "",
+    teacher_id: "",
+    module_id: "",
+    class_group_id: "",
+    date,
+    hour: 1,
+    remark: "",
+  };
+}
+
+function getSessionLabel(hour: number, language: string) {
+  return getTranslation(`session${hour}` as never, language);
+}
+
+function getStatusLabel(status: string, language: string) {
+  switch (status) {
+    case "approved":
+      return getTranslation("approved", language);
+    case "pending":
+      return getTranslation("pending", language);
+    case "refused":
+      return getTranslation("refused", language);
+    case "absent":
+      return getTranslation("absent", language);
+    default:
+      return status;
+  }
+}
+
+function downloadCsv(rows: AttendanceAbsence[], language: string) {
   const csv = [
-    ["Student", "Class", "Module", "Hour", "Date", "Teacher", "Status"],
+    ["Student", "Class", "Module", "Session", "Date", "Teacher", "Remark", "Status"],
     ...rows.map((row) => [
       row.student.full_name,
       row.class_group?.name ?? "",
       row.module?.module_name ?? "",
-      String(row.hour),
+      getSessionLabel(row.hour, language),
       row.date,
       row.teacher.full_name,
+      row.remark ?? "",
       row.status,
     ]),
   ]
@@ -48,23 +90,58 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
   const { language } = useLanguage();
   const [filters, setFilters] = useState<AttendanceFilters>({ include_deleted: true });
   const [absences, setAbsences] = useState<AttendanceAbsence[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [studentQuery, setStudentQuery] = useState("");
   const [classQuery, setClassQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingAbsence, setEditingAbsence] = useState<AttendanceAbsence | null>(null);
+  const [formState, setFormState] = useState<AbsenceFormState>(() => createEmptyFormState());
 
-  const resetFilters = () => {
-    setStudentQuery("");
-    setClassQuery("");
-    setFilters({ include_deleted: true });
-  };
+  const selectedClassStudents = useMemo(() => {
+    if (!formState.class_group_id) {
+      return students;
+    }
+    return students.filter((student) => student.class_group?.class_group_id === formState.class_group_id);
+  }, [formState.class_group_id, students]);
 
-  const loadAbsences = async () => {
+  useEffect(() => {
+    if (!formState.class_group_id && classGroups[0]) {
+      setFormState((current) => ({ ...current, class_group_id: classGroups[0].class_group_id }));
+    }
+  }, [classGroups, formState.class_group_id]);
+
+  useEffect(() => {
+    if (!formState.student_id && selectedClassStudents[0]) {
+      setFormState((current) => ({ ...current, student_id: selectedClassStudents[0].student_id }));
+    }
+  }, [formState.student_id, selectedClassStudents]);
+
+  useEffect(() => {
+    if (!formState.teacher_id && teachers[0]) {
+      setFormState((current) => ({ ...current, teacher_id: String(teachers[0].user.id) }));
+    }
+  }, [formState.teacher_id, teachers]);
+
+  useEffect(() => {
+    if (!formState.module_id && modules[0]) {
+      setFormState((current) => ({ ...current, module_id: modules[0].module_id }));
+    }
+  }, [formState.module_id, modules]);
+
+  const loadAbsences = useCallback(async () => {
+    setIsLoading(true);
     const res = await attendance_client.listAbsences({ ...filters, include_deleted: true });
-    if (res.ok) setAbsences(res.data);
-  };
+    if (res.ok) {
+      setAbsences(res.data);
+    }
+    setIsLoading(false);
+  }, [filters]);
 
   useEffect(() => {
     void loadAbsences();
-  }, [filters.module, filters.date_from, filters.date_to, filters.status]);
+  }, [loadAbsences]);
 
   const displayedAbsences = useMemo(() => {
     const normalizedStudentQuery = studentQuery.trim().toLowerCase();
@@ -107,9 +184,21 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
     });
   }, [activeAbsences]);
 
+  const resetFilters = () => {
+    setStudentQuery("");
+    setClassQuery("");
+    setFilters({ include_deleted: true });
+  };
+
   const review = async (justificationId: number, status: "approved" | "refused") => {
-    const note = status === "refused" ? window.prompt(getTranslation("reviewNotePrompt", language), "") ?? "" : "";
-    await attendance_client.reviewJustification(justificationId, { status, review_note: note }, getCSRFToken() ?? "");
+    const note = status === "refused"
+      ? window.prompt(getTranslation("reviewNotePrompt", language), "") ?? ""
+      : "";
+    await attendance_client.reviewJustification(
+      justificationId,
+      { status, review_note: note },
+      getCSRFToken() ?? ""
+    );
     await loadAbsences();
   };
 
@@ -118,6 +207,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
       .filter((absence) => absence.justification?.status === "pending")
       .map((absence) => absence.justification?.id)
       .filter((value): value is number => Boolean(value));
+
     for (const id of pendingIds) {
       await attendance_client.reviewJustification(id, { status: "approved" }, getCSRFToken() ?? "");
     }
@@ -125,10 +215,67 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
   };
 
   const removeAbsence = async (absenceId: string) => {
-    const reason = window.prompt(getTranslation("deleteAbsenceReasonPrompt", language), getTranslation("manualDeletionReason", language));
-    if (!reason) return;
+    const reason = window.prompt(
+      getTranslation("deleteAbsenceReasonPrompt", language),
+      getTranslation("manualDeletionReason", language)
+    );
+    if (!reason) {
+      return;
+    }
     await attendance_client.deleteAbsence(absenceId, reason, getCSRFToken() ?? "");
     await loadAbsences();
+  };
+
+  const openEditModal = (absence: AttendanceAbsence) => {
+    setEditingAbsence(absence);
+    setFormState({
+      student_id: absence.student.student_id,
+      teacher_id: String(absence.teacher.user),
+      module_id: absence.module?.module_id ?? "",
+      class_group_id:
+        absence.class_group?.class_group_id ??
+        absence.student.class_group?.class_group_id ??
+        "",
+      date: absence.date,
+      hour: absence.hour,
+      remark: absence.remark ?? "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const submitAbsence = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    const payload = {
+      student_id: formState.student_id,
+      teacher_id: Number(formState.teacher_id),
+      module_id: formState.module_id,
+      class_group_id: formState.class_group_id,
+      date: formState.date,
+      hour: formState.hour,
+      remark: formState.remark.trim(),
+    };
+
+    const csrf = getCSRFToken() ?? "";
+    const response = editingAbsence
+      ? await attendance_client.updateAbsence(editingAbsence.id, payload, csrf)
+      : await attendance_client.markAbsences(payload, csrf);
+
+    if (response.ok) {
+      setFeedback(getTranslation(editingAbsence ? "absenceUpdated" : "absenceSaved", language));
+      setIsModalOpen(false);
+      setEditingAbsence(null);
+      await loadAbsences();
+    } else {
+      const detail = typeof response.error === "object" && response.error !== null && "detail" in response.error
+        ? String((response.error as { detail?: unknown }).detail ?? "")
+        : "";
+      setFeedback(detail || getTranslation(editingAbsence ? "absenceUpdateFailed" : "absenceSaveFailed", language));
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -136,20 +283,40 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
       <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{getTranslation("studentAbsencesTab", language)}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{getTranslation("studentAbsencesSubtitle", language)}</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {getTranslation("studentAbsencesTab", language)}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {getTranslation("studentAbsencesSubtitle", language)}
+            </p>
           </div>
-          <div className="flex gap-3">
-            <button type="button" onClick={() => downloadCsv(displayedAbsences)} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => downloadCsv(displayedAbsences, language)}
+              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200"
+            >
               <Download className="h-4 w-4" />
               {getTranslation("exportCsv", language)}
             </button>
-            <button type="button" onClick={() => { void bulkApprove(); }} className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white">
+            <button
+              type="button"
+              onClick={() => {
+                void bulkApprove();
+              }}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white"
+            >
               <Check className="h-4 w-4" />
               {getTranslation("bulkApprove", language)}
             </button>
           </div>
         </div>
+
+        {feedback ? (
+          <div className="mb-4 rounded-2xl border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-700 dark:border-primary-500/20 dark:bg-primary-500/10 dark:text-primary-100">
+            {feedback}
+          </div>
+        ) : null}
 
         <div className="rounded-2xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-700 dark:bg-gray-900/40">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -164,7 +331,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
               {getTranslation("clearFilters", language)}
             </button>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               <span>{getTranslation("searchStudent", language)}</span>
               <span className="relative block">
@@ -192,29 +359,87 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
               </span>
             </label>
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("module", language)}</span>
-              <select value={filters.module ?? ""} onChange={(event) => setFilters((current) => ({ ...current, module: event.target.value || undefined }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900">
-                <option value="">{getTranslation("allModules", language)}</option>
-                {modules.map((module) => <option key={module.module_id} value={module.module_id}>{module.module_name}</option>)}
+              <span>{getTranslation("class", language)}</span>
+              <select
+                value={filters.class ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, class: event.target.value || undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              >
+                <option value="">{getTranslation("allClasses", language)}</option>
+                {classGroups.map((classGroup) => (
+                  <option key={classGroup.class_group_id} value={classGroup.class_group_id}>
+                    {classGroup.name}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <span>{getTranslation("module", language)}</span>
+              <select
+                value={filters.module ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, module: event.target.value || undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              >
+                <option value="">{getTranslation("allModules", language)}</option>
+                {modules.map((module) => (
+                  <option key={module.module_id} value={module.module_id}>
+                    {module.module_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <span>{getTranslation("teacher", language)}</span>
+              <select
+                value={filters.teacher ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, teacher: event.target.value || undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              >
+                <option value="">{getTranslation("allTeachers", language)}</option>
+                {teachers.map((teacher) => (
+                  <option key={teacher.user.id} value={teacher.user.id}>
+                    {teacher.full_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <span>{getTranslation("session", language)}</span>
+              <select
+                value={filters.hour ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, hour: event.target.value ? Number(event.target.value) : undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              >
+                <option value="">{getTranslation("allSessions", language)}</option>
+                {Array.from({ length: 8 }, (_, index) => index + 1).map((hour) => (
+                  <option key={hour} value={hour}>
+                    {getSessionLabel(hour, language)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <span>{getTranslation("Date", language)}</span>
+              <input
+                type="date"
+                value={filters.date ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, date: event.target.value || undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              />
+            </label>
+            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               <span>{getTranslation("status", language)}</span>
-              <select value={filters.status ?? ""} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value || undefined }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900">
+              <select
+                value={filters.status ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value || undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              >
                 <option value="">{getTranslation("allStatuses", language)}</option>
                 <option value="absent">{getTranslation("absent", language)}</option>
                 <option value="pending">{getTranslation("pending", language)}</option>
                 <option value="approved">{getTranslation("approved", language)}</option>
                 <option value="refused">{getTranslation("refused", language)}</option>
               </select>
-            </label>
-            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("fromDate", language)}</span>
-              <input type="date" value={filters.date_from ?? ""} onChange={(event) => setFilters((current) => ({ ...current, date_from: event.target.value || undefined }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900" />
-            </label>
-            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("toDate", language)}</span>
-              <input type="date" value={filters.date_to ?? ""} onChange={(event) => setFilters((current) => ({ ...current, date_to: event.target.value || undefined }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900" />
             </label>
           </div>
         </div>
@@ -255,61 +480,160 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <table className="w-full min-w-[1100px] text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-left text-gray-500 dark:border-gray-700 dark:text-gray-400">
-              <th className="px-4 py-3">{getTranslation("student", language)}</th>
-              <th className="px-4 py-3">{getTranslation("class", language)}</th>
-              <th className="px-4 py-3">{getTranslation("moduleHour", language)}</th>
-              <th className="px-4 py-3">{getTranslation("Date", language)}</th>
-              <th className="px-4 py-3">{getTranslation("absentBy", language)}</th>
-              <th className="px-4 py-3">{getTranslation("justification", language)}</th>
-              <th className="px-4 py-3">{getTranslation("status", language)}</th>
-              <th className="px-4 py-3">{getTranslation("actions", language)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayedAbsences.map((absence) => (
-              <tr key={absence.id} className="border-b border-gray-100 align-top dark:border-gray-800">
-                <td className="px-4 py-3 text-gray-900 dark:text-white">{absence.student.full_name}</td>
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.class_group?.name ?? "—"}</td>
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.module?.module_name ?? "—"} / {absence.hour}</td>
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.date}</td>
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.teacher.full_name}</td>
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.justification?.comment ?? "—"}</td>
-                <td className="px-4 py-3">
-                  <span className={`rounded-full px-2 py-1 text-xs font-bold ${absence.status === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200" : absence.status === "pending" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" : absence.status === "refused" ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200" : "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-200"}`}>
-                    {absence.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex flex-wrap gap-2">
-                    {absence.justification?.status === "pending" ? (
-                      <>
-                        <button type="button" onClick={() => { void review(absence.justification!.id, "approved"); }} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white">
-                          <Check className="h-3.5 w-3.5" />
-                          {getTranslation("approve", language)}
-                        </button>
-                        <button type="button" onClick={() => { void review(absence.justification!.id, "refused"); }} className="inline-flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white">
-                          <X className="h-3.5 w-3.5" />
-                          {getTranslation("refuse", language)}
-                        </button>
-                      </>
-                    ) : null}
-                    {!absence.is_deleted ? (
-                      <button type="button" onClick={() => { void removeAbsence(absence.id); }} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 dark:border-red-500/30 dark:text-red-200">
-                        <Trash2 className="h-3.5 w-3.5" />
-                        {getTranslation("deleteAbsence", language)}
-                      </button>
-                    ) : null}
-                  </div>
-                </td>
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div className="max-h-[34rem] overflow-auto">
+          <table className="w-full min-w-[1250px] text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 text-left text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                <th className="px-4 py-3">{getTranslation("student", language)}</th>
+                <th className="px-4 py-3">{getTranslation("class", language)}</th>
+                <th className="px-4 py-3">{getTranslation("moduleHour", language)}</th>
+                <th className="px-4 py-3">{getTranslation("Date", language)}</th>
+                <th className="px-4 py-3">{getTranslation("teacher", language)}</th>
+                <th className="px-4 py-3">{getTranslation("remarks", language)}</th>
+                <th className="px-4 py-3">{getTranslation("justification", language)}</th>
+                <th className="px-4 py-3">{getTranslation("status", language)}</th>
+                <th className="px-4 py-3">{getTranslation("actions", language)}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">{getTranslation("loading", language)}</td>
+                </tr>
+              ) : displayedAbsences.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">{getTranslation("noAbsencesFound", language)}</td>
+                </tr>
+              ) : (
+                displayedAbsences.map((absence) => (
+                  <tr key={absence.id} className="border-b border-gray-100 align-top dark:border-gray-800">
+                    <td className="px-4 py-3 text-gray-900 dark:text-white">{absence.student.full_name}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.class_group?.name ?? "—"}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.module?.module_name ?? "—"} / {getSessionLabel(absence.hour, language)}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.date}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.teacher.full_name}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.remark?.trim() ? absence.remark : "—"}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.justification?.comment ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-1 text-xs font-bold ${absence.status === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200" : absence.status === "pending" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" : absence.status === "refused" ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200" : "bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-200"}`}>
+                        {getStatusLabel(absence.status, language)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        {absence.justification?.status === "pending" ? (
+                          <>
+                            <button type="button" onClick={() => { void review(absence.justification!.id, "approved"); }} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white">
+                              <Check className="h-3.5 w-3.5" />
+                              {getTranslation("approve", language)}
+                            </button>
+                            <button type="button" onClick={() => { void review(absence.justification!.id, "refused"); }} className="inline-flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white">
+                              <X className="h-3.5 w-3.5" />
+                              {getTranslation("refuse", language)}
+                            </button>
+                          </>
+                        ) : null}
+                        {!absence.is_deleted ? (
+                          <button type="button" onClick={() => openEditModal(absence)} className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">
+                            <SquarePen className="h-3.5 w-3.5" />
+                            {getTranslation("editAbsence", language)}
+                          </button>
+                        ) : null}
+                        {!absence.is_deleted ? (
+                          <button type="button" onClick={() => { void removeAbsence(absence.id); }} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 dark:border-red-500/30 dark:text-red-200">
+                            <Trash2 className="h-3.5 w-3.5" />
+                            {getTranslation("deleteAbsence", language)}
+                          </button>
+                        ) : null}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      {isModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl dark:bg-gray-900">
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{getTranslation("editAbsence", language)}</h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{getTranslation("attendanceTabSubtitle", language)}</p>
+              </div>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="rounded-xl border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">
+                {getTranslation("close", language)}
+              </button>
+            </div>
+
+            <form className="space-y-4" onSubmit={submitAbsence}>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <span>{getTranslation("class", language)}</span>
+                  <select value={formState.class_group_id} onChange={(event) => setFormState((current) => ({ ...current, class_group_id: event.target.value, student_id: "" }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    {classGroups.map((classGroup) => (
+                      <option key={classGroup.class_group_id} value={classGroup.class_group_id}>{classGroup.name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <span>{getTranslation("student", language)}</span>
+                  <select value={formState.student_id} onChange={(event) => setFormState((current) => ({ ...current, student_id: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    {selectedClassStudents.map((student) => (
+                      <option key={student.student_id} value={student.student_id}>{student.full_name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <span>{getTranslation("teacher", language)}</span>
+                  <select value={formState.teacher_id} onChange={(event) => setFormState((current) => ({ ...current, teacher_id: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    {teachers.map((teacher) => (
+                      <option key={teacher.user.id} value={teacher.user.id}>{teacher.full_name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <span>{getTranslation("module", language)}</span>
+                  <select value={formState.module_id} onChange={(event) => setFormState((current) => ({ ...current, module_id: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    {modules.map((module) => (
+                      <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <span>{getTranslation("Date", language)}</span>
+                  <input type="date" value={formState.date} onChange={(event) => setFormState((current) => ({ ...current, date: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800" />
+                </label>
+                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <span>{getTranslation("session", language)}</span>
+                  <select value={formState.hour} onChange={(event) => setFormState((current) => ({ ...current, hour: Number(event.target.value) }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    {Array.from({ length: 8 }, (_, index) => index + 1).map((hour) => (
+                      <option key={hour} value={hour}>{getSessionLabel(hour, language)}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <label className="block space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                <span>{getTranslation("absenceRemark", language)}</span>
+                <textarea value={formState.remark} onChange={(event) => setFormState((current) => ({ ...current, remark: event.target.value }))} rows={4} placeholder={getTranslation("absenceRemarkPlaceholder", language)} className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 dark:border-gray-600 dark:bg-gray-800" />
+              </label>
+
+              <div className="flex flex-wrap justify-end gap-3">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">
+                  {getTranslation("cancel", language)}
+                </button>
+                <button type="submit" disabled={isSubmitting} className="rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                  {isSubmitting ? getTranslation("loading", language) : getTranslation("update", language)}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 };

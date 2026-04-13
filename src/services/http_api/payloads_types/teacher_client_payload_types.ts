@@ -11,11 +11,6 @@ export interface PatchStudentPayload {
   class_group_id?: string;
 }
 
-export interface PostAbsencePayload {
-  student_id: string;
-  teacher_id: number;
-}
-
 export interface PostBehaviourReportPayload {
   date: string;
   type: "excellent" | "good" | "bad";

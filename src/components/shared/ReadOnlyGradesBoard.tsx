@@ -254,13 +254,16 @@ const SectionTable: React.FC<{
       </div>
 
       <div className="max-h-[360px] overflow-auto">
-        <table className="min-w-full border-separate border-spacing-0">
+        <table
+          dir={language === "ar" ? "rtl" : "ltr"}
+          className="min-w-full border-separate border-spacing-0"
+        >
           <thead>
             <tr>
               {columns.map((column) => (
                 <th
                   key={`${config.key}-${column.key}`}
-                  className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                  className="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3 text-left rtl:text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
                 >
                   {getTranslation(column.labelKey, language)}
                 </th>
@@ -275,7 +278,7 @@ const SectionTable: React.FC<{
                 {columns.map((column) => (
                   <td
                     key={`${config.key}-${row.student_id}-${column.key}`}
-                    className="border-b border-gray-100 px-4 py-3 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-200"
+                    className="border-b border-gray-100 px-4 py-3 text-left rtl:text-right text-sm text-gray-700 dark:border-gray-700 dark:text-gray-200"
                   >
                     {renderCellValue(row, column.key)}
                   </td>
