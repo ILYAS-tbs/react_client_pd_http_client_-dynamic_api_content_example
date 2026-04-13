@@ -391,17 +391,23 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
       </div>
 
       {/* ── Section 3 : Remarks & Notes (cards) ── */}
-      {withRemarks.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
-            <div className="bg-amber-100 dark:bg-amber-900/20 p-2 rounded-lg">
-              <FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {getTranslation("remarksAndNotes", language)}
-            </h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+          <div className="bg-amber-100 dark:bg-amber-900/20 p-2 rounded-lg">
+            <FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {getTranslation("remarksAndNotes", language)}
+          </h3>
+        </div>
 
+        {withRemarks.length === 0 ? (
+          <div className="px-6 py-10 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {getTranslation("noMonthlyEvaluations", language)}
+            </p>
+          </div>
+        ) : (
           <div className="p-6 grid gap-4">
             {withRemarks.map((e) => (
               <div
@@ -450,8 +456,8 @@ const MonthlyEvaluationSection: React.FC<MonthlyEvaluationSectionProps> = ({
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

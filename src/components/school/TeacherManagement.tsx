@@ -27,6 +27,12 @@ import { getTranslation } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useModalFormReset } from "../../hooks/useModalFormReset";
 
+type AssignmentGroup = {
+  classId: string;
+  className: string;
+  modules: string[];
+};
+
 const TeacherManagement: React.FC<TeacherManagementProps> = ({
   teachersList: teacherList,
   setTeacherList,
@@ -52,6 +58,45 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
   const [showPassword, setShowPassword] = useState(false);
 
   const { language } = useLanguage()
+
+  const getAssignmentGroups = (teacher: Teacher): AssignmentGroup[] => {
+    const groups = new Map<string, AssignmentGroup>();
+
+    for (const assignment of teacher.modulesAndClassGroups ?? []) {
+      const classId = assignment.class_group.class_group_id;
+      const className = assignment.class_group.name;
+      const existingGroup = groups.get(classId);
+
+      if (existingGroup) {
+        if (!existingGroup.modules.includes(assignment.module.module_name)) {
+          existingGroup.modules.push(assignment.module.module_name);
+        }
+        continue;
+      }
+
+      groups.set(classId, {
+        classId,
+        className,
+        modules: [assignment.module.module_name],
+      });
+    }
+
+    return Array.from(groups.values()).sort((leftGroup, rightGroup) =>
+      leftGroup.className.localeCompare(rightGroup.className)
+    );
+  };
+
+  const getTeacherAssignmentSummary = (teacher: Teacher) => {
+    const groups = getAssignmentGroups(teacher);
+
+    if (!groups.length) {
+      return getTranslation("noClassesAssigned", language);
+    }
+
+    return groups
+      .map((group) => `${group.className}: ${group.modules.join(", ")}`)
+      .join(" • ");
+  };
 
   const resetAddTeacherForm = useCallback(() => {
     setFormData(defaultTeacherForm);
@@ -444,8 +489,8 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">
                   {teacher.full_name}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                  {teacher.modulesAndClassGroups?.[0]?.module.module_name}
+                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                  {getTeacherAssignmentSummary(teacher)}
                 </p>
               </div>
             </div>
@@ -481,9 +526,9 @@ const TeacherManagement: React.FC<TeacherManagementProps> = ({
                 </span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white text-right max-w-[160px] truncate">
                   <ul className="flex flex-col items-end">
-                    {teacher.modulesAndClassGroups?.map((x) => (
-                      <li key={`${x.module.module_id}-${x.class_group.class_group_id}`} className="truncate max-w-[150px]">
-                        {x.module.module_name} - {x.class_group.name}
+                    {getAssignmentGroups(teacher).map((group) => (
+                      <li key={group.classId} className="truncate max-w-[150px]">
+                        {group.className}: {group.modules.join(", ")}
                       </li>
                     ))}
                   </ul>

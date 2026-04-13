@@ -168,7 +168,7 @@ const ParentHomeworks: React.FC<ParentHomeworksProps> = ({
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+        {/* <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
             {getTranslation("selectStudent", language)}
           </label>
@@ -183,7 +183,7 @@ const ParentHomeworks: React.FC<ParentHomeworksProps> = ({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">

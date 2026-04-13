@@ -5,6 +5,7 @@
 //   const teacherModuleClassGroup = Convert.toTeacherModuleClassGroup(json);
 
 export interface TeacherModuleClassGroup {
+  id: number;
   students_count: number;
   average_grade: number;
   teacher: number;
@@ -96,6 +97,7 @@ function sanitizeTeacherModuleClassGroup(
   }
 
   return {
+    id: normalizeNumber(value.id),
     students_count: normalizeNumber(value.students_count),
     average_grade: normalizeNumber(value.average_grade),
     teacher: normalizeNumber(value.teacher),
