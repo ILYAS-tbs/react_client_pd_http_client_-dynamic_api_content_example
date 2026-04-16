@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from "react";
-import { Calendar, Search, Star, Eye } from "lucide-react";
+import { Search, Star, Eye } from "lucide-react";
 import { ActivitiesViewProps } from "../../types";
 import { ParentStudentEvent } from "../../models/ParentStudentEvent";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { FilePreview } from "../shared/file_preview";
 
 interface Activity {
   id: string;
@@ -13,6 +14,7 @@ interface Activity {
   category: string;
   description: string;
   location: string;
+  file?: string | null;
   // ? Additinal data to store about each event
   student: string;
   school: string;
@@ -93,8 +95,9 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
         date: new Date(event.date), // keep as string, or format if needed
         time: event.time,
         category: event.category,
-        description: event.title,
+        description: event.desc ?? event.title,
         location: event.place,
+        file: event.file ?? null,
         // additional data for each event (student, school)
         student: parentEvent.student,
         school: parentEvent.school,
@@ -108,8 +111,8 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
   );
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewCalendar, setViewCalendar] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewCalendar] = useState(false);
+  const [selectedCategory] = useState("all");
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null
   );
@@ -206,13 +209,16 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {getTranslation('titleColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {getTranslation('categoryColumn', language)}
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {getTranslation('description', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {getTranslation('student', language)}
@@ -230,7 +236,7 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                     {getTranslation('location', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    {getTranslation('actions', language)}
+                    {getTranslation('Details', language)}
                   </th>
                 </tr>
               </thead>
@@ -248,6 +254,11 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">
                         {activity.category}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-normal line-clamp-3">
+                        {activity.description}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -291,67 +302,115 @@ const ActivitiesView: React.FC<ActivitiesViewProps> = ({
         )}
       </div>
 
-      {/* Activity Details Modal */}
+      {/* Activity Details Modal - Improved UX */}
       {selectedActivity && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {getTranslation('eventDetails', language)}
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('titleColumn', language)}
-                </label>
-                <p className="text-gray-900 dark:text-white">
-                  {selectedActivity.title}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('categoryColumn', language)}
-                </label>
-                <p className="text-gray-900 dark:text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
+            {/* Sticky Header */}
+            <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 px-6 py-5 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-gray-700 dark:to-gray-600">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {selectedActivity.title}
+              </h2>
+              <div className="flex items-center gap-3 mt-2 flex-wrap">
+                <span className="inline-block bg-primary-200 dark:bg-primary-700 text-primary-800 dark:text-primary-200 text-xs font-semibold px-3 py-1 rounded-full">
                   {selectedActivity.category}
-                </p>
+                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedActivity.date.toLocaleDateString('ar-DZ')}
+                </span>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+              {/* Date & Time Section */}
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wide">
                   {getTranslation('Date', language)}
-                </label>
-                <p className="text-gray-900 dark:text-white">
-                  {selectedActivity.date.toLocaleDateString()}
-                </p>
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      {getTranslation('Date', language)}
+                    </p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {selectedActivity.date.toLocaleDateString('ar-DZ', {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      {getTranslation('Time', language)}
+                    </p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {selectedActivity.time}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+
+              {/* Location Section */}
+              <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 border-l-4 border-blue-500">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wide mb-2">
                   {getTranslation('location', language)}
-                </label>
-                <p className="text-gray-900 dark:text-white">
-                  {selectedActivity.time}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {getTranslation('location', language)}
-                </label>
-                <p className="text-gray-900 dark:text-white">
+                </h3>
+                <p className="text-gray-900 dark:text-white font-medium">
                   {selectedActivity.location}
                 </p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+
+              {/* Description Section */}
+              <div className="space-y-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wide">
                   {getTranslation('description', language)}
-                </label>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {selectedActivity.description}
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {selectedActivity.description || getTranslation('noDescription', language)}
                 </p>
               </div>
+
+              {/* Student & School Section */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 border-l-4 border-green-500">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1">
+                    {getTranslation('student', language)}
+                  </p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {selectedActivity.student}
+                  </p>
+                </div>
+                <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border-l-4 border-purple-500">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1">
+                    {getTranslation('school', language)}
+                  </p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {selectedActivity.school}
+                  </p>
+                </div>
+              </div>
+
+              {/* Attachment Section */}
+              {selectedActivity.file ? (
+                <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border-l-4 border-orange-500">
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wide mb-3">
+                    {getTranslation('attachment', language)}
+                  </h3>
+                  <div className="flex justify-center">
+                    <FilePreview url={selectedActivity.file} filename={selectedActivity.file} />
+                  </div>
+                </div>
+              ) : null}
             </div>
-            <div className="flex justify-end mt-6">
+
+            {/* Sticky Footer */}
+            <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end">
               <button
                 onClick={() => setSelectedActivity(null)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg"
               >
                 {getTranslation('close', language)}
               </button>

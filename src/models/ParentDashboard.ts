@@ -5,9 +5,15 @@ export interface ParentDashboardStats {
   messages: number;
 }
 
+export type ParentPerformanceStatus =
+  | "excellent"
+  | "good"
+  | "needs_improvement"
+  | "pending";
+
 export interface ParentStudentSummary {
   studentId: string;
   name: string;
   className: string;
-  status: "excellent" | "good" | "needs_improvement";
+  status: ParentPerformanceStatus;
 }

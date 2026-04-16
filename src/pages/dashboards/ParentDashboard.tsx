@@ -41,6 +41,8 @@ import {
   ParentStudentSummary,
 } from "../../models/ParentDashboard.ts";
 
+type Semester = "s1" | "s2" | "s3";
+
 const ParentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -92,6 +94,7 @@ const ParentDashboard: React.FC = () => {
   const [studentsSummary, setStudentsSummary] = useState<ParentStudentSummary[]>([]);
   const [isLoadingDashboardStats, setIsLoadingDashboardStats] = useState(true);
   const [isLoadingStudentsSummary, setIsLoadingStudentsSummary] = useState(true);
+  const [overviewSemester, setOverviewSemester] = useState<Semester>("s1");
   const studentRequestRef = useRef(0);
 
   const get_current_parent_students = async () => {
@@ -211,10 +214,10 @@ const ParentDashboard: React.FC = () => {
     }
   };
 
-  const get_parent_students_summary = async () => {
+  const get_parent_students_summary = async (semester: Semester) => {
     try {
       setIsLoadingStudentsSummary(true);
-      const res = await parent_dashboard_client.get_parent_students_summary();
+      const res = await parent_dashboard_client.get_parent_students_summary(semester);
       if (res.ok) {
         setStudentsSummary(res.data);
       } else {
@@ -248,13 +251,16 @@ const ParentDashboard: React.FC = () => {
 
   useEffect(() => {
     void get_current_parent_students();
-    void get_parent_students_summary();
 
     //? chat
     void get_current_parent_schools_teachers();
 
     //?
   }, []);
+
+  useEffect(() => {
+    void get_parent_students_summary(overviewSemester);
+  }, [overviewSemester]);
 
   useEffect(() => {
     if (!students.length) return;
@@ -354,7 +360,10 @@ const ParentDashboard: React.FC = () => {
     if (status === "good") {
       return getTranslation("good", language);
     }
-    return getTranslation("weak", language);
+    if (status === "pending") {
+      return getTranslation("pendingEvaluation", language);
+    }
+    return getTranslation("needsImprovement", language);
   };
 
   const getSummaryBadgeClass = (status: ParentStudentSummary["status"]) => {
@@ -362,10 +371,26 @@ const ParentDashboard: React.FC = () => {
       return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200";
     }
     if (status === "good") {
-      return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200";
+      return "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200";
     }
-    return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200";
+    if (status === "pending") {
+      return "bg-slate-100 text-slate-700 dark:bg-slate-800/80 dark:text-slate-200";
+    }
+    return "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-200";
   };
+
+  const semesterOptions = useMemo(
+    () => [
+      { value: "s1" as const, label: getTranslation("firstSemester", language) },
+      { value: "s2" as const, label: getTranslation("secondSemester", language) },
+      { value: "s3" as const, label: getTranslation("thirdSemester", language) },
+    ],
+    [language]
+  );
+
+  const overviewSemesterLabel =
+    semesterOptions.find((option) => option.value === overviewSemester)?.label ??
+    overviewSemester.toUpperCase();
 
 
 
@@ -408,7 +433,7 @@ const ParentDashboard: React.FC = () => {
     },
         {
       id: "exam_schedule",
-      label: getTranslation("ExamSchedule", language),
+          label: getTranslation("devoirAndExams", language),
       icon: FileText,
     },
       
@@ -492,7 +517,7 @@ const ParentDashboard: React.FC = () => {
           />
         );
       case "exam_schedule":
-        return <ParentExamScheduleManagement students={students} />;
+        return <ParentExamScheduleManagement students={students} selectedStudentId={selectedStudentId} />;
       case "weekly_menu":
         return <ParentWeeklyMealsManagement students={students} />;
 
@@ -542,26 +567,54 @@ const ParentDashboard: React.FC = () => {
             {/* ════ STUDENTS GENERAL INFORMATION - MAIN FOCUS ════ */}
             <div className="rounded-2xl sm:rounded-3xl border-2 border-primary-200 dark:border-primary-800/60 bg-gradient-to-br from-primary-50/30 via-white to-primary-50/20 dark:from-primary-950/20 dark:via-gray-800 dark:to-primary-950/10 shadow-2xl p-4 sm:p-6 lg:p-8 xl:p-10 ring-1 ring-primary-100 dark:ring-primary-900/40">
               <div className="flex flex-col gap-4 sm:gap-6">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white mb-1 sm:mb-2">
-                    {getTranslation("studentsGeneralInformation", language)}
-                  </h1>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                    {getTranslation("monthlyEvaluationForParents", language)}
-                  </p>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white mb-1 sm:mb-2">
+                      {getTranslation("studentsGeneralInformation", language)}
+                    </h1>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                      {getTranslation("monthlyEvaluationForParents", language)}
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-primary-700 dark:text-primary-300">
+                      {overviewSemesterLabel}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 lg:justify-end">
+                    {semesterOptions.map((option) => {
+                      const isActive = option.value === overviewSemester;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setOverviewSemester(option.value)}
+                          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                            isActive
+                              ? "border-primary-600 bg-primary-600 text-white shadow-md dark:border-primary-400 dark:bg-primary-500"
+                              : "border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:text-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-primary-500 dark:hover:text-primary-300"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                   <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 dark:bg-emerald-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-200">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     {getTranslation("excellent", language)}
                   </div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-amber-100 dark:bg-amber-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-200">
-                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                    {getTranslation("veryGood", language)}
+                  <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-200">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    {getTranslation("good", language)}
                   </div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-red-100 dark:bg-red-900/40 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-red-700 dark:text-red-200">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                    {getTranslation("poorPerformance", language)}
+                  <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800/80 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200">
+                    <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+                    {getTranslation("pendingEvaluation", language)}
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-rose-100 dark:bg-rose-900/30 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-rose-700 dark:text-rose-200">
+                    <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                    {getTranslation("needsImprovement", language)}
                   </div>
                 </div>
               </div>

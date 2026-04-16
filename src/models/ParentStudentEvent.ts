@@ -4,6 +4,11 @@
 //
 //   const parentStudentEvent = Convert.toParentStudentEvent(json);
 
+export interface ClassGroupNested {
+  class_group_id: string;
+  name: string;
+}
+
 export interface ParentStudentEvent {
   student_id: string;
   student: string;
@@ -19,6 +24,12 @@ export interface Event {
   date: Date;
   time: string;
   place: string;
+  desc?: string | null;
+  file?: string | null;
+  event_type: "global" | "targeted";
+  class_groups: ClassGroupNested[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Converts JSON strings to/from your types

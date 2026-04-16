@@ -1,74 +1,68 @@
-//! FILES PREVIEW ::
+import { ExternalLink, FileImage, FileText, Paperclip } from "lucide-react";
+
+import { getFileNameFromPath, isImageFile, isPdfFile } from "../../utils/fileUploads";
+
 type FilePreviewProps = {
   url: string;
-  filename?: string;
+  filename?: string | null;
+  compact?: boolean;
 };
 
-export function FilePreview({ url, filename }: FilePreviewProps) {
-  const extension =
-    filename?.split(".").pop()?.toLowerCase() ||
-    url?.split("?")?.[0]?.split("#")?.[0]?.split(".").pop()?.toLowerCase();
+export function FilePreview({ url, filename, compact = false }: FilePreviewProps) {
+  const resolvedName = filename || getFileNameFromPath(url) || "attachment";
 
-  //   console.log("url and file extension extracted :: ");
-  //   console.log(url);
-  //   console.log(extension);
-
-  //   console.log("filename");
-  //   console.log(filename);
-
-  if (!extension) {
+  if (isImageFile(filename || url)) {
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
-        Download file
+      <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3">
+        <img
+          src={url}
+          alt={resolvedName}
+          className={compact
+            ? "h-16 w-16 rounded-xl object-cover border border-gray-200 dark:border-gray-700"
+            : "max-h-56 w-full rounded-2xl object-cover border border-gray-200 dark:border-gray-700"
+          }
+        />
+        {!compact ? (
+          <span className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 dark:text-primary-300">
+            <FileImage className="h-4 w-4" />
+            {resolvedName}
+          </span>
+        ) : null}
       </a>
     );
   }
 
-  if (["png", "jpg", "jpeg", "gif", "webp"].includes(extension)) {
-    return <img src={url} alt={filename} width={200} height="auto" />;
-  }
-
-  if (["mp4", "webm", "ogg"].includes(extension)) {
-    return <video src={url} width={300} height="auto" controls />;
-  }
-
-  if (["pdf"].includes(extension)) {
+  if (isPdfFile(filename || url)) {
     return (
-      <div className="max-w-xs p-3 rounded-2xl shadow bg-gray-100 dark:bg-gray-800 flex items-center gap-3">
-        {/* PDF Icon */}
-        <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-red-100 text-red-600 rounded-lg text-2xl">
-          📄
-        </div>
-
-        {/* PDF Info */}
-        <div className="flex flex-col text-sm overflow-hidden">
-          <span className="font-semibold truncate max-w-[140px] dark:text-gray-400">
-            {filename || "document.pdf"}
-          </span>
-          <span className="text-xs text-gray-500">PDF File</span>
-
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 inline-block px-2 py-1 bg-primary-500 text-white rounded-md text-xs hover:bg-primary-600 transition"
-          >
-            Open
-          </a>
-        </div>
-      </div>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={compact
+          ? "inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
+          : "inline-flex max-w-full items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
+        }
+      >
+        <FileText className="h-4 w-4 flex-shrink-0" />
+        <span className="truncate">{resolvedName}</span>
+        <ExternalLink className="h-4 w-4 flex-shrink-0" />
+      </a>
     );
   }
 
-  // fallback: generic file (docx, xlsx, txt, etc.)
   return (
     <a
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-gray-600 hover:text-gray-500"
+      className={compact
+        ? "inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        : "inline-flex max-w-full items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+      }
     >
-      📎 {filename || "Download file (Preview Unsupported)"}
+      <Paperclip className="h-4 w-4 flex-shrink-0" />
+      <span className="truncate">{resolvedName}</span>
+      <ExternalLink className="h-4 w-4 flex-shrink-0" />
     </a>
   );
 }

@@ -423,7 +423,7 @@ const ContextualChatWorkspace: React.FC<ContextualChatWorkspaceProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              {/* <div className="flex items-center gap-2 shrink-0">
                 <button className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                   <Phone className="h-5 w-5" />
                 </button>
@@ -433,7 +433,7 @@ const ContextualChatWorkspace: React.FC<ContextualChatWorkspaceProps> = ({
                 <button className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                   <MoreVertical className="h-5 w-5" />
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {isThreadLoading ? (

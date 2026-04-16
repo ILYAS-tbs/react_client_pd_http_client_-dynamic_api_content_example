@@ -1,13 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
-  Layers,
   Edit,
   Trash2,
   Plus,
-  FileText,
-  X,
   Search,
-  Download,
 } from "lucide-react";
 import { ClassesManagementProps } from "../../types";
 import { ClassGroup, ClassGroupJson } from "../../models/ClassGroups";
@@ -15,9 +11,11 @@ import { school_dashboard_client } from "../../services/http_api/school-dashboar
 import { PostPutClassGroupPayload } from "../../services/http_api/payloads_types/school_client_payload_types";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
-import { getTranslation } from "../../utils/translations";
+import { getTranslation, getMediaUrl } from "../../utils/translations";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useModalFormReset } from "../../hooks/useModalFormReset";
+import { FilePreview } from "../shared/file_preview";
+import { getFileNameFromPath, isAllowedSchoolUpload, SCHOOL_FILE_ACCEPT } from "../../utils/fileUploads";
 
 interface Class {
   class_group_id: string;
@@ -30,35 +28,6 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
   class_groups_list,
   setClassGroupList,
 }) => {
-  //! Map ClassGroup in models to Class here
-  function mapClassGrpToClass(classes: ClassGroup[]): Class[] {
-    return classes.map((class_group: ClassGroup) => ({
-      class_group_id: class_group.class_group_id,
-      id: class_group.class_group_id,
-      name: `${class_group.name}`,
-      students: 25,
-      teachersPdf: class_group.teacher_list
-        ? {
-          url: class_group.teacher_list,
-          name: class_group.name + ".pdf",
-        }
-        : null,
-    }));
-  }
-  const initial_classes: Class[] = class_groups_list?.map(
-    (class_group: ClassGroup) => ({
-      class_group_id: class_group.class_group_id,
-      id: class_group.class_group_id,
-      name: `${class_group.name}`,
-      students: class_group.students_number,
-      teachersPdf: class_group.teacher_list
-        ? {
-          url: class_group.teacher_list,
-          name: class_group.name + ".pdf",
-        }
-        : null,
-    })
-  );
   // delete :  const [classes, setClasses] = useState<Class[]>(initial_classes);
   // mock data : [{ id: "1a", name: "الصف الأول - أ", students: 25, teachersPdf: null },]
   const [newClass, setNewClass] = useState({
@@ -70,6 +39,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
   const [editingClass, setEditingClass] = useState<Class | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [classFileError, setClassFileError] = useState("");
 
   //! Translations ::
   const { language } = useLanguage()
@@ -86,6 +56,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
     set_updated_class_title("");
     setFile_teachers(null);
     set_chosen_class_id("");
+    setClassFileError("");
   }, []);
 
   const populateClassModalForm = useCallback((cls: Class) => {
@@ -98,6 +69,7 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
     set_updated_class_title(cls.name ?? "");
     setFile_teachers(null);
     set_chosen_class_id(cls.class_group_id ?? "");
+    setClassFileError("");
   }, []);
 
   const { formKey: classModalFormKey } = useModalFormReset({
@@ -130,32 +102,18 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
 
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // the previous UI logic
-    editingClass ? handleUpdateClass() : handleAddClass();
-
     //* API CALL :
     console.log(formData_creation);
     const post_class_group_payload: PostPutClassGroupPayload = {
       name: formData_creation.name,
     };
-    let latest_csrf = getCSRFToken()!;
+    const latest_csrf = getCSRFToken()!;
     const res = await school_dashboard_client.post_class_group(
       post_class_group_payload,
       latest_csrf
     );
 
     if (res.ok) {
-      // Backend returns the new class with real ID
-      const newClassFromBackend = res.data;
-
-      // Map to  frontend Class type
-      const mappedClass: Class = {
-        class_group_id: newClassFromBackend.class_group_id,
-        name: newClassFromBackend.name,
-        students: 0, // or whatever comes from backend
-        teachersPdf: null,
-      };
-
       // Update frontend - A call to fetch the fresh data from the API
       // delete :: setClasses([...classes, mappedClass
 
@@ -185,39 +143,10 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
   const [file_teachers, setFile_teachers] = useState<File | null>(null);
   const [chosen_class_id, set_chosen_class_id] = useState("");
 
-  const handleAddClass = () => {
-    if (newClass.name && newClass.students >= 0) {
-      // delete :
-      // setClasses([...classes, newClass]);
-      // setNewClass({
-      //   class_group_id: "",
-      //   name: "",
-      //   students: 0,
-      //   teachersPdf: null,
-      // });
-      setShowAddModal(false);
-    }
-  };
-
   const handleEditClass = (cls: Class | ClassGroup) => {
     cls = cls as Class; // will be a class from the UI that's what we pass to it
     setEditingClass(cls);
     setShowAddModal(true);
-  };
-
-  const handleUpdateClass = () => {
-    if (editingClass && newClass.name && newClass.students >= 0) {
-      // delete :
-      // setClasses(
-      //   classes.map((cls) =>
-      //     cls.class_group_id === editingClass.class_group_id
-      //       ? { ...cls, ...newClass }
-      //       : cls
-      //   )
-      // );
-      resetClassModalForm();
-      setShowAddModal(false);
-    }
   };
   // API CALL PUT class_group
   async function handleUpdateSubmit(e: React.FormEvent) {
@@ -394,14 +323,13 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     {cls.teacher_list ? (
                       <div className="flex items-center space-x-2 justify-start rtl:space-x-reverse">
-                        <a
-                          href={SERVER_BASE_URL + cls.teacher_list}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary-400 hover:bg-primary-300"
-                        >
-                          {cls.name + ".pdf"}
-                        </a>
+                        {getMediaUrl(cls.teacher_list, SERVER_BASE_URL) ? (
+                          <FilePreview
+                            url={getMediaUrl(cls.teacher_list, SERVER_BASE_URL)!}
+                            filename={getFileNameFromPath(cls.teacher_list) ?? cls.name}
+                            compact
+                          />
+                        ) : null}
                         {/* <button
                           // onClick={() => handleRemovePdf(cls.id)}
                           className="text-primary-400 hover:bg-primary-300"
@@ -495,21 +423,37 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
               {editingClass && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    قائمة المعلمين (PDF)
+                    قائمة المعلمين (PDF / JPG / PNG / WEBP)
                   </label>
+                  {editingClass.teachersPdf && getMediaUrl(editingClass.teachersPdf.url, SERVER_BASE_URL) ? (
+                    <div className="mb-3">
+                      <FilePreview
+                        url={getMediaUrl(editingClass.teachersPdf.url, SERVER_BASE_URL)!}
+                        filename={editingClass.teachersPdf.name}
+                        compact
+                      />
+                    </div>
+                  ) : null}
                   <div className="relative">
                     <input
                       type="file"
-                      accept="application/pdf"
+                      accept={SCHOOL_FILE_ACCEPT}
                       onChange={(e) => {
-                        // handleFileUpload(
-                        //   e,
-                        //   editingClass?.id || `new-${Date.now()}`
-                        // );
+                        const uploadedFile = e.target.files?.[0] ?? null;
+                        if (!uploadedFile) {
+                          setFile_teachers(null);
+                          setClassFileError("");
+                          return;
+                        }
 
-                        e.target.files
-                          ? setFile_teachers(e.target.files[0])
-                          : null;
+                        if (!isAllowedSchoolUpload(uploadedFile)) {
+                          setFile_teachers(null);
+                          setClassFileError(getTranslation("pdfOrImageOnlyError", language));
+                          return;
+                        }
+
+                        setFile_teachers(uploadedFile);
+                        setClassFileError("");
                       }}
                       className="hidden"
                       id="pdfUploadModal"
@@ -519,9 +463,17 @@ const ClassesManagement: React.FC<ClassesManagementProps> = ({
                       className="flex items-center justify-center w-full p-2 bg-primary-500 text-white rounded-lg hover:bg-primary-700 cursor-pointer transition duration-200 text-sm"
                     >
                       <Plus className="h-4 w-4 mr-1" />
-                      رفع ملف PDF
+                      رفع ملف
                     </label>
                   </div>
+                  {file_teachers ? (
+                    <div className="mt-3">
+                      <FilePreview url={URL.createObjectURL(file_teachers)} filename={file_teachers.name} compact />
+                    </div>
+                  ) : null}
+                  {classFileError ? (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400">{classFileError}</p>
+                  ) : null}
                 </div>
               )}
               <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">

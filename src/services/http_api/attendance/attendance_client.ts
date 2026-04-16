@@ -9,6 +9,8 @@ import {
 import { SERVER_BASE_URL } from "../server_constants";
 
 const BASE_URL = SERVER_BASE_URL;
+const ATTENDANCE_ABSENCES_URL = `${BASE_URL}/attendance/absences/`;
+const SCHOOL_ABSENCES_URL = `${BASE_URL}/api/school/absences/`;
 
 type ApiResponse<T> =
   | { ok: true; status: number; data: T }
@@ -28,13 +30,10 @@ async function listAbsences(
   filters: AttendanceFilters = {}
 ): Promise<ApiResponse<AttendanceAbsence[]>> {
   try {
-    const response = await fetch(
-      `${BASE_URL}/attendance/absences/${buildQuery(filters)}`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
+    const response = await fetch(`${ATTENDANCE_ABSENCES_URL}${buildQuery(filters)}`, {
+      method: "GET",
+      credentials: "include",
+    });
     const data: AttendanceAbsence[] = await response.json();
     if (!response.ok) return { ok: false, status: response.status, error: data };
     return { ok: true, status: response.status, data };
@@ -44,11 +43,11 @@ async function listAbsences(
 }
 
 async function markAbsences(
-  absences: MarkAttendancePayload[] | MarkAttendancePayload,
+  absences: MarkAttendancePayload,
   csrfToken: string
 ): Promise<ApiResponse<AttendanceAbsence[]>> {
   try {
-    const response = await fetch(`${BASE_URL}/attendance/absence/`, {
+    const response = await fetch(SCHOOL_ABSENCES_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +70,7 @@ async function deleteAbsence(
   csrfToken: string
 ): Promise<ApiResponse<null>> {
   try {
-    const response = await fetch(`${BASE_URL}/attendance/absence/${absenceId}/`, {
+    const response = await fetch(`${SCHOOL_ABSENCES_URL}${absenceId}/`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +95,7 @@ async function updateAbsence(
   csrfToken: string
 ): Promise<ApiResponse<AttendanceAbsence>> {
   try {
-    const response = await fetch(`${BASE_URL}/attendance/absence/${absenceId}/`, {
+    const response = await fetch(`${SCHOOL_ABSENCES_URL}${absenceId}/`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +119,7 @@ async function quickMarkAbsence(
   csrfToken: string
 ): Promise<ApiResponse<AttendanceAbsence>> {
   try {
-    const response = await fetch(`${BASE_URL}/school/absences/quick-mark/`, {
+    const response = await fetch(SCHOOL_ABSENCES_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

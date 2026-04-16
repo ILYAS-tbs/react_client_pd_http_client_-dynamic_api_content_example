@@ -12,10 +12,6 @@ interface ParentAttendanceTabProps {
   selectedStudentId?: string | null;
 }
 
-function getLocalizedSessionLabel(hour: number, language: string) {
-  return getTranslation(`session${hour}` as never, language);
-}
-
 function getLocalizedStatus(status: string, language: string) {
   switch (status) {
     case "approved":
@@ -32,7 +28,7 @@ function getLocalizedStatus(status: string, language: string) {
 }
 
 const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, selectedStudentId }) => {
-  const { language } = useLanguage();
+  const { language, isRTL } = useLanguage();
   const [absences, setAbsences] = useState<AttendanceAbsence[]>([]);
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null);
   const [selectedAbsence, setSelectedAbsence] = useState<AttendanceAbsence | null>(null);
@@ -46,16 +42,18 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
       return;
     }
 
-    const res = await attendance_client.listAbsences({
+    const response = await attendance_client.listAbsences({
       include_deleted: true,
       student: selectedStudentId,
     });
-    if (res.ok) setAbsences(res.data);
+    if (response.ok) {
+      setAbsences(response.data);
+    }
   }, [selectedStudentId]);
 
   useEffect(() => {
     void loadAbsences();
-  }, [selectedStudentId]);
+  }, [loadAbsences]);
 
   const grouped = useMemo(() => {
     return students.map((student) => {
@@ -79,12 +77,15 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
 
   const submitJustification = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!selectedAbsence || !comment.trim()) return;
-    const res = await attendance_client.submitJustification(
+    if (!selectedAbsence || !comment.trim()) {
+      return;
+    }
+
+    const response = await attendance_client.submitJustification(
       { absence_id: selectedAbsence.id, comment: comment.trim(), file },
       getCSRFToken() ?? ""
     );
-    if (res.ok) {
+    if (response.ok) {
       setSelectedAbsence(null);
       setComment("");
       setFile(null);
@@ -93,7 +94,7 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
   };
 
   return (
-    <section className="space-y-6">
+    <section className={`space-y-6 ${isRTL ? "text-right" : "text-left"}`} dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{getTranslation("myKidsAbsencesTab", language)}</h2>
@@ -117,7 +118,7 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
         <div className="space-y-4">
           {grouped.map(({ student, items, totalActive, pending }) => (
             <article key={student.student_id} className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <button type="button" onClick={() => setExpandedStudentId((current) => current === student.student_id ? null : student.student_id)} className="flex w-full items-center justify-between px-5 py-4 text-left">
+              <button type="button" onClick={() => setExpandedStudentId((current) => current === student.student_id ? null : student.student_id)} className={`flex w-full items-center justify-between px-5 py-4 ${isRTL ? "text-right" : "text-left"}`}>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{student.full_name}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{getTranslation("totalAbsences", language)}: {totalActive} • {getTranslation("pendingJustifications", language)}: {pending}</p>
@@ -127,12 +128,12 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
               {expandedStudentId === student.student_id ? (
                 <div className="border-t border-gray-200 px-5 py-4 dark:border-gray-700">
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[760px] text-sm">
+                    <table className="w-full min-w-[760px] text-sm" dir={isRTL ? "rtl" : "ltr"}>
                       <thead>
-                        <tr className="border-b border-gray-200 text-left text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                        <tr className={`border-b border-gray-200 text-gray-500 dark:border-gray-700 dark:text-gray-400 ${isRTL ? "text-right" : "text-left"}`}>
                           <th className="px-3 py-2">{getTranslation("Date", language)}</th>
-                          <th className="px-3 py-2">{getTranslation("moduleHour", language)}</th>
-                          <th className="px-3 py-2">{getTranslation("teacher", language)}</th>
+                          {/* <th className="px-3 py-2">{getTranslation("module", language)}</th> */}
+                          {/* <th className="px-3 py-2">{getTranslation("teacher", language)}</th> */}
                           <th className="px-3 py-2">{getTranslation("status", language)}</th>
                           <th className="px-3 py-2">{getTranslation("justification", language)}</th>
                           <th className="px-3 py-2">{getTranslation("actions", language)}</th>
@@ -141,19 +142,19 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
                       <tbody>
                         {items.map((absence) => (
                           <tr key={absence.id} className="border-b border-gray-100 dark:border-gray-800">
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.date}</td>
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.module?.module_name ?? "—"} / {getLocalizedSessionLabel(absence.hour, language)}</td>
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.teacher.full_name}</td>
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{getLocalizedStatus(absence.status, language)}</td>
-                            <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.justification?.comment ?? "—"}</td>
-                            <td className="px-3 py-3">
+                            <td className={`px-3 py-3 text-gray-700 dark:text-gray-200 ${isRTL ? "text-right" : "text-left"}`}>{absence.date}</td>
+                            {/* <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.module?.module_name ?? "—"}</td> */}
+                            {/* <td className="px-3 py-3 text-gray-700 dark:text-gray-200">{absence.teacher?.full_name ?? "—"}</td> */}
+                            <td className={`px-3 py-3 text-gray-700 dark:text-gray-200 ${isRTL ? "text-right" : "text-left"}`}>{getLocalizedStatus(absence.status, language)}</td>
+                            <td className={`px-3 py-3 text-gray-700 dark:text-gray-200 ${isRTL ? "text-right" : "text-left"}`}>{absence.justification?.comment ?? "—"}</td>
+                            <td className={`px-3 py-3 ${isRTL ? "text-right" : "text-left"}`}>
                               {!absence.is_deleted && absence.justification?.status !== "pending" && absence.justification?.status !== "approved" ? (
-                                <button type="button" onClick={() => setSelectedAbsence(absence)} className="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-semibold text-white">
+                                <button type="button" onClick={() => setSelectedAbsence(absence)} className="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-semibold text-white rtl:flex-row-reverse">
                                   <Upload className="h-3.5 w-3.5" />
                                   {getTranslation("justifyAbsence", language)}
                                 </button>
                               ) : !absence.is_deleted && !absence.justification ? (
-                                <button type="button" onClick={() => setSelectedAbsence(absence)} className="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-semibold text-white">
+                                <button type="button" onClick={() => setSelectedAbsence(absence)} className="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-3 py-1.5 text-xs font-semibold text-white rtl:flex-row-reverse">
                                   <Upload className="h-3.5 w-3.5" />
                                   {getTranslation("justifyAbsence", language)}
                                 </button>
@@ -176,7 +177,7 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">{absence.student.full_name}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{absence.date} • {absence.module?.module_name ?? "—"}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{absence.date} • {absence.module?.module_name ?? "—"} • {absence.teacher?.full_name ?? "—"}</p>
                 </div>
                 <span className={`rounded-full px-2 py-1 text-xs font-bold ${absence.justification?.status === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200" : absence.justification?.status === "pending" ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200" : "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-200"}`}>
                   {absence.justification?.status}
@@ -201,8 +202,8 @@ const ParentAttendanceTab: React.FC<ParentAttendanceTabProps> = ({ students, sel
             <form onSubmit={submitJustification} className="space-y-4">
               <div className="rounded-2xl bg-gray-50 p-4 text-sm dark:bg-gray-800">
                 <p className="font-semibold text-gray-900 dark:text-white">{selectedAbsence.student.full_name}</p>
-                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.date} • {selectedAbsence.module?.module_name ?? "—"} / {getLocalizedSessionLabel(selectedAbsence.hour, language)}</p>
-                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.teacher.full_name}</p>
+                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.date} • {selectedAbsence.module?.module_name ?? "—"}</p>
+                <p className="mt-1 text-gray-500 dark:text-gray-400">{selectedAbsence.teacher?.full_name ?? "—"}</p>
               </div>
               <label className="block space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 <span>{getTranslation("comment", language)}</span>

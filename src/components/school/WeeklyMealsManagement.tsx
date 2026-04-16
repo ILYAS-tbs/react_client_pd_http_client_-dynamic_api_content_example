@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Calendar, Download, Eye, Trash2, Upload } from "lucide-react";
 import { WeeklyMeal } from "../../models/WeeklyMeal";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
@@ -6,6 +6,8 @@ import { school_dashboard_client } from "../../services/http_api/school-dashboar
 import { WeeklyMealsManagementProps } from "../../types";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { FilePreview } from "../shared/file_preview";
+import { isAllowedSchoolUpload, SCHOOL_FILE_ACCEPT } from "../../utils/fileUploads";
 
 const buildEmptyWeeklyMeal = (schoolId: number): WeeklyMeal => ({
   school_id: schoolId,
@@ -30,7 +32,7 @@ const WeeklyMealsManagement: React.FC<WeeklyMealsManagementProps> = ({ schoolId 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
 
-  const fetchWeeklyMeal = async () => {
+  const fetchWeeklyMeal = useCallback(async () => {
     if (!schoolId || schoolId < 0) {
       return;
     }
@@ -43,12 +45,12 @@ const WeeklyMealsManagement: React.FC<WeeklyMealsManagementProps> = ({ schoolId 
       setWeeklyMeal(buildEmptyWeeklyMeal(schoolId));
     }
     setLoading(false);
-  };
+  }, [schoolId]);
 
   useEffect(() => {
     setWeeklyMeal(buildEmptyWeeklyMeal(schoolId));
     void fetchWeeklyMeal();
-  }, [schoolId]);
+  }, [schoolId, fetchWeeklyMeal]);
 
   const closeUploadModal = () => {
     setShowUploadModal(false);
@@ -63,10 +65,9 @@ const WeeklyMealsManagement: React.FC<WeeklyMealsManagementProps> = ({ schoolId 
       return;
     }
 
-    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-    if (!isPdf) {
+    if (!isAllowedSchoolUpload(file)) {
       setSelectedFile(null);
-      setFileError(getTranslation("pdfOnlyError", language));
+      setFileError(getTranslation("pdfOrImageOnlyError", language));
       return;
     }
 
@@ -141,7 +142,16 @@ const WeeklyMealsManagement: React.FC<WeeklyMealsManagementProps> = ({ schoolId 
                     </div>
                   </td>
                   <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        {hasFile && weeklyMeal.view_url ? (
+                          <FilePreview url={weeklyMeal.view_url} filename={weeklyMeal.pdf_file} compact />
+                        ) : (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
                       <button
                         onClick={() => setShowUploadModal(true)}
                         className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 transition-colors"
@@ -206,6 +216,7 @@ const WeeklyMealsManagement: React.FC<WeeklyMealsManagementProps> = ({ schoolId 
                           <Trash2 className="h-5 w-5" />
                         </button>
                       )}
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -226,26 +237,34 @@ const WeeklyMealsManagement: React.FC<WeeklyMealsManagementProps> = ({ schoolId 
 
             <div className="space-y-4">
               {hasFile && weeklyMeal?.view_url ? (
-                <a
-                  href={weeklyMeal.view_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-500 underline text-sm"
-                >
-                  {getTranslation("viewCurrentWeeklyMeals", language)}
-                </a>
+                <div className="space-y-2">
+                  <FilePreview url={weeklyMeal.view_url} filename={weeklyMeal.pdf_file} />
+                  <a
+                    href={weeklyMeal.view_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-500 underline text-sm"
+                  >
+                    {getTranslation("viewCurrentWeeklyMeals", language)}
+                  </a>
+                </div>
               ) : null}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation("weeklyMealsProgram", language)} (PDF)
+                  {getTranslation("weeklyMealsProgram", language)} (PDF / JPG / PNG / WEBP)
                 </label>
                 <input
                   type="file"
-                  accept="application/pdf"
+                  accept={SCHOOL_FILE_ACCEPT}
                   onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 />
+                {selectedFile ? (
+                  <div className="mt-3">
+                    <FilePreview url={URL.createObjectURL(selectedFile)} filename={selectedFile.name} compact />
+                  </div>
+                ) : null}
                 {fileError ? (
                   <p className="mt-2 text-sm text-red-600 dark:text-red-400">{fileError}</p>
                 ) : null}

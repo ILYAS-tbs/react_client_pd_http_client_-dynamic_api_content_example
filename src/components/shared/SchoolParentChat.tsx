@@ -41,7 +41,6 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
 }) => {
   const { language } = useLanguage();
   const [selectedClassGroupId, setSelectedClassGroupId] = useState("");
-  const [selectedStudentId, setSelectedStudentId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebouncedValue(searchTerm, 300);
 
@@ -55,26 +54,9 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const filteredStudents = useMemo(
-    () =>
-      selectedClassGroupId
-        ? students.filter((student) => student.class_group?.class_group_id === selectedClassGroupId)
-        : students,
-    [selectedClassGroupId, students]
-  );
-
-  useEffect(() => {
-    if (
-      selectedStudentId &&
-      !filteredStudents.some((student) => student.student_id === selectedStudentId)
-    ) {
-      setSelectedStudentId("");
-    }
-  }, [filteredStudents, selectedStudentId]);
-
   useEffect(() => {
     setPage(1);
-  }, [selectedClassGroupId, selectedStudentId, debouncedSearch]);
+  }, [selectedClassGroupId, debouncedSearch]);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,7 +65,6 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
       setIsLoading(true);
       const response = await chat_http_client.get_current_school_parents_chats({
         class_group_id: selectedClassGroupId,
-        student_id: selectedStudentId,
         search: debouncedSearch,
         page,
       });
@@ -106,7 +87,7 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [selectedClassGroupId, selectedStudentId, debouncedSearch, page]);
+  }, [selectedClassGroupId, debouncedSearch, page]);
 
   function patchChatItem(studentId: string, participantUserId: number, patch: Partial<ContextualChatListItem>) {
     setChatResponse((prev) => ({
@@ -119,10 +100,7 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
     }));
   }
 
-  const activeFilterParts = [
-    classGroups.find((group) => group.class_group_id === selectedClassGroupId)?.name,
-    filteredStudents.find((student) => student.student_id === selectedStudentId)?.full_name,
-  ].filter(Boolean);
+  const activeFilterLabel = classGroups.find((group) => group.class_group_id === selectedClassGroupId)?.name;
 
   return (
     <ContextualChatWorkspace
@@ -144,32 +122,6 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
               </option>
             ))}
           </select>
-
-          <select
-            value={selectedStudentId}
-            onChange={(event) => setSelectedStudentId(event.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">{getTranslation("allStudents", language)}</option>
-            {filteredStudents.map((student) => (
-              <option key={student.student_id} value={student.student_id}>
-                {student.full_name}
-              </option>
-            ))}
-          </select>
-
-          {(selectedClassGroupId || selectedStudentId) ? (
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedClassGroupId("");
-                setSelectedStudentId("");
-              }}
-              className="w-full px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              {getTranslation("clearFilters", language)}
-            </button>
-          ) : null}
         </div>
       }
       items={chatResponse.results}
@@ -181,7 +133,7 @@ const SchoolParentChat: React.FC<SchoolParentChatProps> = ({
       emptyStateHint={getTranslation("noChatsMatchFilters", language)}
       selectionPrompt={getTranslation("selectChatToStart", language)}
       selectionHint={getTranslation("noChatsMatchFilters", language)}
-      activeFilterLabel={activeFilterParts.join(" • ") || undefined}
+      activeFilterLabel={activeFilterLabel}
       onPatchChatItem={patchChatItem}
     />
   );

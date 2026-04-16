@@ -1,3 +1,9 @@
+export type StudentPerformanceStatus =
+    | "excellent"
+    | "good"
+    | "needs_improvement"
+    | "pending";
+
 export interface StudentPerformance {
     student_id:                  string;
     student_name:                string;
@@ -9,6 +15,8 @@ export interface StudentPerformance {
     s1_overall:                  number | null;
     s2_overall:                  number | null;
     s3_overall:                  number | null;
+    performance_average:         number | null;
+    performance_status:          StudentPerformanceStatus;
     modules_stats:               ModulesStat[];
 }
 

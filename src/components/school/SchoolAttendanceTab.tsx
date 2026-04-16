@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Check, Download, Search, SquarePen, Trash2, X } from "lucide-react";
+import { Check, Download, SquarePen, Trash2, X } from "lucide-react";
 import { AttendanceAbsence, AttendanceFilters } from "../../models/Attendance";
 import { attendance_client } from "../../services/http_api/attendance/attendance_client";
 import { getCSRFToken } from "../../lib/get_CSRFToken";
@@ -23,7 +23,6 @@ interface AbsenceFormState {
   module_id: string;
   class_group_id: string;
   date: string;
-  hour: number;
   remark: string;
 }
 
@@ -34,13 +33,8 @@ function createEmptyFormState(date = new Date().toISOString().slice(0, 10)): Abs
     module_id: "",
     class_group_id: "",
     date,
-    hour: 1,
     remark: "",
   };
-}
-
-function getSessionLabel(hour: number, language: string) {
-  return getTranslation(`session${hour}` as never, language);
 }
 
 function getStatusLabel(status: string, language: string) {
@@ -60,20 +54,20 @@ function getStatusLabel(status: string, language: string) {
 
 function downloadCsv(rows: AttendanceAbsence[], language: string) {
   const csv = [
-    ["Student", "Class", "Module", "Session", "Date", "Teacher", "Remark", "Status"],
+    ["Student", "Class", "Date", "Module", "Teacher", "Remark", "Status"],
     ...rows.map((row) => [
       row.student.full_name,
       row.class_group?.name ?? "",
-      row.module?.module_name ?? "",
-      getSessionLabel(row.hour, language),
       row.date,
-      row.teacher.full_name,
+      row.module?.module_name ?? "",
+      row.teacher?.full_name ?? "",
       row.remark ?? "",
-      row.status,
+      getStatusLabel(row.status, language),
     ]),
   ]
     .map((line) => line.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
     .join("\n");
+
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
   link.download = `student-absences-${Date.now()}.csv`;
@@ -93,8 +87,6 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [studentQuery, setStudentQuery] = useState("");
-  const [classQuery, setClassQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAbsence, setEditingAbsence] = useState<AttendanceAbsence | null>(null);
   const [formState, setFormState] = useState<AbsenceFormState>(() => createEmptyFormState());
@@ -118,23 +110,11 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
     }
   }, [formState.student_id, selectedClassStudents]);
 
-  useEffect(() => {
-    if (!formState.teacher_id && teachers[0]) {
-      setFormState((current) => ({ ...current, teacher_id: String(teachers[0].user.id) }));
-    }
-  }, [formState.teacher_id, teachers]);
-
-  useEffect(() => {
-    if (!formState.module_id && modules[0]) {
-      setFormState((current) => ({ ...current, module_id: modules[0].module_id }));
-    }
-  }, [formState.module_id, modules]);
-
   const loadAbsences = useCallback(async () => {
     setIsLoading(true);
-    const res = await attendance_client.listAbsences({ ...filters, include_deleted: true });
-    if (res.ok) {
-      setAbsences(res.data);
+    const response = await attendance_client.listAbsences({ ...filters, include_deleted: true });
+    if (response.ok) {
+      setAbsences(response.data);
     }
     setIsLoading(false);
   }, [filters]);
@@ -143,34 +123,22 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
     void loadAbsences();
   }, [loadAbsences]);
 
-  const displayedAbsences = useMemo(() => {
-    const normalizedStudentQuery = studentQuery.trim().toLowerCase();
-    const normalizedClassQuery = classQuery.trim().toLowerCase();
+  const activeAbsences = useMemo(() => absences.filter((item) => !item.is_deleted), [absences]);
+  const justifiedCount = useMemo(() => absences.filter((item) => item.status === "approved").length, [absences]);
+  const unjustifiedCount = useMemo(() => activeAbsences.filter((item) => !item.justification).length, [activeAbsences]);
 
-    return absences.filter((item) => {
-      const matchesStudent =
-        !normalizedStudentQuery ||
-        item.student.full_name.toLowerCase().includes(normalizedStudentQuery);
-      const matchesClass =
-        !normalizedClassQuery ||
-        (item.class_group?.name ?? "").toLowerCase().includes(normalizedClassQuery);
-      return matchesStudent && matchesClass;
-    });
-  }, [absences, classQuery, studentQuery]);
-
-  const activeAbsences = displayedAbsences.filter((item) => !item.is_deleted);
-  const justifiedCount = displayedAbsences.filter((item) => item.status === "approved").length;
-  const unjustifiedCount = activeAbsences.filter((item) => !item.justification).length;
-  const topStudents = Object.values(
-    activeAbsences.reduce<Record<string, { name: string; count: number }>>((acc, item) => {
-      const key = item.student.student_id;
-      acc[key] = acc[key] ?? { name: item.student.full_name, count: 0 };
-      acc[key].count += 1;
-      return acc;
-    }, {})
-  )
-    .sort((left, right) => right.count - left.count)
-    .slice(0, 5);
+  const topStudents = useMemo(() => {
+    return Object.values(
+      activeAbsences.reduce<Record<string, { name: string; count: number }>>((acc, item) => {
+        const key = item.student.student_id;
+        acc[key] = acc[key] ?? { name: item.student.full_name, count: 0 };
+        acc[key].count += 1;
+        return acc;
+      }, {})
+    )
+      .sort((left, right) => right.count - left.count)
+      .slice(0, 5);
+  }, [activeAbsences]);
 
   const heatMap = useMemo(() => {
     return Array.from({ length: 7 }, (_, index) => {
@@ -185,15 +153,21 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
   }, [activeAbsences]);
 
   const resetFilters = () => {
-    setStudentQuery("");
-    setClassQuery("");
     setFilters({ include_deleted: true });
+  };
+
+  const getErrorMessage = (error: unknown) => {
+    if (typeof error === "object" && error !== null && "detail" in error) {
+      return String((error as { detail?: unknown }).detail ?? "");
+    }
+    return "";
   };
 
   const review = async (justificationId: number, status: "approved" | "refused") => {
     const note = status === "refused"
       ? window.prompt(getTranslation("reviewNotePrompt", language), "") ?? ""
       : "";
+
     await attendance_client.reviewJustification(
       justificationId,
       { status, review_note: note },
@@ -203,7 +177,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
   };
 
   const bulkApprove = async () => {
-    const pendingIds = displayedAbsences
+    const pendingIds = absences
       .filter((absence) => absence.justification?.status === "pending")
       .map((absence) => absence.justification?.id)
       .filter((value): value is number => Boolean(value));
@@ -211,6 +185,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
     for (const id of pendingIds) {
       await attendance_client.reviewJustification(id, { status: "approved" }, getCSRFToken() ?? "");
     }
+
     await loadAbsences();
   };
 
@@ -222,6 +197,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
     if (!reason) {
       return;
     }
+
     await attendance_client.deleteAbsence(absenceId, reason, getCSRFToken() ?? "");
     await loadAbsences();
   };
@@ -230,14 +206,13 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
     setEditingAbsence(absence);
     setFormState({
       student_id: absence.student.student_id,
-      teacher_id: String(absence.teacher.user),
+      teacher_id: absence.teacher?.user?.id ? String(absence.teacher.user.id) : "",
       module_id: absence.module?.module_id ?? "",
       class_group_id:
         absence.class_group?.class_group_id ??
         absence.student.class_group?.class_group_id ??
         "",
       date: absence.date,
-      hour: absence.hour,
       remark: absence.remark ?? "",
     });
     setIsModalOpen(true);
@@ -250,11 +225,10 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
 
     const payload = {
       student_id: formState.student_id,
-      teacher_id: Number(formState.teacher_id),
-      module_id: formState.module_id,
+      teacher_id: formState.teacher_id ? Number(formState.teacher_id) : undefined,
+      module_id: formState.module_id || undefined,
       class_group_id: formState.class_group_id,
       date: formState.date,
-      hour: formState.hour,
       remark: formState.remark.trim(),
     };
 
@@ -269,10 +243,10 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
       setEditingAbsence(null);
       await loadAbsences();
     } else {
-      const detail = typeof response.error === "object" && response.error !== null && "detail" in response.error
-        ? String((response.error as { detail?: unknown }).detail ?? "")
-        : "";
-      setFeedback(detail || getTranslation(editingAbsence ? "absenceUpdateFailed" : "absenceSaveFailed", language));
+      setFeedback(
+        getErrorMessage(response.error) ||
+          getTranslation(editingAbsence ? "absenceUpdateFailed" : "absenceSaveFailed", language)
+      );
     }
 
     setIsSubmitting(false);
@@ -293,7 +267,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => downloadCsv(displayedAbsences, language)}
+              onClick={() => downloadCsv(absences, language)}
               className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200"
             >
               <Download className="h-4 w-4" />
@@ -333,32 +307,6 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("searchStudent", language)}</span>
-              <span className="relative block">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="search"
-                  value={studentQuery}
-                  onChange={(event) => setStudentQuery(event.target.value)}
-                  placeholder={`${getTranslation("searchStudentPlaceholder", language)} (${students.length})`}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 dark:border-gray-600 dark:bg-gray-900"
-                />
-              </span>
-            </label>
-            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("searchClass", language)}</span>
-              <span className="relative block">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="search"
-                  value={classQuery}
-                  onChange={(event) => setClassQuery(event.target.value)}
-                  placeholder={`${getTranslation("searchClass", language)} (${classGroups.length})`}
-                  className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 dark:border-gray-600 dark:bg-gray-900"
-                />
-              </span>
-            </label>
-            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               <span>{getTranslation("class", language)}</span>
               <select
                 value={filters.class ?? ""}
@@ -373,7 +321,24 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                 ))}
               </select>
             </label>
+
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <span>{getTranslation("student", language)}</span>
+              <select
+                value={filters.student ?? ""}
+                onChange={(event) => setFilters((current) => ({ ...current, student: event.target.value || undefined }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              >
+                <option value="">{getTranslation("allStudents", language)}</option>
+                {students.map((student) => (
+                  <option key={student.student_id} value={student.student_id}>
+                    {student.full_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {/* <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               <span>{getTranslation("module", language)}</span>
               <select
                 value={filters.module ?? ""}
@@ -387,8 +352,9 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                   </option>
                 ))}
               </select>
-            </label>
-            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            </label> */}
+
+            {/* <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               <span>{getTranslation("teacher", language)}</span>
               <select
                 value={filters.teacher ?? ""}
@@ -402,31 +368,40 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                   </option>
                 ))}
               </select>
-            </label>
+            </label> */}
+
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("session", language)}</span>
-              <select
-                value={filters.hour ?? ""}
-                onChange={(event) => setFilters((current) => ({ ...current, hour: event.target.value ? Number(event.target.value) : undefined }))}
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
-              >
-                <option value="">{getTranslation("allSessions", language)}</option>
-                {Array.from({ length: 8 }, (_, index) => index + 1).map((hour) => (
-                  <option key={hour} value={hour}>
-                    {getSessionLabel(hour, language)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              <span>{getTranslation("Date", language)}</span>
+              <span>{getTranslation("fromDate", language)}</span>
               <input
                 type="date"
-                value={filters.date ?? ""}
-                onChange={(event) => setFilters((current) => ({ ...current, date: event.target.value || undefined }))}
+                value={filters.date_from ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    date_from: event.target.value || undefined,
+                    date: undefined,
+                  }))
+                }
                 className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
               />
             </label>
+
+            <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              <span>{getTranslation("toDate", language)}</span>
+              <input
+                type="date"
+                value={filters.date_to ?? ""}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    date_to: event.target.value || undefined,
+                    date: undefined,
+                  }))
+                }
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-900"
+              />
+            </label>
+
             <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               <span>{getTranslation("status", language)}</span>
               <select
@@ -457,6 +432,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
             ))}
           </div>
         </div>
+
         <div className="space-y-4">
           <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">{getTranslation("topAbsenceStudents", language)}</h3>
@@ -469,6 +445,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
               ))}
             </div>
           </div>
+
           <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">{getTranslation("justificationSplit", language)}</h3>
             <div className="space-y-2 text-sm text-gray-700 dark:text-gray-200">
@@ -487,8 +464,8 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
               <tr className="border-b border-gray-200 text-left text-gray-500 dark:border-gray-700 dark:text-gray-400">
                 <th className="px-4 py-3">{getTranslation("student", language)}</th>
                 <th className="px-4 py-3">{getTranslation("class", language)}</th>
-                <th className="px-4 py-3">{getTranslation("moduleHour", language)}</th>
                 <th className="px-4 py-3">{getTranslation("Date", language)}</th>
+                <th className="px-4 py-3">{getTranslation("module", language)}</th>
                 <th className="px-4 py-3">{getTranslation("teacher", language)}</th>
                 <th className="px-4 py-3">{getTranslation("remarks", language)}</th>
                 <th className="px-4 py-3">{getTranslation("justification", language)}</th>
@@ -501,18 +478,18 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                 <tr>
                   <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">{getTranslation("loading", language)}</td>
                 </tr>
-              ) : displayedAbsences.length === 0 ? (
+              ) : absences.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">{getTranslation("noAbsencesFound", language)}</td>
                 </tr>
               ) : (
-                displayedAbsences.map((absence) => (
+                absences.map((absence) => (
                   <tr key={absence.id} className="border-b border-gray-100 align-top dark:border-gray-800">
                     <td className="px-4 py-3 text-gray-900 dark:text-white">{absence.student.full_name}</td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.class_group?.name ?? "—"}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.module?.module_name ?? "—"} / {getSessionLabel(absence.hour, language)}</td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.date}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.teacher.full_name}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.module?.module_name ?? "—"}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.teacher?.full_name ?? "—"}</td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.remark?.trim() ? absence.remark : "—"}</td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{absence.justification?.comment ?? "—"}</td>
                     <td className="px-4 py-3">
@@ -534,12 +511,14 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                             </button>
                           </>
                         ) : null}
+
                         {!absence.is_deleted ? (
                           <button type="button" onClick={() => openEditModal(absence)} className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-200">
                             <SquarePen className="h-3.5 w-3.5" />
                             {getTranslation("editAbsence", language)}
                           </button>
                         ) : null}
+
                         {!absence.is_deleted ? (
                           <button type="button" onClick={() => { void removeAbsence(absence.id); }} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 dark:border-red-500/30 dark:text-red-200">
                             <Trash2 className="h-3.5 w-3.5" />
@@ -579,6 +558,7 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                     ))}
                   </select>
                 </label>
+
                 <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                   <span>{getTranslation("student", language)}</span>
                   <select value={formState.student_id} onChange={(event) => setFormState((current) => ({ ...current, student_id: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
@@ -587,33 +567,30 @@ const SchoolAttendanceTab: React.FC<SchoolAttendanceTabProps> = ({
                     ))}
                   </select>
                 </label>
+
                 <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                   <span>{getTranslation("teacher", language)}</span>
                   <select value={formState.teacher_id} onChange={(event) => setFormState((current) => ({ ...current, teacher_id: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    <option value="">{getTranslation("allTeachers", language)}</option>
                     {teachers.map((teacher) => (
                       <option key={teacher.user.id} value={teacher.user.id}>{teacher.full_name}</option>
                     ))}
                   </select>
                 </label>
+
                 <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                   <span>{getTranslation("module", language)}</span>
                   <select value={formState.module_id} onChange={(event) => setFormState((current) => ({ ...current, module_id: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
+                    <option value="">{getTranslation("allModules", language)}</option>
                     {modules.map((module) => (
                       <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
                     ))}
                   </select>
                 </label>
+
                 <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                   <span>{getTranslation("Date", language)}</span>
                   <input type="date" value={formState.date} onChange={(event) => setFormState((current) => ({ ...current, date: event.target.value }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800" />
-                </label>
-                <label className="space-y-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  <span>{getTranslation("session", language)}</span>
-                  <select value={formState.hour} onChange={(event) => setFormState((current) => ({ ...current, hour: Number(event.target.value) }))} className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-800">
-                    {Array.from({ length: 8 }, (_, index) => index + 1).map((hour) => (
-                      <option key={hour} value={hour}>{getSessionLabel(hour, language)}</option>
-                    ))}
-                  </select>
                 </label>
               </div>
 

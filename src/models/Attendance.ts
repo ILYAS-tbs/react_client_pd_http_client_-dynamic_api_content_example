@@ -3,6 +3,11 @@ export interface AttendanceLinkedClassGroup {
   name: string;
 }
 
+export interface AttendanceLinkedSchool {
+  user?: number;
+  school_name?: string;
+}
+
 export interface AttendanceLinkedModule {
   module_id: string;
   module_name: string;
@@ -14,8 +19,13 @@ export interface AttendanceLinkedStudent {
   class_group?: AttendanceLinkedClassGroup | null;
 }
 
+export interface AttendanceLinkedTeacherUser {
+  id: number;
+  username?: string;
+}
+
 export interface AttendanceLinkedTeacher {
-  user: number;
+  user: AttendanceLinkedTeacherUser;
   full_name: string;
 }
 
@@ -40,31 +50,26 @@ export interface AttendanceJustification {
 export interface AttendanceAbsence {
   id: string;
   student: AttendanceLinkedStudent;
-  teacher: AttendanceLinkedTeacher;
+  teacher?: AttendanceLinkedTeacher | null;
   module?: AttendanceLinkedModule | null;
   class_group?: AttendanceLinkedClassGroup | null;
+  school?: number | AttendanceLinkedSchool | null;
   date: string;
-  hour: number;
-  session: number;
-  session_label?: string | null;
   remark?: string | null;
   created_at: string;
   deleted_at?: string | null;
   deleted_reason?: string | null;
   is_deleted: boolean;
   status: string;
-  can_teacher_undo: boolean;
-  undo_deadline?: string | null;
   justification?: AttendanceJustification | null;
 }
 
 export interface MarkAttendancePayload {
   student_id: string;
-  module_id: string;
-  teacher_id: number;
-  class_group_id?: string;
+  class_group_id: string;
   date: string;
-  hour: number;
+  module_id?: string;
+  teacher_id?: number;
   remark?: string;
 }
 
@@ -72,7 +77,6 @@ export interface QuickMarkAbsencePayload {
   student_id: string;
   class_group_id: string;
   date: string;
-  session: number;
   module_id?: string;
   teacher_id?: number;
   remark?: string;
@@ -97,7 +101,6 @@ export interface AttendanceFilters {
   date?: string;
   date_from?: string;
   date_to?: string;
-  hour?: number;
   status?: string;
   include_deleted?: boolean;
 }

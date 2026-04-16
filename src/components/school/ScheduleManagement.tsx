@@ -5,7 +5,6 @@ import {
   Search,
   Upload,
   Eye,
-  FileText,
 } from "lucide-react";
 import { ScheduleManagementProps } from "../../types";
 import { ClassGroup } from "../../models/ClassGroups";
@@ -15,6 +14,8 @@ import { school_dashboard_client } from "../../services/http_api/school-dashboar
 import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation, getMediaUrl } from "../../utils/translations";
+import { FilePreview } from "../shared/file_preview";
+import { isAllowedSchoolUpload, SCHOOL_FILE_ACCEPT } from "../../utils/fileUploads";
 
 
 const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
@@ -29,6 +30,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
   const [selectedClassGroupId, setSelectedClassGroupId] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const fetchSchedules = async () => {
     setLoading(true);
@@ -58,7 +60,32 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
     setEditingSchedule(existing ?? null);
     setSelectedClassGroupId(classGroup.class_group_id);
     setSelectedFile(null);
+    setFileError(null);
     setShowUploadModal(true);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setEditingSchedule(null);
+    setSelectedFile(null);
+    setFileError(null);
+  };
+
+  const handleFileChange = (file: File | null) => {
+    if (!file) {
+      setSelectedFile(null);
+      setFileError(null);
+      return;
+    }
+
+    if (!isAllowedSchoolUpload(file)) {
+      setSelectedFile(null);
+      setFileError(getTranslation("pdfOrImageOnlyError", language));
+      return;
+    }
+
+    setSelectedFile(file);
+    setFileError(null);
   };
 
   const handleSubmit = async () => {
@@ -78,9 +105,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
       res = await school_dashboard_client.upload_schedule(formData, csrf);
     }
     if (res.ok) await fetchSchedules();
-    setShowUploadModal(false);
-    setEditingSchedule(null);
-    setSelectedFile(null);
+    closeUploadModal();
   };
 
   const handleDelete = async (scheduleId: string) => {
@@ -145,6 +170,9 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                 {filteredClassGroups.map((cg: ClassGroup) => {
                   const schedule = scheduleByClassGroup[cg.class_group_id];
                   const hasFile = !!schedule?.schedule_file;
+                  const fileUrl = hasFile
+                    ? getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)
+                    : null;
                   return (
                     <tr
                       key={cg.class_group_id}
@@ -154,7 +182,16 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                         {cg.name}
                       </td>
                       <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            {hasFile && fileUrl ? (
+                              <FilePreview url={fileUrl} filename={schedule.schedule_file} compact />
+                            ) : (
+                              <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3">
                           {/* Upload Button */}
                           <button
                             onClick={() => openUploadModal(cg)}
@@ -205,6 +242,7 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                               <Trash2 className="h-5 w-5" />
                             </button>
                           )}
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -244,46 +282,56 @@ const ScheduleManagement: React.FC<ScheduleManagementProps> = ({
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {getTranslation("currentFile", language)}
                   </label>
-                  <a
-                    href={getMediaUrl(editingSchedule.schedule_file, SERVER_BASE_URL) ?? undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary-500 underline text-sm"
-                  >
-                    {getTranslation("viewCurrentSchedule", language)}
-                  </a>
+                  <div className="space-y-2">
+                    {getMediaUrl(editingSchedule.schedule_file, SERVER_BASE_URL) ? (
+                      <FilePreview
+                        url={getMediaUrl(editingSchedule.schedule_file, SERVER_BASE_URL)!}
+                        filename={editingSchedule.schedule_file}
+                      />
+                    ) : null}
+                    <a
+                      href={getMediaUrl(editingSchedule.schedule_file, SERVER_BASE_URL) ?? undefined}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-500 underline text-sm"
+                    >
+                      {getTranslation("viewCurrentSchedule", language)}
+                    </a>
+                  </div>
                 </div>
               )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {getTranslation("scheduleFile", language)} (PDF)
+                  {getTranslation("scheduleFile", language)} (PDF / JPG / PNG / WEBP)
                 </label>
                 <input
                   type="file"
-                  accept="application/pdf"
-                  onChange={(e) =>
-                    setSelectedFile(e.target.files?.[0] ?? null)
-                  }
+                  accept={SCHOOL_FILE_ACCEPT}
+                  onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 />
+                {selectedFile ? (
+                  <div className="mt-3">
+                    <FilePreview url={URL.createObjectURL(selectedFile)} filename={selectedFile.name} compact />
+                  </div>
+                ) : null}
+                {fileError ? (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{fileError}</p>
+                ) : null}
               </div>
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => {
-                  setShowUploadModal(false);
-                  setEditingSchedule(null);
-                  setSelectedFile(null);
-                }}
+                onClick={closeUploadModal}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-sm"
               >
                 {getTranslation("cancel", language)}
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={!selectedFile && !editingSchedule}
+                disabled={!selectedFile}
                 className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 text-sm"
               >
                 {editingSchedule

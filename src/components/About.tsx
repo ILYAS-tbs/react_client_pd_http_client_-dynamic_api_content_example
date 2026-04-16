@@ -11,7 +11,7 @@ export function About() {
       icon: BookOpen,
       title: language === 'ar' ? 'تعليم متطور' : language === 'fr' ? 'Éducation Avancée' : 'Advanced Education',
       description: language === 'ar' ? 'منصة تعليمية حديثة تواكب أحدث التطورات التكنولوجية' : language === 'fr' ? 'Plateforme éducative moderne suivant les dernières évolutions technologiques' : 'Modern educational platform following the latest technological developments',
-      image: 'https://images.pexels.com/photos/5212317/pexels-photo-5212317.jpeg?auto=compress&cs=tinysrgb&w=600'
+      image: '/assets/landing_page/family.jpeg'
     },
     {
       icon: Users,

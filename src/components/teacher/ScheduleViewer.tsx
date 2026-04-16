@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Calendar, Eye, Search } from "lucide-react";
+import { Calendar, Search } from "lucide-react";
 import { ScheduleViewerProps } from "../../types";
 import { Schedule } from "../../models/Schedule";
 import { SERVER_BASE_URL } from "../../services/http_api/server_constants";
 import { teacher_dashboard_client } from "../../services/http_api/teacher-dashboard/teacher_dashboard_client";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation, getMediaUrl } from "../../utils/translations";
+import { FilePreview } from "../shared/file_preview";
 
 const ScheduleViewer: React.FC<ScheduleViewerProps> = () => {
   const { language } = useLanguage();
@@ -108,15 +109,11 @@ const ScheduleViewer: React.FC<ScheduleViewerProps> = () => {
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                       {schedule.schedule_file ? (
-                        <a
-                          href={getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200"
-                          title={getTranslation("view", language)}
-                        >
-                          <Eye className="h-5 w-5" />
-                        </a>
+                        <FilePreview
+                          url={getMediaUrl(schedule.schedule_file, SERVER_BASE_URL)!}
+                          filename={schedule.schedule_file}
+                          compact
+                        />
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}

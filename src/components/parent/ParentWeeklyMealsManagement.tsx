@@ -5,6 +5,7 @@ import { parent_dashboard_client } from "../../services/http_api/parent-dashboar
 import { ParentWeeklyMealsManagementProps } from "../../types";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
+import { FilePreview } from "../shared/file_preview";
 
 const ParentWeeklyMealsManagement: React.FC<ParentWeeklyMealsManagementProps> = ({ students }) => {
   const { language } = useLanguage();
@@ -69,7 +70,16 @@ const ParentWeeklyMealsManagement: React.FC<ParentWeeklyMealsManagementProps> = 
                       {row.school_name}
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          {row.has_pdf && row.view_url ? (
+                            <FilePreview url={row.view_url} filename={row.pdf_file} compact />
+                          ) : (
+                            <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3">
                         {row.has_pdf && row.view_url ? (
                           <a
                             href={row.view_url}
@@ -108,6 +118,7 @@ const ParentWeeklyMealsManagement: React.FC<ParentWeeklyMealsManagementProps> = 
                             <Download className="h-5 w-5" />
                           </button>
                         )}
+                        </div>
                       </div>
                     </td>
                   </tr>

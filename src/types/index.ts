@@ -192,6 +192,7 @@ export interface ScheduleManagementParentProps {
 
 export interface ParentExamScheduleManagementProps {
   students: Student[];
+  selectedStudentId?: string | null;
 }
 
 export interface ParentWeeklyMealsManagementProps {

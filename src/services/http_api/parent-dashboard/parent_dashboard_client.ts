@@ -8,7 +8,7 @@ import { MonthlyEvaluation } from "../../../models/MonthlyEvaluation";
 import { TeacherUpload } from "../../../models/TeacherUpload";
 import { ParentAbsence } from "../../../models/ParentAbsence";
 import { ParentStudentEvent } from "../../../models/ParentStudentEvent";
-import { ExamSchedule } from "../../../models/ExamSchedule";
+import { Schedule } from "../../../models/Schedule";
 import { ParentWeeklyMeal } from "../../../models/WeeklyMeal";
 import { ParentReadOnlyGradesResponse } from "../../../models/StudentGrade";
 import {
@@ -34,6 +34,7 @@ const URLS = {
   post_absence_report: `${BASE_URL}/school/absence-reports/`,
   parent_students_events: `${BASE_URL}/parent/parents/parent_students_events/`,
   get_current_parent_schedules: `${BASE_URL}/parent/parents/get_current_parent_schedules/`,
+  get_current_parent_devoir_exam_schedules: `${BASE_URL}/parent/parents/get_current_parent_devoir_exam_schedules/`,
   get_current_parent_exam_schedules: `${BASE_URL}/parent/parents/get_current_parent_exam_schedules/`,
   get_current_parent_weekly_meals: `${BASE_URL}/parent/weekly-meals/`,
   get_parent_dashboard_stats: `${BASE_URL}/parent/parents/dashboard_stats/`,
@@ -229,8 +230,6 @@ async function post_absence_report(
     return { ok: false, error: error };
   }
 }
-import { Schedule } from "../../../models/Schedule";
-
 async function get_current_parent_schedules(studentId: string): Promise<ApiResult<Schedule[]>> {
   try {
     const response = await fetch(withStudentId(URLS.get_current_parent_schedules, studentId), {
@@ -245,13 +244,32 @@ async function get_current_parent_schedules(studentId: string): Promise<ApiResul
   }
 }
 
-async function get_current_parent_exam_schedules(): Promise<ApiResult<ExamSchedule[]>> {
+async function get_current_parent_exam_schedules(studentId: string): Promise<ApiResult<Schedule[]>> {
   try {
-    const response = await fetch(URLS.get_current_parent_exam_schedules, {
+    const response = await fetch(withStudentId(URLS.get_current_parent_exam_schedules, studentId), {
       method: "GET",
       credentials: "include",
     });
-    const data: ExamSchedule[] = await response.json();
+    const data: Schedule[] = await response.json();
+    if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+type GroupedSchedules = {
+  devoir: Schedule[];
+  exam: Schedule[];
+};
+
+async function get_current_parent_devoir_exam_schedules(studentId: string): Promise<ApiResult<GroupedSchedules>> {
+  try {
+    const response = await fetch(withStudentId(URLS.get_current_parent_devoir_exam_schedules, studentId), {
+      method: "GET",
+      credentials: "include",
+    });
+    const data: GroupedSchedules = await response.json();
     if (!response.ok) return { ok: false, error: `HTTP ${response.status}` };
     return { ok: true, status: response.status, data };
   } catch (error) {
@@ -287,9 +305,12 @@ async function get_parent_dashboard_stats(studentId: string): Promise<ApiResult<
   }
 }
 
-async function get_parent_students_summary(): Promise<ApiResult<ParentStudentSummary[]>> {
+async function get_parent_students_summary(
+  semester: "s1" | "s2" | "s3" = "s1"
+): Promise<ApiResult<ParentStudentSummary[]>> {
   try {
-    const response = await fetch(URLS.get_parent_students_summary, {
+    const params = new URLSearchParams({ semester });
+    const response = await fetch(`${URLS.get_parent_students_summary}?${params.toString()}`, {
       method: "GET",
       credentials: "include",
     });
@@ -318,6 +339,7 @@ export const parent_dashboard_client = {
 
   post_absence_report: post_absence_report,
   get_current_parent_schedules: get_current_parent_schedules,
+  get_current_parent_devoir_exam_schedules: get_current_parent_devoir_exam_schedules,
   get_current_parent_exam_schedules: get_current_parent_exam_schedules,
   get_current_parent_weekly_meals: get_current_parent_weekly_meals,
   get_parent_dashboard_stats: get_parent_dashboard_stats,

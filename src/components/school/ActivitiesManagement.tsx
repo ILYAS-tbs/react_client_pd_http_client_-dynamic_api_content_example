@@ -11,6 +11,8 @@ import { getCSRFToken } from "../../lib/get_CSRFToken";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { getTranslation } from "../../utils/translations";
 import { useModalFormReset } from "../../hooks/useModalFormReset";
+import { FilePreview } from "../shared/file_preview";
+import { isAllowedSchoolUpload, SCHOOL_FILE_ACCEPT } from "../../utils/fileUploads";
 
 interface Activity {
   event_id: string;
@@ -20,6 +22,7 @@ interface Activity {
   category: string;
   desc: string;
   place: string;
+  file?: string | null;
 }
 
 const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
@@ -37,6 +40,10 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewCalendar, setViewCalendar] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [postEventFile, setPostEventFile] = useState<File | null>(null);
+  const [patchEventFile, setPatchEventFile] = useState<File | null>(null);
+  const [postFileError, setPostFileError] = useState("");
+  const [patchFileError, setPatchFileError] = useState("");
 
   // const handleAddActivity = () => {
   //   if (
@@ -104,15 +111,18 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   }
 
   //! Post Event ::
-  const createPostEventForm = () => ({
-    title: "",
-    category: "",
-    date: "",
-    time: "",
-    place: "",
-    desc: "",
-    school_id: school_id,
-  });
+  const createPostEventForm = useCallback(
+    () => ({
+      title: "",
+      category: "",
+      date: "",
+      time: "",
+      place: "",
+      desc: "",
+      school_id: school_id,
+    }),
+    [school_id]
+  );
   const [postEventForm, setPostEventForm] = useState<PostEventPayload>({
     ...createPostEventForm(),
   });
@@ -128,8 +138,10 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   const resetPostEventForm = useCallback(() => {
     setPostEventForm(createPostEventForm());
     setPostModalError("");
+    setPostEventFile(null);
+    setPostFileError("");
     setEditingActivity(null);
-  }, [school_id]);
+  }, [createPostEventForm]);
 
   const { formKey: addActivityFormKey } = useModalFormReset({
     isOpen: showAddModal,
@@ -162,6 +174,7 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       place: postEventForm.place ?? "",
       desc: postEventForm.desc ?? "",
       school_id: school_id,
+      file: postEventFile,
     };
 
     const post_event_res = await school_dashboard_client.post_event(
@@ -196,15 +209,18 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   );
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const createPatchEventForm = () => ({
-    title: "",
-    category: "",
-    date: "",
-    time: "",
-    place: "",
-    desc: "",
-    school_id: school_id,
-  });
+  const createPatchEventForm = useCallback(
+    () => ({
+      title: "",
+      category: "",
+      date: "",
+      time: "",
+      place: "",
+      desc: "",
+      school_id: school_id,
+    }),
+    [school_id]
+  );
   const [patchEventForm, setPatchEventForm] = useState<PostEventPayload>({
     ...createPatchEventForm(),
   });
@@ -220,8 +236,10 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   const resetPatchEventForm = useCallback(() => {
     setPatchEventForm(createPatchEventForm());
     setPatchModalError("");
+    setPatchEventFile(null);
+    setPatchFileError("");
     set_last_selected_event(null);
-  }, [school_id]);
+  }, [createPatchEventForm]);
 
   const populatePatchEventForm = useCallback((event: Event) => {
     setPatchEventForm({
@@ -265,6 +283,8 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
       date: patchEventForm.date,
       time: patchEventForm.time,
       place: patchEventForm.place,
+      desc: patchEventForm.desc,
+      file: patchEventFile,
     };
     const event_id = last_selected_event?.event_id ?? "";
 
@@ -289,6 +309,27 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
   useEffect(() => {
     setActivities(events_list);
   }, [events_list]);
+
+  const handleEventFileSelection = (
+    file: File | null,
+    onSelect: (nextFile: File | null) => void,
+    onError: (message: string) => void
+  ) => {
+    if (!file) {
+      onSelect(null);
+      onError("");
+      return;
+    }
+
+    if (!isAllowedSchoolUpload(file)) {
+      onSelect(null);
+      onError(getTranslation("pdfOrImageOnlyError", language));
+      return;
+    }
+
+    onSelect(file);
+    onError("");
+  };
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -392,6 +433,9 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                     {getTranslation('locationColumn', language)}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    {getTranslation('attachment', language)}
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {getTranslation('actionsColumn', language)}
                   </th>
                 </tr>
@@ -427,6 +471,13 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
                         {activity.place}
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {activity.file ? (
+                        <FilePreview url={activity.file} filename={activity.file} compact />
+                      ) : (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2 rtl:space-x-reverse">
                         <button
@@ -459,252 +510,397 @@ const ActivitiesManagement: React.FC<ActivitiesManagementProps> = ({
         )}
       </div>
 
-      {/* Add Activity Modal */}
+      {/* Add Activity Modal - Improved UX with Scrollable Sections */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {editingActivity ? "تعديل الفعالية" : "إضافة فعالية جديدة"}
-            </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl">
+            {/* Sticky Header */}
+            <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 px-6 py-5 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-gray-700 dark:to-gray-600">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {getTranslation('addActivity', language)}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {getTranslation('fillAllFieldsBelow', language) || 'ملء جميع الحقول المطلوبة'}
+              </p>
+            </div>
 
-            <form key={addActivityFormKey} className="space-y-4" onSubmit={handlePostEvent}>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  العنوان
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={postEventForm.title}
-                  onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="اسم الفعالية"
-                />
+            {/* Scrollable Content */}
+            <form key={addActivityFormKey} className="flex-1 overflow-y-auto px-6 py-6 space-y-6" onSubmit={handlePostEvent}>
+              {/* ========== SECTION 1: BASIC INFO ========== */}
+              <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  {getTranslation('basicInfo', language) || 'معلومات أساسية'}
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    العنوان *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={postEventForm.title}
+                    onChange={handlePostFormChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                    placeholder="مثال: يوم رياضي"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      الفئة *
+                    </label>
+                    <select
+                      name="category"
+                      value={postEventForm.category}
+                      onChange={handlePostFormChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">اختر الفئة</option>
+                      <option value="رياضية">رياضية</option>
+                      <option value="علمية">علمية</option>
+                      <option value="ثقافية">ثقافية</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      التاريخ *
+                    </label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={postEventForm.date}
+                      onChange={handlePostFormChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      الوقت *
+                    </label>
+                    <input
+                      type="time"
+                      name="time"
+                      value={postEventForm.time}
+                      onChange={handlePostFormChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      الموقع *
+                    </label>
+                    <input
+                      type="text"
+                      name="place"
+                      value={postEventForm.place}
+                      onChange={handlePostFormChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="مثال: ملعب المدرسة"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الفئة
-                </label>
-                <select
-                  name="category"
-                  value={postEventForm.category}
-                  onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">اختر الفئة</option>
-                  <option value="رياضية">رياضية</option>
-                  <option value="علمية">علمية</option>
-                  <option value="ثقافية">ثقافية</option>
-                </select>
+              {/* ========== SECTION 2: CONTENT ========== */}
+              <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  {getTranslation('content', language) || 'المحتوى'}
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    الوصف *
+                  </label>
+                  <textarea
+                    name="desc"
+                    value={postEventForm.desc}
+                    onChange={handlePostFormChange}
+                    required
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                    placeholder="صف الفعالية والأنشطة المخطط لها..."
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  التاريخ
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={postEventForm.date}
-                  onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+              {/* ========== SECTION 3: ATTACHMENTS ========== */}
+              <div className="space-y-4 pb-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  {getTranslation('optionalFields', language) || 'حقول اختيارية'}
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {getTranslation('attachment', language)} (PDF / JPG / PNG / WEBP)
+                  </label>
+                  <input
+                    type="file"
+                    accept={SCHOOL_FILE_ACCEPT}
+                    onChange={(e) =>
+                      handleEventFileSelection(
+                        e.target.files?.[0] ?? null,
+                        setPostEventFile,
+                        setPostFileError
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                  {postEventFile ? (
+                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-800">
+                      <p className="text-sm text-green-800 dark:text-green-200 font-medium mb-2">
+                        ✓ {postEventFile.name}
+                      </p>
+                      <FilePreview url={URL.createObjectURL(postEventFile)} filename={postEventFile.name} compact />
+                    </div>
+                  ) : null}
+                  {postFileError ? (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium">
+                      ⚠ {postFileError}
+                    </p>
+                  ) : null}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الوقت
-                </label>
-                <input
-                  type="time"
-                  name="time"
-                  value={postEventForm.time}
-                  onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الوصف
-                </label>
-                <textarea
-                  name="desc"
-                  value={postEventForm.desc}
-                  onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="تفاصيل الفعالية"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الموقع
-                </label>
-                <input
-                  type="text"
-                  name="place"
-                  value={postEventForm.place}
-                  onChange={handlePostFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="مكان الفعالية"
-                />
-              </div>
-
-              {/* error */}
+              {/* Error Message */}
               {postModalError && (
-                <div className="text text-red-600">{postModalError}</div>
+                <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+                    ⚠ {postModalError}
+                  </p>
+                </div>
               )}
-
-              <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    resetPostEventForm();
-                  }}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  إلغاء
-                </button>
-                <button
-                  // onClick={
-                  //   editingActivity ? handleUpdateActivity : handleAddActivity
-                  // }
-                  type="submit"
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  {/* {editingActivity ? "تحديث" : "إضافة"} */}
-                  إضافة
-                </button>
-              </div>
             </form>
+
+            {/* Sticky Footer */}
+            <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rtl:space-x-reverse">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddModal(false);
+                  resetPostEventForm();
+                }}
+                className="px-5 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg transition-colors font-medium"
+              >
+                إلغاء
+              </button>
+              <button
+                type="submit"
+                form={addActivityFormKey}
+                onClick={handlePostEvent}
+                className="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-md hover:shadow-lg"
+              >
+                إضافة الفعالية
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Edit Activity Modal */}
+      {/* Edit Activity Modal - Improved UX with Scrollable Sections */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              تعديل الفعالية
-            </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl">
+            {/* Sticky Header */}
+            <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-700 px-6 py-5 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-600">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                تعديل الفعالية
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                حدّث معلومات الفعالية أدناه
+              </p>
+            </div>
 
-            <form key={editActivityFormKey} className="space-y-4" onSubmit={handlePatchEvent}>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  العنوان
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={patchEventForm.title}
-                  onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="اسم الفعالية"
-                />
+            {/* Scrollable Content */}
+            <form key={editActivityFormKey} className="flex-1 overflow-y-auto px-6 py-6 space-y-6" onSubmit={handlePatchEvent}>
+              {/* ========== SECTION 1: BASIC INFO ========== */}
+              <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  معلومات أساسية
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    العنوان
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={patchEventForm.title}
+                    onChange={handlePatchFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    placeholder="اسم الفعالية"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      الفئة
+                    </label>
+                    <select
+                      name="category"
+                      value={patchEventForm.category}
+                      onChange={handlePatchFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">اختر الفئة</option>
+                      <option value="رياضية">رياضية</option>
+                      <option value="علمية">علمية</option>
+                      <option value="ثقافية">ثقافية</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      التاريخ
+                    </label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={patchEventForm.date}
+                      onChange={handlePatchFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      الوقت
+                    </label>
+                    <input
+                      type="time"
+                      name="time"
+                      value={patchEventForm.time}
+                      onChange={handlePatchFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      الموقع
+                    </label>
+                    <input
+                      type="text"
+                      name="place"
+                      value={patchEventForm.place}
+                      onChange={handlePatchFormChange}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="مكان الفعالية"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الفئة
-                </label>
-                <select
-                  name="category"
-                  value={patchEventForm.category}
-                  onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">اختر الفئة</option>
-                  <option value="رياضية">رياضية</option>
-                  <option value="علمية">علمية</option>
-                  <option value="ثقافية">ثقافية</option>
-                </select>
+              {/* ========== SECTION 2: CONTENT ========== */}
+              <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  المحتوى
+                </h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    الوصف
+                  </label>
+                  <textarea
+                    name="desc"
+                    value={patchEventForm.desc}
+                    onChange={handlePatchFormChange}
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    placeholder="صف الفعالية والأنشطة..."
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  التاريخ
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={patchEventForm.date}
-                  onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+              {/* ========== SECTION 3: ATTACHMENTS ========== */}
+              <div className="space-y-4 pb-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                  الملفات المرفقة
+                </h3>
+
+                {last_selected_event?.file ? (
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-3">
+                      الملف الحالي:
+                    </p>
+                    <FilePreview url={last_selected_event.file} filename={last_selected_event.file} />
+                  </div>
+                ) : null}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {getTranslation('attachment', language)} (PDF / JPG / PNG / WEBP)
+                  </label>
+                  <input
+                    type="file"
+                    accept={SCHOOL_FILE_ACCEPT}
+                    onChange={(e) =>
+                      handleEventFileSelection(
+                        e.target.files?.[0] ?? null,
+                        setPatchEventFile,
+                        setPatchFileError
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {patchEventFile ? (
+                    <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-800">
+                      <p className="text-sm text-green-800 dark:text-green-200 font-medium mb-2">
+                        ✓ {patchEventFile.name}
+                      </p>
+                      <FilePreview url={URL.createObjectURL(patchEventFile)} filename={patchEventFile.name} compact />
+                    </div>
+                  ) : null}
+                  {patchFileError ? (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-medium">
+                      ⚠ {patchFileError}
+                    </p>
+                  ) : null}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الوقت
-                </label>
-                <input
-                  type="time"
-                  name="time"
-                  value={patchEventForm.time}
-                  onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الوصف
-                </label>
-                <textarea
-                  name="desc"
-                  value={patchEventForm.desc}
-                  onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="تفاصيل الفعالية"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  الموقع
-                </label>
-                <input
-                  type="text"
-                  name="place"
-                  value={patchEventForm.place}
-                  onChange={handlePatchFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="مكان الفعالية"
-                />
-              </div>
-
-              {/* error */}
+              {/* Error Message */}
               {patchModalError && (
-                <div className="text text-red-600">{patchModalError}</div>
+                <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+                    ⚠ {patchModalError}
+                  </p>
+                </div>
               )}
-
-              <div className="flex justify-end space-x-3 rtl:space-x-reverse mt-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowEditModal(false);
-                    resetPatchEventForm();
-                  }}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  إلغاء
-                </button>
-                <button
-                  // onClick={
-                  //   editingActivity ? handleUpdateActivity : handleAddActivity
-                  // }
-                  type="submit"
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  {/* {editingActivity ? "تحديث" : "إضافة"} */}
-                  تحديث
-                </button>
-              </div>
             </form>
+
+            {/* Sticky Footer */}
+            <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rtl:space-x-reverse">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowEditModal(false);
+                  resetPatchEventForm();
+                }}
+                className="px-5 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg transition-colors font-medium"
+              >
+                إلغاء
+              </button>
+              <button
+                type="submit"
+                form={editActivityFormKey}
+                onClick={handlePatchEvent}
+                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md hover:shadow-lg"
+              >
+                حفظ التغييرات
+              </button>
+            </div>
           </div>
         </div>
       )}

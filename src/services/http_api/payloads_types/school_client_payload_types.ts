@@ -148,12 +148,19 @@ export interface PostEventPayload {
   place: string;
   desc: string;
   school_id: number;
+  event_type: "global" | "targeted";
+  class_group_ids?: string[];
+  file?: File | null;
 }
 
 export interface PatchEventPayload {
-  title: string;
-  category: string;
-  date: string;
-  time: string;
-  place: string;
+  title?: string;
+  category?: string;
+  date?: string;
+  time?: string;
+  place?: string;
+  desc?: string;
+  event_type?: "global" | "targeted";
+  class_group_ids?: string[];
+  file?: File | null;
 }
