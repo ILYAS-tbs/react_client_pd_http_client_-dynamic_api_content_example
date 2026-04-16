@@ -3,6 +3,7 @@ import { Target, Eye, Award, Users, BookOpen, BarChart3 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
 
+//  comment jsut to be able to push
 export function About() {
   const { language, isRTL } = useLanguage();
 
