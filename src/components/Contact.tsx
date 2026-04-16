@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Send, Clock, MessageCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Phone, Mail, MapPin, Send, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
+
+const CONTACT_EMAIL = 'pedaconnect0@gmail.com';
+
+type SubmissionNotice = {
+  type: 'success' | 'error';
+  message: string;
+};
 
 export function Contact() {
   const { language, isRTL } = useLanguage();
@@ -12,12 +19,77 @@ export function Contact() {
     message: '',
     userType: 'parent'
   });
+  const [submissionNotice, setSubmissionNotice] = useState<SubmissionNotice | null>(null);
+
+  useEffect(() => {
+    if (!submissionNotice) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSubmissionNotice(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timer);
+  }, [submissionNotice]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formState);
-    // Reset form
+
+    const userTypeLabel =
+      formState.userType === 'school'
+        ? language === 'ar'
+          ? 'مدرسة'
+          : language === 'fr'
+            ? 'École'
+            : 'School'
+        : formState.userType === 'teacher'
+          ? language === 'ar'
+            ? 'معلم'
+            : language === 'fr'
+              ? 'Enseignant'
+              : 'Teacher'
+          : language === 'ar'
+            ? 'ولي أمر'
+            : language === 'fr'
+              ? 'Parent'
+              : 'Parent';
+
+    const subjectText = `[PedaConnect Contact] ${formState.subject}`;
+    const bodyText = [
+      `${language === 'ar' ? 'الاسم' : language === 'fr' ? 'Nom' : 'Name'}: ${formState.name}`,
+      `${language === 'ar' ? 'البريد الإلكتروني' : language === 'fr' ? 'Email' : 'Email'}: ${formState.email}`,
+      `${language === 'ar' ? 'نوع المستخدم' : language === 'fr' ? 'Type d\'utilisateur' : 'User Type'}: ${userTypeLabel}`,
+      '',
+      `${language === 'ar' ? 'الرسالة' : language === 'fr' ? 'Message' : 'Message'}:`,
+      formState.message,
+    ].join('\n');
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(CONTACT_EMAIL)}&su=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
+    const openedWindow = window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+
+    if (!openedWindow) {
+      setSubmissionNotice({
+        type: 'error',
+        message:
+          language === 'ar'
+            ? 'تم حظر فتح Gmail. اسمح بالنوافذ المنبثقة ثم أعد المحاولة.'
+            : language === 'fr'
+              ? 'L\'ouverture de Gmail a été bloquée. Autorisez les pop-ups puis réessayez.'
+              : 'Gmail was blocked from opening. Allow pop-ups and try again.'
+      });
+      return;
+    }
+
+    setSubmissionNotice({
+      type: 'success',
+      message:
+        language === 'ar'
+          ? 'تم فتح Gmail في تبويب جديد مع رسالتك الجاهزة.'
+          : language === 'fr'
+            ? 'Gmail a été ouvert dans un nouvel onglet avec votre message prêt.'
+            : 'Gmail opened in a new tab with your message ready.'
+    });
     setFormState({
       name: '',
       email: '',
@@ -46,7 +118,7 @@ export function Contact() {
     {
       icon: Mail,
       title: language === 'ar' ? 'البريد الإلكتروني' : language === 'fr' ? 'Email' : 'Email',
-      primary: 'info@pedaconnect.dz',
+      primary: CONTACT_EMAIL,
       secondary: language === 'ar' ? 'نرد خلال 24 ساعة' :
         language === 'fr' ? 'Réponse sous 24h' :
           'We respond within 24 hours'
@@ -121,6 +193,20 @@ export function Contact() {
                       'We\'ll get back to you as soon as possible'}
                 </p>
               </div>
+
+              {submissionNotice && (
+                <div
+                  className={`mb-6 rounded-lg border px-4 py-3 text-sm font-medium ${
+                    submissionNotice.type === 'success'
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300'
+                      : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300'
+                  } ${isRTL ? 'text-right' : 'text-left'}`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  {submissionNotice.message}
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
@@ -238,6 +324,16 @@ export function Contact() {
                         'Send Message'}
                   </span>
                 </button>
+
+                <p className={`text-sm text-gray-500 dark:text-gray-400 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  {language === 'ar' ? 'أو راسلنا مباشرة على ' : language === 'fr' ? 'Ou écrivez-nous directement à ' : 'Or email us directly at '}
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="font-semibold text-primary-500 hover:text-primary-600"
+                  >
+                    {CONTACT_EMAIL}
+                  </a>
+                </p>
               </form>
             </div>
           </div>
@@ -259,9 +355,18 @@ export function Contact() {
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                         {info.title}
                       </h4>
-                      <p className="text-primary-500 font-medium">
-                        {info.primary}
-                      </p>
+                      {info.icon === Mail ? (
+                        <a
+                          href={`mailto:${CONTACT_EMAIL}`}
+                          className="text-primary-500 font-medium hover:text-primary-600"
+                        >
+                          {info.primary}
+                        </a>
+                      ) : (
+                        <p className="text-primary-500 font-medium">
+                          {info.primary}
+                        </p>
+                      )}
                       <p className="text-gray-600 dark:text-gray-300 text-sm">
                         {info.secondary}
                       </p>
