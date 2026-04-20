@@ -7,6 +7,7 @@ import {
   CreditCard,
   LayoutGrid,
   Activity,
+  BarChart3,
 } from "lucide-react";
 import DashboardLayout from "../../components/DashboardLayout";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -18,6 +19,7 @@ import { ReportsManagement } from "../../components/AdminDashboard/ReportsManage
 import { AnnouncementsManagement } from "../../components/AdminDashboard/AnnouncementsManagement";
 import { MembershipsManagement } from "../../components/AdminDashboard/MembershipsManagement";
 import { ActivityCenter } from "../../components/AdminDashboard/ActivityCenter";
+import { ParentsFamiliesManagement } from "../../components/AdminDashboard";
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -28,6 +30,7 @@ const AdminDashboard: React.FC = () => {
     { id: "overview", label: getTranslation("admin.overview", language), icon: LayoutGrid },
     { id: "schools", label: getTranslation("admin.schools", language), icon: School },
     { id: "users", label: getTranslation("admin.userManagement", language), icon: Users },
+    { id: "parents-families", label: getTranslation("admin.parentsFamilies", language), icon: BarChart3 },
     { id: "reports", label: getTranslation("admin.reports", language), icon: FileText },
     { id: "announcements", label: getTranslation("admin.announcements", language), icon: MessageSquare },
     { id: "subscriptions", label: getTranslation("admin.subscriptions", language), icon: CreditCard },
@@ -41,6 +44,9 @@ const AdminDashboard: React.FC = () => {
 
       case "users":
         return <UsersManagement />;
+
+      case "parents-families":
+        return <ParentsFamiliesManagement />;
 
       case "reports":
         return (

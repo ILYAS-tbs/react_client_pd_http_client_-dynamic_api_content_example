@@ -15,5 +15,7 @@ export interface ParentStudentSummary {
   studentId: string;
   name: string;
   className: string;
+  schoolId?: string;
+  schoolName?: string;
   status: ParentPerformanceStatus;
 }

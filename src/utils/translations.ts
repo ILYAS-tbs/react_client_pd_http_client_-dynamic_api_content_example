@@ -3378,6 +3378,206 @@ educationalMaterials: {
     en: "Schools",
     fr: "Écoles",
   },
+  parentsFamilies: {
+    ar: "الأولياء والعائلات",
+    en: "Parents & Families",
+    fr: "Parents et Familles",
+  },
+  linkedStudents: {
+    ar: "الطلاب المرتبطون",
+    en: "Linked Students",
+    fr: "Élèves liés",
+  },
+  avgChildrenPerParent: {
+    ar: "متوسط الأطفال لكل ولي",
+    en: "Avg Children / Parent",
+    fr: "Moyenne d'enfants par parent",
+  },
+  largeFamilies: {
+    ar: "العائلات الكبيرة (3+)",
+    en: "Large Families (3+)",
+    fr: "Grandes familles (3+)",
+  },
+  familyDistribution: {
+    ar: "توزيع العائلات",
+    en: "Family Distribution",
+    fr: "Répartition des familles",
+  },
+  familyDistributionDescription: {
+    ar: "تصنيف الأولياء حسب عدد الأطفال المرتبطين بهم.",
+    en: "Parents grouped by number of linked children.",
+    fr: "Parents regroupés selon le nombre d'enfants liés.",
+  },
+  parentsPerSchool: {
+    ar: "الأولياء حسب المدرسة",
+    en: "Parents Per School",
+    fr: "Parents par école",
+  },
+  parentsPerSchoolDescription: {
+    ar: "مقارنة توزيع العلاقات العائلية عبر المدارس.",
+    en: "Compare how family relationships are distributed across schools.",
+    fr: "Comparez la répartition des relations familiales entre les écoles.",
+  },
+  linkedStudentsLabel: {
+    ar: "طلاب مرتبطون",
+    en: "linked students",
+    fr: "élèves liés",
+  },
+  parentsLabel: {
+    ar: "أولياء",
+    en: "parents",
+    fr: "parents",
+  },
+  noSchoolDistributionAvailable: {
+    ar: "لا توجد بيانات توزيع حسب المدرسة حالياً.",
+    en: "No school distribution available yet.",
+    fr: "Aucune répartition par école disponible pour le moment.",
+  },
+  parentsExplorer: {
+    ar: "مستكشف الأولياء",
+    en: "Parents Explorer",
+    fr: "Explorateur des parents",
+  },
+  parentsExplorerDescription: {
+    ar: "ابحث وصفِّ واستعرض البنية العائلية عبر المنصة.",
+    en: "Search, filter, and inspect family structures across the platform.",
+    fr: "Recherchez, filtrez et explorez les structures familiales sur la plateforme.",
+  },
+  searchParents: {
+    ar: "ابحث باسم الولي أو بريده الإلكتروني",
+    en: "Search parent name or email",
+    fr: "Rechercher par nom du parent ou e-mail",
+  },
+  allSchools: {
+    ar: "جميع المدارس",
+    en: "All schools",
+    fr: "Toutes les écoles",
+  },
+  minChildren: {
+    ar: "الحد الأدنى للأطفال",
+    en: "Min children",
+    fr: "Min. enfants",
+  },
+  maxChildren: {
+    ar: "الحد الأقصى للأطفال",
+    en: "Max children",
+    fr: "Max. enfants",
+  },
+  newestParents: {
+    ar: "أحدث الأولياء",
+    en: "Newest parents",
+    fr: "Parents les plus récents",
+  },
+  mostChildren: {
+    ar: "الأكثر أطفالاً",
+    en: "Most children",
+    fr: "Le plus d'enfants",
+  },
+  alphabetical: {
+    ar: "أبجدي",
+    en: "Alphabetical",
+    fr: "Alphabétique",
+  },
+  loadingParentAnalytics: {
+    ar: "جار تحميل تحليلات الأولياء",
+    en: "Loading parent analytics",
+    fr: "Chargement des analyses des parents",
+  },
+  loadingFamilyDetails: {
+    ar: "جار تحميل تفاصيل العائلة",
+    en: "Loading family details",
+    fr: "Chargement des détails de la famille",
+  },
+  failedLoadParentAnalytics: {
+    ar: "تعذر تحميل تحليلات الأولياء",
+    en: "Failed to load parent analytics",
+    fr: "Impossible de charger les analyses des parents",
+  },
+  failedLoadParentDetails: {
+    ar: "تعذر تحميل تفاصيل الولي",
+    en: "Failed to load parent details",
+    fr: "Impossible de charger les détails du parent",
+  },
+  noParentsMatchedFilters: {
+    ar: "لا يوجد أولياء يطابقون المرشحات الحالية.",
+    en: "No parents matched the current filters.",
+    fr: "Aucun parent ne correspond aux filtres actuels.",
+  },
+  largeFamily: {
+    ar: "عائلة كبيرة",
+    en: "Large family",
+    fr: "Grande famille",
+  },
+  familyProfile: {
+    ar: "ملف العائلة",
+    en: "Family profile",
+    fr: "Profil familial",
+  },
+  noLinkedSchools: {
+    ar: "لا توجد مدارس مرتبطة",
+    en: "No linked schools",
+    fr: "Aucune école liée",
+  },
+  childrenCountOne: {
+    ar: "طفل واحد",
+    en: "1 child",
+    fr: "1 enfant",
+  },
+  childrenCountTwo: {
+    ar: "طفلان",
+    en: "2 children",
+    fr: "2 enfants",
+  },
+  childrenCountThreePlus: {
+    ar: "3 أطفال أو أكثر",
+    en: "3+ children",
+    fr: "3+ enfants",
+  },
+  schoolsInvolved: {
+    ar: "المدارس المرتبطة",
+    en: "Schools involved",
+    fr: "Écoles concernées",
+  },
+  joined: {
+    ar: "تاريخ الانضمام",
+    en: "Joined",
+    fr: "Inscrit le",
+  },
+  relationship: {
+    ar: "صلة القرابة",
+    en: "Relationship",
+    fr: "Relation",
+  },
+  address: {
+    ar: "العنوان",
+    en: "Address",
+    fr: "Adresse",
+  },
+  notProvided: {
+    ar: "غير متوفر",
+    en: "Not provided",
+    fr: "Non fourni",
+  },
+  notSpecified: {
+    ar: "غير محدد",
+    en: "Not specified",
+    fr: "Non précisé",
+  },
+  noAddressProvided: {
+    ar: "لا يوجد عنوان متوفر",
+    en: "No address provided",
+    fr: "Aucune adresse fournie",
+  },
+  childrenDetails: {
+    ar: "تفاصيل الأطفال",
+    en: "Children Details",
+    fr: "Détails des enfants",
+  },
+  classGroup: {
+    ar: "القسم / المجموعة",
+    en: "Class / Group",
+    fr: "Classe / Groupe",
+  },
   reports: {
     ar: "التقارير",
     en: "Reports",

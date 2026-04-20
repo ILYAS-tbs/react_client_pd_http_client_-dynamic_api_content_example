@@ -76,6 +76,7 @@ const ParentDashboard: React.FC = () => {
   // ! Fetch from the API
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [selectedSchoolId, setSelectedSchoolId] = useState("all");
 
   const [uploads, setUploads] = useState<TeacherUpload[]>([]);
 
@@ -262,16 +263,55 @@ const ParentDashboard: React.FC = () => {
     void get_parent_students_summary(overviewSemester);
   }, [overviewSemester]);
 
-  useEffect(() => {
-    if (!students.length) return;
+  const schoolOptions = useMemo(() => {
+    const uniqueSchools = new Map<string, string>();
+    students.forEach((student) => {
+      const schoolId = student.school?.school_id;
+      const schoolName = student.school?.school_name;
+      if (schoolId && schoolName) {
+        uniqueSchools.set(String(schoolId), schoolName);
+      }
+    });
 
-    const selectedStillExists = students.some(
+    return Array.from(uniqueSchools.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((left, right) => left.name.localeCompare(right.name));
+  }, [students]);
+
+  useEffect(() => {
+    if (selectedSchoolId === "all") {
+      return;
+    }
+
+    const schoolStillExists = schoolOptions.some((school) => school.id === selectedSchoolId);
+    if (!schoolStillExists) {
+      setSelectedSchoolId("all");
+    }
+  }, [schoolOptions, selectedSchoolId]);
+
+  const filteredStudents = useMemo(() => {
+    if (selectedSchoolId === "all") {
+      return students;
+    }
+
+    return students.filter(
+      (student) => String(student.school?.school_id ?? "") === selectedSchoolId
+    );
+  }, [selectedSchoolId, students]);
+
+  useEffect(() => {
+    if (!filteredStudents.length) {
+      setSelectedStudentId("");
+      return;
+    }
+
+    const selectedStillExists = filteredStudents.some(
       (student) => student.student_id === selectedStudentId
     );
     if (!selectedStillExists) {
-      setSelectedStudentId(students[0]!.student_id);
+      setSelectedStudentId(filteredStudents[0]!.student_id);
     }
-  }, [students, selectedStudentId]);
+  }, [filteredStudents, selectedStudentId]);
 
   useEffect(() => {
     if (!selectedStudentId) return;
@@ -311,6 +351,47 @@ const ParentDashboard: React.FC = () => {
     () => students.find((student) => student.student_id === selectedStudentId) ?? null,
     [selectedStudentId, students]
   );
+
+  const studentSchoolLookup = useMemo(() => {
+    const lookup = new Map<string, { schoolId: string; schoolName: string }>();
+    students.forEach((student) => {
+      lookup.set(student.student_id, {
+        schoolId: String(student.school?.school_id ?? ""),
+        schoolName: student.school?.school_name ?? "—",
+      });
+    });
+    return lookup;
+  }, [students]);
+
+  const filteredStudentsSummary = useMemo(() => {
+    return studentsSummary.filter((summary) => {
+      const summarySchoolId = summary.schoolId ?? studentSchoolLookup.get(summary.studentId)?.schoolId ?? "";
+      return selectedSchoolId === "all" || summarySchoolId === selectedSchoolId;
+    });
+  }, [selectedSchoolId, studentSchoolLookup, studentsSummary]);
+
+  const groupedStudentsSummary = useMemo(() => {
+    const groups = new Map<string, { schoolId: string; schoolName: string; rows: ParentStudentSummary[] }>();
+
+    filteredStudentsSummary.forEach((summary) => {
+      const schoolInfo = studentSchoolLookup.get(summary.studentId);
+      const schoolId = summary.schoolId ?? schoolInfo?.schoolId ?? "unknown";
+      const schoolName = summary.schoolName ?? schoolInfo?.schoolName ?? "—";
+
+      if (!groups.has(schoolId)) {
+        groups.set(schoolId, { schoolId, schoolName, rows: [] });
+      }
+
+      groups.get(schoolId)!.rows.push(summary);
+    });
+
+    return Array.from(groups.values())
+      .map((group) => ({
+        ...group,
+        rows: [...group.rows].sort((left, right) => left.name.localeCompare(right.name)),
+      }))
+      .sort((left, right) => left.schoolName.localeCompare(right.schoolName));
+  }, [filteredStudentsSummary, studentSchoolLookup]);
 
   const selectedStudents = selectedStudent ? [selectedStudent] : [];
 
@@ -503,7 +584,7 @@ const ParentDashboard: React.FC = () => {
             userType="parent"
             teachers_list={teachers_list}
             parent_id={parent_id ?? 0}
-            students={students}
+            students={filteredStudents}
             selectedStudentId={selectedStudentId}
           />
         );
@@ -517,14 +598,14 @@ const ParentDashboard: React.FC = () => {
           />
         );
       case "exam_schedule":
-        return <ParentExamScheduleManagement students={students} selectedStudentId={selectedStudentId} />;
+        return <ParentExamScheduleManagement students={filteredStudents} selectedStudentId={selectedStudentId} />;
       case "weekly_menu":
-        return <ParentWeeklyMealsManagement students={students} />;
+        return <ParentWeeklyMealsManagement students={filteredStudents} />;
 
       case "homework":
         return (
           <ParentHomeworks
-            students={students}
+            students={filteredStudents}
             selectedStudentId={selectedStudentId}
             onSelectedStudentChange={setSelectedStudentId}
           />
@@ -625,38 +706,55 @@ const ParentDashboard: React.FC = () => {
                     <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4" />
                     <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
                   </div>
-                ) : studentsSummary.length === 0 ? (
+                ) : groupedStudentsSummary.length === 0 ? (
                   <div className="col-span-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-10 border border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
                     {getTranslation("noStudentsFound", language)}
                   </div>
                 ) : (
-                  studentsSummary.map((summary) => {
-                    return (
-                      <div
-                        key={summary.studentId}
-                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 p-5 sm:p-6 transition-all duration-300"
-                      >
-                        <div className="flex items-start justify-between gap-4 min-w-0">
-                          <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                            <div className="bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/40 dark:to-primary-800/40 p-2 sm:p-3 rounded-full flex-shrink-0">
-                              <UserIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 dark:text-primary-300" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
-                                {summary.name}
-                              </h3>
-                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
-                                {summary.className || "—"}
-                              </p>
-                            </div>
-                          </div>
-                          <span className={`inline-flex max-w-full self-start px-3 py-1.5 rounded-full text-xs font-bold text-center leading-tight whitespace-normal break-words ${getSummaryBadgeClass(summary.status)}`}>
-                            {getSummaryLabel(summary.status)}
-                          </span>
+                  groupedStudentsSummary.map((group) => (
+                    <div key={group.schoolId} className="col-span-full space-y-4">
+                      <div className="flex flex-col gap-3 rounded-2xl border border-primary-100 bg-white/90 px-5 py-4 shadow-sm dark:border-primary-900/40 dark:bg-gray-900/40 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-500 dark:text-primary-300">
+                            {getTranslation("schoolName", language)}
+                          </p>
+                          <h3 className="mt-1 text-xl font-bold text-gray-900 dark:text-white">
+                            {group.schoolName}
+                          </h3>
+                        </div>
+                        <div className="inline-flex items-center rounded-full bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700 dark:bg-primary-950/40 dark:text-primary-200">
+                          {group.rows.length}
                         </div>
                       </div>
-                    );
-                  })
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-7">
+                        {group.rows.map((summary) => (
+                          <div
+                            key={summary.studentId}
+                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 p-5 sm:p-6 transition-all duration-300"
+                          >
+                            <div className="flex items-start justify-between gap-4 min-w-0">
+                              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                                <div className="bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/40 dark:to-primary-800/40 p-2 sm:p-3 rounded-full flex-shrink-0">
+                                  <UserIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary-600 dark:text-primary-300" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">
+                                    {summary.name}
+                                  </h3>
+                                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                                    {summary.className || "—"}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className={`inline-flex max-w-full self-start px-3 py-1.5 rounded-full text-xs font-bold text-center leading-tight whitespace-normal break-words ${getSummaryBadgeClass(summary.status)}`}>
+                                {getSummaryLabel(summary.status)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
                 )}
               </div>
             </div>
@@ -678,33 +776,55 @@ const ParentDashboard: React.FC = () => {
     >
       {students.length > 0 && (
         <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 {getTranslation("selectStudent", language)}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                {selectedStudent?.full_name ?? getTranslation("selectStudentPrompt", language)}
+                {selectedStudent
+                  ? `${selectedStudent.full_name} - ${selectedStudent.school?.school_name ?? "—"}`
+                  : getTranslation("selectStudentPrompt", language)}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 sm:justify-end">
-              {students.map((student) => {
-                const isActive = student.student_id === selectedStudentId;
-                return (
-                  <button
-                    key={student.student_id}
-                    type="button"
-                    onClick={() => setSelectedStudentId(student.student_id)}
-                    className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${isActive
-                        ? "border-primary-500 bg-primary-500 text-white"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-primary-300 hover:text-primary-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-primary-500 dark:hover:text-primary-300"
-                      }`}
-                    aria-pressed={isActive}
-                  >
-                    {student.full_name}
-                  </button>
-                );
-              })}
+            <div className="grid gap-4 lg:grid-cols-[220px,1fr] lg:items-start">
+              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/40">
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  {getTranslation("schoolName", language)}
+                </label>
+                <select
+                  value={selectedSchoolId}
+                  onChange={(event) => setSelectedSchoolId(event.target.value)}
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                >
+                  <option value="all">{getTranslation("all", language)}</option>
+                  {schoolOptions.map((school) => (
+                    <option key={school.id} value={school.id}>
+                      {school.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-wrap gap-2 sm:justify-end">
+                {filteredStudents.map((student) => {
+                  const isActive = student.student_id === selectedStudentId;
+                  return (
+                    <button
+                      key={student.student_id}
+                      type="button"
+                      onClick={() => setSelectedStudentId(student.student_id)}
+                      className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${isActive
+                          ? "border-primary-500 bg-primary-500 text-white"
+                          : "border-gray-300 bg-white text-gray-700 hover:border-primary-300 hover:text-primary-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-primary-500 dark:hover:text-primary-300"
+                        }`}
+                      aria-pressed={isActive}
+                    >
+                      {student.full_name}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
           {isLoadingStudentScope && (

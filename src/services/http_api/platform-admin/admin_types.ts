@@ -67,6 +67,51 @@ export interface User {
   admin_status?: boolean | null;
 }
 
+export interface ParentChild {
+  id: string;
+  student_name: string;
+  school_id: number | null;
+  school_name: string | null;
+  class_group_id: string | null;
+  class_group_name: string | null;
+}
+
+export interface ParentSchoolLink {
+  school_id: number;
+  school_name: string | null;
+}
+
+export interface ParentFamily {
+  id: number;
+  full_name: string;
+  email: string;
+  total_children: number;
+  total_schools: number;
+  schools_involved: ParentSchoolLink[];
+  children: ParentChild[];
+  created_at: string;
+  phone_number?: string | null;
+  relationship_to_student?: string | null;
+  address?: string | null;
+}
+
+export interface ParentsPerSchoolStat {
+  school_id: number;
+  school_name: string;
+  parents_count: number;
+  students_count: number;
+}
+
+export interface ParentFamilyStats {
+  total_parents: number;
+  total_students: number;
+  average_children_per_parent: number;
+  parents_with_1_child: number;
+  parents_with_2_children: number;
+  parents_with_3_plus_children: number;
+  parents_per_school: ParentsPerSchoolStat[];
+}
+
 // Report Management
 export interface AbsenceReport {
   id: string;

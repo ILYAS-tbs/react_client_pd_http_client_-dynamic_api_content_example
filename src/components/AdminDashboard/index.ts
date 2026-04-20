@@ -6,6 +6,7 @@ export { ReportsManagement } from "./ReportsManagement";
 export { AnnouncementsManagement } from "./AnnouncementsManagement";
 export { MembershipsManagement } from "./MembershipsManagement";
 export { ActivityCenter } from "./ActivityCenter";
+export { ParentsFamiliesManagement } from "./ParentsFamiliesManagement";
 export { StatsCard, StatsGrid } from "./StatsCard";
 export { PaginationControls } from "./PaginationControls";
 export { LoadingSpinner, ErrorAlert, SuccessAlert } from "./ui";

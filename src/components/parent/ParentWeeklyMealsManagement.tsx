@@ -11,6 +11,9 @@ const ParentWeeklyMealsManagement: React.FC<ParentWeeklyMealsManagementProps> = 
   const { language } = useLanguage();
   const [weeklyMeals, setWeeklyMeals] = useState<ParentWeeklyMeal[]>([]);
   const [loading, setLoading] = useState(false);
+  const visibleStudentIds = new Set(students.map((student) => student.student_id));
+
+  const visibleWeeklyMeals = weeklyMeals.filter((row) => visibleStudentIds.has(row.student_id));
 
   useEffect(() => {
     const fetchWeeklyMeals = async () => {
@@ -40,7 +43,7 @@ const ParentWeeklyMealsManagement: React.FC<ParentWeeklyMealsManagementProps> = 
               <Calendar className="h-12 w-12 mx-auto mb-3 animate-pulse text-gray-300" />
               <p>{getTranslation("loading", language)}</p>
             </div>
-          ) : students.length === 0 || weeklyMeals.length === 0 ? (
+          ) : students.length === 0 || visibleWeeklyMeals.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-300" />
               <p>{getTranslation("noWeeklyMealsAvailable", language)}</p>
@@ -61,7 +64,7 @@ const ParentWeeklyMealsManagement: React.FC<ParentWeeklyMealsManagementProps> = 
                 </tr>
               </thead>
               <tbody>
-                {weeklyMeals.map((row) => (
+                {visibleWeeklyMeals.map((row) => (
                   <tr key={row.student_id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
                       {row.student_name}

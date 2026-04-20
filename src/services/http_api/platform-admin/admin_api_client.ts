@@ -4,6 +4,8 @@ import {
   PlatformAdmin,
   School,
   User,
+  ParentFamily,
+  ParentFamilyStats,
   AbsenceReport,
   BehaviourReport,
   Announcement,
@@ -43,6 +45,11 @@ const URLS = {
   user_reactivate: `${BASE_URL}/users/{id}/reactivate/`,
   user_bulk_deactivate: `${BASE_URL}/users/bulk_deactivate/`,
   user_bulk_reactivate: `${BASE_URL}/users/bulk_reactivate/`,
+
+  // Parent Families Management
+  parents: `${BASE_URL}/parents/`,
+  parent_detail: `${BASE_URL}/parents/{id}/`,
+  parent_stats: `${BASE_URL}/parents/stats/`,
 
   // Report Management
   reports: `${BASE_URL}/reports/`,
@@ -369,6 +376,43 @@ export const adminApiClient = {
       method: "POST",
       body: JSON.stringify({ user_ids: userIds }),
     }, csrfToken);
+  },
+
+  // ============== PARENT FAMILIES MANAGEMENT ==============
+  async listParents(
+    page: number = 1,
+    pageSize: number = 20,
+    filters?: {
+      school?: number | string;
+      min_children?: number;
+      max_children?: number;
+      created_from?: string;
+      created_to?: string;
+      search?: string;
+      ordering?: string;
+    }
+  ): Promise<PaginatedResponse<ParentFamily>> {
+    return makeRequest(
+      `${URLS.parents}${buildQuery({
+        page,
+        page_size: pageSize,
+        school: filters?.school,
+        min_children: filters?.min_children,
+        max_children: filters?.max_children,
+        created_from: filters?.created_from,
+        created_to: filters?.created_to,
+        search: filters?.search,
+        ordering: filters?.ordering,
+      })}`
+    );
+  },
+
+  async getParent(id: number): Promise<ParentFamily> {
+    return makeRequest(URLS.parent_detail.replace("{id}", id.toString()));
+  },
+
+  async getParentStats(): Promise<ParentFamilyStats> {
+    return makeRequest(URLS.parent_stats);
   },
 
   // ============== REPORT MANAGEMENT ==============
