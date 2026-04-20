@@ -1,7 +1,16 @@
 import React from 'react';
-import { GraduationCap, Phone, Mail, MapPin, Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF, SOCIAL_LINKS } from '../lib/platformContacts.ts';
+
+function TiktokIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M14 3c.18 1.54 1.05 3.04 2.32 4.08A6.3 6.3 0 0 0 20 8.48v3.08a9.26 9.26 0 0 1-3.12-.54 9.53 9.53 0 0 1-1.88-.92v5.67a5.77 5.77 0 0 1-1.62 4.01A5.98 5.98 0 0 1 9 21.5a6 6 0 0 1-4.24-1.74A5.77 5.77 0 0 1 3 15.75a5.77 5.77 0 0 1 1.76-4.01A6 6 0 0 1 9 10c.34 0 .68.03 1 .09v3.15A2.78 2.78 0 0 0 9 13.05c-1.66 0-3 1.22-3 2.7s1.34 2.7 3 2.7 3-1.22 3-2.7V3h2Z" />
+    </svg>
+  );
+}
 
 export function Footer() {
   const { language, isRTL } = useLanguage();
@@ -32,10 +41,10 @@ export function Footer() {
   ];
 
   const socialLinks = [
-    { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
-    { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-    { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+    { icon: Facebook, href: SOCIAL_LINKS.facebook, label: 'Facebook' },
+    { icon: Instagram, href: SOCIAL_LINKS.instagram, label: 'Instagram' },
+    { icon: Linkedin, href: SOCIAL_LINKS.linkedin, label: 'LinkedIn' },
+    { icon: TiktokIcon, href: SOCIAL_LINKS.tiktok, label: 'TikTok' },
   ];
 
   const scrollToSection = (href: string) => {
@@ -149,7 +158,12 @@ export function Footer() {
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <Phone className="w-5 h-5 text-primary-500 flex-shrink-0" />
                 <div>
-                  <p className="text-gray-300">+213 21 123 456</p>
+                  <a
+                    href={`tel:${CONTACT_PHONE_HREF}`}
+                    className="text-gray-300 hover:text-primary-400"
+                  >
+                    {CONTACT_PHONE_DISPLAY}
+                  </a>
                   <p className="text-gray-400 text-sm">
                     {language === 'ar' ? 'الأحد - الخميس، 8:00 - 17:00' :
                       language === 'fr' ? 'Dim - Jeu, 8:00 - 17:00' :
@@ -161,7 +175,12 @@ export function Footer() {
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <Mail className="w-5 h-5 text-primary-500 flex-shrink-0" />
                 <div>
-                  <p className="text-gray-300">info@pedaconnect.dz</p>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="text-gray-300 hover:text-primary-400"
+                  >
+                    {CONTACT_EMAIL}
+                  </a>
                   <p className="text-gray-400 text-sm">
                     {language === 'ar' ? 'دعم العملاء' :
                       language === 'fr' ? 'Support Client' :

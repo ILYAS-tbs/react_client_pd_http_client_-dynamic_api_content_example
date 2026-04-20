@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Phone, Mail, MapPin, Send, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../utils/translations';
-
-const CONTACT_EMAIL = 'pedaconnect0@gmail.com';
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF } from '../lib/platformContacts.ts';
 
 type SubmissionNotice = {
   type: 'success' | 'error';
@@ -110,7 +109,7 @@ export function Contact() {
     {
       icon: Phone,
       title: language === 'ar' ? 'الهاتف' : language === 'fr' ? 'Téléphone' : 'Phone',
-      primary: '+213 21 123 456',
+      primary: CONTACT_PHONE_DISPLAY,
       secondary: language === 'ar' ? 'الأحد - الخميس، 8:00 - 17:00' :
         language === 'fr' ? 'Dim - Jeu, 8:00 - 17:00' :
           'Sun - Thu, 8:00 AM - 5:00 PM'
@@ -358,6 +357,13 @@ export function Contact() {
                       {info.icon === Mail ? (
                         <a
                           href={`mailto:${CONTACT_EMAIL}`}
+                          className="text-primary-500 font-medium hover:text-primary-600"
+                        >
+                          {info.primary}
+                        </a>
+                      ) : info.icon === Phone ? (
+                        <a
+                          href={`tel:${CONTACT_PHONE_HREF}`}
                           className="text-primary-500 font-medium hover:text-primary-600"
                         >
                           {info.primary}
